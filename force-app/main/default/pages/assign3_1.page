@@ -1,0 +1,23 @@
+<apex:page controller="assign3_1_controller">
+<apex:form >
+  <apex:selectList value="{!s}" size="1" >
+                    <apex:selectOptions value="{!options}"/>
+
+      </apex:selectList>
+      <br/>
+      <br/>
+      Gender:<apex:selectRadio value="{!s1}">
+       <apex:selectOptions value="{!glist}"/>
+      </apex:selectRadio>
+      
+     Hobbies:  <apex:selectList value="{!s2}" size="1" >
+           <apex:selectOptions value="{!hlist}"/>
+
+      </apex:selectList>
+      <br/>
+      <br/>
+      
+      <apex:commandButton value="Show" action="{!go}"/>
+  <apex:outputText >{!s}</apex:outputText>
+  </apex:form>
+  </apex:page>

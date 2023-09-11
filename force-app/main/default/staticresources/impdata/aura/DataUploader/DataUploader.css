@@ -1,0 +1,20 @@
+/* remove the "or drop files" label from the right of the lightning:input type file */
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{
+    display: none;
+}
+.THIS .heading {
+    font-weight: bold;
+    font-size : 18px;
+}
+
+.THIS th, .THIS td { 
+    padding: 10px; 
+    vertical-align: center;
+    float: center;
+}
+
+.THIS table { 
+    border-collapse: separate; 
+    border-spacing: 10px; 
+    margin: 0 auto;
+}

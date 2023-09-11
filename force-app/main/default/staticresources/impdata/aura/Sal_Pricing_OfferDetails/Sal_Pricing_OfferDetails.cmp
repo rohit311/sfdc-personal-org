@@ -1,0 +1,158 @@
+<aura:component  controller="SAL_PricingCtrlV2"> 
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType':'Applicant__c'}"/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{}"/>
+    <aura:attribute name="oppId" type="Id" />
+    <aura:attribute name="lineoptedList" type="List" />
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="elitecardoption" type="List"/><!--22017-->
+    <aura:attribute name="emicardoption" type="List"/><!--22017-->
+	 <aura:attribute name="loan" type="Opportunity"/><!--24667-->
+    <aura:attribute name="addOnSolList" type="List"/><!--24667-->
+    <aura:attribute name="NoOfAddCards" type="String" /><!-- 24667-->
+    <!-- <aura:attribute name="poList" type="List" />24667-->
+    <aura:attribute name="DisableAdd" type="Boolean" default="false" /><!-- 24667-->
+    <aura:attribute name="isPreapproved" type="Boolean" default="false"/><!--24667-->
+     <aura:handler name="init" action="{!c.doInit}" value="{!this}"/><!--24667-->
+    <aura:handler name="updateAddOnSolList" event="c:AddOnCardEvent" action="{!c.handleUpdateSol}"/><!--24667-->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <div style="position:relative">
+        <ui:scrollerWrapper class="scrollerSize">
+            <div class="innerDivWrapper">        
+                <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <label class="slds-form-element__label"> FFR Subscribe </label>
+                        <div class="slds-form-element__control">
+                            <lightning:input name="ffrSubscribe" type="checkbox" label="" checked="{!v.applicantObj.Financial_Health_Check_Guide__c}" aura:id="ffrSubscribe" />
+                        </div>
+                    </div>
+                     <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                                <lightning:select aura:id="elitecard" name="elitecard" label="Elite Card " value="{!v.applicantObj.Elite_card_product__c}">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.elitecardoption}" var="eliteopt">
+                                        <option value="{!eliteopt.label}" text="{!eliteopt.value}" selected="{!v.applicantObj.Elite_card_product__c == eliteopt.label}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                         <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="emicard" name="emicard" label="EMI Card " value="{!v.applicantObj.EMI_Card__c}">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.emicardoption}" var="emiopt">
+                                        <option value="{!emiopt.label}" text="{!emiopt.value}" selected="{!v.applicantObj.EMI_Card__c == emiopt.label}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input label="Line Eligibility" name="lineeligibility" aura:id="lineeligibility" value="{!v.scam.Line_assigned_basis_Credit_Assessment__c}" disabled="true"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="lineopted" name="lineopted" label="Line Opted" value="{!v.scam.Line_opted__c}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.lineoptedList}" var="lineopt">
+                                    <option value="{!lineopt}" text="{!lineopt}" selected="{!v.scam.Line_opted__c == lineopt}"></option>
+                                </aura:iteration>
+                            </lightning:select>                   
+                            
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                    <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                        <lightning:button variant="brand" iconName="utility:save" onclick="{!c.saveOffers}" aura:id="save" label="Save" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                        
+                    </div>
+                </div>
+            </div>
+        </ui:scrollerWrapper>
+    </div>
+      <!-- Added for Bug 24667 Start-->  
+    ADD-ON CARDS DETAILS
+    <aura:iteration items="{!v.addOnSolList}" var="solobj">
+       <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+            <div class="applyColor">
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--5-of-6">
+                        <div class="" role="">
+                            <button value="{!solobj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse " aura:id="edit_btn" onclick="{!c.editRecord}" title="Edit" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                            <button value="{!solobj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                            <!-- 20391-S -->
+                            
+							                        </div>
+                    </div>
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">First Name:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="firstName" value="{!solobj.Add_on_Holder_First_Name__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Last Name:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="lastName" value="{!solobj.Add_on_Holder_Last_Name__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Mobile Number:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="MobNo" value="{!solobj.Add_on_holder_Mobile__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Date Of Birth:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="DOB" value="{!solobj.Add_on_Holder_DOB__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Email:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="email" value="{!solobj.Add_on_Holder_Email__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Charge Amount:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="email" value="{!solobj.Charge_Type__c}"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p>
+            </div>
+    
+        </div>
+        
+    </aura:iteration>
+    <!--Bug 24313 Start-->
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="overrideModalbox" class="slds-modal slds-align_absolute-center">
+        <div class="slds-modal__container">
+            <div class="slds-modal__content  slds-p-around--medium " style=" padding-left: 16px; ">         
+                E-application Form and E-agreement consent is already taken. Revised acceptance will have to be taken. Do you want to proceed?
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">No</button>
+                <button class="slds-button slds-button--neutral" onclick="{!c.saveoffersModal}">Yes</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    <!--Bug 24313 end-->
+    <div class="slds-box" style="background: #f4f6f9;">
+        <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+        <lightning:button class="slds-button slds-theme--alt-inverse slds-button--brand" aura:id="add_btn" onclick="{!c.addNewRecord}" title="Add New" disabled="{!v.DisableAdd}"><lightning:icon iconName="utility:add" size="small" variant="inverse"/></lightning:button>
+        </div>
+        </div>
+    <br/>
+     <!-- Added for Bug 24667 Stop-->  
+    {!v.body}
+</aura:component>

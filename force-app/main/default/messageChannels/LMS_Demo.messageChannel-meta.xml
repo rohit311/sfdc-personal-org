@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Winter 20 - LMS Demo.</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>Dual list box</description>
+        <fieldName>selectedValues</fieldName>
+    </lightningMessageFields>
+    <masterLabel>LMS_Demo</masterLabel>
+</LightningMessageChannel>

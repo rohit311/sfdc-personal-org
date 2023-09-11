@@ -1,0 +1,5 @@
+<apex:page standardController="Lead" extensions="DetailButtonController">
+    <apex:form >
+        <apex:commandButton value="Do something" action="{!doSomething}" oncomplete="return false;"/>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="To navigate to particular Tab">
+     <aura:attribute name="TabId" type="String"/>
+</aura:event>

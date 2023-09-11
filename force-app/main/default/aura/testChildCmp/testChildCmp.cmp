@@ -1,0 +1,5 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+	<aura:method name="dummyMethod" action="{!c.testMethod}" access="public">
+        <aura:attribute name="param1" type="String"/>
+    </aura:method>
+</aura:component>

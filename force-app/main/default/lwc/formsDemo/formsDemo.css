@@ -1,0 +1,13 @@
+.mycls .slds-media__body {
+  flex: 0 !important;
+}
+
+.inp-cls .slds-input {
+  --sds-c-input-color-background: red;
+  background-color: red;
+}
+
+.fixed-width {
+  border: 1px solid red;
+  flex: 1 1 0;
+}

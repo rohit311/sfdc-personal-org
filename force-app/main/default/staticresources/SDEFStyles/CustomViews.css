@@ -1,0 +1,1070 @@
+.bmcButtonArrowUp {
+	background: url(SDEFbuttons/b_darrow_U_new.gif) !important;
+	width:20px;
+	height:20px;
+	
+}
+
+.bmcButtonArrowDown {
+	background: url(SDEFbuttons/b_darrow_D_new.gif) !important;
+	width:20px;
+	height:20px;
+	
+}
+.bmcButtonArrowMoveTop {
+	background: url(SDEFbuttons/b_move_to_top.gif) !important;
+	width:20px;
+	height:20px;
+}
+
+.bmcButtonArrowMoveBottom {
+	background: url(SDEFbuttons/b_move_to_bottom.gif) !important;
+	width:20px;
+	height:20px;
+}
+.bmcSort {
+	background: url(SDEFbuttons/sort_icon_4.png) !important;
+	width:20px;
+	height:20px;
+	
+}
+.bmcSortDisable {
+	background: url(SDEFbuttons/btn_sort_disable.png) !important;
+	width:20px;
+	height:20px;
+	
+}
+.bmcMultiEditValues {
+	background: url(SDEFbuttons/btn_multi-edit.png) !important;
+	width:20px;
+	height:20px;
+	
+}
+.bmcMultiEditValuesDisable {
+	background: url(SDEFbuttons/btn_multi-edit_disable.png) !important;
+	width:20px;
+	height:20px;
+	
+}
+
+.requiredBlock {
+    display:none !important;
+}
+.custom { padding: 0.5em 0.8em 0.8em 1em; }
+.critical { background: #FFFFE7; border: 1px solid black;}
+
+.clsFieldSetMainFormLabelTD,.clsFieldSetMainFormLabelTD1{
+  white-space: normal;
+  padding-left:10px;
+  font-family: Tahoma, MS Sans Serif;
+  font-size: 11px;
+  width:27%;
+
+}
+.clsFieldSetMainFormLabelTD1{
+  width:26%;
+}
+.clsFieldSetMainFormTextBoxTD,.clsFieldSetMainFormTextBoxTD1{
+  white-space: normal;
+  padding-left:2px;
+  width:73%;
+  padding-top:5px;
+}
+.clsFieldSetMainFormTextBoxTD1{
+width:74%;
+}
+.clsFieldSetMainFormTextBox {
+    border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    color: #000000;
+     *height: 19px;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    padding-left: 5px;
+    padding-top: 1px;
+    vertical-align: top;
+    width: 197px;
+
+}
+.clsInputCheckBoxCustom
+{
+	vertical-align: top;
+	color: #000000;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	width:14px;
+	height:14px;
+	*width:14px !important;
+	*height:14px !important;
+	padding: 0px;
+	margin: 0px;
+	padding-left: 0px;
+	border:none;
+} 
+.clsAccordianCheckBoxCustom
+{
+	vertical-align: top;
+	color: #000000;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	width:14px;
+	height:14px;
+	*width:14px !important;
+	*height:14px !important;
+	padding: 0px;
+	margin-left: 3px;
+	*margin-left: 10px;
+	padding-left: 0px;
+	border:none;
+} 
+.clsFieldSetMainFormTable select {
+     border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    color: #000000;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    padding-left: 5px;
+    padding-top: 1px;
+    vertical-align: top;
+	height: 19px;
+    width:204px;
+    *width:195x;  
+}
+.clsFieldSetMainFormTable input[type=checkbox] {
+       float:left;
+       border:none; 
+       border:0px;  
+}
+.clsFieldSetAccordianTable {
+  width:275px;
+  background:#FFFFFF;
+}
+
+.clsFieldSetAccordianLabelTD{
+ 
+ white-space: normal;
+ font-family: Tahoma, MS Sans Serif;
+ font-size: 11px;
+ width:35%;
+ padding-left: 8px;
+
+}
+.clsFieldSetAccordianTextBoxTD{
+ white-space: normal;
+ font-family: Tahoma, MS Sans Serif;
+ font-size: 11px;
+ width:65%;
+
+}
+.clsFieldSetAccordianTextBox,.clsFieldSetAccordianTexBoxReadOnly{
+    border: 1px solid grey;
+    vertical-align: top;
+    width: 130px;
+    height: 18px;
+	*height: 19px;
+    color: #000000;
+    font-family: Tahoma, MS Sans Serif;
+    font-size: 11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding-left: 5px;
+    margin-left:3px;
+	*margin-left:10px;
+}
+.clsFieldSetAccordianTexBoxReadOnly {
+ background-color: #D4D0C8;
+}
+.clsFSMainPanTextBoxTask,.clsFSMainPanTexBoxReadOnlyTask{
+    border: 1px solid grey;
+    vertical-align: top;
+    width: 195px;
+    *height: 19px;
+    color: #000000;
+    font-family: Tahoma, MS Sans Serif;
+    font-size: 11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding-left: 5px;
+    margin-left:0px;
+	height: 17px;
+}
+.clsFSMainPanTexBoxReadOnlyTask{
+ background-color: #D4D0C8;	
+}
+.clsFieldSetTexBoxReadOnlyWOBorder{
+		border: 0px;
+		margin: 0px;
+}
+.clsFieldSetAccordianTable input[type=checkbox] {
+       float:left;
+       border:none; 
+       border:0px;   
+}
+.clsFieldSetAccordianTexArea {
+    height: 55px;
+    width: 130px;
+    padding-left:5px;
+    overflow: auto;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    font-family:Tahoma,MS Sans Serif;
+    font-size:11px;
+    margin-left:3px;
+	*margin-left:10px;
+   
+}
+.clsFieldSetAccordianTable select {
+       border: 1px solid grey;
+    vertical-align: top;
+	width: 137px;
+    *width: 130px;
+    height: 19px;
+    color: #000000;
+    font-family: Tahoma, MS Sans Serif;
+    font-size: 11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding-left: 5px;
+    margin-left:3px;
+	*margin-left:10px;
+    
+}
+.popUpWindowClass .x-window-header{
+	 background: url(SDEFimages/top-bottom.png) repeat 0px 0px transparent;
+	 height:25px;
+	 padding-top:5px;
+	 border:none;
+}
+.popUpWindowClass .x-window-body {
+	border:5px solid #CCD8E7;
+}
+.popUpWindowClass{
+	border:1px solid #999999;
+	border-top:none;;
+	background:#FFFFFF;
+
+}
+
+.overlayDialog .topLeft h2, .inlineOverlayDialog .topLeft h2, div.x-window .x-window-header-text {
+    padding-left:10px;
+    line-height:150%;          
+    color:#06629F;
+    padding-top:10px;
+    font-family:Tahoma, MS Sans Serif;
+    font-size:12px;
+    font-weight:bold;
+}
+  
+.dialogClose, .dialogCloseOn, div.x-window .x-tool-close, div.x-window .x-tool-close-over {
+    background: url(SDEFbuttons/b_close.png);
+    height: 20px;
+    width: 20px; 
+	margin-right: 5px;
+}
+.dialogCloseOn, div.x-window div.x-tool-close-over {
+   height: 20px;
+    width: 20px; 
+    background: url(SDEFbuttons/b_close.png);
+    background-position:none;
+}
+.overlayDialog .topRight, .inlineOverlayDialog .topRight, div.x-window div.x-window-tl {
+    background: url(SDEFimages/overlay_crns.png) no-repeat scroll 0 0 transparent;
+	height: 30px;
+	border-color: -moz-use-text-color #999999;
+	border-style: none solid;
+	border-width: medium 1px;
+	padding-left: 0;
+	padding-right: 0;
+}
+.overlayDialog .topLeft, .inlineOverlayDialog .topLeft, div.x-window div.x-window-tr {
+    background: url(SDEFimages/overlayTopLft.png) no-repeat scroll left top transparent;
+	padding:none;
+   
+    
+}
+ .overlayDialog .middle, .inlineOverlayDialog .middle, div.x-window div.x-window-mr {
+    background: url(SDEFimages/overlayTopLft.png) repeat-x scroll left 0 #FFFFFF;
+	margin-top:-15px;
+    border:1px solid #999999;
+    border-top:none;
+    border-bottom:none;
+	padding-right:0;
+   
+}
+div.x-window .x-window-ml, div.x-window .x-window-bl{
+	padding-left: 0;
+}
+.overlayDialog .bottomRight, .inlineOverlayDialog .bottomRight {
+    background: url(SDEFimages/overlay_crns.png) no-repeat scroll right -235px transparent;
+    
+}
+.overlayDialog .bottomLeft, .inlineOverlayDialog .bottomLeft {
+    background: url(SDEFimages/overlayBtmLft.png) no-repeat scroll left bottom transparent;
+   
+}
+div.x-window div.x-window-mc {
+	background-color: #CCD9E8;
+ padding:12px 5px 0px;
+}
+div.x-window div.x-window-footer {
+    background: url(SDEFimages/overlay_crns_ext.png) no-repeat scroll right bottom transparent;
+   
+}
+div.x-window div.x-window-br {
+    background: url(SDEFimages/overlay_crns_ext.png) no-repeat scroll right bottom transparent;
+	
+}
+div.x-window div.x-panel-btns {
+    background: url(SDEFimages/overlayBtmLft.png) no-repeat scroll left bottom transparent;
+    
+}
+.btnShare.btn{
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	font-weight:normal;
+}
+.bmcExplorer:disabled {
+   background: url(SDEFbuttons/b_ci_explorer_disable.gif);
+   background-color: #E3E3E3;
+    margin: 1px;
+    border: none;
+    width: 24px;
+    height: 24px;
+}
+.bmcExplorer:hover {
+    background: url(SDEFbuttons/b_ci_explorer.gif);
+    background-color: #E3E3E3;
+    border: none;
+    width: 25px;
+    height: 25px;
+    cursor:pointer;
+}
+.bmcExplorer:disabled:hover {
+    background: url(SDEFbuttons/b_ci_explorer_disable.gif);
+    background-color: #E3E3E3;
+    border: none;
+    width: 25px;
+    height: 25px;
+    cursor:pointer;
+}
+.bmcUserInfoPopup:hover {
+   background: url(SDEFbuttons/b_user_info_popup.gif);
+   background-color: #E3E3E3;
+    margin: 1px;
+    border: none;
+    width: 24px;
+    height: 24px;
+}
+.bmcInfoPopup {
+	background-image: url(SDEFbuttons/Preview-Icon.png) !important;
+	background-color: transparent;
+	height: 20px;
+	width: 20px;
+	margin: 0% -30%;
+	border: none;
+	cursor:pointer;
+	float: right;
+}
+.tooltip {
+	border-bottom: 0px dotted #000000; 
+	color: #000000; 
+	outline: none;
+	text-decoration: none;
+	position: relative;
+}
+.tooltip span {
+	margin-left: -999em;
+	position: absolute;
+}
+.tooltipVisible{
+	border-radius: 5px 5px; 
+	-moz-border-radius: 5px; 
+	-webkit-border-radius: 5px; 
+	box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); 
+	-webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); 
+	-moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+	position: absolute; left: 1em; top: 2em; z-index: 99;
+	margin-left: 0 !important; 
+	width: auto;
+}
+
+.multiPickListClsTable{
+ width:100%;
+ margin-top:5px;
+ background:#FFFFFF;
+ 
+}
+.accordionMultiPickListClsTable{
+ width:100%;
+ margin-bottom:5px;
+ margin-top:5px;
+ background:#FFFFFF;
+ 
+}
+.multiPickListCls{
+ width:124px;
+ font: normal 11px Tahoma, MS Sans Serif; 
+} 
+.accordionMultiPickListCls{
+   width:99px;
+  *width:93px;
+ font: normal 11px Tahoma, MS Sans Serif; 
+}
+.multiPickListClsTD{
+ padding-left:10px; 
+} 
+.clsAccordianMultiPickListLabelTD{
+ white-space: normal;
+ font-family: Tahoma, MS Sans Serif;
+ font-size: 11px;
+ padding-left:10px;
+} 
+td.multiPickListClsTD img{
+ width:24px;
+}
+td.clsAccordianMultiPickListLabelTD img{
+ width:24px;
+}
+.picklistArrowLeft {
+  margin-top:-15px;
+  margin-left:8px;
+  margin-right:8px;
+  width:30px;
+  height: 20px;
+} 
+.picklistArrowRight {
+  margin-left:8px;
+   margin-right:8px;
+  width:30px;
+  height: 20px;
+} 
+.picklistArrowLeft,
+.picklistArrowRight,
+.rightArrowIcon,
+.leftArrowIcon,
+.doubleArrowUp,
+.upArrowIcon,
+.downArrowIcon,
+.doubleArrowDwn{
+background: url(SDEFimages/combobox_arrows_sprite.gif) no-repeat scroll 0 0 transparent;
+
+}
+.picklistArrowLeft, .leftArrowIcon {
+    background-position: left -60px;
+}
+.multiSelectPicklistTable .multiSelectPicklistRow .multiSelectPicklistCell {
+    vertical-align: middle;
+    background-color: #fff;
+}
+.clsFieldSetMainFormTable .dateOnlyInput input {
+  width: 197px;
+}
+.clsFieldSetAccordianTable .dateOnlyInput input {
+  width: 130px;
+  height: 15px;
+  *height: 19px;
+}
+/* Styles for Date picker
+.mCalendar {
+    margin: 5px;
+}
+.datePicker {
+    -moz-border-radius: 5px 5px 5px 5px;
+    -moz-box-shadow: 0 2px 6px #111111;
+    border: 0 none;
+    padding: 7px 5px 6px;
+    width: auto;
+}
+.datePicker, .mCalendar .body {
+    background-color: #EDEDED;
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: left -109px;
+    background-repeat: repeat-x;
+    border: 1px solid #D6D6D6;
+    border-top:1px solid #cccccc;
+    border-left:1px solid #cccccc;
+    border-right:1px solid #666666;
+    border-bottom:1px solid #666666;
+   
+}
+.datePicker .calBody {
+    border: 0 none;
+    padding: 0 10px;
+}
+.mCalendar .header .prevCalArrow, .datePicker .dateBar .calLeft, .datePicker .dateBar .calLeftOn {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -61px;
+    height: 16px;
+    width: 18px;
+}
+.datePicker .dateBar .calLeftOn {
+    background-position: -18px -61px;
+}
+.mCalendar .header .nextCalArrow, .datePicker .dateBar .calRight, .datePicker .dateBar .calRightOn {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -84px;
+    height: 16px;
+    width: 18px;
+}
+.datePicker .dateBar .calRightOn {
+    background-position: -18px -84px;
+}
+.datePicker .dateBar .calLeft, .datePicker .dateBar .calLeftOn {
+    margin: 2px 4px 0 0;
+}
+.datePicker .dateBar .calRight, .datePicker .dateBar .calRightOn {
+    margin: 2px 9px 0 4px;
+}
+.mCalendar .header td, .datePicker .calDays {
+    border: 0 none;
+    color: #4A4A56;
+    font-family: Arial,Helvetica,sans-serif;
+}
+.datePicker .dateBar {
+    padding: 0 0 4px;
+}
+.mCalendar .calDays, .datePicker .calDays .dayOfWeek {
+    color: #4A4A56;
+    font-size: 0.7em;
+    font-weight: normal;
+    padding: 2px;
+}
+.datePicker .calDays .dayOfWeek, .datePicker .calDays .weekday, .datePicker .calDays .weekend {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    padding: 2px 0;
+}
+.datePicker .calDays {
+    font-size: 1em;
+}
+.datePicker .calRow {
+    font-size: 0.81em;
+}
+.mCalendar .highlight td, .mCalendar .days td {
+    padding: 2px;
+}
+.mCalendar .highlight td a, .mCalendar .days td a, .datePicker .calDays td {
+    font-size: 0.8em;
+}
+.mCalendar td a.calActive, .mCalendar .calActive {
+    color: #333333;
+}
+.mCalendar .highlight, .mCalendar .highlight td, .mCalendar .highlight th {
+    background-color: transparent;
+}
+.mCalendar td a.calToday, .mCalendar tr td.calToday {
+    background-color: transparent;
+    border: 0 none;
+}
+.mCalendar tr td.calToday a, .datePicker .calDays .todayDate {
+    background-color: #1797C0;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+.mCalendar tr td.calToday a {
+    padding: 2px 3px;
+}
+.datePicker .calDays .highlight {
+    background-color: #E3F3FF;
+    color: #000000;
+    font-weight: bold;
+}
+.datePicker .calDays .selectedDate {
+    background-color: #C6E1FF;
+    border: 1px solid #99CCFF;
+    color: #000000;
+}
+.mCalendar .topLeft {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 0;
+    border: 0 none;
+    height: 4px;
+}
+.mCalendar .topLeft .topRight {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -16px;
+    height: 4px;
+    width: 4px;
+}
+.mCalendar .bottomLeft {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -31px;
+    height: 4px;
+}
+.mCalendar .bottomLeft .bottomRight {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -46px;
+    height: 4px;
+    width: 4px;
+}
+.datePicker .buttonBar {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    padding: 2px 0 0;
+}
+.datePicker .buttonBar .calToday {
+    color: #015BA7;
+    font-weight: normal;
+    text-decoration: none;
+}*/
+.homeCalendarEvents, #proposedEventDiv {
+    margin: 10px 10px 0;
+}
+.homeCalendarEvents .date {
+    color: #000000;
+    padding-top: 10px;
+}
+.homeCalendarEvents li {
+    border-color: #CCCCCC;
+    border-style: solid;
+}
+.homeCalendarEvents li.date {
+    border-bottom-color: #4A4A56;
+    border-width: 0 0 1px;
+}
+.homeCalendarEvents li.event {
+    border-bottom-color: #D4DADC;
+    border-width: 0 0 1px;
+}
+.homeCalendarEvents li.event span.event {
+    margin-right: 20px;
+}
+#homePage .bPageBlock .pbBody {
+    padding: 0;
+}
+.bCalendar .calendarHeaderBG, body.taskTab .calendarHeaderBG, body.eventTab .calendarHeaderBG {
+    background: none repeat scroll 0 0 transparent;
+    margin-top: 10px;
+}
+body.eventTab .calendarHeader > span, body.eventTab .bPageTitle, body.eventTab .bPageTitle .ptBreadcrumb, .bCalendar .calendarHeader > span, .bCalendar .bPageTitle, .bCalendar .ptBreadcrumb {
+    margin-bottom: 0;
+}
+body.eventTab .bPageTitle .content h1, .bCalendar .bPageTitle .content h1 {
+    margin-bottom: 5px;
+}
+body.eventTab .bPageTitle .content a, .bCalendar .bPageTitle .content a {
+    margin-left: 2px;
+    margin-right: 5px;
+}
+.calendarHeader label, .calendarHeader a {
+    color: #015BA7;
+    text-decoration: none;
+}
+.calendarHeader a:hover {
+    text-decoration: underline;
+}
+.calendarHeader .dateText {
+    font-size: 1.0em;
+    margin: 6px 10px 0;
+}
+.calendarHeader .arrowIcons {
+    margin: 5px 20px 0 0;
+}
+.calendarHeader .arrowIcons .prevCalArrow, .calendarHeader .arrowIcons .nextCalArrow {
+    background: url("/img/alohaSkin/nextPrevBtn_sprite.png") no-repeat scroll left top transparent;
+    height: 19px;
+    margin: 0;
+    width: 22px;
+}
+.calendarHeader .arrowIcons .nextCalArrow {
+    background-position: right top;
+}
+.calendarHeader .arrowIcons a:hover .prevCalArrow {
+    background-position: left -19px;
+}
+.calendarHeader .arrowIcons a:hover .nextCalArrow {
+    background-position: right -19px;
+}
+body .bodyDiv .bMultiuserCalendar .bPageBlock, body .bodyDiv .bCalendar .bPageBlock {
+    -moz-border-radius: 0 0 0 0;
+    border-color: #1797C0 -moz-use-text-color -moz-use-text-color #D0D0D0;
+    border-style: solid none none solid;
+    border-width: 2px 0 0 1px;
+}
+.calendarHeader .buttons {
+    margin-top: 2px;
+}
+.multiuserCalendar .calendarTable, .bMultiuserCalendar .calendarTable, .bCalendar .calendarBlock .calendarDayWeekView, .bCalendar .calendarMonthView {
+    border: 0 none;
+}
+.multiuserCalendar .calendarTable, .bMultiuserCalendar .calendarTable, .bCalendar .calendarBlock .calendarDayWeekView {
+    border-right: 1px solid #D0D0D0;
+}
+.multiuserCalendar .calendarTable .headerRow th, .bMultiuserCalendar .calendarTable .headerRow th, .bCalendar .calendarDayWeekView #daynamerow th, .bCalendar .calendarMonthView .headerRow td.upperLeft, .bCalendar .calendarMonthView .headerRow th {
+    background: url("/img/alohaSkin/calHeader_bg.png") repeat-x scroll left top #F0F0F0;
+    border-left: 0 none;
+    border-right: 1px solid #CCCCCC;
+    border-top: 1px solid #E7E7E7;
+    padding: 3px;
+}
+.multiuserCalendar .calendarTable .headerRow th, .bMultiuserCalendar .calendarTable .headerRow th, .bCalendar .calendarDayWeekView #daynamerow th {
+    border-bottom: 1px solid #C3C3C3;
+    border-left: 1px solid #CCCCCC;
+    border-right: 0 none;
+}
+.bMultiuserCalendar .calendarTable .headerRow .cbCol, .bMultiuserCalendar .calendarTable .dateRow .cbCol, .bCalendar .calendarDayWeekView #daynamerow .firstWeekCell {
+    border-left: 0 none;
+    padding: 0;
+}
+.multiuserCalendar .calendarTable .odd .cbCol, .multiuserCalendar .calendarTable .even .cbCol {
+    border-left: 1px solid #CCCCCC;
+}
+.bCalendar .bPageBlock .calendarDayWeekView, .bCalendar .calendarMonthView .calActive {
+    background-color: #FFFFFF;
+}
+.bCalendar .calendarMonthView td > div {
+    padding: 0 5px 10px;
+}
+.bMultiuserCalendar .calendarTable .dateRow th, .bMultiuserCalendar .calendarTable .dateRow td, .bCalendar .calendarDayWeekView #daynumberrow td, .bCalendar .calendarDayWeekView #daynumberrow th, .bCalendar .calendarMonthView .date {
+    background-color: #EBEBEB;
+    padding: 1px 3px;
+}
+.bMultiuserCalendar .calendarTable .dateRow th, .bMultiuserCalendar .calendarTable .dateRow td {
+    border-top: 0 none;
+}
+.bCalendar .calendarMonthView td .date a {
+    color: #000000;
+    text-decoration: underline;
+}
+.bCalendar .calendarDayWeekView .hourRowLabel, .bCalendar .calendarMonthView .weekLink {
+    background-color: #EAEAEA;
+}
+.bCalendar .calendarMonthView .calToday {
+    background-color: #F0FAFF;
+}
+.bCalendar .calendarMonthView .calToday .date {
+    background-color: #B8E4FB;
+}
+.bCalendar .calendarMonthView .calInactive {
+    background-color: #F4F4F4;
+}
+body.eventTab .recurrenceSectionBackground img, body.homeTab .homeCalendarEvents .eventIcon img, body.homeTab .bMyTask td.dataCell img, .bCalendar .calendarMonthView .calActive img, .bCalendar .calendarMonthView .calInactive img, .bCalendar .calendarMonthView .calToday img {
+    vertical-align: middle;
+}
+.bCalendar .calendarMonthView td span.event {
+    color: #666666;
+    font-size: 0.8em;
+    font-weight: normal;
+}
+.bCalendar .calendarDayWeekView .multiLineEventBlock {
+    background: url("/img/alohaSkin/calEvent_bg.png") repeat-x scroll left top #F2F2F2;
+    border: 0 none;
+}
+.bCalendar .calendarDayWeekView .multiLineEventBlock a, .bCalendar .calendarMonthView td a {
+    color: #015BA7;
+    text-decoration: none;
+}
+.bCalendar .calendarDayWeekView .multiLineEventBlock a:hover, .bCalendar .calendarMonthView td a:hover {
+    text-decoration: underline;
+}
+.bCalendar .calendarDayWeekView .eventBlockDivDnD {
+    border-width: 0 1px 1px 0;
+    margin: 0;
+    padding-left: 5px;
+}
+.bCalendar .calendarDayWeekView .alldayevent .eventBlockDivDnD {
+    margin-right: 4px;
+}
+.bCalendar .calendarDayWeekView tr .alldayevent {
+    background-color: #F7F6F9;
+    border-bottom: 1px solid #D9D9D9;
+}
+.bCalendar .calendarDayWeekView tr .alldayevent.dailyLastRow, .bCalendar .calendarDayWeekView tr .alldayevent.weeklyLastRow {
+    border-bottom: 1px solid #D9D9D9;
+}
+.bCalendar .even {
+    border-bottom: 1px solid #EFEFEF;
+}
+.bCalendar .evenHour {
+    border-bottom: 1px solid #EAEAEA;
+}
+.multiuserCalendar .even td, .multiuserCalendar .odd td, .bCalendar .odd, .bCalendar .oddHour {
+    border-bottom: 1px solid #D9D9D9;
+}
+.bCalendar .calendarDayWeekView .fixedTable .hourRowDnD, .multiuserCalendar th.nameCol, .multiuserCalendar .even td.cbCol, .multiuserCalendar .odd td.cbCol {
+    background-color: #EBEBEB;
+}
+.multiuserCalendar .even th.nameCol {
+    background-color: #E4E4E4;
+}
+body .bodyDiv .bCalendar .bMyTask .bPageBlock {
+    border-bottom: 1px solid #D0D0D0;
+    border-right: 1px solid #D0D0D0;
+}
+.legend .outOfOffice, .multiuserCalendar .eventOOO, .bCalendar .calendarDayWeekView .eventBlockDiv.eventOOO, .bCalendar .calendarDayWeekView .eventBlockDivDnD.eventOOO, .hoverDetail.eventOOO .hoverOuter {
+    background-color: #B64B32;
+}
+.legend .busy, .multiuserCalendar .eventBusy, .bCalendar .calendarDayWeekView .eventBlockDiv.eventBusy, .bCalendar .calendarDayWeekView .eventBlockDivDnD.eventBusy, .hoverDetail.eventBusy .hoverOuter {
+    background-color: #6777CC;
+}
+.legend div {
+    padding-right: 2px;
+}
+.multiUserCalendarHeader {
+    margin-top: 5px;
+}
+.multiUserCalendarHeader .bNext {
+    margin: -20px 0 10px;
+}
+.multiUserCalendarHeader .bNext .next {
+    float: none;
+}
+#calendar-panel td.calendarBlock .apexp .bPageBlock.apexDefaultPageBlock .pbBody {
+    margin: 0;
+}
+.bCalendar .calendarDayWeekView #alldayrow .multiLineEventBlock {
+    background-color: #FFFFFF;
+    background-image: none;
+    border-top: 1px solid #CCCCCC;
+}
+body.eventTab .bodyDiv #editEventCalendar {
+    border-top: 2px solid #1797C0;
+    display: block;
+    margin-top: 5px;
+}
+#editEventCalendar .calendarHeader .extra {
+    margin: 5px 0;
+}
+#editEventCalendar .multiuserCalendar td.cbCol a {
+    color: #015BA7;
+    font-weight: normal;
+    text-decoration: none;
+}
+#editEventCalendar .multiuserCalendar td.cbCol a:hover {
+    text-decoration: underline;
+}
+#editEventCalendar .multiuserCalendar .odd th.nameCol, #editEventCalendar .multiuserCalendar .even th.nameCol {
+    color: #006600;
+    font-weight: bold;
+}
+#editEventCalendar .multiuserCalendar .error th.nameCol {
+    background-color: #D74C3B;
+    color: #FFFFFF;
+    font-weight: normal;
+}
+.bCalendar .calendarLayout .calendarDayWeekView th.calDnDHover, .bCalendar .calendarLayout .calendarDayWeekView td.calDnDHover, .bCalendar .calendarDayWeekView .calDnDHover {
+    background-color: #C6E1FF;
+}
+.datePicker .buttonBar .calToday {
+font-size:70%;
+
+}
+#AccordionDiv{
+	height: 300px;
+	width:275px;
+	background:#FFFFFF;
+}
+.clsCustomCR{
+	padding-left:2px;
+	padding-bottom: 5px;
+}
+
+/* Styles for Custom SSIncident */
+.customSStableCls {
+ width :340px;
+}
+.customSSLabelTD {
+ width:25%;
+ white-space: normal;
+ color: #004376;
+ font-family: tahoma,Ms Sans Serif;
+ font-size: 1.0em;
+ font-weight: bold;
+}
+.customSSInputTD {
+    padding-top:5px;
+    width:75%;
+}
+.clsSSInputTextArea {
+    border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    height: 41px;
+    overflow: auto;
+    padding-left: 5px;
+    width: 202px;
+}
+.clsSSInputTextBoxReadOnly {
+    background-color: #EFF3F5;
+    border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    color: #000000;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    height: 14px;
+    margin: 0;
+    padding: 2px 2px 2px 5px;
+    vertical-align: top;
+    width: 200px;
+}
+.clsSSInputTextBox {
+    background-color: #ffffff;
+    border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    color: #000000;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    height: 14px;
+    margin: 0;
+    padding: 2px 2px 2px 5px;
+    vertical-align: top;
+    width: 200px;
+}
+
+.clsSSInputCheckBox {
+    height: 14px;
+    margin: 0;
+    padding: 2px 2px 2px 5px;
+    vertical-align: top;
+    width: 200px;
+}
+.customSStableCls select {
+    background-color: #ffffff;
+    border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+    border-style: solid;
+    border-width: 1px;
+    color: #000000;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    height: 20px;
+    margin: 0;
+    padding: 2px 2px 2px 5px;
+    vertical-align: top;
+    width: 209px;
+}
+.customSStableCls .dateOnlyInput input {
+   width: 200px;
+}
+.x-tool-lookuppm {
+    background: url(SDEFbuttons/b_performance_metrics_on_click.png) repeat scroll 0 0 transparent;
+    height: 20px;
+    width: 20px; 
+}
+.clsOutputPanelReadOnly{
+  width:197px;
+  min-height: 17px; 
+  height:auto !important; 	
+  height:17px; 
+  background-color: #D4D0C8;
+  font-family: Tahoma, MS Sans Serif;
+  vertical-align: top;
+  font-size: 11px;
+  border: 1px solid;
+  border-top-color: #6a7378;
+  border-left-color: #6a7378;
+  border-right-color: #bac3c8;
+  border-bottom-color: #bac3c8;
+  padding-left: 5px;
+
+}
+.clsAccordionOutputPanelReadOnly{
+  width:130px; 
+  min-height: 18px; 
+  height:auto !important; 	
+  height:18px; 
+  background-color: #D4D0C8;
+  font-family: Tahoma, MS Sans Serif;
+  vertical-align: top;
+  font-size: 11px;
+  border: 1px solid;
+  border-top-color: #6a7378;
+  border-left-color: #6a7378;
+  border-right-color: #bac3c8;
+  border-bottom-color: #bac3c8;
+  padding-left: 5px;
+  *padding-left: 0px;
+  margin-left: 3px;
+  *margin-left: 10px;
+
+}
+.clsCustomInputFieldReadOnly {
+ background: transparent;
+ border:none;
+ color: #000000;
+ font-family: Tahoma, MS Sans Serif;
+ font-size: 11px;
+ width: 100%;
+}
+.clsSSOutputPanelReadOnly{
+  width:202px;
+  height:18px; 
+  background-color: #D4D0C8;
+  font-family: Tahoma, MS Sans Serif;
+  vertical-align: top;
+  font-size: 11px;
+  border: 1px solid;
+  border-top-color: #6a7378;
+  border-left-color: #6a7378;
+  border-right-color: #bac3c8;
+  border-bottom-color: #bac3c8;
+  padding-left: 5px;
+}
+#reorder{
+	visibility:hidden; 
+	display: none; 
+	padding-left: 2px; 
+	padding-right: 4px; 
+	padding-top: 174px;
+	-webkit-padding-before: 171px;
+}
+.errorMsg{
+	display:none;
+}
+.x-menu-list-item {
+ margin-left: 0;
+}
+.ReadOnlyPanelHeight{
+	height:auto !important;
+	padding-top:2px;
+	padding-bottom:2px;
+}	
+#btnToolbar,#btnToolbar .x-panel,#btnToolbar .x-panel .x-panel-bwrap{
+        *height: 37px; 
+}
+/* This class is available on BMCStyleSheet.css and overridden for Custom form. */ 
+.clsRowBlueBgPanel{
+ width: 265px;
+ *width: 275px;
+}
+a{
+	color:blue;
+	cursor:pointer;
+}
+body button, body .x-btn, body .btn, body .btnDisabled, body .btnCancel, body .menuButton .menuButtonButton {
+    font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	font-weight:normal;
+}
+.tooltipDisable{	 
+	margin-left: -999em;
+}
+
+/*CSS for Bubble popup */
+.bubbleTableFont{	 
+	font-size:12px;
+	font-family: Arial, sans-serif;
+}
+.bubbleTableRow{	 
+	font-weight:bold;
+	word-break: keep-all;
+	white-space: nowrap;
+	padding-right: 5px;
+}

@@ -1,0 +1,19 @@
+<apex:page standardController="Account" recordSetVar="Accounts">
+   <apex:pageBlock >
+    <apex:form >
+      <apex:dataTable value="{!accounts}" var="a">
+        <apex:column >
+          <apex:outputPanel >
+              <apex:actionSupport event="onmouseover" reRender="details">
+                <apex:param name="aid" value="{!a.id}" />
+              </apex:actionSupport>
+              {!a.Name}
+          </apex:outputPanel>
+        </apex:column>
+      </apex:dataTable>
+     </apex:form>
+   </apex:pageBlock>
+  <apex:outputPanel id="details">
+     <apex:detail subject="{!$CurrentPage.parameters.aid}" relatedList="false" title="false"/>
+  </apex:outputPanel>
+</apex:page>

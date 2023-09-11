@@ -1,0 +1,278 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SALMobilityCntrl_V2">
+    <aura:method name="getPO" action="{!c.doInit}" />
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="nameTheme" type="string"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="iscommunityUser" type="string"/>
+    <aura:attribute name="referralSearchKeyword" type="string" default=""/>
+    <aura:attribute name="leadSourceList" type="String[]"/>
+    <aura:attribute name="qualityDespositionList" type="String[]" default="Approved,Rejected,Follow Up,Pending"/>
+    <!--<aura:method name="validateSave" action="{!c.validateSave}" access="PUBLIC"/>-->
+    <aura:attribute name="productOffering" type="Product_Offerings__c" />
+    <aura:attribute name="objLead" type="Lead" default="{'sobjectType': 'Lead'}"/> 
+    <aura:attribute name="productOfferingId" type="Id"/>
+    <aura:attribute name="productList" type="String[]"/>
+    <aura:attribute name="customerTypeList" type="String[]"/>
+    <aura:attribute name="companyCategoryList" type="String[]"/><!--commented code for bug 18576-->
+    <aura:attribute name="mobilenumber" type="String"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="isPOconverted" type="Boolean"/>
+    <aura:attribute name="isEmpDisable" type="Boolean"/><!-- Bug 18448 -->
+    <aura:attribute name="isDesDisable" type="Boolean"/><!-- Bug 18448 -->
+       <!--23064 by swapnil s-->
+    <aura:attribute name="userInfo" type="user"/>
+     <aura:attribute name="displayExotel" type="boolean" default="false"/> 
+    <aura:attribute name="validExotelProd" type="String[]" default=""/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<!--23064 by swapnil e -->
+    <!-- Bug 18576 Start -->
+    <aura:attribute name="employerList" type="Segment_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedEmployer" type="Segment_Master__c" default="{}"/>
+    <aura:attribute name="employerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="ifOther" type="Boolean" default="false"/>
+    <aura:attribute name="companyCategory" type="String" default=""/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{'sobjectType':'SurrogateCAM__c',Id:'',Special_Profile_Employer__c:''}"/>
+    <aura:attribute name="segId" type="Id"/>
+	<aura:attribute name="StateList" type="String[]"/><!-- 5881 -->
+	<aura:attribute name="CityList" type="String[]"/><!--5881-->
+    <aura:attribute name="isOfferEmpty" type="Boolean" default="false"/><!--5881-->
+    <aura:attribute name="showEmi" type="Boolean" default="false"/><!--5881-->
+    <aura:handler event="c:DisplayErrFieldsPO" action="{!c.showErrFields}"/><!--5881 -->
+	<aura:handler event="c:DestroyChild" action="{!c.DestroyChildCmp}"/>
+    
+    <!-- Bug 18576 End -->
+    <!--<c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />-->
+    
+   
+    
+    <lightning:card title="Personal Details" class="applyMarginToCard slds-section-title--divider">
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-horizontal--small">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="leadFirst" label="First Name" value="{!v.objLead.FirstName}" disabled="true" name="leadFNname"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="leadLast" label="Last Name" value="{!v.objLead.LastName}" disabled="true" name="leadFLNname"/>
+                        </div>
+                    </div>   
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="mobileNumber" style="font-weight:900;">Mobile Number</label>
+                            <div class="">
+                                <a href="{!v.mobilenumber}" target="_blank">{!v.objLead.Customer_Mobile__c}</a>
+                                <!--23064 start -->
+                                     <!--Removed Exotel call button-->                  
+                                <!--23064 start -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value" aura:id="poAlterMobileId" label="Alternate Mobile" value="{!v.productOffering.Alternate_Mobile_No__c}" disabled="true" name="poAlterMobile"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value" aura:id="leadDesId" label="Designation" value="{!v.objLead.Designation__c}" disabled="true" name="leadDes"/><!--put null condition in disabled for Bug 18448-->
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="leadCibilId" label="CIBIL Score" value="{!v.objLead.CIBIL_Score__c}" disabled="true" name="leadCibil"/>
+                        </div>
+                    </div>
+                    
+                    <!--Bug 18576 Start -->
+                    <div aura:id="employerSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" aura:id="employerName" label="Employer Name" class="slds-lookup__search-input" onchange="{!c.employerKeyPressController}" value="{!v.employerSearchKeyword}" messageWhenValueMissing="Please Enter Employer Name" disabled="true"/>        
+                           
+                            <!--This part is for Display typehead lookup result List-->  
+                            <div class="slds-lookup__menu slds" id="sourceList">
+                                <div aura:id="employerMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                   <ul class="slds-lookup__list" role="listbox">
+                                    <aura:iteration items="{!v.employerList}" var="singleRec" indexVar="idx">
+                                        <li role="presentation">
+                                            <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                <div class="slds-media__body">
+                                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                        <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectEmployer}">{!singleRec.Name}</a></div>
+                                                    </div>
+                                                </div>    
+                                            </span>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" aura:id="companycategory" name="companycategory" value="{!v.companyCategory}" label="Company Category" disabled="true"/>
+                        </div>
+                    </div>
+					     <!-- Bug 24667 s-->
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input style="color:black;font-weight:900;" aura:id="addoncards" name="addoncards" value="{!v.objLead.Number_of_Add_on_card__c}" label="Number of Add-on card" disabled="true"/>
+                        </div>
+                    </div>
+                    <!--Bug 24667 e-->
+                    <aura:if isTrue="{!v.ifOther}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input style="color:black;font-weight:900;" aura:id="EmpNameIFOthers" name="EmpNameIFOthers" value="{!v.objLead.Employer_Name__c}" label="Employer Name(If Others)" required="true" messageWhenValueMissing="Please Enter Employer Name" disabled="{!v.isEmpDisable}"/>
+                            </div>
+                        </div> 
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="padding-top:1%;padding-bottom:1%">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="profile">Special Profile</label>
+                                <lightning:input style="color:black;font-weight:900;" type="checkbox" aura:id="profile" name="profile" checked="{! if(v.scam != null,v.scam.Special_Profile_Employer__c,false)}" label="" disabled="{!v.isEmpDisable}"/>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <!-- Bug 18576 End -->
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    <!--5881 s-->
+	<lightning:card  class="applyMarginToCard slds-section-title--divider">
+		<p class="slds-p-horizontal_small">
+			<div class="slds-p-horizontal--small">
+				<div class="slds-grid slds-wrap slds-grid--pull-padded">
+					<!--<div class="slds-form-element slds-p-top__x-small slds-p-horizontal__small slds-size__1-of-1 slds-medium-size__3-of-6 slds-large-size__4-of-12"><div class="slds-form-element__control"><lightning:input class="slds-required" style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="PAN__c" label="PAN Number" value="{!v.objLead.PAN__c}"  name="leadPAN" disabled="{!or(v.iscommunityUser,v.isPOconverted)}"/></div></div>-->
+					<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-is-required slds-form-element__control">
+							<label for="DOB__c" style="font-weight:900;" label="" class="slds-form-element__label">
+								<span class="slds-required">*</span>Date Of Birth
+							</label>
+							<lightning:input type = "date" style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="DOB__c" value="{!v.objLead.DOB__c}"  name="leadDOB" disabled="{!or(v.iscommunityUser,v.isPOconverted)}"/>
+						</div>
+					</div>
+					<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<lightning:select class="applyText" aura:id="Resi_Pick_City__c" name="City" label="Residence City"  messageWhenValueMissing="Please Select Value"  value="{!v.productOffering.Resi_Pick_City__c}" disabled="{!or(or(v.iscommunityUser,v.isPOconverted),v.Discity)}" >
+								<option value="" text="--None--"></option>
+								<aura:iteration items="{!v.CityList}" var="City">
+									<option  value="{!City}" text="{!City}" selected="{!v.productOffering.Resi_Pick_City__c == City}"></option>
+								</aura:iteration>
+							</lightning:select>
+						</div>
+					</div>
+					<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<label for="Resi_Pick_State__c" style="font-weight:900;" class="slds-form-element__label">
+								<span class="slds-required">*</span>Residence State
+							</label>
+							<lightning:select class="applyText" aura:id="Resi_Pick_State__c" label="" name="State"  messageWhenValueMissing="Please Select Value"  value="{!v.productOffering.Resi_Pick_State__c}" disabled="{!or(or(v.iscommunityUser,v.isPOconverted),v.Disstate)}">
+								<option value="" text="--None--"></option>
+								<aura:iteration items="{!v.StateList}" var="State">
+									<option  value="{!State}" text="{!State}" selected="{!v.productOffering.Resi_Pick_State__c == State}"></option>
+								</aura:iteration>
+							</lightning:select>
+						</div>
+					</div>
+					<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<label for="Pin_Code__c" style="font-weight:900;" class="slds-form-element__label">
+								<span class="slds-required">*</span>Pin Code
+							</label>
+							<lightning:input style="color:black;font-weight:900;" label="" messageWhenValueMissing="Please Enter Value" aura:id="Pin_Code__c" value="{!v.productOffering.Pin_Code__c}" name="poResiPin" maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pin code" pattern="^([0-9]{6})" disabled="{!or(v.iscommunityUser,v.isPOconverted)}"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</p>
+	</lightning:card>
+<!--5881 e-->
+    <lightning:card title="Offer Details" class="applyMarginToCard slds-section-title--divider">
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-horizontal--small">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <!--5881 s-->
+							<label for="Offer_Amount__c" style="font-weight:900;" class="slds-form-element__label">
+								<span class="slds-required">*</span>Offer Amount
+							</label>
+							<!--5881 e-->
+							<lightning:input style="color:black;font-weight:900;" label="" pattern="^[1-9]\d*(\.\d+)?$" messageWhenPatternMismatch="Please Enter Valid Amount" aura:id="Offer_Amount__c" value="{!v.productOffering.Offer_Amount__c}" disabled="{!or(!v.isOfferEmpty,or(v.iscommunityUser,v.isPOconverted))}" name="offerAmt"/>
+							<!--Changed Binding of Offer Amount and remove required for Bug 17800 -->
+						</div>
+                    </div>   
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="requiredClass slds-form-element__control">
+							<!--5881 s-->
+							<label for="Offer_ROI__c" style="font-weight:900;" class="slds-form-element__label">
+								<span class="slds-required">*</span>Offer ROI
+							</label>
+							<!--5881 e-->
+							<lightning:input style="color:black;font-weight:900;" label="" messageWhenValueMissing="Please Enter Value"  aura:id="Offer_ROI__c" value="{!v.productOffering.Offer_ROI__c}" disabled="{!or(v.iscommunityUser,v.isPOconverted)}" name="offerROI"/>
+                        </div>
+                    </div>
+<div class="slds-form-element slds-p-horizontal--small slds-p-top--x-small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="requiredClass slds-form-element__control">
+							<!--5881 s-->
+							<label for="Tenor__c" style="font-weight:900;" class="slds-form-element__label">
+								<span class="slds-required">*</span>Offer Tenor
+							</label>
+							<!--5881 e-->
+							<lightning:input style="color:black;font-weight:900;" label="" pattern="^[1-9]\d*?$" messageWhenPatternMismatch="Please Enter Valid Tenor" aura:id="Tenor__c" value="{!v.productOffering.Tenor__c}" disabled="{!or(v.iscommunityUser,v.isPOconverted)}" name="offerTenor"/>
+							<!--Changed Binding of Offer Tenor and remove required for Bug 17800 -->
+						</div>
+					</div>
+                    <aura:if isTrue="{!v.showEmi}">
+					<div class="slds-form-element slds-p-horizontal--small slds-p-top--x-small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="requiredClass slds-form-element__control">
+							<!--5881 s-->
+							<label for="EMI_Amount__c" style="font-weight:900;" class="slds-form-element__label ">
+								<span class="slds-required">*</span>Offer EMI
+							</label>
+							<!--5881 e-->
+							<lightning:input style="color:black;font-weight:900;" messageWhenValueMissing="Please Enter Value"  aura:id="EMI_Amount__c" value="{!v.productOffering.EMI_Amount__c}" disabled="true" name="offerEMI"/>
+						</div>
+					</div>
+                    </aura:if>
+					<!--5881 s-->
+                    <div class="slds-form-element slds-p-horizontal--small slds-p-top--x-small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<lightning:input style="color:black;font-weight:900;" aura:id="availedAmount" pattern="^[1-9]\d*(\.\d+)?$" messageWhenPatternMismatch="Please Enter Valid Amount" label="Availed Amount" value="{!v.productOffering.Availed_Amount__c}" name="availedAmount" disabled="{!or(v.iscommunityUser,v.isPOconverted)}"/>
+						</div>
+					</div>
+					<div class="slds-form-element slds-p-horizontal--small slds-p-top--x-small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<lightning:input style="color:black;font-weight:900;" aura:id="availedTenor" pattern="^[1-9]\d*?$" messageWhenPatternMismatch="Please Enter Valid Tenor" label="Availed Tenor" value="{!v.productOffering.Availed_Tenor__c}" name="availedTenor" disabled="{!or(v.iscommunityUser,v.isPOconverted)}"/>
+						</div>
+					</div>
+					<!--5881 e-->
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    <c:SAL_PODispositionScreen aura:id="dispositionScreen" theme="{!v.nameTheme}" leadSourceList="{!v.leadSourceList}" productOffering="{!v.productOffering}"
+                                                   qualityDespositionList="{!v.qualityDespositionList}"
+                                                   isTeleCaller="{!v.isTeleCaller}"
+                                                   isFieldAgent="{!v.isFieldAgent}"
+                                                   sourceSearchKeyword="{!v.sourceSearchKeyword}"
+                                                   referralSearchKeyword="{!v.referralSearchKeyword}"
+                                                   iscommunityUser="{!v.iscommunityUser}"
+                                                   isPOconverted="{!v.isPOconverted}" objLead = "{!v.objLead}"/>
+  
+    <!-- kishore added objLead bug 5881 -->
+</aura:component>

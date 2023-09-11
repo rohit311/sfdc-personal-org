@@ -1,0 +1,204 @@
+<aura:component controller="EmployeeLoanAutomationCtrl" implements="flexipage:availableForAllPageTypes" access="global" >
+<!--<ltng:require styles="/resource/slds213/assets/styles/salesforce-lightning-design-system.min.css" 
+                  scripts="/resource/jquery224" />-->
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="empId" type="String" default="333333"/>
+    <aura:attribute name="listApp" type="List"/> 
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute type="Boolean" name="sortAsc" default="true"/>
+    <aura:attribute type="Boolean" name="sortAscDist" default="true"/> 
+    <aura:attribute type="Boolean" name="isOfferAvailabel"/>
+    <aura:attribute type="Boolean" name="isDetailsAvailable" />
+    <aura:attribute name="PaginationList" type="Object"/>
+    <aura:attribute name="repayObj" type="Object"/>
+    <aura:attribute name="emandateStatus" type="boolean" default="false"/>  
+    <aura:attribute name="distPOList" type="List[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="selTabId" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="oppId" type="String"/>
+     <aura:attribute name="applicationAcceptance" type="boolean" default="false"/> 
+     <aura:attribute name="agrementAcceptance" type="boolean"  default="false"/>
+    <aura:registerEvent name="DestroyTrackApplicationEvent" type="c:DestroyTrackApplication"/>  
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="callMydetails" type="c:invokeMyDetails"/>
+     <aura:registerEvent name="flowIdToLanding" type="c:flowIdToLanding"/>
+    
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}"/>
+    
+    <div id="waitingDiv" style="display:none" class="slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    
+    
+    <aura:if isTrue="{!v.listApp.length > 0}" >
+        <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--12-of-12">    
+            <thead  class="slds-grid slds-hyphenate">
+                
+            </thead>
+            <tbody class="slds-grid slds-wrap">
+                
+                <aura:iteration items="{!v.PaginationList}" var="obj">
+                    <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                        
+                        <td class="floatLeft WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            <a onclick="{!c.toggleAssVersion}" id="{! obj.Loan_Application__c}">
+                                <aura:if isTrue="{!v.class =='hideCls'}">
+                                    
+                                    <span class="font-weight-bold important-message" id="{! obj.Loan_Application__c}" style="margin-left:10px;margin-right:10px;">+ </span>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.myid == obj.Loan_Application__c}">
+                                            <span class=" important-message" id="{! obj.Loan_Application__c }" style="margin-left:10px; margin-right:10px;">-</span> 
+                                            
+                                            <aura:set attribute="else"  >
+                                                <span class="floatLeft important-message" style="margin-left:10px;margin-right:10px;">+
+                                                </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            
+                            <span style="margin-left:5px; margin-right:10px;" class="slds-text-title_bold">
+                             LA No. </span>
+                            <span id="{!obj.Loan_Application__c}">
+                                <a onclick="{!c.nevigateToStage}" id="{!obj.Loan_Application__r.Id}">  {!obj.Loan_Application__r.Loan_Application_Number__c}</a>
+                            </span>
+                            
+                        </td> 
+                        
+                        <td class="WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            <span style="margin-left:5px; margin-right:10px;" class="slds-text-title_bold"> Stage</span>
+                           
+                            <aura:if isTrue="{!obj.Loan_Application__r.StageName == 'DSA/PSF Login'}">
+                                My Details 
+                            </aura:if>
+                             <aura:if isTrue="{!obj.Loan_Application__r.StageName == 'Post Approval Sales'}">
+                               Value Added Services 
+                            </aura:if>  
+                            <aura:if isTrue="{!obj.Loan_Application__r.StageName == 'Approved'}">
+                               Approved
+                            </aura:if>
+                             <aura:if isTrue="{!obj.Loan_Application__r.StageName == 'Branch Ops'}">
+                               Sent for Disbursement
+                            </aura:if>
+                             <aura:if isTrue="{!obj.Loan_Application__r.StageName == 'Moved To Finnone'}">
+                               Sent for Disbursement
+                            </aura:if>
+                        </td>
+                        
+                    </tr>
+                    
+                    <!-- start of Add row --> 
+                    <aura:if isTrue="{!v.myid == obj.Loan_Application__c}">
+                        <aura:if isTrue="{!v.class == 'showCls' }">
+                            
+                            <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                <div style="width:100%;">
+                                    <fieldset class="slds-form--compound">
+                                        <div class="slds-form-element__row slds-m-top--x-small ">
+                                            
+                                            <lightning:card class=" slds-size--12-of-12" >
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--10-of-12 slds-align_absolute-center ">                   
+                                                    <table >
+                                                        <tr>
+                                                            <td > KYC </td>
+                                                            <td>
+                                                                <aura:if isTrue="{!and(obj.KYC_Verifications__c == false,!(obj.Loan_Application__r.StageName == 'Branch Ops'))}">
+                                                                <ui:outputText class="boldText" value="KYC Pending"/>
+                                                                    <aura:set attribute="else">
+                                                                        <ui:outputText class="boldText" value="Completed"/>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>Application Form </td>  
+                                                            <td>
+                                                                <aura:if isTrue="{!and(v.applicationAcceptance,!(obj.Loan_Application__r.StageName == 'Branch Ops'))}">
+                                                                <ui:outputText class="boldText" value="Acceptance Pending"/>
+                                                                    <aura:set attribute="else">
+                                                                        <ui:outputText class="boldText" value="Completed"/>
+                                                                    </aura:set>
+                                                                </aura:if></td>
+                                                            
+                                                        </tr>
+                                                        <tr>     
+                                                            <td> 	Agreement Form</td>
+                                                            <td>
+                                                               <aura:if isTrue="{!and(v.agrementAcceptance,!(obj.Loan_Application__r.StageName == 'Branch Ops'))}">
+                                                                <ui:outputText class="boldText" value="Acceptance Pending"/>
+                                                                    <aura:set attribute="else">
+                                                                        <ui:outputText class="boldText" value="Completed"/>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </td>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Mandate Registration </td>
+                                                            <td> 
+                                                            	<aura:if isTrue="{!and(v.emandateStatus == false,!(obj.Loan_Application__r.StageName == 'Branch Ops'))}">
+                                                                <ui:outputText class="boldText" value="Submit Physical Nach"/>
+                                                                    <aura:set attribute="else">
+                                                                        <ui:outputText class="boldText" value="Completed"/>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </td>
+                                                        </tr>             
+                                                        
+                                                    </table>
+                                                </div>
+                                                
+                                            </lightning:card>
+                                            
+                                            
+                                            
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                
+                            </tr>
+                            
+                            
+                        </aura:if>
+                    </aura:if>
+                    
+                    <!-- End row -->
+                    
+                </aura:iteration>
+            </tbody>
+        </table>
+        <br />
+        <lightning:buttonGroup class="slds-align_absolute-center">
+            <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+                              onclick="{!c.previous}" variant="brand"
+                              iconName='utility:back'/>
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                              onclick="{!c.next}" variant="brand"
+                              iconName='utility:forward' iconPosition='right'/>
+            
+        </lightning:buttonGroup>
+        <div class="slds-align_absolute-center slds-text-body_regular">
+            Page {!v.currentPage} of {!v.totalPages}
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-align_absolute-center slds-text-heading_medium">
+                No Records Found
+            </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,201 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="accObj" type="Account" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="final_foir" type="Decimal"/> <!-- added for Bug: 23715 -->
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="mySelectedvalues" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="tenorList" type="List" default="12,18,24,36,48,60,72"/><!--Added 18 for bug 23064-->
+    <aura:attribute name="camObj" type="CAM__c" default="" /> 
+    <aura:attribute name="srcamObj" type="SurrogateCAM__c" default="" />
+    <aura:attribute name="appObj" type="Applicant__c"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute name="downSizeList" type="List"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="downSizeFlag" default="false"/> <!-- US_24979 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <!--22017 start-->
+    <aura:attribute name="isHybirdFlexi" type="boolean" default="false"/> 
+    <aura:handler name="change" value="{!v.appObj.Pure_Flexi_Period__c}" action="{!c.calculateDroplinePeriod}"/>
+    <aura:handler name="change" value="{!v.camObj.Tenor__c}" action="{!c.calculateDroplinePeriod}"/>
+    <!--22017 end-->
+	<aura:attribute type="Boolean" name="isFromTile" default="true"/><!--9465-->
+    <aura:attribute name="loan" type="Opportunity"/> <!--9465-->
+    <!--<aura:attribute name="final_foir" type="Decimal"/>9465-->
+	<aura:if isTrue="{!v.isFromTile}" ><!--9465 added if-->
+    
+    <c:GenericBackCmp/>
+	</aura:if>
+    <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card title="" class="applyMarginToCard slds-box">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    <table>
+                        
+                        <tbody> 
+                            <aura:if isTrue="true">
+                                    <aura:if isTrue="{!v.isFromTile}" ><!--9465 added if else-->
+                                   <tr class="green-color" style="height:30px;text-align :center"> 
+                                    <div style="padding-top:8px"> Eligibility </div> </tr>
+                                     <aura:set attribute="else">
+                                     <tr style="height:30px;text-align :center"> 
+                                    <div style="padding-top:8px"> Eligibility </div> </tr>
+                                     </aura:set>
+                                </aura:if>
+                                     <aura:set attribute="else">
+                                     <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Eligibility </div> </tr>
+                                     </aura:set>
+                            </aura:if> 
+                            <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                <lightning:card title="" class="applyColor">
+                                    <p class="slds-p-horizontal_small slds-theme_shade">  
+                                        <div class="slds-p-horizontal--small">                
+                                            <div class="slds-grid slds-wrap slds-grid--pull-padded">	
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input aura:id="Finalloanamount" label="Approved Loan Amount" value="{!v.camObj.Proposed_Loan_Amt__c}" name="appamount" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <!--SAL 2.0 CR's changed tenor to input from picklist -->
+                                                        <lightning:input aura:id="tenor" label="Approved Tenor in month" required="true" messageWhenValueMissing="Please enter tenor" value="{!v.camObj.Tenor__c}" name="tenor" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input aura:id="FinalROI" label="Approved Rate" value="{!v.camObj.ROI__c}" name="rate" />
+                                                    </div>
+                                                </div> 
+                     <!--22017 start-->
+                                <aura:if isTrue="{!v.isHybirdFlexi}">
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" id="pureFlexiDiv">    
+                                            <lightning:input aura:id="PureFlexPeriod1" label="Pure Flexi Period" value="{!v.appObj.Pure_Flexi_Period__c}" name="PureFlexiPeriod"  type="text" maxlength="4" messageWhenPatternMismatch="Please enter valid Pure Flexi Period" pattern="[0-9]*" messageWhenBadInput="Pure Flexi Period should contain only digits." placeholder="Pure Flexi Period"/>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" >
+                                            <lightning:input label="Pure Flexi Period EMI" value="{!v.appObj.Pure_Flexi_EMI__c}" name="PureFlexi" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input aura:id="DropLinPeriod1" label="Drop Line Flexi Period" value="{!v.appObj.Drop_Line_Flexi_Period__c}" name="DropLineFlexi" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                              <!--22017 end-->
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Applicable Multiplier ( as per policy )" value="{!v.camObj.Multiplier__c}" name="mulitiplier" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Applicable FOIR (as per policy)" value="{!v.camObj.Applicable_FOIR1__c}" name="appfoir" disabled="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Risk Segmentation" value="{!v.appObj.Risk_Segmentation__c}" name="segmentation" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Max Amount as per multiplier" value="{!v.camObj.Max_Loan_Amnt_as_p_NAS_Multip_PL_Oblig__c}" name="maxamt" disabled="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Max Amount as per FOIR" value="{!v.camObj.LAP_EMI__c}" name="maxamtfoir" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Max EMI as per Multiplier" value="{!v.srcamObj.Maximum_EMI_as_per_Multiplier__c}" name="maxemi" disabled="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Max EMI as per FOIR" value="{!v.camObj.Maxi_EMI_Cust__c}" name="foirmaxemi" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Final FOIR" value="{!v.camObj.Eligible_FOIR__c}" name="finalfoir" disabled="true" /> <!-- Bug 23715 -->
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Max Eligible loan" value="{!v.camObj.sal_max_loan__c}" name="maxeliLoan" disabled="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="EMI of the Proposed Loan" value="{!v.camObj.EMI_on_Proposed_Loan_TO__c}" name="proposeloanemi" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Secured FOIR" value="{!v.camObj.Secured_FOIR__c}" name="securefoir" disabled="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Unsecured FOIR" value="{!v.camObj.Unsecured_FOIR__c}" name="unsecurefoir" disabled="true" />
+                                                    </div>
+                                                </div> 
+                                                <!--9465 start-->
+                                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input type="text" aura:id="hybridFlexi" disabled="true" name="hybridFlexi" label="Eligible for Hybrid Flexi" value="{!v.camObj.Business_Continuty__c}" messageWhenValueMissing="Please Enter Value"/>
+                                                    </div>
+                                                </div>
+                                                <!--9465 stop-->
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div aura:id="pickListDiv" class="slds-form-element__control">
+                                                        <c:MultiSelectPicklist aura:id="mymultiselect" options="{!v.downSizeList}" mySelectedvalues="{!v.mySelectedvalues}" Label="Downsizing Reasons" mandatory="true"/><!--US_24979 false to true-->
+                                                        <!-- <div aura:id="multiselectdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please select reject reason</div>--> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </lightning:card>
+                            </div>
+                        </tbody>
+                    </table>
+                    <br/> 
+                    <div  class="slds-p-top--x-small slds-align_absolute-center">
+                        <lightning:button variant="brand" label="Re-Calculate Eligibility" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.updateCamObj}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                        
+                    </div>
+                    
+                    
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    {!v.body}
+</aura:component>

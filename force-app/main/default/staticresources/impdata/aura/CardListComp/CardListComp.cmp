@@ -1,0 +1,40 @@
+<aura:component controller="BLMobilityController">
+	<aura:attribute name="TotalRecords" type="Product_Offerings__c[]" />
+    <aura:attribute name="PageRecords" type="Product_Offerings__c[]" access="public"/>
+    <aura:attribute name="page" type="integer" default="1" description="using for store page Number" />
+    <aura:attribute name="pages" type="integer" description="using for store All Pages page Number" />
+    <aura:attribute name="pagenumbers" type="integer[]" description="using for store All Page Numbers" />
+    <aura:attribute name="total" type="integer" description="total records count store " />
+    <aura:attribute name="pagesize" type="integer" default="25" description="Number of records per page " />
+    <aura:method name="refresh" action="{!c.doInit}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<div class="SLDS" >
+    	<aura:if isTrue="{!! empty(v.TotalRecords)}">
+	        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--2-of-2">
+	            <aura:iteration items="{!v.PageRecords}" var="po">
+					<c:POCard po="{!po}" />
+	            </aura:iteration>
+	        </div>
+	        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-2">
+	            <div style="background-color: #F0F8FF; ">
+	                &nbsp; Page {!v.page} of {!v.pages} ({!v.total} Items)
+	                &nbsp;
+	                <button class="slds-button noborder" data-dir="previous" onclick="{!c.PageDirection}" disabled="{!not( v.page > 1)}" title="Previous page">
+		           		<lightning:buttonIcon iconName="utility:chevronleft" size="small" alternativeText="previous page"/>
+		       		</button>
+	                <aura:iteration items="{!v.pagenumbers}" var="idx">
+	                    &nbsp;&nbsp;
+	                    <button class="slds-button noborder" text="{!idx}" data-index="{!idx}" onclick="{!c.pageNum}">{!idx}</button>
+	                </aura:iteration>
+	                &nbsp;
+	                <button class="slds-button noborder" data-dir="next" onclick="{!c.PageDirection}" disabled="{!not( v.pages > v.page)}" title="Next page">
+		           		<lightning:buttonIcon iconName="utility:chevronright" size="small" alternativeText="next page"/>
+		       		</button>
+	            </div>
+	        </div>
+		</aura:if>
+		<aura:if isTrue="{! empty(v.TotalRecords)}">
+			<h3 class="slds-section-title--divider">You don't have any Product Offerings in this Category</h3>
+		</aura:if>
+    </div>
+</aura:component>

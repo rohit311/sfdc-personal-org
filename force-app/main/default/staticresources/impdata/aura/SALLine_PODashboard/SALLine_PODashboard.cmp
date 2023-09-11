@@ -1,0 +1,247 @@
+<!-- SALLine_PODashboard-->
+<aura:component access="global" controller="LineAssignmentCntrl"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"  >
+    <aura:attribute name="offerObj" type="Product_Offerings__c" default=""/>
+    <aura:attribute name="leadObj" type="Lead" default=""/>
+    <aura:attribute name="offerId" type="String" default=""/>
+    <aura:attribute name="leadId" type="String" default=""/>
+    <aura:attribute name="DeDupeList" type="List" default=""/>
+    <aura:attribute name="mapOfIcons" type="List"/>
+    <aura:attribute name="EPFOcheck" type="Boolean" default="false"/>
+    <aura:attribute name="Domaincheck" type="Boolean" default="false"/>
+    <aura:attribute name="Emailcheck" type="Boolean" default="false"/>
+    <aura:attribute name="Cibilcheck" type="Boolean" default="false"/>
+    <aura:attribute name="DeDupeFlag" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <c:LoaderForMobility/>
+<div>    
+    				<div class="slds-page-header" style=" background-color: #0072bc" role="banner">
+          <div class="slds-grid">
+            <div class="slds-col">
+          		<p id="poDetailsHeading" class="slds-text-heading--label slds-align_absolute-center font-size-14" style="color:white;font-weight: bold;">PO Dashboard</p>
+            </div>
+          </div>
+    	</div>
+                    <div style="position:relative">
+                        <ui:scrollerWrapper class="scrollerSize">
+                        <div class="innerDivWrapper">
+                            <div aura:id='MainPopUp' class="{!(v.offerObj == null || v.offerObj == '') ? 'slds-modal__content slds-p-around--medium' : 'slds-modal__content slds-p-around--medium'}" style="top:1rem;height : 380px !important;">
+                                
+                                
+                                
+                                <!-- <lightning:button title="Check" onclick="{!c.onclickbutton}">Check</lightning:button> -->
+                                <div class="slds-scrollable_y " style="font-size: 14px;overflow-y:hide;overflow-x:hide;">
+                                    <div id="mytable" style="overflow-x:hide;" class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                                        
+                                        <ul class="slds-m-left_xx-small slds-grid slds-wrap slds-grid_pull-padded">                      
+                                             <!-- Next Section -->
+                                                <li class="slds-p-horizontal_small slds-size_6-of-12 slds-medium-size_6-of-12 slds-size_6-of-12">                                        
+                                                    <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                        <div id="margin">
+                                                        </div>
+                                                        <div class="slds-media__figure">
+                                                            <span id="CIBILNorms" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                                    <aura:if isTrue="{!icons.name == 'CIBIL Norms'}">
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">CIBIL Norms</span>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                                
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                    CIBIL Norms
+                                                                </h3>
+                                                            </div>
+                                                            <div class="slds-tile__detail">
+                                                                <dl class="slds-list_horizontal slds-wrap">
+                                                                    <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                    <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}"></dd>-->
+                                                                    
+                                                                    <div id="CibilSection" class="slds-grid slds-size_12-of-12">
+                                                                        <dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">CIBIL Norms : </dt>
+                                                                        <dd id="CibilSectionVal" class="fontColor slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;margin-top:5%;margin-right:10%;">
+                                                                            <aura:if isTrue="{!v.Cibilcheck}">
+                                                                            	Positive
+                                                                                <aura:set attribute="else">
+                                                                                	Refer
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                    </div>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                            </li>
+                                            <!-- De Dupe -->
+                                            <li class="slds-p-horizontal_small slds-size_6-of-12 slds-medium-size_6-of-12 slds-size_6-of-12">                                                    
+                                                    <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                        <div id="margin">
+                                                        </div>
+                                                        <div class="slds-media__figure">
+                                                            <span id="De Dupe" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                                    <aura:if isTrue="{!icons.name == 'De Dupe'}">
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">De Dupe</span>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                                
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                    De Dupe
+                                                                </h3>
+                                                            </div>
+                                                            <div class="slds-tile__detail">
+                                                                <dl class="slds-list_horizontal slds-wrap">
+                                                                    <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                    <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}"></dd>-->
+                                                                    
+                                                                    <div id="DeDupeDetailsSection" class="slds-grid slds-size_12-of-12">
+                                                                        <dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">De Dupe status : </dt>
+                                                                        <dd id="DeDupeDetails" class="slds-size_1-of-2 slds-item_detail slds-truncate fontColor" title="Description for second label"  style="width:50%;margin-top:5%;margin-right:10%;">  
+                                                                            <aura:if isTrue="{!v.DeDupeFlag}">
+                                                                            	Good
+                                                                                <aura:set attribute="else">
+                                                                                	Bad
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                    </div>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                                    
+                                                </li>
+                                            
+
+                                             <!-- Next Section -->
+                                            <li class="slds-p-horizontal_small slds-size_6-of-12 slds-medium-size_6-of-12 slds-size_6-of-12">
+                                                    <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card" >
+                                                        <div id="margin">
+                                                        </div>
+                                                        <div class="slds-media__figure">
+                                                            <span id="EmploymentDetails" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                                    <aura:if isTrue="{!icons.name == 'Employment Section'}">
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">Employment Section</span>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                                
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                    Employment Section
+                                                                </h3>
+                                                            </div>
+                                                            <div class="slds-tile__detail">
+                                                                <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                    <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                    <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}"></dd>-->
+                                                                    
+                                                                    <div id="EmploymentSectionVals" class="slds-grid slds-wrap slds-size_12-of-12">
+                                                                        <div class="slds-size_12-of-12 slds-grid slds-wrap">
+                                                                        <dt class="slds-size_1-of-2 slds-item_label slds-grid slds-wrap slds-text-color_strong fontColor" title="Second Label" style="margin-top:2%;margin-right:10%">EPFO : </dt>
+                                                                        <dd id="EmploymentSectionEPFOVal" class="fontColor slds-grid slds-wrap slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;margin-top:2%;margin-right:10%;">
+                                                                            <aura:if isTrue="{!v.EPFOcheck}">
+                                                                            	Positive
+                                                                                <aura:set attribute="else">
+                                                                                	Negative
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                        </div>    
+                                                                        <div class="slds-size_12-of-12 slds-grid slds-wrap">
+                                                                        <dt class="slds-size_2-of-2 slds-item_label slds-grid slds-wrap slds-text-color_strong fontColor" title="Third Label" style="margin-right:10%">Email Verification: </dt>
+                                                                        <dd id="EmploymentSectionEmailVal" class="fontColor slds-grid slds-wrap slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;margin-right:10%;">
+                                                                            <aura:if isTrue="{!v.Emailcheck}">
+                                                                            	Verified
+                                                                                <aura:set attribute="else">
+                                                                                	Not Verified
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                        </div>
+                                                                        <div class="slds-size_12-of-12 slds-grid slds-wrap">
+                                                                        <dt class="slds-size_1-of-2 slds-item_label slds-grid slds-wrap slds-text-color_strong fontColor" title="Third Label" style="margin-right:10%">Domain Check : </dt>
+                                                                        <dd id="EmploymentSectionDomainVal" class="fontColor slds-grid slds-wrap slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;margin-right:10%;">
+                                                                            <aura:if isTrue="{!v.Domaincheck}">
+                                                                            	Successful
+                                                                                <aura:set attribute="else">
+                                                                                	Not Successful
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                        </div>
+                                                                    </div>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                            </li>
+                                                    
+                                            <!-- Next Section -->
+                                                <li class="slds-p-horizontal_small slds-size_6-of-12 slds-medium-size_6-of-12 slds-size_6-of-12">                                                    
+                                                    <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                        <div id="margin">
+                                                        </div>
+                                                        <div class="slds-media__figure">
+                                                            <span id="BankDetails" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                                    <aura:if isTrue="{!icons.name == 'Banking Section'}">
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">Banking Section</span>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                                
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                    Banking Section
+                                                                </h3>
+                                                            </div>
+                                                            <div class="slds-tile__detail">
+                                                                <dl class="slds-list_horizontal slds-wrap">
+                                                                    <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                    <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}"></dd>-->
+                                                                    
+                                                                    <div id="BankDetailsSection" class="slds-grid slds-size_12-of-12">
+                                                                        <dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Bank Details Changed : </dt>
+                                                                        <dd id="BankDetailsVal" class="slds-size_1-of-2 slds-item_detail slds-truncate fontColor" title="Description for second label"  style="width:50%;margin-top:5%;margin-right:10%;">  
+                                                                            <aura:if isTrue="{!v.offerObj.Bank_Details_Change__c}">
+                                                                            	Yes
+                                                                                <aura:set attribute="else">
+                                                                                	No
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </dd>
+                                                                    </div>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+                                                    </article>
+                                                    
+                                                </li>
+                                            
+                                         </ul>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        </ui:scrollerWrapper>
+                    </div>
+    </div>       
+</aura:component>

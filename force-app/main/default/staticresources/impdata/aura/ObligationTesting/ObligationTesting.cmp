@@ -1,0 +1,16 @@
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+	<aura:attribute name="recordId" type="Id" default="0065D000004RCBn"/>
+    <aura:attribute name="obligLst" type="List"/>
+    <aura:attribute name="totalObligations" type="integer"/>
+    <aura:attribute name="oblType" type="List"/>
+    <aura:attribute name="statusLst" type="List"/>
+    <aura:attribute name="finLst" type="List"/>
+    <aura:attribute name="allApps" type="List"/>    
+    <aura:attribute name="loanTypeLst" type="List"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    
+    <c:ObligationListView  applicantObj="{!v.applicant}"  loanTypeLst="{!v.loanTypeLst}" allApps="{!v.allApps}" oppId="{!v.loan.Id}" obligLst="{!v.obligLst}" totalObligations ="{!v.totalObligations}" stageName="{!v.stageName}" oblType="{!v.oblType}" statusLst="{!v.statusLst}" finLst="{!v.finLst}" />
+</aura:component>

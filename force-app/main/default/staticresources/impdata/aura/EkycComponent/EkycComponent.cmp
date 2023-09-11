@@ -1,0 +1,174 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" 
+                access="global">
+        <aura:attribute name="isViewCustomerEyeModal" type="boolean" default="false"/>
+	 <ltng:require scripts="/resource/jqueryformobility" />
+    <ltng:require scripts="/resource/jQueryThree" />
+    <aura:attribute type="Applicant__c" name="appNew" />
+    <!--Bug 21064 - added -->
+    <aura:attribute type="String" name="ekycAddress" default=""/>
+    <aura:attribute type="Boolean" name="isEkycDone" default="false"/>
+    <aura:attribute type="eKYC__c" name="kyc" default="{'sObjectType':'eKYC__c'}"/>
+    <aura:attribute type="String" name="ekycSource" default=""/>
+    <aura:attribute type="Account" name="accObj" />
+    <aura:attribute type="Contact" name="conNew" default="{'sObjectType':'Contact'}"/>  
+    <aura:attribute type="String" name="custId" />
+     <aura:attribute name="isPreapproved" type="Boolean" default="false"/>
+    <aura:attribute name="randomNum" type="String" /><!--bug id 18669 Sal 2.0 sales-->
+    <aura:attribute name="ismobilityV2" type="Boolean" default="false"/><!--18669-->
+     <aura:attribute name="hideBiometricOption" type="Boolean" default="true"/><!--18669-->
+    <aura:attribute name="aadharValueDss" type="String" default="Aadhaar OTP"/><!--bug id 18669 Sal 2.0 sales--><!--changed default value for bug id 20884 -->    
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>   
+   <!-- <aura:registerEvent name="fetchRandomNumberEvent" type="c:FetchRandomNumber"/>bug id 18669 Sal 2.0 sales-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+        <div style=" overflow-x:hidden !important;" class="  slds-theme_shade">
+        <lightning:card title="EKYC Details" class="applyColor" >
+     <div>
+     	<div class="slds-tabs--scoped">    
+     		<div class="slds-m-top_medium slds-m-left_x-small slds-m-right_x-small slds-border_bottom slds-border_right slds-border_left slds-border_top">         
+                 <div aura:id="KYCTabContent" class="slds-tabs--scoped__content" role="tabpanel" aria-labelledby="LoanTab">
+                    <!-- <br/>
+                     
+                     	
+                         <br/>
+                         <br/> -->
+                     		<p class="slds-p-horizontal_small">
+                            <aura:if isTrue="{!v.isPreapproved}"> 
+                                <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <label class="slds-form-element__label" for="customereyelink">Customer Eye:</label>
+                                    <a href="" onclick="{!c.redirectToCustomerEye}" style="margin-left: 1.6%;">Customer Eye</a> 
+                                </div> 
+                     		</aura:if>  
+                     		</p>
+                     		<!--<div style="margin-left: 1.6%;"><strong>Aadhar Details</strong></div> -->	
+                                <p class="slds-p-horizontal_small">
+                                   <aura:if isTrue="{! v.kyc.Id==null}"><!--changed for bug id 18669 Sal 2.0 sales{!!v.appNew.eKYC_Processing__c} -->
+                                       <c:AadharVerification page="{!v.page}" stageName="{!v.stageName}" showHeading="true" isDSS="true" parentId="{!if(v.appNew.Id != null,v.appNew.Id,'')}" isMobility="true" parentObj="Applicant" randomNum="{!v.randomNum}" aadharValue="{!v.aadharValueDss}" flowis ="MobilityV2" ismobilityV2="{!V.hideBiometricOption}"/><!-- flowis="MobilityV2"   added for bug id 18669 Sal 2.0 sales -->
+                                        <aura:set attribute="else">
+                                            <div id="aadharDone"> <strong>Aadhaar details have been received successfully! </strong></div>
+                                        </aura:set>
+                                    </aura:if>
+                                </p>                   
+					 <div>
+                         <aura:if isTrue="{!v.kyc.eKYC_First_Name__c != null}">                                                         
+                            <div class="slds-p-horizontal--small">
+                                 <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCType">EKYC TYPE:</label>
+                                        <ui:outputText aura:id="EKYCType" value="{!v.ekycSource}" />
+                                     </div>                                                          
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCFN">EKYC First Name : </label>
+                                        <ui:outputText aura:id="EKYCFN" value="{!v.kyc.eKYC_First_Name__c}" /> 
+                                     </div>   
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCLN">EKYC Last Name : </label>
+                                       <ui:outputText aura:id="EKYCLN" value="{!v.kyc.eKYC_Last_Name__c}" />
+                                     </div> 
+                                 </div>  
+                                 <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                  	<div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCDob">EKYC DOB:</label>
+                                        <ui:outputText aura:id="EKYCDob" value="{!v.kyc.eKYC_Date_of_Birth__c}" />
+                                     </div>  
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Gender:</label>
+                                        <ui:outputText aura:id="EKYCGender" value="{!v.kyc.eKYC_Gender__c}" />
+                                     </div>
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Pincode:</label>
+                                        <ui:outputText aura:id="EKYCGender" value="{!v.kyc.eKYC_Pin_Code__c}" />
+                                     </div>
+                                     
+                                 </div>    
+                                 <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                  	<div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCDob">EKYC City:</label>
+                                        <ui:outputText aura:id="EKYCDob" value="{!v.kyc.eKYC_City__c}" />
+                                     </div>  
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC State:</label>
+                                        <ui:outputText aura:id="EKYCGender" value="{!v.kyc.eKYC_State__c}" />
+                                     </div>
+                                     <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Address:</label>
+                                        <ui:outputText aura:id="EKYCGender" value="{!v.ekycAddress+' '+v.kyc.Location__c}" />
+                                     </div>
+                                     
+                                     
+                                 </div>   
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded" >
+                                    <div  class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYChouseno">EKYC House No:</label>
+                                        <ui:outputText aura:id="EKYChouseno" value="{!v.kyc.House__c}" />
+                                     </div>
+                                    <div style="display:inline-flex" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Mobile:</label>
+                                        <ui:outputText aura:id="EKYCGender" value="{!v.kyc.Masked_Phone__c}" />
+                                     </div>
+                                	<div style="display:inline-flex" class="slds-form-element slds-p-top--x-small slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Email:</label>
+                                        <ui:outputRichText aura:id="EKYCGender" value="{!v.kyc.Masked_Email__c}" />
+                                     </div>
+                                    
+                                </div>
+                                 <div class="slds-grid slds-wrap slds-grid--pull-padded" >
+                                     <div style="display:inline-flex" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     	<label class="slds-form-element__label" for="EKYCGender">EKYC Photo:</label>
+                                        <ui:outputRichText aura:id="EKYCGender" value="{!v.kyc.eKYC_Photo__c}" />
+                                     </div>
+                                </div>
+                                
+                            </div>    
+                         </aura:if>     
+
+                     </div>                    
+                </div>
+     		</div>  
+    	</div>        
+    </div>
+            </lightning:card>
+            <!-- code added by hrushikesh -->
+             <aura:if isTrue="{!v.isViewCustomerEyeModal}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View Customer Eye</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe aura:id="frame1" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe aura:id="frame2" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe aura:id="frame3" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe aura:id="frame4" id="frame4" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+                        <!-- code added by hrushikesh STOP -->
+
+            
+    </div>
+</aura:component>

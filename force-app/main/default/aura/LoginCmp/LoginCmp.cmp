@@ -1,0 +1,53 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="LoginController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="userName" type="String" default=""/>
+    <aura:attribute name="pwd" type="String" default=""/>
+    <aura:attribute name = "isNewUser" type="Boolean" default="false"/>
+    <aura:attribute name = "isError" type="Boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String" default=""/>
+    <aura:attribute name="contact" type="Contact" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <br/>
+    <br/>
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                 <span class="slds-assistive-text">Loading</span>
+                 <div class="slds-spinner__dot-a"></div>
+                 <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+ 	</aura:if>
+    <center>
+        <div aura:id="outerLogindiv">
+            <div aura:id="LoginFormdiv">
+                <div class="slds-form-element__control slds-float--center">
+                    <lightning:input name="input1" label="User Id" placeholder="someone@example.com" value="{!v.userName}" style="width: 255px !important;" required="true"/>
+                    <br/>
+                    <lightning:input type="password" name="input2" label="Password" placeholder="minimum of 6 characters" value="{!v.pwd}" style="width: 255px !important;"  pattern=".{6,}" required="true"/>
+                </div>    
+                <br/>
+                <br/>
+                <lightning:button variant="brand" label="Submit" onclick="{!c.Submit}" />
+                <br/>
+                <br/>
+                New? Register here : <lightning:button variant="brand" label="Register" onclick="{!c.Register}" />
+            </div>
+         </div>
+    </center>
+    
+    <div aura:id="RegisterForm">
+        <!--<c:RegisterCmp isOpen="{!v.isNewUser}"/>-->
+    </div>    
+    
+    <div class="slds-theme_shade"></div>
+    
+    <div>
+        <c:PopupComp title="Error" isOpen="{!v.isError}" message="{!v.errorMsg}"/>    
+    </div>
+    
+</aura:component>

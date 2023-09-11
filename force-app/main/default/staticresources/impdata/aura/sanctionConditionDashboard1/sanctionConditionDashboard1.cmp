@@ -1,0 +1,56 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="Status__c" type="List"/>
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="discrepancyList" type="Discrepancy__c[]"/>
+    <aura:attribute name="SanctionFinalOutput" type="String" default="Done"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:handler event="c:SetParentAttributes" action="{!c.setParentAttributVar}"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="loan" type="Opportunity"/> <!-- 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <c:GenericBackCmp/>
+    <br/>
+    
+    
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card class="applyMarginToCard slds-box" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                   
+                 <!--   <div class="slds-grid slds-wrap slds-grid-pull-padded">     -->      
+                        
+                                <table>
+                                  	<tbody> 
+					 <aura:if isTrue="{!v.SanctionFinalOutput != ''}">
+                                        <aura:if isTrue="{!v.SanctionFinalOutput == 'Done'}" >
+                                            <tr class="green-color" style="height:30px;text-align :center"> 
+                                                <div style="padding-top:8px"> Sanction Condition : {!v.SanctionFinalOutput}  </div> </tr>
+                                            
+                                            <aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Sanction Condition: {!v.SanctionFinalOutput}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if> 
+					<aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Sanction Condition: {!v.SanctionFinalOutput}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if> 
+                                <c:SAL_Pricing_SanctionConditions Status__c="{!v.Status__c}" loan="{!v.loan}" displayReadOnly="{!v.displayReadOnly}" existingDisList="{!v.existingDisList}" loanid="{!v.oppId}" discrepancyList="{!v.discrepancyList}" flow="credit"/>
+                                    </tbody>
+                                </table>
+                            
+                   <!-- </div> -->
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

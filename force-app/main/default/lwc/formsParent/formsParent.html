@@ -1,0 +1,52 @@
+<template>
+    <!--<c-forms-demo></c-forms-demo>-->
+
+    <lightning-button class="slds-m-left_xx-small slds-m-bottom_small slds-m-top_x-small"
+                        variant="brand"
+                        label="Validate"
+                        disabled={disableBtn}
+                        onclick={handleValidate}>
+    </lightning-button>
+
+    <!--<div class="form__group field">
+      <input type="input" class="form__field" placeholder="Name" name="name" id='name' required />
+      <label for="name" class="form__label">Name</label>
+    </div>-->
+    <div class="slds-grid slds-wrap slds-align-top">
+      <div class="SelectedOptions slds-col slds-size_1-of-4 slds-m-right_xx-small">
+          <div class="slds-form-element">
+            <lightning-combobox
+            name="progress"
+            label="Status"
+            value={value}
+            placeholder="Select Progress"
+            options={options}
+            onchange={handleChange} ></lightning-combobox>
+          </div>
+      </div>
+      <div class="SelectedText slds-col slds-size_1-of-4 slds-m-right_xx-small">
+          <div class="slds-form-element__control slds-m-top_large">
+              <input type="text" id="text-input-id-47" placeholder="A placeHolder" required="" class="slds-input" />
+          </div>
+      </div>
+      <div class="slds-col slds-size_1-of-4 slds-m-right_xx-small slds-m-top_large">
+          <lightning-button label="Click Me" variant="brand-outline" onclick={handleClick}></lightning-button>
+      </div>
+  </div>
+
+  <lightning-dual-listbox name="languages"
+                            label="Select Languages"
+                            source-label="Available"
+                            selected-label="Selected"
+                            field-level-help="Select your preferred languages"
+                            options={options}
+                            onchange={handleChange}
+                            disable-reordering=false></lightning-dual-listbox>
+    <div class="slds-box" >
+        <p>Selected values are: {selected}</p>
+    </div>
+    <lightning-button disabled variant="neutral" label="test" title="test" class="myDisabledClass"></lightning-button>
+
+
+
+</template>

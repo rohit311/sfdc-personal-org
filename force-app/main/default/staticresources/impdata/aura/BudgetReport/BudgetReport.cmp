@@ -1,0 +1,196 @@
+<aura:component controller="BudgetReport">
+    <aura:handler name="init" value="{! this }" action = "{! c.onInit }" />    
+    <aura:attribute name="budgets" type="Object[]" />
+    <aura:attribute name="ipAddr" type="String" />
+    <aura:attribute name="showSpinner" type="boolean" default="false" />
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Heading  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <div class="slds-page-header slds-border_bottom" role="banner">
+        <div class="slds-grid">            
+            <div class="slds-col">
+                <div class="slds-media slds-media--center slds-no-space slds-text-heading_large slds-grow ">
+                    <div class="slds-media__figure">
+                        <button class="slds-button">
+                            <lightning:icon  title="User Licenses - Budget Report" iconName="custom:custom102" size="large" />
+                        </button>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-heading--label">User Licenses</p>
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle" title="Budget Report">Budget Report</h1>
+                    </div>
+                    <div class="slds-media__body">
+                        <lightning:button variant="brand" class="slds-p-around_small" label="Asset Confirmation" title="Confirm your assets!" onclick="{! c.onAssetConfirmation }" />                        
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+- END : Heading  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Spinner  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <aura:if isTrue="{! v.showSpinner }">
+        <lightning:spinner />
+    </aura:if>
+    <!-- +-+-+-+-+-+-+-+-+-+- END   : Spinner  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Report table  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <div class="slds-grid slds-m-top_xxx-small">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-m-around_xxx-small slds-m-right_small slds-border_right slds-border_left">
+            <!-- +-+-+-+-+-+-+-+-+-+- START : Report table ::: Heading +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <thead class="slds-m-around_xxx-small font-size-11">
+                <tr class="slds-m-around_xxx-small" scope="row"> 
+                    <th rowspan="3" scope="col" class="slds-cell-wrap slds-border_right">
+                        <span class="slds-align_absolute-center">Business Units </span>
+                    </th>
+                    <th colspan="5" scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Projections for FY 19-20</span>
+                    </th>
+                    <th colspan="5" scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Consumptions for FY 19-20</span>
+                    </th>
+                    <th colspan="5" scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remainings for FY 19-20</span>
+                    </th>
+                </tr>
+                
+                <tr scope="row">
+                    <th colspan="5" scope="col" class="slds-cell-wrap"> 
+                        <span class="slds-align_absolute-center">19-20 Budget</span>
+                    </th>
+                    <th colspan="5" scope="col" class="slds-cell-wrap"> 
+                        <span class="slds-align_absolute-center">License Utilized </span>
+                    </th>
+                    <th colspan="5" scope="col" class="slds-cell-wrap"> 
+                        <span class="slds-align_absolute-center">License Remaining </span>
+                    </th>
+                </tr>
+                
+                <tr scope="row">
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">EE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">REE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Total(19-20) without Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Total with Community</span>
+                    </th>                    
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">EE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">REE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Total(19-20) consumed without Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Total consumed with Community</span>
+                    </th>
+                    
+                                        
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remaining EE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remaining REE(19-20)</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remaining Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remaining Total(19-20) without Community</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remaining Total with Community</span>
+                    </th>
+                </tr>
+            </thead>
+            <!-- +-+-+-+-+-+-+-+-+-+- END  : Report table ::: Heading +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <!-- +-+-+-+-+-+-+-+-+-+- START  : Report table ::: BODY  +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <tbody>                
+                <aura:if isTrue ="{! or(v.budgets == null, empty(v.budgets) ) }">
+                    <tr>
+                        <td colspan="16">
+                            <span class="slds-align_absolute-center slds-m-around_small">There is no data to display.</span>
+                        </td>
+                    </tr>
+                </aura:if>
+                
+                <aura:if isTrue="{! not(empty(v.budgets) ) }">
+                    <aura:iteration  items="{! v.budgets }" var="oBudget" >
+                        <tr>
+                            <td>
+                                {! oBudget.businessUnit }
+                            </td>
+                            <td>
+                                {! oBudget.EE_projection }
+                            </td>
+                            <td>
+                                {! oBudget.REE_projection }
+                            </td>
+                            <td>
+                                {! oBudget.community_projection }
+                            </td>
+                            <td>
+                                {! oBudget.total_projection_wo_community }
+                            </td>
+                            <td>
+                                {! oBudget.total_projection_w_community }
+                            </td>
+                            <td>
+                                {! oBudget.EE_consumption }
+                            </td>
+                            <td>
+                                {! oBudget.REE_consumption }
+                            </td>
+                            <td>
+                                {! oBudget.community_consumption }
+                            </td>
+                            <td>
+                                {! oBudget.total_consumption_wo_community }
+                            </td>
+                            <td>
+                                {! oBudget.total_consumption_w_community }
+                            </td>
+                            
+                            <td>
+                                {! oBudget.remaining_EE }
+                            </td>
+                            <td>
+                                {! oBudget.remaining_REE }
+                            </td>
+                            <td>
+                                {! oBudget.remaining_community }
+                            </td>
+                            <td>
+                                {! oBudget.remaining_total_wo_community }
+                            </td>
+                            <td>
+                                {! oBudget.remaining_total_w_community }
+                            </td>
+                        </tr>
+                    </aura:iteration >
+                </aura:if>
+            </tbody>
+            <!-- +-+-+-+-+-+-+-+-+-+- END  : Report table ::: BODY  +-+-+-+-+-+-+-+-+-+-+-+- -->
+        </table>
+        <!-- +-+-+-+-+-+-+-+-+-+- END  : Report table +-+-+-+-+-+-+-+-+-+-+-+- -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+- START : MODAL  +-+-+-+-+-+-+-+-+-+-+-+- -->
+        <div aura:id="Modalbox">
+             {!v.body}
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+- END  : MODAL  +-+-+-+-+-+-+-+-+-+-+-+- -->
+        <!-- MODAL END --> 
+    </div>
+</aura:component>

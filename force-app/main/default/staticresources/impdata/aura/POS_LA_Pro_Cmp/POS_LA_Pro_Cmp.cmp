@@ -1,0 +1,108 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobileLoanController">
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!-- BugId - 22141 S -->
+    <aura:attribute name = "appId" type = "String"/>
+    <aura:attribute name = "FraudValidationResult" type = "String" default ="" />
+    <!--22141 E -->
+    <!--Bug 24237 S-->
+    <aura:attribute name = "stpNonStp" type = "String" default =""/>
+    <!--Bug 24237 E-->
+    <aura:attribute name="oppoObj" type="Opportunity"/>
+    <aura:attribute name="feesNChargesListParent" type="Fees_and_Charge__c[]" access="global"/>
+    <aura:attribute name="insuranceListParent" type="DPLinsurance__c[]" access="global"/>
+    <aura:attribute name="applicantParent" type="Applicant__c" access="global"/>
+    <aura:attribute name="contactParent" type="Contact" access="global"/>
+     <aura:attribute name="productOffering" type="Product_Offerings__c"/>
+    <aura:attribute name="accountObj" type="Object"/>
+     <aura:attribute name ="isCreditDoneAtPO" type = "String" default = "false"/> <!-- Bug 22425 CC Code changes SME -->
+    <aura:attribute name="currentDisbDetailsId" type="String"/>
+    <aura:attribute name="cddObjParent" type="Current_Disbursal_Details__c" default="{}"/>
+    <aura:attribute name="repaymentDetailsId" type="String"/>
+    <aura:attribute name="rmdObjParent" type="RePayment_mode_detail__c" default="{}"/>
+    <aura:attribute name="shouldBeDisable" type="Boolean" default="false"/>
+   <!-- <aura:attribute name="maritalStatusValueParent" type="String" access="global"/>	-->
+    
+    <aura:attribute name="LoanId" type="String" default="0060k0000067E4r"/>
+    <aura:attribute name="TabId" type="String" default="LoanInfo" />
+    <aura:attribute name="isStp" type="Boolean" default="false" />
+    <!-- 28 jan S -->
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+     <!-- 28 jan E -->
+    <aura:handler phase="bubble" event="c:ShowToastEvent" action="{!c.showToast}"/>
+    <aura:handler event="c:POSNavigateToTab" action="{!c.Navigate}"/>
+    <aura:registerevent name="DisableFormEvent" type="c:DisableFormEvent" />
+    <aura:registerEvent name="passInsuranceListEvt" type="c:PassInsuranceListEvent"/>
+     <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <!--Added for Bug 24487 By Gopika EMI Card-->
+    <aura:handler event="c:handleEmiCardFeesCharges" action="{!c.handleEMICardFetchEvent}"/>
+    <aura:if isTrue="{!v.showSpinner}">
+    	<lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isStp}">
+   <div id = "POS_LA_MainDIV">
+       <!--22141 S -->
+   <c:LANCard  aura:id="LanCard" recordId="{!v.LoanId}" oppObj="{!v.oppoObj}"  mobileValidationResult ="{!v.FraudValidationResult}"  isCreditDoneAtPO = "{!v.isCreditDoneAtPO}"></c:LANCard><br/>		 <!-- Bug 22425 CC Code changes SME -->			
+    <!-- 22141 E -->
+     <div class="innerDivWrapper">
+    <lightning:tabset onselect="{!c.tabSelected}" variant="default" selectedTabId="{!v.TabId}" >
+        <lightning:tab label="Loan Info" aura:id="tab1" tabindex="1" id="LoanInfo" title="Loan Info" >
+            <c:POS_LA_LoanInfo oppId="{!v.LoanId}" applicantObj = "{!v.applicantParent}" spinnerFlag="{!v.showSpinner}"/>
+        </lightning:tab>
+        <lightning:tab label="CKYC Details" aura:id="tab2" tabindex="2" id="CKyc" title="CKYC Details">
+             <c:POS_LA_CKYC contact="{!v.contactParent}" applicantObject="{!v.applicantParent}" shouldBeDisable="{!v.shouldBeDisable}" spinnerFlag="{!v.showSpinner}"/>
+        </lightning:tab>
+        <lightning:tab label="Obligation" aura:id="tab3" tabindex="3" id="Obligation" title="Obligation">
+      		<!-- added stpNonStp Bug 24237 --> <!-- added 2 parameter of contact and applicant obje for US_27806_CKYC -->
+            <c:POS_LA_Obligation contact="{!v.contactParent}" applicantObject="{!v.applicantParent}" stpNonStp="{!v.stpNonStp}" loanAppID="{!v.LoanId}" OppObj="{!v.oppoObj}" shouldBeDisable="{!v.shouldBeDisable}" isReadOnly="{!v.shouldBeDisable}" spinnerFlag="{!v.showSpinner}" FraudResult = "{!v.FraudValidationResult}"/> 
+        </lightning:tab>
+        <aura:if isTrue="{!v.oppoObj.StageName == 'Post Approval Sales' || v.oppoObj.StageName == 'Branch Ops' || v.oppoObj.StageName == 'Moved To Finnone'}">
+            <lightning:tab label="Commercials" aura:id="tab4" tabindex="4" id="Commercial" title="Commercials" >
+                <c:POS_LA_Commercials recordId="{!v.LoanId}" OppObj="{!v.oppoObj}"  applicant="{!v.applicantParent}" 
+                                      shouldBeDisable="{!v.shouldBeDisable}" accountId="{!v.oppoObj.AccountId}" 
+                                      productOffering="{!v.productOffering}" childAccount="{!v.accountObj}" spinnerFlag="{!v.showSpinner}" stpNonStp = "{!v.stpNonStp}"/>
+            </lightning:tab>
+            <lightning:tab label="Insurance" aura:id="tab5" tabindex="5" id="Insurance" title="Insurance">
+            
+                <c:GenericRecordDetails  isCommunityUsr = "{!v.isCommunityUsr}" loanAppID="{!v.LoanId}" insuranceObjList="{!v.insuranceListParent}" apprInsuranceAmount="{!v.accountObj.Approved_Insurance__c}" isPosLaFlow="true" loanStage="{!v.oppoObj.StageName}" stageName = "{!v.oppoObj.StageName}" shouldBeDisable="{!v.shouldBeDisable}" />
+                   
+                </lightning:tab>
+            <lightning:tab label="Fees" aura:id="tab6" tabindex="6" id="Fees" title="Fees">
+                <c:POS_LA_FeesCharges oppoObject="{!v.oppoObj}" rmdObj="{!v.rmdObjParent}" feesNChargesList="{!v.feesNChargesListParent}" shouldBeDisable="{!v.shouldBeDisable}" spinnerFlag="{!v.showSpinner}"/>
+            </lightning:tab>
+            <lightning:tab label="Disbursal" aura:id="tab7" tabindex="7" id="Disbursal" title="Disbursal">
+                <c:POS_Disbursal recordId="{!v.LoanId}" OppObj="{!v.oppoObj}" cddId="{!v.currentDisbDetailsId}" rmdId="{!v.repaymentDetailsId}" feesNChargesListParent="{!v.feesNChargesListParent}"
+                                 shouldBeDisable="{!v.shouldBeDisable}" cddObj="{!v.cddObjParent}" rmdObj="{!v.rmdObjParent}" spinnerFlag="{!v.showSpinner}"/>
+            </lightning:tab>
+        </aura:if>
+    </lightning:tabset>
+          </div> 
+        </div>
+           </aura:if>
+        
+    <br/>
+    <br/>
+<br/>
+    <aura:attribute name="test" type="String"  default=""/>
+    
+     <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   
+</aura:component>

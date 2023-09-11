@@ -1,0 +1,8 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="StockAnalysisCtrl">
+	<!--<ltng:require scripts="{!join(',')}" afterScriptsLoaded="{!c.afterScriptsLoaded}" />  -->  
+    <aura:attribute name="chartType" type="String" default=""/>
+    
+    
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+    
+</aura:component>

@@ -1,0 +1,33 @@
+<template>
+
+    <c-custom-Toast>
+    </c-custom-Toast>
+
+    <div class="slds-p-around_medium">
+        <div class="slds-size_2-of-6">
+            <lightning-input type="text" label="Name" onchange={handleChange}></lightning-input>
+        </div>
+
+        <div class="slds-size_2-of-6">
+            <lightning-input type="email" label="E-mail" onchange={handleChange}></lightning-input>
+        </div>
+
+        <div class="slds-size_2-of-6">
+            <lightning-combobox
+                            value={value}
+                            options={pickListvalues}
+                            placeholder="Select an Option"
+                            label="Type"
+                            onchange={handleChange}
+                            ></lightning-combobox>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <lightning-button label="Save" variant="brand" onclick={handleSave}>
+            </lightning-button>
+        </div>
+        
+
+
+    </div>    
+</template>

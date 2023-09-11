@@ -1,0 +1,44 @@
+<!-- EmployeeDocumentUploader -->
+<aura:component controller="EmployeeLoanAutomationCtrl" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="oppId" type="String" default="0060l0000055bIG"/>
+    <aura:attribute name="DocumentList" type="List" default=""/>
+    <aura:attribute name="DocumentSelectList" type="List" default=""/>
+    <aura:attribute name="DocSelected" type="String" default=""/>
+    <aura:attribute name="accordian_name" type="String" default=""/>
+    <aura:attribute name="displayReadOnly" type="boolean" default="false"/>
+    <!--<aura:attribute name="selTabId" type="String" default=""/>-->
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.populateList}"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	 <aura:attribute name="applicantObj" type="Applicant__c"/> <!-- DMS upload by swapnil 24317 -->
+    <aura:attribute name="DMSDocmap" type="Map" default="{}"/><!-- DMS upload by swapnil 24317 -->
+    <lightning:accordion activeSectionName="{!v.accordian_name}">
+        <aura:if isTrue="{!!v.displayReadOnly}">
+    <lightning:accordionSection name="DocUploader" label="Document Uploader">
+            <aura:if isTrue="{!v.accordian_name == 'DocUploader'}">
+            <div style=" overflow:auto;">
+                <lightning:select aura:id="selectedDoc" name="Document" label="Select Document" value="{!v.DocSelected}" onchange="{!c.setDocVisible}">
+                    <option value=""> --None-- </option>
+                    <aura:iteration var="option" items="{!v.DocumentSelectList}">
+                        <option value="{!option}">{!option}</option>
+                    </aura:iteration>     
+                </lightning:select>
+            </div>
+   <div aura:id="Uploader" class="slds-scrollable_y slds-hide">
+              
+                    <div style="padding-top: 30px; padding-left: 20px;" class="slds-scrollable_y ">
+                        <c:DocumentUploader aura:id="file-uploader-1" instance="11" parentId="{!v.applicantObj.Id}" fileName="{!v.DocSelected}" uploadType="{! v.DocSelected == 'Cheque' ? 'feed' : 'Attachment'}" displayUpload="false" uploadImageFilesOnly="{!if(v.DocSelected == 'Photograph',true,false)}" flow="Mobility2" showUploadButton="true"/><!-- Need to add showUploadButton="false" --> <!-- Parent Id changed by swapnil 24317 -->
+                    </div>
+
+                	</div>
+                    
+            </aura:if>
+        </lightning:accordionSection>
+    </aura:if>
+        <lightning:accordionSection name="DocList" label="Uploaded Documents">
+            <div>
+                <c:DocumentsList isEmployeeLoans="true" displayReadOnly="{!v.displayReadOnly}" parentId="{!v.applicantObj.Id}" flow="Mobility2" isUnderwitercmp="false"/>        
+            </div>
+        </lightning:accordionSection>
+        
+    </lightning:accordion>
+</aura:component>

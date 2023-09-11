@@ -1,0 +1,104 @@
+<!-- Sal_Opp_Mobility_Perfios -->
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="bankAccountList" type="List"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="bankAccount" type="Bank_Account__c" default="{'sobjectType': 'Bank_Account__c'}"/>
+    <aura:attribute name="isSendFlagChecked" type="Boolean" default="false"/>
+    <aura:registerEvent name="appPerfiosEvent" type="c:Sal_Opp_Perfios"/>
+    <aura:attribute name="customEmailLabel" type="String"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default=""/>
+    <aura:attribute name="disablepage" type="Boolean" default="false"/> 
+    <aura:attribute name="theme" type="String" default=""/>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <div class="slds-p-horizontal--small">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:select aura:id="bankAccountId" class="optionClass" name="bankAccountName" label="Bank Account Name" required="true" messageWhenValueMissing="Please Select Bank Account Name" value="{!v.bankAccount.Bank_Name_List__c}">
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.bankAccountList}" var="ba">
+                                <option value="{!ba}" text="{!ba}" selected="{!v.bankAccount.Bank_Name_List__c == ba}"></option>
+                            </aura:iteration>
+                        </lightning:select>                   
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12" style="padding-top:2%;padding-left:4%">
+                  
+                    <div class="slds-form-element__control perfioccheckbox">
+                        <lightning:input name="sendEmailId" type="checkbox" label="Send Email for Perfios" value="{!v.bankAccount.Send_Email_For_Perfios__c}" checked="{!v.isSendFlagChecked}" aura:id="sendEmailId" disabled="{!v.bankAccount.Send_Email_For_Perfios__c}"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="accountNumberId" label="Bank Account Number" value="{!v.bankAccount.Bank_Acct_Number__c}" name="accountNumberName" placeholder="Bank Account Number" type="text" maxlength="25" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Bank Account Number can only accept digits." pattern="[0-9]*"/>
+                    </div>
+                </div>
+                <div style="{!v.customEmailLabel == 'FALSE'?'display:none':'display:block'}" class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <label class="slds-form-element__label"> Upload Bank Statement </label>
+                    <div class="slds-form-element__control">
+                        <lightning:button variant="brand" label="Upload" iconName="utility:save" iconPosition="left" onclick="{!c.uploadPerfios}"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <label class="slds-form-element__label" for="select-01"> Bank Account - Link </label> <br/>
+                        <aura:if isTrue="{!and(v.bankAccount.Id != null,v.bankAccount.Id != '',v.bankAccount.Id != undefined)}">
+                            <a onclick="{!c.redirectToPerfiosRecord}" target="_blank">
+                                Bank Account - Perfios
+                            </a>
+                            <aura:set attribute="else">
+                                Bank Account Not Available
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </ui:scrollerWrapper>
+    <br/>
+    <div class="slds-p-top--x-small">
+        <lightning:button variant="brand" class="slds-align_absolute-center" label="Initiate Perfios" iconName="utility:save" iconPosition="left" onclick="{!c.operationOnPerfios}"/>
+    </div>
+    <div id="perfiosSuccess" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div id="perfiosSucc" class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="perfiosSuccessMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="perfiosError" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div id="perfiosErr" class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme_error" role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                <h2 id ="perfiosErrorMsg"></h2>
+            </div>
+        </div>
+    </div>
+    <div id="perfiosInfo" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--info" role="alert" >
+                <lightning:icon iconName="utility:info" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastInfo}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="perfiosInfoMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+</aura:component>

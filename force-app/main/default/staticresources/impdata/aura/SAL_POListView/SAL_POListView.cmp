@@ -1,0 +1,163 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="selTabId" type="String"/>
+    <aura:attribute type="Boolean" name="showFilter" default="false"/> <!-- 981 -->
+    <aura:attribute name="countAccordian" type="Integer"/><!-- 981 countAccordian-->
+    <aura:attribute name="followupPOTodayToFuture" type="Product_Offerings__c[]" /><!--981-->
+    <!-- azure981-->
+     <aura:attribute name="CibilPO_Priority" type="Product_Offerings__c[]" />
+     <aura:attribute name="ProgramType_Priority" type="Product_Offerings__c[]" />
+     <aura:attribute name="OthersPriority" type="Product_Offerings__c[]" />
+    <!-- azure981-->
+    <!--20939 s-->
+    <aura:attribute name="POMap" type="List" /> 
+    <aura:attribute name="notContactList" type="Product_Offerings__c[]" />
+    <aura:attribute name="notEligibleList" type="Product_Offerings__c[]" />
+    <aura:attribute name="notInterestedList" type="Product_Offerings__c[]" />
+    <!--20939 e-->
+    <aura:attribute name="onload" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="poSource" type="List" default="[
+                                                         {'label': 'Lead Source', 'value': 'lead_source'},
+                                                         {'label': 'PO Source', 'value': 'po_source'}
+                                                         ]"/>
+    <aura:attribute name="poListInit" type="Product_Offerings__c[]" />
+    <aura:attribute name="freshpoList" type="Product_Offerings__c[]" />
+     <aura:attribute name="dispositionList" type="Product_Offerings__c[]" />
+    <aura:attribute name="prioritypoList" type="Product_Offerings__c[]" />
+    <aura:attribute name="flwuppoList" type="Product_Offerings__c[]" /> 
+    <aura:attribute name="ccLeadpoList" type="Product_Offerings__c[]" /><!-- Bug 18623 -->
+    <aura:attribute name="subpoList" type="Product_Offerings__c[]" />
+    <aura:attribute name="allpoList" type="Product_Offerings__c[]" />
+    <aura:attribute name="filteredPOList" type="Product_Offerings__c[]" />
+    <aura:attribute name="lstPo" type="Product_Offerings__c[]"/> 
+    <aura:attribute name="latitude" type="String"/>
+    <aura:attribute name="longitude" type="String"/>
+    <aura:attribute name="isGPSEnabled" type="boolean"/> 
+    <aura:attribute name="sourceVal" type="String" default="lead_source"/>
+    <aura:attribute name="employerList" type="Segment_Master__c[]" default="[]"/><!--bug id 18539-->
+    <aura:attribute name="selectedEmployer" type="Segment_Master__c" default="{}"/><!--bug id 18539-->
+    <aura:attribute name="employerSearchKeyword" type="string" default=""/><!--bug id 18539-->
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/><!--bug id 18539-->
+    
+    <!--Added by swapnil MGM 19263 s-->
+    <aura:attribute name="mgmQueueList" type="Product_Offerings__c[]" />
+    <!--Added by swapnil MGM 19263 e-->
+    <aura:registerEvent name="navigateToComponent" type="c:navigateToParent"/>
+    <aura:registerEvent name="DestroyChild1" type="c:DestroyChild"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:SetPOId" action="{!c.navigateToMyPO}"/> 
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <aura:attribute name="productOfferingId" type="String"/>
+    <aura:attribute name="isValidated" type="boolean" default="true"/><!--Bug 17815 -->
+    <aura:attribute name="ProgramTypeList" type="String[]" default="Pre-Approved,Financial,Surrogate,BLUS_Preapproved,BLUS_Financial,Salaried,DLUS_Preapproved,TOPUP"/><!-- Bug 18538-->
+    <aura:attribute name="progTypValue" type="String"/><!--Bug 18538 --> 
+    <aura:attribute name="view" type="String" default="fresh"/> <!--Adhoc  --> 
+    <!--<aura:attribute name="Emplyr" type="String"/> Bug 18539 -->
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    
+    <ui:scrollerWrapper class="{!$Browser.isIPhone ? 'scrollerSize ' : ''}">
+    <div style="position:relative">
+    <div class="innerDivWrapper">
+  <!--	<c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />-->
+    <div id="tabset" class="">
+        
+        <lightning:button class="slds-theme--alt-inverse  " iconName='utility:back' aura:id="BackButtonId" variant="brand" label="Back" onclick="{!c.sendback}" />
+        
+        <lightning:buttonIcon variant="brand" alternativeText="Filter" onclick="{!c.showFilter}" class="slds-theme--alt-inverse slds-float_right " aura:id="filterList" iconName="utility:filterList" />                
+        <br />
+        <div class="slds-box filterDiv slds-m-top--medium" id="filterDivTog" style="display:none">
+            <lightning:radioGroup aura:id="leadoPoSrc"
+                                  name="radioButtonGroup"
+                                  options="{! v.poSource }"
+                                  value="{! v.sourceVal }" />
+            <lightning:input type="text" label="" name="source" aura:id="src_Val"/>
+            <lightning:input type="text" label="Loan Amount:" aura:id="loan_amt" name="loan_amt" pattern="^[0-9]+$" messageWhenPatternMismatch="Please Enter valid Number" /> <!--changed type from number to Text,Bug 17687 --> 
+            <!--Bug 18538 Start-->
+            <lightning:select aura:id="prg_type" label="Program Type:" name="prg_typeName" value="{!v.progTypValue}">
+                <option value="">-- None --</option>
+                <aura:iteration items="{!v.ProgramTypeList}" var="progType">
+                    <option value="{!progType}" text="{!progType}"></option>
+                </aura:iteration>
+            </lightning:select> 
+            <!--Bug 18538 End-->
+            <!--Bug 18539 Start
+            <lightning:input type="text" label="Employer :" aura:id="EmpVal" value="{!v.Emplyr}"/>
+            Bug 18539 End-->
+            
+            
+         
+            <!--bug id 18539 start-->
+            <div aura:id="employerSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup ">
+                <div class="slds-form-element__control">
+                    <lightning:input aura:id="EmpVal" label="Employer Name:" class="slds-lookup__search-input" onchange="{!c.employerKeyPressController}" value="{!v.employerSearchKeyword}"/>        
+                   
+                    <!--This part is for Display typehead lookup result List-->  
+                    <div class="slds-lookup__menu slds" id="sourceList">
+                        <div aura:id="employerMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                           <ul class="slds-lookup__list" role="listbox">
+                            <aura:iteration items="{!v.employerList}" var="singleRec" indexVar="idx">
+                                <li role="presentation">
+                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                        <div class="slds-media__body">
+                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectEmployer}">{!singleRec.Name}</a></div>
+                                            </div>
+                                        </div>    
+                                    </span>
+                                </li>
+                            </aura:iteration>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--bug id 18539 end-->
+            
+            
+            <lightning:input type="date" label="Offer Date:" class="{! !v.isValidated ? 'slds-has-error' : ''}" aura:id="off_date" name="off_date" onchange="{!c.onValueChange}" messageWhenBadInput="Please enter valid date"/><!-- added messageWhenBadInput,onchange and Class attribute added for Bug 17815 -->
+            <!--Bug 17815 Start -->
+            
+            <aura:if isTrue="{!!v.isValidated}">
+                <div class="slds-text-color_error slds-p-left_x-small">
+                    Date must not be in future.
+                </div>
+            </aura:if>
+            <!--Bug 17815 End -->
+            <br />
+            <div class="slds-align_absolute-center">
+                <lightning:buttonIcon alternativeText="Search" onfocus="{!c.onFocusDate}" onclick="{!c.filterPO}" class="slds-show slds-theme--alt-inverse" aura:id="searchList" iconName="utility:search" variant="brand"/>                     
+                
+                &nbsp; &nbsp;
+                <lightning:button class="slds-theme--alt-inverse slds-float_right" variant="brand" label="Clear" onclick="{! c.clearSearch }" />
+                
+            </div>
+        </div>
+        <lightning:button class="slds-m-top_small slds-hide slds-theme--alt-inverse" iconName='utility:back' aura:id="backBtn" variant="brand" label="Back To List" onclick="{! c.goBack }" />
+        
+            <lightning:tabset class="slds-m-top--medium" aura:id="tabSection" onselect="{!c.tabSelected}" selectedTabId="{!v.selTabId}">
+                
+                <lightning:tab id="fresh" aura:id="fresh" label="Fresh" />
+                <lightning:tab id="priority" aura:id="priority" label="Priority"/>
+                <lightning:tab id="followUp" aura:id="followUp" label="Follow up"/>
+                <lightning:tab id="disposition" aura:id="disposition" label="Dispostion"/>
+                <!--<lightning:tab id="submitted" aura:id="submitted" label="Submitted"/>
+                <lightning:tab id="ccLead" aura:id="ccLead" label="CC Leads"/> --> <!-- Bug 18623 -->
+                <!--added by swapnil for referral program bug id 19263-->
+                <lightning:tab id="mgm" aura:id="mgm" label="MGM Queue"/>
+                <lightning:tab id="all" aura:id="all" label="All"/>
+                
+            </lightning:tabset>
+           
+    	</div>
+        <div aura:id = "childCmpbody"> {!v.body} </div>     
+      </div>
+        
+     </div>
+     </ui:scrollerWrapper>
+    <br />
+    
+     
+</aura:component>

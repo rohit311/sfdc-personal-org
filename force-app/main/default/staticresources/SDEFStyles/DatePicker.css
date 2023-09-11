@@ -1,0 +1,266 @@
+/* Styles for date picker */
+.datePicker {
+background-color:#B7C6B2;
+border-bottom:1px solid #000000;
+border-right:1px solid #000000;
+display:none;
+left:0;
+margin-top:2px;
+padding:1px 1px 2px 2px;
+position:absolute;
+top:0;
+width:17em;
+z-index:51;
+/*margin-left:-100px;*/
+}
+.datePicker .dateBar {
+margin:0;
+overflow:hidden;
+padding:1px 2px;
+text-align:center;
+white-space:nowrap;
+}
+.datePicker select {
+vertical-align:top;
+}
+.datePicker .calBody {
+border-color:#7B829D #7B829D -moz-use-text-color;
+border-style:solid solid none;
+border-width:1px 1px medium;
+}
+.datePicker .calDays {
+color:#333333;
+font-family:'Verdana','Geneva',sans-serif;
+font-size:0.8em;
+font-weight:normal;
+width:100%;
+}
+.datePicker .calDays .prevMonth, .datePicker .calDays .nextMonth {
+color:#999999;
+}
+.datePicker .calDays th, .datePicker .calDays td {
+text-align:center;
+width:14%;
+}
+.datePicker .calDays .dayOfWeek {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#ECECEC url(/img/func_icons/cal/dp_daysbg.gif) repeat-x scroll center top;
+border-bottom:1px solid #E0DEE0;
+padding:3px 0;
+}
+.datePicker .calDays .weekend, .datePicker .calDays .weekday {
+border-bottom:1px solid #E0F0FB;
+border-right:1px solid #E0F0FB;
+cursor:pointer;
+padding:5px 0;
+}
+.datePicker .calDays .weekend {
+background-color:#F2F3F7;
+}
+.datePicker .calDays .weekday {
+background-color:#FFFFFF;
+}
+.datePicker .calDays .dueDate {
+background-color:#FF1100;
+color:#000000;
+font-weight:bold;
+}
+.datePicker .calDays .todayDate {
+border:1px solid #000000;
+}
+.datePicker .calDays .startDate, .datePicker .calDays .endDate {
+text-decoration:underline;
+}
+.datePicker .calDays .startDate, .datePicker .calDays .endDate, .datePicker .calDays .selectedDate {
+background-color:#FBFAE3;
+color:#000000;
+font-weight:bold;
+}
+.datePicker .calDays .highlight {
+background-color:#E0F0FD;
+color:#000000;
+}
+.datePicker .buttonBar {
+background-color:#ECECEC;
+border-top:1px solid #E1E2E9;
+clear:both;
+padding:2px 0;
+text-align:center;
+}
+.datePicker .buttonBar .calToday {
+font-size:91%;
+font-weight:bold;
+text-decoration:underline;
+color:#333333;
+}
+.datePicker .dateBar .calLeft, .datePicker .dateBar .calLeftOn, .datePicker .dateBar .calRight, .datePicker .dateBar .calRightOn {
+margin:2px 2px 0;
+}
+.datePicker .dateBar .calLeft {
+background-image:url(/img/func_icons/cal/dp_left.gif);
+background-position:left top;
+height:21px;
+width:13px;
+}
+.datePicker .dateBar .calLeftOn {
+background-image:url(/img/func_icons/cal/dp_left.gif);
+background-position:right top;
+height:21px;
+width:13px;
+}
+.datePicker .dateBar .calRight {
+background-image:url(/img/func_icons/cal/dp_right.gif);
+background-position:left top;
+height:21px;
+width:13px;
+}
+.datePicker .dateBar .calRightOn {
+background-image:url(/img/func_icons/cal/dp_right.gif);
+background-position:right top;
+height:21px;
+width:13px;
+}
+.mCalendar {
+    margin: 5px;
+}
+.datePicker {
+    -moz-border-radius: 5px 5px 5px 5px;
+    -moz-box-shadow: 0 2px 6px #111111;
+    border: 0 none;
+    padding: 7px 5px 6px;
+    width: auto;
+}
+.datePicker, .mCalendar .body {
+    background-color: #EDEDED;
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: left -109px;
+    background-repeat: repeat-x;
+    border: 1px solid #D6D6D6;
+    border-top:1px solid #cccccc;
+    border-left:1px solid #cccccc;
+    border-right:1px solid #666666;
+    border-bottom:1px solid #666666;
+   
+}
+.datePicker .calBody {
+    border: 0 none;
+    padding: 0 10px;
+}
+.mCalendar .header .prevCalArrow, .datePicker .dateBar .calLeft, .datePicker .dateBar .calLeftOn {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -61px;
+    height: 16px;
+    width: 18px;
+}
+.datePicker .dateBar .calLeftOn {
+    background-position: -18px -61px;
+}
+.mCalendar .header .nextCalArrow, .datePicker .dateBar .calRight, .datePicker .dateBar .calRightOn {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -84px;
+    height: 16px;
+    width: 18px;
+}
+.datePicker .dateBar .calRightOn {
+    background-position: -18px -84px;
+}
+.datePicker .dateBar .calLeft, .datePicker .dateBar .calLeftOn {
+    margin: 2px 4px 0 0;
+}
+.datePicker .dateBar .calRight, .datePicker .dateBar .calRightOn {
+    margin: 2px 9px 0 4px;
+}
+.mCalendar .header td, .datePicker .calDays {
+    border: 0 none;
+    color: #4A4A56;
+    font-family: Arial,Helvetica,sans-serif;
+}
+.datePicker .dateBar {
+    padding: 0 0 4px;
+}
+.mCalendar .calDays, .datePicker .calDays .dayOfWeek {
+    color: #4A4A56;
+    font-size: 0.7em;
+    font-weight: normal;
+    padding: 2px;
+}
+.datePicker .calDays .dayOfWeek, .datePicker .calDays .weekday, .datePicker .calDays .weekend {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    padding: 2px 0;
+}
+.datePicker .calDays {
+    font-size: 1em;
+}
+.datePicker .calRow {
+    font-size: 0.81em;
+}
+.mCalendar .highlight td, .mCalendar .days td {
+    padding: 2px;
+}
+.mCalendar .highlight td a, .mCalendar .days td a, .datePicker .calDays td {
+    font-size: 0.8em;
+}
+.mCalendar td a.calActive, .mCalendar .calActive {
+    color: #333333;
+}
+.mCalendar .highlight, .mCalendar .highlight td, .mCalendar .highlight th {
+    background-color: transparent;
+}
+.mCalendar td a.calToday, .mCalendar tr td.calToday {
+    background-color: transparent;
+    border: 0 none;
+}
+.mCalendar tr td.calToday a, .datePicker .calDays .todayDate {
+    background-color: #1797C0;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+.mCalendar tr td.calToday a {
+    padding: 2px 3px;
+}
+.datePicker .calDays .highlight {
+    background-color: #E3F3FF;
+    color: #000000;
+    font-weight: bold;
+}
+.datePicker .calDays .selectedDate {
+    background-color: #C6E1FF;
+    border: 1px solid #99CCFF;
+    color: #000000;
+}
+.mCalendar .topLeft {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 0;
+    border: 0 none;
+    height: 4px;
+}
+.mCalendar .topLeft .topRight {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -16px;
+    height: 4px;
+    width: 4px;
+}
+.mCalendar .bottomLeft {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -31px;
+    height: 4px;
+}
+.mCalendar .bottomLeft .bottomRight {
+    background-image: url("/img/alohaSkin/cal_sprite.png");
+    background-position: 0 -46px;
+    height: 4px;
+    width: 4px;
+}
+.datePicker .buttonBar {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    padding: 2px 0 0;
+}
+.datePicker .buttonBar .calToday {
+    color: #015BA7;
+    font-weight: normal;
+    text-decoration: none;
+}

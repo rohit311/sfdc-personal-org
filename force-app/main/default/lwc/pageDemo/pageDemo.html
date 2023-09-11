@@ -1,0 +1,15 @@
+<template>
+  <template if:true={firstPage}>
+    <!--<c-cmponenttest record-id={recordId}></c-cmponenttest>-->
+    <div>First div</div>
+</template>
+<template if:true={secondPage}>
+    <!--<c-cmponent record-id={recordId}></c-cmponent>-->
+    <div>Second div</div>
+</template>
+
+<div class="slds-text-align_center">
+    <lightning-button variant="brand" label="Previous" onclick={handlePrevious} class="slds-m-right_x-small"></lightning-button>
+    <lightning-button variant="brand" label="Next" onclick={handleNext} class="slds-m-right_x-small"></lightning-button>
+</div>
+</template>

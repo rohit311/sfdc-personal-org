@@ -1,0 +1,38 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome" access="global">
+
+    <!-- Declare attributes --> 
+    <aura:attribute name="Legend" type="String" description="Legend to display" />
+    <aura:attribute name="perText" type="String" default="0%" access="private" description="Text to display inside circle. It is auto calculated field and used internally." />
+    <aura:attribute name="cirDeg" type="String" default="0" access="private" description="Degree of Progress to show. It is auto calculated field and used internally." />
+    
+    <aura:attribute name="totalProgress" type="String" default="100" description="Total progress. It can be number OR API name of field." />
+    <aura:attribute name="actualProgress" type="String" default="50" description="Actual progress. It can be number OR API name of field." />
+    
+    <aura:attribute name="theme" type="String" default="red" description="Theme of Circular Progress Bar. Possible values are red, orange, green"/>
+    <aura:attribute name="size" type="String" default="small" description="Size of Circular Progress Bar. Possible values are small, medium, big."/>
+    
+    <!-- Declare events hendlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="This event is fired when component is initialized"/>
+    <aura:handler name="change" value="{!v.actualProgress}" action="{!c.doInit}" description="This event is fired when actualProgress attribute changes"/>
+    <aura:handler name="change" value="{!v.totalProgress}" action="{!c.doInit}" description="This event is fired when totalProgress attribute changes"/>
+    
+    <!-- Start of circular progress bar container -->
+    <div class="clearFloats slds-align--absolute-center">
+        <!-- Start of circular progress bar div -->
+        <div class="{!(v.cirDeg > 179) ? 'container p50plus ' + v.theme + ' ' + v.size : 'container ' + v.theme + ' ' + v.size}">
+            <span>{!v.perText}</span> 
+            <div class="slice">
+                <div class="bar" style="{!'-webkit-transform: rotate(' + v.cirDeg + 'deg); -moz-transform: rotate(' + v.cirDeg + 'deg); -ms-transform: rotate(' + v.cirDeg + 'deg); -o-transform: rotate(' + v.cirDeg + 'deg); transform: rotate(' + v.cirDeg + 'deg); -ms-transform: rotate(' + v.cirDeg + 'deg);'}"></div>
+                <div class="fill"></div>
+            </div>
+        </div>
+        <!-- End of circular progress bar div -->
+    </div>
+    <!-- End of circular progress bar container -->
+    
+    <!-- Start of legend to be displayed -->
+    <div class="clearFloats slds-align--absolute-center legend"> 
+        {!v.Legend}
+    </div>
+    <!-- End of legend to be displayed -->
+</aura:component>

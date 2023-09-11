@@ -1,0 +1,98 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="coqmRecord" type="Credit_Officer_Queue_Mapping__c"/>
+    <aura:attribute name="identifier" type="String"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    
+    <aura:attribute name="oldQueueValue" type="String"/>
+    <aura:attribute name="oldExceptionQVal" type="String"/>
+
+    <aura:attribute name="selectedData" type="List"/>
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="refNum" type="Decimal"/>
+<!--     <aura:attribute name="coqm" type="Credit_Officer_Queue_Mapping__c" description="" /> -->
+    <aura:attribute name="coqmObj" type="Credit_Officer_Queue_Mapping__c" description="" />
+    <aura:attribute name="isRecordLoaded" type="Boolean" default="false" />
+    <aura:attribute name="isLoaded" type="Boolean" default="false" />
+
+    <force:recordData aura:id="COQMRecordLoader"
+        recordId="{!v.recordId}"
+        targetFields="{!v.coqmObj}"
+        targetError="{!v.errorMsg}"
+        recordUpdated="{!c.handleRecordUpdated}"
+        fields="Id, Name, QueueValue__c , ExceptionQueueValue__c"
+        mode="EDIT"
+    />
+
+<!--     <aura:handler name="render" action="{!c.doInit}" value="{!this}"/> -->
+    <aura:handler name="oSelectedRecordIdListEvent" event="c:SelectedRecordIdListEvent" action="{!c.getEventSelectedValues}"/> 
+    <aura:if isTrue="{!v.isRecordLoaded}">
+    <div class="lookup-container">
+       <fieldset aura:id="details" class="slds-form--stacked slds-p-bottom--medium">
+           <h3 class="slds-section-title--divider">Select multiple values : </h3>
+           <div class="slds-p-horizontal--small ">
+               <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                   <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size_2-of-3">
+                       <lightning:input type="text" label="Queue" value="{!v.coqmObj.QueueValue__c}" aura:id="queueId" />                       
+                   </div>
+                   <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size_1-of-3" style="margin-top: 1.7rem; !important">
+                   		<lightning:buttonIcon iconName="utility:search" variant="bare" alternativeText="Lookup" iconClass="dark" onclick="{!c.openModalPopup}" value='{"identifier":"Queue","objectName":"Queue_Master__c","refNum":1}'/>                        
+                   </div>
+               </div>
+           </div>
+
+            <div class="slds-p-horizontal--small">
+               <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size_2-of-3">
+                           <lightning:input type="text" label="Exception Queue" value="{!v.coqmObj.ExceptionQueueValue__c}" aura:id="exceptionQueueId" />                           
+                       </div>
+                       <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size_1-of-3" style="margin-top: 1.7rem; !important">
+                           <lightning:buttonIcon iconName="utility:search" variant="bare" alternativeText="Lookup" iconClass="dark" onclick="{!c.openModalPopup}" value='{"identifier":"ExceptionQueue","objectName":"Queue_Master__c","refNum":1}'/> 
+                       </div>
+               </div>
+           </div>     
+           
+       </fieldset>
+   </div>
+    
+    <!-- Modal popup to display multi-select options -->
+   <aura:if isTrue="{!v.isLoaded}">
+   <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="customPopup" class="slds-modal">
+        <div class="slds-modal__container" style="width:100% !important">
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">Lookup to select multiple values</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <div>
+                   <c:MultiselectCustomLookup objectApiName="{!v.objectName}" refNumber="{!v.refNum}" selectedValues="{!v.selectedData}" />
+                </div>
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+      </aura:if>
+
+	</aura:if>
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+</aura:component>

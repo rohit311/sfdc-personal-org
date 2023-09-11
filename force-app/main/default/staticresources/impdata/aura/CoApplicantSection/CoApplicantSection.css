@@ -1,0 +1,35 @@
+.THIS .BFLStyle {
+    color: white !important; 
+    background-color: rgb(22, 50, 92) !important;
+    text-align: center;
+}
+
+.THIS .tdWrapper {
+    padding-left: 5px !important;
+}
+
+.THIS .ButtonStyle {  
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+}
+
+.THIS.slds-spinner_container {
+  z-index: 10000;
+  position: fixed;
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}

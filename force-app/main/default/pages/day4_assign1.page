@@ -1,0 +1,26 @@
+<apex:page docType="HTML-5.0" controller="day4_assign1_controller">
+<apex:form >
+
+Date:<apex:input type="date" value="{!d}"/>
+<br/>
+<br/>
+      <apex:commandButton value="Click" action="{!calc}">
+            </apex:commandButton> 
+         <apex:pageBlock >          
+          <apex:repeat value="{!linemap}" var="line">
+        
+        Invoice id:{!line.id}
+               <apex:repeat value="{!linemap[line]}" var="item">
+        Quantity:{!item.Quantity__c}
+        <br/>
+        Unit Price:{!item.Unit_Price__c}
+        <br/>
+        Merchandise:{!item.Merchandise__C}
+       </apex:repeat>
+
+        <br/>
+                </apex:repeat>
+              </apex:pageBlock>
+
+</apex:form>
+</apex:page>

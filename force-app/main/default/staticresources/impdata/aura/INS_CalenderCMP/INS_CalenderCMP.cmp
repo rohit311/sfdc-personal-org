@@ -1,0 +1,45 @@
+<aura:component controller="InsCustDetailsCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <ltng:require styles="{!$Resource.InsuranceCalender     + '/fullcalendar/fullcalendar.css'}"
+                  scripts="{!join(',',
+                           $Resource.InsuranceCalender  + '/fullcalendar/lib/jquery.min.js',
+                           $Resource.InsuranceCalender  + '/fullcalendar/lib/moment.min.js',
+                           $Resource.InsuranceCalender  + '/fullcalendar/fullcalendar.js'
+                           )}"
+                  afterScriptsLoaded="{!c.afterScriptsLoaded}" />
+    
+    <ltng:require styles="/resource/InsuranceCalender/fullcalendar/fullcalendar.css"/>
+    
+    <aura:attribute name='Objectlist' type='Object[]'/>
+    <aura:attribute name='objMap' type='map'/>
+    <aura:attribute name="buttonstate" type="Boolean" default="false"/>
+    <aura:attribute name="showCalendarCmp" type="Boolean" default="true"/>
+    <aura:attribute name="openCustDetails" type="Boolean" default="false"/>
+    <aura:attribute name="childParam" type="Object"/>
+    <aura:registerEvent name="INSHomePgEvent" type="c:INS_GoToHomePgEvent"/>
+    
+    <!--
+     <lightning:buttonStateful
+        labelWhenOff="List View"
+        labelWhenOn="Grid View"
+        
+        state="{!v.buttonstate}"
+                               onclick="{!c.handleClick }"/>-->
+    <div class="slds-p-horizontal--small slds-theme_shade slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-left: 0px;margin-right: 0px;  ">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded" style="margin-top: 7px;">
+            <aura:if isTrue="{!v.showCalendarCmp}">
+                <lightning:button variant="brand"  label="Back" aura:id="back_btn" onclick="{!c.backToHome}" class="slds-theme--alt-inverse slds-float_left bckBtnClass" title="Back"> 
+                    <lightning:icon iconName="utility:back" title="Back" size="x-small" variant="inverse"/>
+                </lightning:button>
+                
+                <div id="calendar" class="slds-card" >
+                    
+                    
+                </div>
+                <div id="listcalendar" class="slds-card"/>
+            </aura:if>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.openCustDetails == true}">
+       <c:INS_CustomerDetails objParam = "{!v.childParam}" aura:id="custCmpId"/>
+    </aura:if>
+</aura:component>

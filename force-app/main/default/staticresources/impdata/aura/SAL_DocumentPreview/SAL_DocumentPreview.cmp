@@ -1,0 +1,11 @@
+<aura:component controller="LighteningUtilities" access="global">
+    
+	<aura:attribute name="parentId" type="String"/>
+    
+    <aura:attribute name="attachmentUrl" type="String" default="https://bflhts--Partial.cs72.my.salesforce.com/servlet/servlet.FileDownload?file="/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="prefixURL" type="String" default="/sfc/servlet.shepherd/version/download/"/>
+    <c:GenericBackCmp/>
+   
+    <div aura:id="iframeHolder"></div>
+</aura:component>

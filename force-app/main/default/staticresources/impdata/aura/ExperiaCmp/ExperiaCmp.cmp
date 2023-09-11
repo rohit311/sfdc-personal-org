@@ -1,0 +1,9 @@
+<aura:component controller="OpportunityDetailsOperator">
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="isDisabled"   type="Boolean"  default = "false" />
+    <aura:attribute name="repayObj" type="RePayment_mode_detail__c" />
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+	<aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>	
+    
+    <lightning:button aura:id="UMRNBtn" class="slds-button slds-theme--alt-inverse slds-button--brand"  label="Get UMRN"  variant="brand" value="{!v.id}" onclick="{! c.fetchUMRN }" disabled = "{! v.isDisabled }"/>
+</aura:component>

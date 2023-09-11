@@ -1,0 +1,10 @@
+<apex:page standardController="Account" extensions="DEController">
+  
+
+  <apex:form >
+  {!greetings}
+
+  <apex:commandButton action="{!dosomething}" value="Click"></apex:commandButton>
+  {!greetings}
+  </apex:form>
+</apex:page>

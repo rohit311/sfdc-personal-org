@@ -1,0 +1,13 @@
+<apex:page >
+ 
+ <style type="text/css">
+ .asidetext{font-style: italic;}
+ </style>
+ <apex:outputText style="font-weight:bold;">
+ This text is styled directly.
+ </apex:outputText>
+ 
+ <apex:outputText styleClass="asidetext">
+ This text is styled via a stylesheet class.
+ </apex:outputText>
+</apex:page>

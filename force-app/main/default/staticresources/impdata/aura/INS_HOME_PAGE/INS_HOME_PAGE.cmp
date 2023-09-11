@@ -1,0 +1,109 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--attributes-->
+    <aura:attribute name="homeFlag" type="Boolean" default="true"/>
+    <aura:attribute name="isSpinner" type="Boolean" default="false"/>
+   	<aura:attribute name="tileId" type="String" />
+    <aura:attribute name="ChildParam" type="Object" access="public"/>   
+    
+    <!--Handlers-->
+    <aura:handler name="INSHomePgEvent" event="c:INS_GoToHomePgEvent" action="{!c.handleHmPgEvt}"/>
+    
+    <aura:if isTrue="{!v.isSpinner}">
+        <lightning:spinner variant="brand"  size="large" />
+    </aura:if>
+    <c:INS_NotificationCmp />
+    <ui:scrollerWrapper class="scrollerSize">
+         
+        <div style="position:relative" class="slds-theme_default">
+            <div class="innerDivWrapper">
+                <aura:if isTrue="{!v.homeFlag}">
+                    <div>
+                        <div style="background-color:white">
+							<img src="{!$Resource.BajajLogoIns}" class="slds-align_absolute-center"/>	
+						</div> 
+                        <div class="slds-grid slds-align_absolute-center borderColor">
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="newLeadId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <!--<lightning:button class="temp" onclick="{!c.openTileCmp}" aura:id="newLeadID">-->
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="action:new_lead" size="large" variant="inverse"/>
+                                        <p>NEW LEAD</p>  
+                                    </lightning:card>
+                                    <!--</lightning:button>-->
+                                </a>
+                            </div>
+                            
+                            
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="leadListId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="standard:lead_list" size="large" variant="inverse"/>
+                                        <p>LEAD LIST   </p>                                         
+                                        <div class="slds-hidden">hi</div>   
+                                    </lightning:card>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-align_absolute-center borderColor">
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="followUpId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="action:follow" size="large" variant="inverse"/>
+                                        <p>FOLLOW UP</p>
+                                    </lightning:card>
+                                </a>
+                            </div>
+                            
+                            
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="ntbId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="action:new_contact" size="large" variant="inverse"/>
+                                        <p>NTB</p>
+                                    </lightning:card>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-align_absolute-center borderColor">
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a id="dashboradId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="standard:dashboard" size="large" variant="inverse"/>
+                                        <p>DASHBOARD</p>
+                                        <div class="slds-hidden">hi</div>
+                                    </lightning:card>
+                                </a>
+                            </div>
+                             <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="calendarId" onclick="{!c.openTileCmp}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="standard:date_time" size="large" variant="inverse"/>
+                                        <p>CALENDAR</p>
+                                        <div class="slds-hidden">hi</div>
+                                    </lightning:card>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                
+              	 <aura:if isTrue="{!(v.tileId == 'newLeadId' || v.tileId == 'leadListId' || v.tileId == 'followUpId')}">
+                	<c:INS_MAIN_CMP objParam = "{!v.ChildParam}" />
+                </aura:if>
+                
+                <!--<aura:if isTrue="{!v.tileId == 'dashboradId'}">
+                	<c:INS_DashboardCMP/>
+                </aura:if>-->
+                 <aura:if isTrue="{!v.tileId == 'ntbId'}">
+                	<c:INS_NTBCMP/>
+                </aura:if>
+                <aura:if isTrue="{!v.tileId == 'calendarId'}">
+                	<c:INS_CalenderCMP/>
+                </aura:if>
+                
+            </div>
+            
+        </div>
+        
+    </ui:scrollerWrapper>
+</aura:component>

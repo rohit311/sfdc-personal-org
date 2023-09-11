@@ -1,0 +1,23 @@
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS .MyBtn{
+    margin-top:10px;
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+/*19861 start*/
+.THIS .div2 {
+    height: 100px;    
+    padding: 50px;
+    box-sizing: border-box;
+}
+/*19861 end*/

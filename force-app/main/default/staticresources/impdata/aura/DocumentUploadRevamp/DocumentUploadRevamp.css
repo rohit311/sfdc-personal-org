@@ -1,0 +1,13 @@
+.THIS  .slds-form-element__label {
+    display : none;
+    visibility : hidden;
+}
+
+.THIS  .slds-form_horizontal {
+    display : none;
+    visibility : hidden;
+}
+
+.THIS .btnClass {
+    text-align: left;
+}

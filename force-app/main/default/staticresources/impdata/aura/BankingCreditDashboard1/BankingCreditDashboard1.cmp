@@ -1,0 +1,179 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="abbvalue" type="string" default=""/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="conObj" type="Contact" default="{}"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="accObj" type="Account" default="{}"/>
+    <aura:attribute name="bankVerifyDone" type="string" default=""/> 
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/>	
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <!-- 24315 start -->
+    <aura:attribute name="disbObj" type="Current_Disbursal_Details__c"/>
+    <aura:attribute name="repayObj" type="RePayment_mode_detail__c"/>
+    <!-- 24315 stop -->
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute name="bankCheckDashboardData" type="Object" default=""/>
+    <!--24315s--><aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 --><!--24315e-->
+    
+    <c:GenericBackCmp/> <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card class="applyMarginToCard slds-box" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                        
+                        <table>
+                            
+                            <tbody> 
+                                <aura:if isTrue="{! !empty(v.bankCheckDashboardData)}">
+                                    <aura:if isTrue="{!and(!empty(v.bankCheckDashboardData.banking_output),v.bankCheckDashboardData.banking_output == 'SUCCESSFUL')}">
+                                        <tr class="green-color" style="height:30px;text-align :center"> 
+                                            <div style="padding-top:8px"> Banking Check: Successful  </div> </tr>
+                                        
+                                        
+                                        <aura:set attribute="else">
+                                            <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Banking Check: Not Confirmed </div> </tr>
+                                        </aura:set>
+                                    </aura:if> 
+                                    <aura:set attribute="else">
+                                        <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Banking Check: Not Confirmed </div> </tr>
+                                    </aura:set>
+                                </aura:if>
+                                <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                    <lightning:card title="" class="applyColor">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <aura:if isTrue="{!v.bankObj.Perfios_Flag__c == true}" >
+                                                                <lightning:input name="Ptype" label="Perfios/Non Perfios Case" value="Perfios" disabled="true" />
+                                                                <aura:set attribute="else">
+                                                                    <lightning:input name="Ptype" label="Perfios/Non Perfios Case" value="Non Perfios" disabled="true" />
+                                                                </aura:set>
+                                                            </aura:if> 
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <aura:if isTrue="{!and(!empty(v.bankObj),!empty(v.bankObj.Perfios_Bank_Name__c))}" >
+                                                                <lightning:input name="bankName" label="Bank Name(from perfios)" value="{!v.bankObj.Perfios_Bank_Name__c}" disabled="true"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:input name="bankName" label="Bank Name" value="{!v.bankObj.Bank_Name__c}" disabled="true"/>
+                                                                </aura:set>
+                                                            </aura:if> 
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <aura:if isTrue="{!and(!empty(v.bankObj),v.bankObj.Perfios_Flag__c == true)}" >
+                                                                <lightning:input name="bankName" label="Account Number (from perfios/SDK)" value="{!v.bankObj.Perfios_Account_No__c}" disabled="true"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:input name="bankName" label="Account Number" value="{!v.bankObj.Bank_Acct_Number__c}" disabled="true"/>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </div>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.bankObj.Perfios_Flag__c == true}" >
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input type="text" name="source" value="{!v.bankObj.Source_Of_Data__c}" label="Source of bank statement" placeholder="" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                        <aura:if isTrue="{!v.bankObj.Source_Of_Data__c == 'PDF Uploaded'}" >
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label>  Link </label> <br/><br/>
+                                                                    <a onclick="{!c.redirectToPerfiosRecord}" target="_blank">
+                                                                        Bank Account Link
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </aura:if>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input type="text" name="authFlag" value="{!v.bankObj.Authenticity_Score_Flag__c}" label="Authenticity Score Flag" placeholder="" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input type="text" name="address" value="{!v.bankObj.Perfios_Client_Address__c}" label="Address" disabled="true" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input type="text" name="addressCheck" value="{!v.conObj.Customer_address_matches_with_perfios__c}" label="Address matching with Perfios Address" placeholder="" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                    
+                                                    
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control"> 
+                                                            
+                                                            <lightning:input type="text" name="covert" value="{!v.bankVerifyDone}" label="Covert Applicability" disabled="true" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        
+                                                        <lightning:input aura:id="dateVariation1" label="Salary Credit date Variation" name="dateVariation" value="{!v.bankObj.Salary_Date_Inconsistency_Found__c == true ? 'Yes' : 'No'}" disabled="true"/>
+                                                    </div>
+                                                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        
+                                                        <lightning:input aura:id="amtVariation" label="Salary Amount Variation" name="amtVariation" value="{!v.bankObj.Salary_Amount_Difference__c == true ? 'Yes' : 'No'}" disabled="true"/>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.bankObj.Perfios_Flag__c == true}" >
+                                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input type="text" name="abb" value="{!v.abbvalue}" label="ABB" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </aura:if>
+                                                    <!--24315s-->
+                                                    
+                                                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">                                                               
+                                                        <lightning:input aura:id="RepaymentAccountNumber" label="Repayment Account Number" name="Repayment Account Number" value="{!v.repayObj.A_C_NO__c}" disabled="true"/>
+                                                    </div>
+                                                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">                                                               
+                                                        <lightning:input aura:id="DisbursementAccountNumber" label="Disbursement Account Number" name="Disbursement Account Number" value="{!v.disbObj.Bank_Account__c}" disabled="true"/>
+                                                    </div>
+                                                    
+                                                    <!--24315e-->
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </lightning:card>
+                                </div></tbody>
+                            
+                        </table>
+                        <br/>
+                        <br/>
+                        <!--24315s-->
+                        <div class="slds-align_absolute-center slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div  class="slds-form-element__control">
+                                <lightning:button aura:id="Approve" class="slds-theme_alt-inverse" variant="brand" label="Approve Banking" onclick="{!c.updateBankAccount}" disabled="{!or(v.displayReadOnly,v.bankObj.Perfios_account_same_as_Salary_account__c)}"/><!-- CR 22307 for display readonly  -->
+                            </div>
+                        </div><!--24315e-->                        
+                        
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

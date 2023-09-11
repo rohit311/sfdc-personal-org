@@ -1,0 +1,96 @@
+<!--
+Component Name: SalesComplianceCmp                                                                                       
+Description   :This component is used to fill the questionnaries from Customer afer opportunity is Moved to finnone        
+-->
+
+<aura:component controller="Sales_Compliance_Cntrl" implements="flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="pdObj" type="Personal_Discussion__c" default="{'sobjectType':'Personal_Discussion__c'}"/>
+    <aura:attribute name="OppId" type="String"/>
+    <aura:attribute name="quesdetailslist" type="Object" />
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}"/>
+   
+    
+    <div aura:id="dashboardModel" class="slds-size--12-of-12 slds-align_absolute-center" id="dashboardModelId"> 
+        <div aura:id="deviceBasedDiv" id="deviceBasedDiv" role="dialog" tabindex="-1" aria-describedby="MainPopUp" aria-labelledby="header99" class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large align-dashboard':'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large'}">
+            <div class="slds-modal__container slds-size--12-of-12"  style="overflow:auto;">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.onCrossButton}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> Questions List </h2>
+                </div>
+                
+                <ui:scrollerWrapper class="scrollerSize" >
+                   
+                 <div style="position:relative">   
+                 <div class="innerDivWrapper">
+                <div aura:id='MainPopUp' class="slds-modal__content slds-p-around--medium   slds-scrollable_y">
+                   
+                    <div class="slds-scrollable" style="font-size: 14px;">
+                         <div style="position:relative;overflow-y:scroll !important;min-height:100vh;">
+                        <table id="mytable" style="overflow:auto;" class="slds-no-row-hover slds-hyphenate  slds-scrollable_y slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                            <thead>
+                                <tr class="slds-hyphenate slds-text-title_caps slds-col slds-size--12-of-12 ">
+                                    <th scope="col" class="slds-size--1-of-12 blue-color slds-hyphenate WrapText">
+                                        <div class="slds-text-title_caps  slds-hyphenate WrapText" title="Check List" style=" color: white;">Sr No</div>	
+                                    </th>
+                                    <th scope="col" class=" slds-col blue-color slds-size--6-of-12 slds-hyphenate WrapText">
+                                        <div class="slds-text-title_caps slds-hyphenate WrapText" value="Remark" title="Remark" style=" color: white;">Questions</div>
+                                    </th>
+                                    <th scope="col" class=" slds-col blue-color slds-size--5-of-12 slds-hyphenate WrapText">
+                                        <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Disposition" style=" color: white;">Answer</div>
+                                    </th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>  
+                                
+                                <aura:iteration items="{!v.quesdetailslist}" indexVar="index" var="quesdetails">  
+                                    <tr class="{!if(quesdetails.showQues,'slds-size--12-of-12','slds-hide slds-size--12-of-12')}" id="tableid">
+                                        
+                                        <th id="{!'srno'+quesdetails.index}" value="{!'srno'+index}" scope="row" data-label="" class=" slds-size--1-of-12  ">
+                                            <div  class=" WrapText slds-hyphenate"  >{!index+1} </div>
+                                        </th>
+                                        <th id="{!'question'+index}" value="{!quesdetails.title}" scope="row" data-label="" class=" slds-size--6-of-12  ">
+                                            <div  class=" WrapText slds-hyphenate" ><aura:if isTrue="{!quesdetails.mandatory== 'TRUE'}">*</aura:if>{!quesdetails.title} </div>
+                                        </th>
+                                        <td data-label=" "  class="slds-size--5-of-12 ">
+                                            <aura:if isTrue="{!quesdetails.type == 'picklist'}">
+                                                <lightning:select onchange="{!c.checkChange}" aura:id="answer" name="{!index}" label="" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Select Value"  value="{!quesdetails.selectedvalue}" disabled="false">
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration  items="{!quesdetails.answer}" var="dis">
+                                                        <option class="font-size-14" value="{!dis}" text="{!dis}" selected="{!quesdetails.selectedvalue == dis}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                                <aura:set attribute="else">
+                                                    <lightning:input type="text" messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </td>
+                                        
+                                    </tr>
+                                </aura:iteration>
+                              
+                            </tbody>
+                        </table>
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+                            <div class="slds-p-around--x-small" align="center">
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.saverecords}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+                
+                        </div>
+                </ui:scrollerWrapper>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    
+</aura:component>

@@ -1,0 +1,9 @@
+<apex:page controller="Refreshpage_controller">
+  <apex:form id="tx">
+     <apex:commandButton action="{!incr}" value="INC" reRender="tx"/>
+     <apex:outputText >
+        {!i} 
+     </apex:outputText>
+  
+  </apex:form>
+</apex:page>

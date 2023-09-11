@@ -1,0 +1,57 @@
+.THIS .offer-pg-cont1{
+    width: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+.THIS .offer-pg1 > .testing{
+    overflow-x: auto;
+ 
+    margin-left:10px;
+    float:left;
+   
+}
+.THIS .lightningtoast{
+    padding-top: 130px !important;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    }
+.THIS .offer-pg1{
+    
+    width: 1500px;
+}
+.THIS .divWidth
+{
+      width: 600px;
+    
+}
+
+@media only screen and (max-width: 500px){
+   .THIS .offer-pg1{
+        
+        width: 480px;
+     
+       
+}
+
+.THIS .offer-pg-cont1{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+}
+@media only screen and (max-width: 850px) and (min-width: 500px){
+   .THIS .offer-pg1{
+        
+        width: 800px;
+}
+
+.THIS .offer-pg-cont1{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+}
+.THIS .slds-checkbox--faux{
+    background-color:lightgrey !important;
+}

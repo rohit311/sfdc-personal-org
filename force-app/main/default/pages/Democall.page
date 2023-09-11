@@ -1,0 +1,15 @@
+<apex:page docType="HTML-5.0" controller="democall_controller">
+<apex:form >
+      <apex:actionFunction name="callme" action="{!demo1}" reRender="ab"/>  
+       
+       <apex:pageBlock id="ab">
+     FirstName:  <apex:input value="{!firstname}"/>
+     LastName:   <apex:input value="{!lastname}"/>
+        <!--  <apex:commandButton value="click" onclick="callme()"/>  -->
+          <apex:outputPanel onclick="callme()" styleClass="btn">
+          Create
+          </apex:outputPanel>
+       </apex:pageBlock>
+
+</apex:form> 
+</apex:page>

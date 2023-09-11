@@ -1,0 +1,75 @@
+.THIS #Header{
+    background-color:#007acc;
+    color:white;
+    font-family:Arial;
+    text-align: center;
+    line-height: 5px;
+}
+
+.THIS .coApplicantsectionHeader {
+    width: 35%;
+    background-color:#C0C0C0;
+    color: Black!important;
+    padding: 5px;
+    border-spacing: 5px;
+}
+
+.THIS .coApplicantsection {
+    width: 35%;
+    padding: 5px;
+    border-spacing: 5px;
+}
+.THIS .bnt{
+    
+    cursor: pointer;
+    color: #0072bc;
+    width: 25%;
+    border: 1px solid #b5b5b5;
+    border-bottom-color: #7f7f7f;
+    background: #e8e8e9;
+    font-weight: bold;
+    font-size:12px ;
+    border-radius: 3px;
+    font-family: Arial,Helvetica,sans-serif;
+    background: #d8edff;
+    box-sizing: border-box;
+    height: 25px;
+    line-height: normal;
+}
+
+.THIS #Header1{
+    
+    color: Black!important;
+    padding: 5px;
+    border-spacing: 5px;
+}
+
+.THIS #footer{
+    
+    background-color:#007acc;
+    color:white;
+    font-family:Arial;
+    
+}
+
+.THIS table,.THIS td,.THIS th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.THIS table {
+    
+}
+
+.THIS th {
+    text-align: center;
+    padding-right:50px;  
+    width: 100px;
+    
+}
+
+.THIS #Body{
+    background-color:#f2f2f2;
+    color:#000000;
+    font-family:Arial;
+}

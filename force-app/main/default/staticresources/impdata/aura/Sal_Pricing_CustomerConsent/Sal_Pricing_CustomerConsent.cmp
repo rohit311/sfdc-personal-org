@@ -1,0 +1,225 @@
+<aura:component controller="SAL_PricingCtrlV2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <!--SAL 2.0 CR's s-->
+    <aura:attribute name="isViewReportModalOpen" type="Boolean" default="false"/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="headerVal" type="String" default=""/>
+    <!--SAL 2.0 CR's e-->
+    <aura:attribute type="Boolean" name="displayExotel" default="false"/><!-- Bug 23064 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute name="validExotelProd" type="String[]" default=""/><!-- Bug 23064 -->
+    <aura:attribute name="nameTheme" type="String" default=""/>
+    <aura:attribute name="loanid" type="ID"/> 
+    <aura:attribute name="totalDisbAmount" type="String"/> <!--22624 -->
+    <aura:attribute type="Opportunity" name="loan"/><!--22017-->
+    <aura:attribute name="datevalidationmsg1" type="String"/>
+    <aura:attribute name="datevalidationmsg2" type="String"/>
+    <aura:attribute name="dateValidationError1" type="Boolean" default="false"/>
+    <aura:attribute name="dateValidationError2" type="Boolean" default="false"/>
+    <aura:attribute name="disbusmentList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="disbusment" type="Current_Disbursal_Details__c"/>
+    <aura:attribute name="chargeList" type="Fees_and_Charge__c"/>
+    <aura:attribute name="upfrontCharge" type="Fees_and_Charge__c"/>
+    <aura:attribute name="touchFreeCharge" type="Fees_and_Charge__c"/>
+    <aura:attribute name="BPICharge" type="Fees_and_Charge__c"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="EMI1stDate" type="String"/>
+    <aura:attribute name="EMILastDate" type="String"/>
+    <aura:attribute name="BPI" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+    <aura:attribute name="account" type="Account" default="{}"/>
+    <aura:attribute name="netdisbamt" type="Decimal" default="0.0"/>
+    <aura:attribute name="StampDuty" type="String"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+    <aura:method name="updatelastemi" action="{!c.updatelastemi}" access="PUBLIC" /><!--22017-->
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/><!--22017-->
+	 <aura:attribute name="isMITC" type="Boolean" default="false"/><!--25097-->
+    <aura:attribute name="appObj" type="Applicant__c" default="{'sobjectType':'Applicant__c','Drop_Line_Flexi_Period__c':0}"/><!--SAL 2.0 CR--> 
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+
+    <!--  <div style="position:relative">
+        <ui:scrollerWrapper class="scrollerSize">
+            <div class="innerDivWrapper"> -->
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" style="background: #f4f6f9;" >
+        <div class="slds-grid slds-wrap slds-grid--pull-padded" >
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input type="number" value="{!v.BPI}" label="BPI" name="nameBPI" />                                         
+                    </div>        
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input type="number" value="{!v.StampDuty}" label="Stamp Duty" name="nameBPI" />             
+                    </div>        
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="emi1st" value="{!v.EMI1stDate}" class="{! v.dateValidationError1 ? 'slds-has-error' : ''}" onchange="{!c.dateUpdate}"  type="date" label="1st EMI Date" name="name1EmiDate" messageWhenValueMissing="Please Enter Value" required="true"/>
+                    </div>        
+                    <aura:if isTrue="{!v.dateValidationError1}">
+                        <div class="slds-text-color_error slds-p-left_x-small">
+                            {!v.datevalidationmsg1}
+                        </div>
+                    </aura:if>  
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input type="number" aura:id="disAmountId" value="{!v.netdisbamt}" label="Disbursement Amount" name="nameDisAmount" messageWhenValueMissing="Please Enter Value" required="true"/>
+                    </div>        
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input  value="{!v.EMILastDate}" type="date" label="Last EMI Date" class="{! v.dateValidationError2 ? 'slds-has-error' : ''}" onchange="{!c.dateUpdate}"  name="nameLastEmiDate" aura:id="emiLastId" messageWhenValueMissing="Please Enter Value" required="true"/>
+                    </div>     
+                    <aura:if isTrue="{!v.dateValidationError2}">
+                        <div class="slds-text-color_error slds-p-left_x-small">
+                            {!v.datevalidationmsg2}
+                        </div>
+                    </aura:if> 
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element__control">
+                        <lightning:input type="number"  value="{!v.EMI}" label="EMI" name="nameEMI" aura:id="emiId" messageWhenValueMissing="Please Enter Value" disabled="true" /><!--SAL CR's added disabled -->
+                    </div>        
+                </div>
+            </div>
+            <!--SAL 2.0 CR start--> 
+            <aura:if isTrue="{!v.loan.Scheme_Master__r.IsHybridFlexi__c}">
+                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control" id="pureFlexiDiv">    
+                            <lightning:input aura:id="PureFlexPeriod1" label="Pure Flexi Period" value="{!v.appObj.Pure_Flexi_Period__c}" disabled="true" name="PureFlexiPeriod"  type="text" pattern="[0-9]*" messageWhenBadInput="Pure Flexi Period should contain only digits." placeholder="Pure Flexi Period"/>
+                            
+                        </div>
+                    </div>
+                </div> 
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control" >
+                            <lightning:input label="Pure Flexi Period EMI" value="{!v.appObj.Pure_Flexi_EMI__c}" name="PureFlexi" disabled="true"/>
+                        </div>
+                    </div>
+                </div> 
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="DropLinPeriod1" label="Drop Line Flexi Period" value="{!v.appObj.Drop_Line_Flexi_Period__c}" name="DropLineFlexi" disabled="true"/>
+                        </div>
+                    </div>
+                </div>
+            </aura:if>
+            <!--SAL 2.0 CR end--> 
+            <aura:if isTrue="{!(v.upfrontCharge!=null)}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    
+                    <div class="slds-col slds-size_1-of-1">
+                        <div class="slds-form-element__control">
+                            <lightning:input type="decimal" value="{!v.upfrontCharge.Change_Amount__c}" label="Upfront Charge" name="upfrontCharges1" aura:id="upfrontCharges1"/>
+                        </div>        
+                    </div>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!(v.touchFreeCharge!=null)}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    
+                    <div class="slds-col slds-size_1-of-1">
+                        <div class="slds-form-element__control">
+                            <lightning:input type="decimal" value="{!v.touchFreeCharge.Change_Amount__c}" label="Touch Free Fees" name="touchfreeCharges1" aura:id="touchfreeCharges1"/>
+                        </div>        
+                    </div>
+                </div>
+            </aura:if>
+            <!--SAL 2.0 CR's s-->
+            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="select-01"> Application Form </label> <br/>
+                    <a onclick="{!c.redirectToReport}">
+                        Preview 
+                    </a>
+                    
+                </div> 
+            </div>
+            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="select-01"> E-Agreement </label> <br/>
+                    <a onclick="{!c.redirectAggToReport}">
+                        Preview
+                    </a>
+                    
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="mobileNumber">Mobile Number</label>
+                    <div class="slds-grid slds-size--3-of-5">
+                        <div class="slds-size--1-of-2">
+                            <a id="{!v.appObj.Id}" >{!v.account.Mobile__c}</a><!-- Sprint 23064 -->                                    
+                            <!--Bug 23064 start-->
+                        </div>
+                        
+                        <aura:if isTrue="{!and(v.displayExotel,!v.displayReadOnly)}">
+                            <div onclick="{!c.makeacall}" class="slds-size--1-of-2" data-value="{!v.appObj.Id}">
+                                
+                                <!-- 23064 changed by swapnil -->
+                                <c:Exotel_APICmp frommobile="none" tomobile="{!v.account.Mobile__c}"  recordId="{!v.appObj.Id}" objName="Applicant__c"  Product="{!v.appObj.Product__c}"/>
+                            </div>
+                        </aura:if>
+                        <!--Bug 23064 stop-->
+                    </div>
+                </div>
+            </div>
+            <!--SAL 2.0 CR's e-->
+        </div>
+        <aura:if isTrue="{!v.nameTheme!='Theme4t'}">
+            <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                    <lightning:button variant="brand" iconName="utility:save" onclick="{!c.saveCustomerCons}" aura:id="save" label="Save" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"/> <!-- CR 22307 -->
+                    <lightning:button variant="brand" iconName="utility:save" onclick="{!c.send_E_Aggrement}" aura:id="save" label="Send Mail To Customer" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"/> <!-- CR 22307 -->
+                    
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                    <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                        <lightning:button variant="brand" iconName="utility:save" onclick="{!c.saveCustomerCons}" aura:id="save" label="Save" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"/> <!-- CR 22307 -->
+                        
+                    </div>
+                </div>
+                <div class="slds-align_absolute-center">
+                    <div class="slds-align_absolute-center">
+                        <lightning:button variant="brand" iconName="utility:save" onclick="{!c.send_E_Aggrement}" aura:id="save" label="Send Mail To Customer" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"/> <!-- CR 22307 -->
+                        
+                    </div>
+                </div>
+            </aura:set>
+        </aura:if>
+    </div>
+    <!--</div></ui:scrollerWrapper></div>-->
+    <!--SAL 2.0 CR's s-->
+    <aura:if isTrue="{!v.isViewReportModalOpen}">
+        <c:SAL_ConsentPreview isViewReportModalOpen="{!v.isViewReportModalOpen}" isCommunityUsr="{!v.isCommunityUsr}" oppId="{!v.loanid}" headerVal="{!v.headerVal}" theme="{!v.nameTheme}" isMITC="{!v.isMITC}"/><!--25097-->
+    </aura:if>
+    <!--SAL 2.0 CR's e-->
+    
+    
+</aura:component>

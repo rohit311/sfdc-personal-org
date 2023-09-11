@@ -1,0 +1,7 @@
+<aura:component >
+    <aura:registerEvent name="cmpEvent" type="c:ceEvent"/>
+    
+    <h1>Component event demo.</h1>
+    <p><ui:button label="Click here to fire a component event" press="{!c.fireComponentEvent}" /></p>
+    
+</aura:component>

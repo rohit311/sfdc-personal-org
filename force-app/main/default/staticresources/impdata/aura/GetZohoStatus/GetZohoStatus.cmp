@@ -1,0 +1,35 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="ZohoDetailsController" >
+	
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="recordId" type="id" access="global"/>
+     <aura:attribute name="StatusVal" type="string" access="global"/>   
+   
+     <div class="slds-notify slds-notify--toast slds-theme_success" >
+             <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-regular">
+                      {!v.StatusVal}
+                    </h2>
+                </div>
+            </div>
+         </div>               
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div class="slds-notify slds-notify--toast slds-theme_success" role="alert">
+            <span class="slds-assistive-text">Success</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small slds-wrap">
+                       {!v.StatusVal}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   
+    
+</aura:component>

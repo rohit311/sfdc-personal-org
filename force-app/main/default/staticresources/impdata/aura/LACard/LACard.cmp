@@ -1,0 +1,109 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" controller="SALMobilityCntrl_V2">
+    <ltng:require scripts="{!$Resource.jqueryformobility}"/>
+    <aura:attribute name="oppObj" type="Opportunity" />
+    <aura:attribute name="stageCompletion" type="String"/>
+     <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 -->
+    <aura:attribute name="priAppObj" type="Applicant__c" default="{}"/><!--Bug 24668 -->
+    <aura:attribute name="TATtime" type="String"/>
+    <aura:attribute name="toggleI" type="Boolean" default="false"/>
+    <!-- underwriter screen changes start-->
+    <aura:attribute name="isCredit" type="Boolean" default="false"/>
+    <!-- underwriter screen changes end-->
+    <aura:attribute name="messageFromEvent" type="String"/>
+    <aura:handler name="eventDashboard" event="c:EventDashboard" action="{!c.closeModel}"/>
+	<aura:attribute name="flow" type="String" default="sales" /> <!-- CR 22307 --> 
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    
+    
+    
+    <div aura:id="boxBorder" >
+        <lightning:card class="slds-box slds-box_x-small" title="{!v.oppObj.Name}" iconName="utility:edit_form">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_11-of-12 slds-medium-size_11-of-12 slds-large-size_11-of-12 slds-grid slds-wrap">
+                        <div class="slds-size_1-of-3 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                            LAN
+                        </div><!--Bug 18799 increased column from 2 to 3-->
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_small" style="font-weight: bold">
+                            : {!v.oppObj.Loan_Application_Number__c}
+                        </div><!-- Bug 18799 added slds-text-body_small -->
+                        <div class="slds-size_1-of-3 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                            Stage
+                        </div><!--Bug 18799 increased column from 2 to 3 -->
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_small" style="font-weight: bold">
+                            : {!v.oppObj.StageName}
+                        </div><!-- Bug 18799 added slds-text-body_small -->
+						
+						 <div class="slds-size_1-of-3 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                            TAT
+                        </div><!--Bug 18799 increased column from 2 to 3 -->
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_small" style="font-weight: bold">
+                                                        : {!v.TATtime}
+                        </div><!-- Bug 18799 added slds-text-body_small -->
+                    </div>
+                    <!-- underwriter screen changes start-->
+                    <aura:if isTrue="{!v.isCredit == false}">
+                        <div class="slds-col slds-size_1-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+                            <aura:if isTrue="{!v.flow == 'pricing'}"> <!-- CR 22307 --> 
+                               <!-- <a id="info" onclick="{!c.openPricingDashboard}" href="" style="text-decoration: none;">
+                                    <lightning:icon iconName="utility:info" />
+                                </a> -->
+                                <a id="info" onclick="{!c.openPricingDashboard1}" href="" style="text-decoration: none;">
+                                    <lightning:icon iconName="utility:info" />
+                                </a>
+                                <aura:set attribute="else">
+                                    <!--<a id="info" onclick="{!c.openDashboard}" href="" style="text-decoration: none;">
+                                        <lightning:icon iconName="utility:info" />
+                                    </a>-->
+                                    <a id="info" onclick="{!c.openDashboard1}" href="" style="text-decoration: none;">
+                                        <lightning:icon iconName="utility:info" />
+                                    </a>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                   </aura:if>
+                    <!-- underwriter screen changes start-->   
+                    <!--<div class="slds-col slds-size_1-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+                            <aura:if isTrue="{!v.oppObj.StageName == 'Post Approval Sales'}">
+                                <a id="info" onclick="{!c.openPricingDashboard}" href="" style="text-decoration: none;">
+                                    <lightning:icon iconName="utility:info" />
+                                </a>
+                           </aura:if>
+                        <aura:if isTrue="{!v.oppObj.StageName == 'DSA/PSF Login'}">
+                                    <a id="info" onclick="{!c.openDashboard}" href="" style="text-decoration: none;">
+                                        <lightning:icon iconName="utility:info" />
+                                    </a>
+                            </aura:if>
+                         <aura:if isTrue="{!v.oppObj.StageName == 'Underwriting'}">
+                                    <a id="info" onclick="{!c.openCreditDashboard}" href="" style="text-decoration: none;">
+                                        <lightning:icon iconName="utility:info" />
+                                    </a>
+                            </aura:if>
+                        </div>-->
+                </div>
+                <aura:if isTrue="{!v.oppObj.StageName == 'Sales Reject'}">
+                    <div class="slds-progress-bar slds-progress-bar_medium slds-progress-bar_circular slds-m-top--medium" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25" role="progressbar">
+                        <span class="slds-progress-bar__valueFail" style="width:20%" aura:id="progressSpan"/>
+                    </div>
+                    <aura:set attribute="else">
+                        <div class="slds-progress-bar slds-progress-bar_medium slds-progress-bar_circular slds-m-top--medium" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25" role="progressbar">
+                            <span class="slds-progress-bar__value" style="{!'width:'+v.stageCompletion}" aura:id="progressSpan"/>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </p>
+        </lightning:card>
+    </div>
+    <div  aura:id="newtag" style="auto;" class="slds-align_absolute-center">
+        {!v.body}
+    </div>
+    
+    
+    
+    
+    
+    <!-- <c:SalesDashboard oppId="{!v.oppObj.Id}" />-->
+    
+    
+</aura:component>

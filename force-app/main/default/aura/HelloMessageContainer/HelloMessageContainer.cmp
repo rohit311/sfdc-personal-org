@@ -1,0 +1,3 @@
+<aura:component >
+    <c:HelloMessage message="This message"/>
+</aura:component>

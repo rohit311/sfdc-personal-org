@@ -1,0 +1,47 @@
+.THIS .slds-card__header{
+    padding: 0;
+}
+
+.THIS .slds-card__body{
+    margin-bottom: 0;
+}
+
+.THIS .floatLeft{
+    padding-left: 0.5px;
+}
+
+.THIS .important-message {
+    font-weight: bold;
+    font-size: 150%;
+}
+
+.THIS .a {
+    text-decoration: none;
+}
+.THIS .color-blue{
+  background-color: lightblue;
+
+}
+
+.THIS .plussign
+{
+        font-size: 300%;
+}
+.THIS .applyMarginToCard
+{
+    padding-right: 0px;
+    padding-left: 0px;
+    padding-top: 0px;
+}
+.THIS .green-color{
+    background-color: lightgreen;
+
+}
+
+.THIS .orange-color{
+    background-color: rgb(255,144,144);
+
+}
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}

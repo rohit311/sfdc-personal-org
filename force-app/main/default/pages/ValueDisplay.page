@@ -1,0 +1,11 @@
+<apex:page standardController="Account">
+   <apex:form >
+      <apex:pageBlock title="Hello {!$User.FirstName}">
+         Account name-{!Account.name}
+          <apex:inputField value="{!Account.Name}"/>
+          <apex:commandButton action="{!save}" value="Save Account"/>
+      </apex:pageBlock> 
+    
+   </apex:form> 
+   
+</apex:page>

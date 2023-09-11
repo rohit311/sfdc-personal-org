@@ -1,0 +1,38 @@
+<apex:page >
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  
+  <body ng-app="Testapp3">
+     <div ng-controller="Ctrl3">
+         <div ng-repeat="rec in Ctrl3.rec">
+            <h3 ng-bind="rec.Id"></h3>
+            <br/>
+            <h3 ng-bind="rec.Name"></h3>
+         </div>  
+     </div>
+  </body>  
+    
+   <!-- <div id="data1">
+        
+    </div>  -->
+    
+  <script src="/soap/ajax/10.0/connection.js"> </script>
+   <script src="/soap/ajax/10.0/apex.js"> </script>
+   
+  <script>
+   
+   
+     angular.module('Testapp3',[]).controller('Ctrl3',[function(){
+        sforce.connection.sessionId = '{!$Api.Session_ID}';
+   
+        var self=this;
+        
+        var qr=sforce.connection.query("SELECT Id,Name FROM Opportunity;");
+        var self.rec=qr.getArray("records");
+        
+        alert("SyncedQuoteId: " + qr.records);
+     }]);
+     
+  
+
+  </script>  
+</apex:page>

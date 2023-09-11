@@ -1,0 +1,119 @@
+<aura:component controller="InitiateECSController" access="global">
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="isSuccess" type="Boolean" />
+    <aura:attribute name="disabled" type="boolean" default="false" />
+    <aura:attribute name="isOpen" type="Boolean" default="true" />
+    <aura:registerEvent name="CloneButton" type="c:CloneEvent" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="ECSMap" type="Map"/>
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--22017-->
+    {!v.body}
+    <div class="slds">
+        
+    </div>
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="container">
+            <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-modal_large slds-fade-in-open">
+                <div class="slds-modal__container modalStyle">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-button svg slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModalWindow}">
+                            &#10062; <span class="slds-assistive-text">&#10062;</span>
+                        </button>
+                        <h2 id="header99" class="slds-text-link_faux slds-text-heading_large ">
+                            ECS Details {!v.ECSMap.Called}
+                        </h2>
+                    </div> 
+                    <div class="slds-modal__content slds-p-around--large">
+                        <div id="form_div" class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <aura:if isTrue="{!!v.isSuccess}" >
+                                {!v.errorMessage}
+                            </aura:if>
+                            <aura:if isTrue="{!v.isSuccess}" >
+                                <div class="slds" style="overflow:auto;">
+                                    <ui:scrollerWrapper class="scrollerSize">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">        
+                                            <div class="slds-p-horizontal--small">
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">ECS Bank A/C No</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.accNo}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">MICR No</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.micrCode}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">IFSC</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.ifscCode}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">Bank Name</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.bankName}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">BANK BRANCH NAME</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.branchName}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">A/C TYPE</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.accTYPE}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">A/C HOLDER NAME
+                                                            </label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.customerName}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">ECS END DATE</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.endDate}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label">OPEN ECS BALANCE LIMIT</label>
+                                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!v.ECSMap.balLimit}"/></strong>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </ui:scrollerWrapper>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <div class="slds-align_absolute-center">
+                            <span class="slds-align_absolute-center"> 
+                                <div class=" slds-align_absolute-center">
+                                    <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.cloneRepayDetails}" disabled="{!v.disabled}">Clone</button>
+                                </div> 
+                            </span>
+                        </div>    					
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open">
+                
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

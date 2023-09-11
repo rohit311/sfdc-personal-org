@@ -1,0 +1,172 @@
+<!-- Sal_Opp_MCPOutputCmp -->
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:dependency resource="markup://force:navigateToURL" type="EVENT"/>
+    <aura:attribute name="primaryApplicant" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="oppId" type="Id"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="dedupe" type="De_Dupe__c"/>
+    <aura:attribute name="cam" type="CAM__c"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibilTempObj" type="Cibil_Temp__c"/>
+    <aura:attribute name="theme" type="String"/>
+    <aura:attribute name="maxEligibileLoanAmount" type="Integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:ApplicantData" action="{!c.fetchApplicant}"/>
+    <aura:attribute name="HLEver" type="String"/>
+    <aura:attribute name="isViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+    
+    <div class="slds-p-horizontal--small">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="cibilScoreName" label="CIBIL Score" value="{!v.primaryApplicant.CIBIL_Score__c}" aura:id="cibilScoreId" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="cibilCodifiedName" label="Codified CIBIL" value="{!v.primaryApplicant.Codified_CIBIL__c}" aura:id="cibilCodifiedId" disabled="true"/>
+                </div>
+            </div>                            
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="riskSegmentationName" label="Risk Segmentation" value="{!v.primaryApplicant.Risk_Segmentation__c}" aura:id="riskSegmentationId" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="HLEverName" label="HL Ever" value="{!v.HLEver}" aura:id="HLEverId" disabled="true"/>
+                </div> 
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="maxLoanName" label="Maximum Eligible Loan Amount" value="{!v.maxEligibileLoanAmount}" aura:id="maxLoanId" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="enq12Name" label="Enquiry in last 12 months" value="{!v.cibilExt1.No_of_PL_Enq_in_Last_12_Months__c}" aura:id="enq12Id" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <label class="slds-form-element__label"> Negative Area </label>
+                <div class="slds-form-element__control">
+                    <lightning:input name="negAreaName" type="checkbox" label="" checked="{!v.dedupe.Negative_Area__c}" aura:id="negAreaId" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="enq6Name" label="Enquiry in last 6 months" value="{!v.cibilExt1.No_of_PL_Enq_in_Last_6_Months__c}" aura:id="enq6Id" disabled="true"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="select-01"> View CIBIL- link </label> <br/>
+                    <aura:if isTrue="{!v.cibil}">
+                        <a onclick="{!c.redirectToViewCibilReport}">
+                            View CIBIL Report
+                        </a>
+                        <aura:set attribute="else">
+                            Link Not Available
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="select-01"> View CIBIL Report- link </label> <br/>
+                    <aura:if isTrue="{!v.cibilExt1}">
+                        <a onclick="{!c.redirectToOneViewCibilReport}">
+                            One View CIBIL Report
+                        </a>
+                        <aura:set attribute="else">
+                            Link Not Available
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input name="dpdName" label="DPD Cluster Segment" value="{!v.cibilTempObj.DPD_cluster_Segment__c}" aura:id="dpdId" disabled="true"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <aura:if isTrue="{!v.isViewReportModalOpen}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            
+                           <!-- {!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}-->
+                           <iframe src="{!'https://bflhts.force.com/Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}" frameBorder="0" height="80% !important"/>
+                            <aura:set attribute="else">
+                                <!--{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}-->
+                                <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">                        
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.primaryApplicant.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isOneViewReportModalOpen}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'https://bflhts.force.com/Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+</aura:component>

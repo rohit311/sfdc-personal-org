@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" ><!-- US : 13265-->
+    <aura:attribute name="SearchInfo" type="Object"/>
+    <aura:attribute name="dSource" type="String"/>
+    <aura:attribute name="downInfo" type="Object"/>
+</aura:event>

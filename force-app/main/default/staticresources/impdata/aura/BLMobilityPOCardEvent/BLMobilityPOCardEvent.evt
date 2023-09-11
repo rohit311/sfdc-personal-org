@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="cibilScore" type="String"/>
+    <aura:attribute name="loanNumber" type="String"/>
+    <aura:attribute name="checkconvert" type="boolean"/>
+</aura:event>

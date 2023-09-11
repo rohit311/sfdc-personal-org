@@ -1,0 +1,35 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="parentObj" type="String" default=""/>
+    <aura:attribute name="parentId" type="String" default=""/>
+    <aura:attribute name="productofferId" type="String" default=""/>
+    <aura:attribute name="phonenumber" type="String" default=""/>
+    <aura:attribute name="otpValue" type="String" default=""/>
+    <aura:attribute name="oldotpValue" type="String" default="123456"/>
+    <aura:registerEvent name="submitotp" type="c:afterSubmitotp"/>
+    <aura:handler event="c:setOtp" action="{!c.setOtpValue}"/>
+    <aura:handler name="change" value="{!v.otpValue}" action="{!c.valueChangeValidation}"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:method name="MakeOtpBlank" action="{!c.clearOtpVal}"/> 
+
+    <div class="slds-p-horizontal--small">
+        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <div class="slds-form-element__control">
+                <lightning:input type="text" aura:id="otpvalue" maxlength="5" name="otpvalue" value="{!v.otpValue}" label="Enter OTP" placeholder="Please Enter OTP" required="true"  messageWhenPatternMismatch="OTP can only accept digits." pattern="[0-9]*"/><!-- placeholder text changed for bug id 17745--><!--commented  messageWhenValueMissing="Please Enter OTP" for 22018/24966-->
+                <div aura:id="otpdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">OTP entered is invalid.Kindly regenerate OTP</div> 
+                <div aura:id="otpdiverr" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please Enter OTP</div><!-- added for for 22018/24966 -->
+            </div>
+        </div>
+        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-align_absolute-center" align="center">
+            <div class="slds-p-around--x-small">
+                <lightning:button aura:id="submitOTP" variant="brand" class="slds-theme_alt-inverse" label="Submit" onclick="{!c.submitOTP}"/>
+            </div>
+            <div class="slds-p-around--x-small slds-hide">
+                <lightning:button aura:id="generateOTP" class="slds-theme_alt-inverse" variant="brand" label="Generate OTP" onclick="{!c.generateOTP}" />
+            </div>
+            <div class="slds-p-around--x-small">
+                <lightning:button aura:id="regenerateOTP" class="slds-theme_alt-inverse" variant="brand" label="Regenerate OTP" onclick="{!c.generateOTP}"/>
+            </div>
+        </div>
+        
+    </div>
+</aura:component>

@@ -1,0 +1,137 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="RejectReasonCntrl">
+    <ltng:require styles="{! $Resource.MultiSelectPicklist + '/select2-4.0.3/dist/css/select2.min.css'}" 
+      scripts="{!join(',',
+                   $Resource.jquery224 )
+      }"/>
+    <aura:attribute name="LoanId" type="String" />  
+    <aura:attribute name="GroupType" type="String" />  <!-- Value came from Elegiblity VF page -->
+    <aura:attribute name="mapPicklists" type="map" description="map to store field api name  with picklist values"/>
+    <aura:attribute name="Opportunity" type="Opportunity" default="{'sobjectType' : 'Opportunity'}"/>
+    <aura:attribute name="fields" type="String" default="Reject_Reason__c,Reject_Reason_1__c,Product__c,Eligible_for_cross_sell__c,Products_for_cross_sell__c"  description="Comma seperated picklist type field api name "/>  
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="productOptions" type="object[]" description="map to store field api name  with picklist values"/>
+    
+    <aura:attribute name="Loan" type="Opportunity" />
+    <aura:attribute name="rejectReasonOptions" type="string[]" />
+    <aura:attribute name="rejectReason1Options" type="string[]"/>
+    <aura:attribute name="CrossSellProductOptions" type="string[]"/>
+    
+    <aura:attribute name="mapRejectReasonOptions" type="map" />
+    <aura:attribute name="mapRejectReason1Options" type="map" />
+        <aura:attribute name="recordLoadFlag" type="boolean" default="false" />
+    <aura:attribute name="eligiblecrosssellOptions" type="string[]"/>
+       <aura:attribute name="mySelectedvalues" type="String" default=""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>   <!-- Execution start here -->
+     <aura:attribute name="showSpinner"  type="Boolean"  default = "false" />
+  <!--  <force:recordData aura:id="recordHandler"
+                      recordId="{!v.LoanId}"
+                      fields="Id,Scheme_Master__c,AccountId,Branch_Name__c,Product__c,Eligible_for_cross_sell__c,Products_for_cross_sell__c,Reject_Reason_1__c,Reject_Reason__c,Cross_sell_comments__c,COO_Comments__c"
+                      targetRecord="{!v.simpleRecord}"
+                      targetFields="{!v.Opportunity}"
+                      mode="EDIT"
+                      recordUpdated="{!c.handleRecordUpdated}"
+
+                      />
+
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div aura:id="customToast" class="slds-notify_container slds-hide" >
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">  
+                            <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ --> 
+    
+  <aura:if isTrue = "{! v.showSpinner }">
+       
+        <div aura:id="spinnerId" class="slds-spinner_container slds-is-relative">
+             <lightning:spinner variant="brand" size="large" alternativeText="Loading...Please wait!" /> 
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.recordLoadFlag}">
+    <div class="slds-card">
+        <div class="slds-card__body slds-card__body_inner"> 
+            
+            <div class="slds-form  slds-p-around_medium">
+                 <div class="slds-form-element slds-p-top_x-small">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:select aura:Id="productId" value="{!v.Opportunity.Product__c}" label="Product"  onchange="{!c.onControllerFieldChange}">>
+                                <option value="">--- None ---</option>
+                                <aura:iteration items="{!v.productOptions}" var="prod">
+                                    <option value="{!prod}">{!prod}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                     </div>
+                </div>
+                <div class="slds-form-element slds-p-top_x-small">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2 ">
+                            <c:MultiselectPicklistSME aura:id="crosssellproduct" picklistId="crosssellproductId" options="{!v.CrossSellProductOptions}" mySelectedvalues="{!v.Opportunity.Products_for_cross_sell__c}" Label="Products for cross sell" />
+                        </div> 
+                        
+                        <div class="slds-col slds-size_1-of-2 slds-p-left_small">
+                            <lightning:select aura:Id="eligiblecrosssellId"  value="{!v.Opportunity.Eligible_for_cross_sell__c}" label="Eligible for cross sell">
+                                <option value="">--- None ---</option>
+                                <aura:iteration items="{!v.eligiblecrosssellOptions}" var="eligible">
+                                    <option value="{!eligible}">{!eligible}</option>
+                                    
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+                </div> 
+               
+               
+                 <div class="slds-grid slds-wrap slds-p-top_x-small">
+                        <div class="slds-col slds-size_1-of-2 ">
+                             <c:MultiselectPicklistSME aura:id="rejectReason" picklistId="rejectReasonId" options="{!v.rejectReasonOptions}" mySelectedvalues="{!v.Opportunity.Reject_Reason__c}" Label="Reject Reason" />
+                        </div>
+                     <div class="slds-col slds-size_1-of-2 slds-p-left_small">
+                            <lightning:select  value="{!v.Opportunity.Reject_Reason_1__c}" label="Reject Reason 1" disabled="{v.bDisabledDependentFld}">
+                                <option value="">--- None ---</option>
+                                <aura:iteration  items="{!v.rejectReason1Options}" var="rejectreason1">
+                                    <option value="{!rejectreason1}">{!rejectreason1}</option>        
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+               
+                      
+                <div class="slds-form-element slds-p-top_x-small"> 
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2 ">
+                            <lightning:inputRichText disabledCategories ="FORMAT_FONT" value="{!v.Opportunity.Cross_sell_comments__c}" label="Cross-sell comments" labelVisible="true"></lightning:inputRichText>
+                        </div>
+                        
+                        <div class="slds-col slds-size_1-of-2 slds-p-left_small">
+                            <lightning:textarea name="COO Comments " label="COO Comments" value="{!v.Opportunity.COO_Comments__c}"/>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <footer class="slds-card__footer">
+          	<div class="slds-align_absolute-center">  
+            <lightning:button variant="brand" label="Done" title="Done" onclick="{! c.handleSaveRecord }" />
+            <lightning:button  label="Cancel" title="Cancel" onclick="{! c.cancelClick }" />
+            </div>
+        </footer>
+    </div>
+    </aura:if>
+    
+</aura:component>

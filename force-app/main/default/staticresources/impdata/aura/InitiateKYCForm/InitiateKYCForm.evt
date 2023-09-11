@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to Initiate the KYC Form" >
+    <aura:attribute name="kyc" type="eKYC__c"/>
+</aura:event>

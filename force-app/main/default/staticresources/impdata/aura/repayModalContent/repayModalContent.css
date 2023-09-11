@@ -1,0 +1,78 @@
+.THIS .wrapStyle {
+    height:50vh;
+    overflow-x:hidden;
+}
+
+.THIS .slds-has-error .slds-input {
+    box-shadow : none;
+    border: 1px solid;
+    border-right-color: #d8dde6;
+    border-bottom-color: #d8dde6;
+    border-left-color: red;   
+    border-top-color: #d8dde6;
+    
+    border-left-width: 5px;
+}
+/*.THIS .slds-scope .slds-input {
+border-color:rgb(172, 60, 74);
+
+}*/
+.THIS .green-color{
+    background-color: lightgreen;
+    
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+
+/*.THIS #input-8{
+border-left-color: red;
+}
+.THIS #input-14{
+border-left-color: red;
+}
+.THIS #input-15{
+border-left-color: red;
+}
+.THIS .slds-scope [role=combobox] input[readonly] {
+padding-left: .75rem;
+border-color: #c23934;
+background-color: rgb(255, 255, 255);
+font-size: inherit;
+font-weight: 400;
+}
+*/
+
+.THIS .slds-scope [role=combobox] input[readonly]{padding-left:.75rem;
+    border-right-color: #d8dde6;
+    border-bottom-color: #d8dde6;
+    border-left-color: red;   
+    border-top-color: #d8dde6;
+    
+    background-color:rgb(255, 255, 255);font-size:inherit;font-weight:400;}
+.THIS .slds-scope .slds-has-error .slds-input:active {
+    box-shadow: none; 
+}
+.THIS .slds-has-error .slds-select {
+    border-right-color: #d8dde6;
+    border-bottom-color: #d8dde6;
+    border-left-color: red;   
+    border-top-color: #d8dde6;
+    border-left-width: 5px;
+    box-shadow: none; 
+    background-clip: padding-box;
+}
+
+.THIS .mobHeader{
+    height:3rem;
+}
+.THIS .mobFooter{
+    height:4rem;
+}

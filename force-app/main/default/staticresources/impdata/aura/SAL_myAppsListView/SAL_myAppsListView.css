@@ -1,0 +1,18 @@
+.THIS .important-message {
+   font-weight: bold;
+    font-size: 150%;
+
+}
+
+.THIS th{
+    background-color:gainsboro !important;
+}
+
+.THIS .WrapText
+{
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    -ms-hyphens: auto !important;
+   -moz-hyphens: auto !important;
+}

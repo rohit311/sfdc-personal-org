@@ -1,0 +1,235 @@
+<aura:component access="global" controller="SFDCMobilePOController">
+    
+ 	<ltng:require scripts="/resource/jqueryformobility1" />
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="collpaseText" type="String" default="+"/>
+    <aura:attribute name="offer" type="OfferDetails" default="{}"/>
+    <aura:attribute name="cibilScore" type="String" default=""/>
+    <aura:attribute name="offerAmount" type="String" default=""/>
+    <aura:attribute name="offerROI" type="String" default=""/>
+    <aura:attribute name="offerPF" type="String" default=""/>
+    <aura:attribute name="offerTenor" type="String" default=""/>
+    <aura:attribute name="offerInsurance" type="String" default=""/>
+    <aura:attribute name="offerProcessMaster" type="String" default=""/> 
+    <aura:attribute name="segmentation" type="String" default=""/>
+    <aura:attribute name="loanNumber" type="String" default=""/>
+    <aura:attribute name="PO" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="Lead" type="Lead" default="{}"/>
+    <aura:attribute name="SolPolicy" type="Object[]" default="{}"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="IsCheckProcess" type="Boolean" default="false"/>
+    <aura:attribute name="loanId" type="String" default=""/>
+    <!-- User Story 2357 Starts -->
+    <aura:attribute name ="docDisableFlag" type = "Boolean" default = "false"/>
+    <!-- User Story 2357 Ends -->
+    <aura:handler event="c:POS_DisplayOfferEvent" action="{!c.setOffer}"/>
+    <aura:registerEvent name="showCibilModal" type="c:showCibilModal"/>
+    <aura:handler event="c:LoanConversionEvent" action="{!c.showLoanNumber}"/>
+       <!--Bug 22425 CC Code changes SME S  -->
+    <aura:attribute name = "isSegmentMatched" type = "String" default = "false"/>
+    <aura:attribute name = "iscreditReadOnly" type = "Boolean" default = "false"/>
+    <aura:attribute name = "MCPResult" type = "String" default = ""/>
+    <aura:attribute name = "MCPFailed" type = "String" default = ""/>
+    <!-- Bug 22425 CC Code changes SME E -->
+    <!-- BugId 23801 S -->
+    <aura:attribute name = "poRef" type = "String" default = ""/> 
+    <!-- BugId 23801 E -->
+    <!--Priyanka -->
+    <aura:registerEvent name="STPCall" type="c:UpdateAlldata"/>
+    <aura:handler event="c:UpdateAlldata" action="{!c.setSTPData}"/>
+    
+    <!--POS YK-->
+    <!--<aura:handler event="c:POS_CallSTPDisposition" action="{!c.callSTPIntegration}"/>--> <!-- Priyanka -->
+    <aura:registerEvent name="stpNonStpEvent" type="c:POS_StpNonStpFlow"/>
+    <aura:handler event="c:POS_CallSTPDisposition" action="{!c.callSTPIntegration}"/>
+    <aura:registerEvent name="POS_PO_PassParam" type="c:POS_PO_PassParam"/> 
+    
+    <aura:method name="callSTPIntegration" action="{!c.callSTPIntegration}" description="Sample method with parameters"></aura:method>
+    
+    <article class="slds-card">
+        <fieldset aura:id="offerDetails" class="slds-form--stacked slds-hide ">
+            <div>
+                <div style="width:100%">
+                    <h3 class=" slds-p-around_small" style="height:50px;    background: rgb(243, 242, 242)">
+                        <!-- BugId 23801 S added  PO Ref__c-->
+                        <span class=" slds-section-title--divider slds-float_left">Offer<span class="slds-p-left--small"><b>{!v.poRef}</b></span></span>
+                        <span class="slds-float_right">
+                          <lightning:button aura:id="stpButton" variant="brand" label="Check Process" onclick="{!c.callSTPIntegration}" disabled="{!v.IsCheckProcess}" class="slds-p-left_x-large slds-p-right_x-large slds-m-around_xxx-small"/>
+							<!-- User Story 2357 Starts -->
+                            <c:DocumentUploadRevamp Flow="PO" parentId="{!v.PO.Id}" docDisableFlag="{!v.docDisableFlag}"/>
+                            <!-- User Story 2357 Ends -->
+                             <!-- Bug 24487 EMI Card chnages-->
+                            <aura:if isTrue="{!v.PO.Id}">
+                            <c:EMI_CARD_PRO isPOFlag="true" IdEMI="{!v.PO.Id}" isMobility="true" checkprocess="{!v.IsCheckProcess}"/> 
+                             </aura:if>
+                            <!--S Bug 24968 - April 2019 - Credit Card for Doctors product If condition is added on Credit card button-->
+                           <aura:if isTrue="{!and(v.PO.Card_limit__c != null,v.PO.Card_limit__c >0)}">
+                                <aura:if isTrue="{!and(and(and(v.offer.cibilScore !='',v.offer.cibilScore != null),and(v.offer.offerAmount !='',v.offer.offerAmount >0)), and(and(v.isSegmentMatched!='',v.isSegmentMatched =='true'),and(v.MCPFailed!='',v.MCPFailed!='true')))}">                                    
+                                    <c:POS_Credit_Card cibil_Score= "{!v.offer.cibilScore}" recordId="{!v.PO.Id}" flow="PO" readOnlyMode = "{!v.iscreditReadOnly}"/><!-- US_16142__CIBIL Validation for Credit Card-Standalone added cibil_Score attribute -->
+                                </aura:if>
+                                <!-- Bug 22425 CC Code changes SME E -->
+                            </aura:if>
+                            <!--E Bug 24968 - April 2019 - Credit Card for Doctors product If condition is added on Credit card button-->
+                        </span>
+                    </h3>
+                </div>
+            </div>
+            <div class="slds-p-horizontal--large slds-p-top--small slds-p-bottom--small slds-form_horizontal">
+                <aura:if isTrue="{!and(v.offer.cibilScore !='',v.offer.cibilScore != null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Cibil Score: </label>
+                        </div>
+                        
+                        <div  class = "slds-float_left slds-col slds-text-align_left " style="padding-right:0;padding-left: 0;">
+                            <a href="javascript:void(0)" onclick="{!c.openmodalCibil }">
+                                <ui:outputText value="{!v.offer.cibilScore}"/>
+                            </a>
+                        </div>
+                        
+                        <!-- cibil view report modal starts here -->
+                        
+                        <!-- Cibil view report modal ends here -->
+                        
+						<!--   -->
+                    </div> 
+                </aura:if>
+                <aura:if isTrue="{!and(v.offer.segmentation!='',v.offer.segmentation!= null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Segmentation: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputText value="{!v.offer.segmentation}"/>
+                        </div>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(v.offer.offerAmount !='',v.offer.offerAmount != null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Amount(in Lacs): </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">   
+                            <ui:outputText value="{!v.offer.offerAmount + ' Lacs'}" />
+                        </div>
+                    </div>
+                    
+                </aura:if>
+                
+                <aura:if isTrue="{!and(v.loanNumber !='',v.loanNumber != null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Loan Number: </label>
+                        </div>
+                         <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">   
+                        <ui:outputURL value="" label="{!v.loanNumber}" click="{!c.navigateToCPV}"/>
+                        </div>
+                    </div>
+                </aura:if>
+               <!-- <div class="expandCollapse slds-text-heading_medium" aura:id="expand" onclick="{!c.ToggleCollapse}"> {!v.collpaseText} </div>-->
+                <!--	</div> -->
+                <!-- Code for Collapsible section starts -->	
+                <div class="Message">							
+                    
+                </div> 
+                <!--	<div class="slds-p-horizontal-large slds-p-top-small slds-p-bottom-small slds-form-stacked"> -->
+                <div class="container slds-hide" id="containerCollapsable" aura:id="containerCollapsable">    
+                    <aura:if isTrue="{!and(v.offerROI!='',v.offerROI!=null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">ROI: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputNumber value="{!v.offerROI}"/>
+                        </div>
+                    </div>
+                    </aura:if>
+                    
+                   
+                    <aura:if isTrue="{!and(v.offerPF!='' ,v.offerPF != null)}">
+                    <div  class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">PF: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputNumber value="{!v.offerPF}"/>
+                        </div>
+                    </div>
+                    </aura:if>
+                     
+                    <aura:if isTrue="{!and(v.offerTenor!='',v.offerTenor!= null)}">
+                    <div  class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Tenor: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputNumber value="{!v.offerTenor}"/>
+                        </div>
+                    </div>
+                    </aura:if>
+                  
+                    <aura:if isTrue="{!and(v.offerInsurance!='',v.offerInsurance!= null)}">
+                    <div  class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Insurance: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputNumber value="{!v.offerInsurance}"/>
+                        </div>
+                    </div>
+                    </aura:if>
+           
+                    <aura:if isTrue="{!and(v.offerProcessMaster != '',v.offerProcessMaster != null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Process Type: </label>
+                        </div>
+                        <div class = "slds-col  slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <aura:if isTrue="{! v.offerProcessMaster == 'STP'}">
+                                <ui:outputText class="greenFont" value="{!v.offerProcessMaster}"/>
+                                <aura:set attribute="else">
+                                    <ui:outputText class="redFont" value="{!v.offerProcessMaster}"/>
+                                </aura:set>
+                            </aura:if>
+                          
+                            <aura:if isTrue="{! v.offerProcessMaster != 'STP'}">
+                            	<lightning:buttonIcon iconName="utility:info_alt" variant="bare" onclick="{! c.openProcessmodal }" alternativeText="Info" size="large" />
+                            </aura:if>
+                        </div>
+                    </div>
+                    </aura:if>
+                    
+                    <!--  For Displaying the Modal Box-->
+
+                    <!-- Code for displaying  Modal Box Ends -->
+                    
+                </div>
+               
+                <div aura:id="collapse" class="expandCollapse slds-text-heading_medium" style="height: 40px;" onclick="{!c.ToggleCollapse}"> {!v.collpaseText} </div>
+            	
+            </div>
+            <!-- Code for Collapsible section Ends -->			
+        </fieldset>
+        
+    </article>
+    <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>    
+</aura:component>

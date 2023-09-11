@@ -1,0 +1,153 @@
+<aura:component controller="SALMobilityCntrl_V2" ><!--Controller added 23064 -->
+   <aura:attribute name="newOppList" type="List"/> <!--Bug 23064-->
+    <aura:attribute name="validExotelProd" type="String[]"/><!--Bug 23064 -->
+    <aura:attribute name="oppList" type="Opportunity[]" />
+    <aura:attribute name="PaginationList" type="Opportunity[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:handler name="change" value="{!v.oppList}" action="{!c.doInit}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    
+    <aura:registerEvent name="navigateToOpp" type="c.navigateToOpp"/>
+    <aura:if isTrue="{!v.oppList.length > 0}" >
+        
+        <table class="slds-m-top_small slds-table slds-hyphenate floatLeft slds-size--12-of-12">    
+            <thead  class="slds-grid slds-wrap">
+                <tr class ="headCls slds-grid slds-size--12-of-12">
+                    <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left " style="margin-left:0px"> 
+                        <b>Name </b>
+                    </th>
+                    
+                    <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-hyphenate slds-border_left slds-hyphenate">
+                        <b>LAN</b>
+                    </th>
+                    
+                </tr>
+                
+                
+            </thead>
+            <tbody class="slds-grid slds-wrap">
+                
+                <aura:iteration items="{!v.PaginationList}" var="obj">
+                    <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                        
+                        <td class="floatLeft WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate">
+                            <a style="text-decoration:none" onclick="{!c.toggleAssVersion}" id="{! obj.Id }">
+                                <aura:if isTrue="{!v.class =='hideCls'}">
+                                    
+                                    <span class=" important-message" id="{!obj.Id}">+ </span>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.myid == obj.Id}">
+                                            <span class=" slds-p-right_x-small important-message" id="{! obj.Id }">-</span> 
+                                            
+                                            <aura:set attribute="else"  >
+                                                <span class=" important-message">+
+                                                </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            <a id="{!obj.Id}" onclick="{!c.navigateToLA}" href="" target="_blank">
+                                {!obj.Name} 
+                            </a>
+                        </td> 
+                        
+                        <td class="WrapText slds-m-top_x-small slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate ">
+                            {!obj.Loan_Application_Number__c}
+                        </td>
+                        
+                    </tr>
+                    
+                    <!-- start of Add row --> 
+                    <aura:if isTrue="{!v.myid == obj.Id}">
+                        <aura:if isTrue="{!v.class == 'showCls' }">
+                            
+                            <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                <div style="width:100%;">
+                                    <fieldset class="slds-form--compound">
+                                        <div class="slds-form-element__row slds-m-top--x-small ">
+                                            
+                                            <lightning:card class=" slds-size--12-of-12" >
+                                                <header class="slds-hide"></header>
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--10-of-12 slds-align_absolute-center ">                   
+                                                     <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left floatLeft">
+                                                            
+                                                           
+                                                            <b><a id="{!obj.Id +';'+obj.Mobile__c}"  onclick="{!c.makeacall}">{!obj.Mobile__c}</a></b><!--23064-->
+                                                            <!--23064 start -->
+                                                            
+                                                            <aura:iteration items="{!v.newOppList}" var="callItem"> 
+                                                                
+                                                                <aura:if isTrue="{!and(callItem.opp.Id == obj.Id,callItem.showCall == true)}">
+                                                                    
+                                                                    
+                                                                    <!-- 23064 changed by swapnil -->
+                                                                    <c:Exotel_APICmp frommobile="none" tomobile="{!obj.Mobile__c}"  recordId="{!callItem.ApplicantId}" objName="Applicant__c"  Product="{!obj.Product__c}"/>
+                                                                    
+                                                                </aura:if>
+                                                            </aura:iteration>
+                                                                <!--23064 start -->
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left floatLeft">
+                                                            Loan Amount:
+                                                            <b><ui:outputText value="{!obj.Loan_Amount__c}"/></b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control slds-float_left floatLeft">
+                                                            Application Source:
+                                                            <b><ui:outputText value="{!obj.Application_Source__c}"/></b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            </lightning:card>
+                                            
+                                            
+                                            
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                
+                            </tr>
+                            
+                            
+                        </aura:if>
+                    </aura:if>
+                    
+                    <!-- End row -->
+                    
+                </aura:iteration>
+            </tbody>
+        </table>
+        <br />
+        <lightning:buttonGroup class="slds-align_absolute-center">
+            <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+                              onclick="{!c.previous}" variant="brand"
+                              iconName='utility:back'/>
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                              onclick="{!c.next}" variant="brand"
+                              iconName='utility:forward' iconPosition='right'/>
+            
+        </lightning:buttonGroup>
+        <div class="slds-align_absolute-center slds-text-body_regular">
+            Page {!v.currentPage} of {!v.totalPages}
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_medium">
+                No Records Found
+            </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

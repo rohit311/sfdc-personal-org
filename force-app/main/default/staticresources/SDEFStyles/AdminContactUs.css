@@ -1,0 +1,118 @@
+.contactUsNewClsInputTextAreaTD {
+	    padding:5px 5px 10px 10px;
+	    width:100%;
+	}
+	.lookupIconOn {
+		background-image: url(SDEFbuttons/b_pick.gif);
+		vertical-align: top;
+		padding-left: 5px;
+		width: 18px;
+		height: 18px;
+		margin: 0px;
+		padding: 0px;
+		border: 0px;
+	}
+	#saveId{
+		margin-left:5px !important;
+	}
+	.contactUsNewClsInputTextBoxReadOnly  {
+	    background-color:#D4D0C8;
+	    border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	    border-style:solid;
+	    border-width:1px;
+	    color:#000000;
+	    font-family:arial;
+	    font-size:9pt;
+	    height:13px;
+	    margin:0px 4px 0px 0px;
+	    padding:2px 2px 2px 5px;
+	    vertical-align:top;
+	    width:195px;
+	}
+	.div15pxVspacing {
+		height: 15px;
+	}
+	.clsInputCheckBoxTD {
+		color: #000000;
+		padding-left: 7px !important;
+		*padding-left: 7px !important;
+	}
+	.clsInputCheckBoxLabel {
+		vertical-align: middle !important;
+		font-family: arial;
+		color: #000000;
+		padding-right: 5px;
+		font-size: 9pt;
+		padding-left: 1px;
+	}
+	.headerMessageOnContactUsPage {
+	    color:#004075;
+	    font-family:arial;
+	    font-size:10pt;
+	    font-weight:bold;
+	    margin:0;
+	    padding-left:10px;
+	    padding-right:30px;
+	    padding-top:3px;
+	    vertical-align:top;
+	    white-space:nowrap;
+	    width:2%;
+	}
+	.contactUsNewClsInputTextAreaTD {
+	    padding:5px 5px 10px 10px;
+	    width:100%;
+	}
+	.contactUsNewClsInputTextArea  {
+	    border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	    border-style:solid;
+	    border-width:1px;
+	    color:#000000;
+	    font-family:arial;
+	    font-size:9pt;
+	    height:70px;
+	    overflow:auto;
+	    padding-bottom:0;
+	    padding-left:5px;
+	    vertical-align:top;
+	    width:97%;
+	}
+	.contactUsNewClsInputLabelTD {
+	    color:#000000;
+	    font-family:arial;
+	    font-size:9pt;
+	    margin:0;
+	    padding-left:10px;
+	    padding-top:1px;
+	    vertical-align:top;
+	    white-space:normal;
+	}
+	.clsInputTextBoxTD {
+		width: 200px;
+		padding-bottom: 5px;
+		float:left; text-align:left;
+	}
+	.contactUsNewClsInputTextBoxReadOnly  {
+	    background-color:#D4D0C8;
+	    border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	    border-style:solid;
+	    border-width:1px;
+	    color:#000000;
+	    font-family:arial;
+	    font-size:9pt;
+	    height:13px;
+	    margin:0px 4px 0px 0px;
+	    padding:2px 2px 2px 5px;
+	    vertical-align:top;
+	    width:195px;
+	}
+	.MainDiv{
+		margin-left:-2px;
+		margin-top:10px
+		*margin-top:-4px;
+	}
+	.CommandButtonDiv{
+		float:left; margin-left:10px;
+		*margin-left:5px;
+		padding-bottom:4px;
+		text-align:left;
+	}

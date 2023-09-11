@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template" >
+	<aura:attribute name="custObj" type="Object"/>
+    <aura:attribute name="isNew" type="Boolean"/>
+</aura:event>

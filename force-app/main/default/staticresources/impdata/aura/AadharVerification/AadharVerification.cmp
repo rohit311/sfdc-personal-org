@@ -1,0 +1,252 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobilePOController">
+	<!--<ltng:require scripts="/resource/bootstrap" />-->
+    
+    <aura:registerEvent name="initiateKYCFormEvent" type="c:InitiateKYCForm"/>
+    <!--Rohit 16111 Ekyc added init start-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<!--Rohit 16111 Ekyc added init stop-->
+    <aura:registerEvent name="shareAadhaarHashCode" type="c:shareAadhaarHashCode"/><!-- Bug 16111 - Hemant keni-->
+    <aura:handler event="c:LoanConversionEvent" action="{!c.disableForm}"/>
+	<!--Bug - 16111 S - Hemant Keni-->
+    <aura:attribute name="showHeading" type="Boolean" default="true"/>
+    <aura:attribute name="parentObj" type="String" default=""/>
+    <aura:attribute name="parentId" type="String" default=""/>
+	<!--Bug - 16111 E - Hemant Keni-->
+    <!--rohit 16111 S-->
+	<aura:attribute name="vaultData" type="List" default=""/>
+    <aura:attribute name="isDSS" type="Boolean" default="false"/>
+    <aura:attribute name="isMobility" type="Boolean" default="false"/>
+     <aura:attribute name="isPro" type="Boolean" default="false"/>
+    <aura:attribute name="isPOS" type="Boolean" default="false"/>
+    <aura:attribute name="CoAppAadharNo" type="String" default=""/>
+    <aura:attribute name="AgreeFlag" type="Boolean" default="false"/>
+    <aura:attribute name="kyc" type="eKYC__c" default="{eKYC_First_Name__c:'',eKYC_Last_Name__c:'',eKYC_Gender__c:''}"/>
+    <aura:attribute name="ekycDone" type="String" default=""/>
+	<!--rohit 16111 E -->
+    <aura:attribute name="Product" type="String" default=""/>
+    <aura:attribute name="HashCode" type="String" default=""/><!-- added for Bug 15230 -->
+	<!-- Bug 18669 Start-->
+    <aura:attribute name="aadharConsent" type="String" /><!--Added By Nihit Bug 19368-->
+	<aura:attribute name="randomNum" type="String" />
+	<aura:attribute name="aadharOption" type="List" default="['Aadhaar OTP','Biometric']"/><!--changed for radioinput 18669-->
+	<aura:attribute name="aadharValue" type="String" default=""/><!--changed for radioinput 18669-->
+    <aura:attribute name="aadharValueDefault" type="String" default="Aadhaar OTP"/><!--changed for radioinput 18669-->
+    <aura:attribute name="encAadhar" type="String"/>
+    <aura:attribute name="isBioEkycModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+    <aura:attribute name="stageName" type="String" />
+	 <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+     <aura:attribute name="ismobilityV2" type="Boolean" default="false"/>
+    <!--Rohit added for 19712 S-->
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isMobilityOpen" type="boolean" default="false"/>
+    <!--Rohit added for 19712 E-->
+     <!--<aura:registerEvent name="GetRandomNumberForBiometricEkyc" type="c:GetRandomNumberForBiometricEkyc"/>-->
+	<!-- Bug 18669 End -->
+    <aura:attribute name="flowis" type="String" default=""/><!-- bug id 19912bug id 18669-->
+    <aura:attribute name="oppId" type="String" default=""/><!-- bug id 19912 bug id 18669-->
+	<aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+    <fieldset class="slds-form--stacked slds-p-bottom--small">
+        <h3 id="AadharHeading" class="{!v.showHeading == 'true'  ? 'slds-section-title--divider' : 'slds-hide'}">AADHAAR DETAILS</h3><!--Bug - 16111 - Hemant Keni-->
+         <!--added style for bug id 21851 start--> 
+       <aura:if isTrue ="{!(v.hideAadhaarSection == true)}">
+        <div style="margin-left: 5%;font-size: 150%;" id="abcDiv">
+            As per UIDAI Aadhaar is not applicable. 
+        </div>
+           </aura:if>
+        <!--added style for bug id 21851 end-->
+		
+		<div class="slds-p-around--small">
+			
+			<aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+            <div class="slds-form-element slds-is-required" id="aadharNumberInputDiv"><!-- added id for bug id 16111-->
+                <!--<lightning:radioGroup aura:id="radioButtonGroupId"
+                                  name="radioButtonGroup"
+                                  options="{!v.aadharOption }"
+                                  value="{! v.aadharValue }"/>Bug 18669 --><!--commented for radioinput bug id 18669-->
+                <!--added for bug id 18669 radioinput start-->
+               <!-- <aura:if isTrue="{!v.isDSS== true}">--><!--commented for Promobility bug id 18669-->
+                 <!-- <aura:if isTrue ="{!(v.isMobility == true)  || (v.isPro == true)}">added  || (isPro == true) for ProMobility bug id 18669 -->
+                   	<aura:if isTrue ="{!(v.isPro == true)||(v.isMobility == true)}">
+					<aura:if isTrue ="{!(v.ismobilityV2 == false)}"><!--add condition for mobility v2-->
+                		<aura:if isTrue ="{!v.stageName == 'Post Approval Sales'}"> 
+                       		<lightning:input type="radio" name="select" value="{!v.aadharOption[1]}" label="{!v.aadharOption[1]}" onchange="{!c.handleRadioClick}" checked="true"/>
+                       		<aura:set attribute="else">
+                               <lightning:input  aura:id = "radioAadharOTP" type="radio" name="select" value="{!v.aadharOption[0]}" label="{!v.aadharOption[0]}" onchange="{!c.handleRadioClick}" />
+                               <lightning:input  aura:id = "radioBiometric" type="radio" name="select" value="{!v.aadharOption[1]}" label="{!v.aadharOption[1]}" onchange="{!c.handleRadioClick}" checked="true"/>
+                    		</aura:set>
+                       </aura:if>
+					   </aura:if>
+                	</aura:if> 
+                
+                    <!--</aura:if>-->
+                  <!--</aura:if>-->
+                <!--added for bug id 18669 radioinput end-->
+                    <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="aadharNumber">Enter Aadhaar Number</label>
+                    <ui:inputText aura:id="aadharNumber" class="slds-input" placeholder="Provide 12 Digit Aadhaar Number" maxlength="12" disabled="false" required="false" />
+                </div>
+            </div>  
+            <!-- if condition added for Bug 18669 -->
+            <aura:if isTrue="{!v.aadharValue == 'Aadhaar OTP'}"><!--changed for radiobutton bug id 18669-->
+                <div class="slds-text-align--left slds-m-top--x-small" id="aadharNumberInputDiv1"><!-- added id for bug id 16111-->
+                    <lightning:icon iconName="utility:info_alt" size="x-small" class="brand"/>
+                    <ui:outputText aura:id="helpText" value=" One Time Password will be sent to mobile number registered with Aadhaar Card"/>
+                </div>
+            </aura:if>
+            <br/>
+            <!-- Ekyc 16111(Rohit) added consent agreement start-->
+            
+            <div id="consentDiv"  >
+                <div style="display:block" >
+                   
+        			<p style="color:#fffff3;"><span style="background-color:#3366ff;">Consent for Authentication</span></p>
+    				<br/>
+   				 	  <!-- start- Added the consent to Static Resource Bug-19368 by Nihit-->
+ 			        <p>{!v.aadharConsent}</p>
+                    <br/>
+                	<!-- end Bug-19368 by Nihit -->					
+                	
+                </div>  
+             </div>
+           <!--Bug 18669 Start-->
+            <div  class="slds-form-element slds-m-top--x-small .slds-col--padded" >					
+                
+               <!-- <div id="BiometricButton" class="slds-form-element__control"> 
+                    <a href="{!'https://partial-bflloans.cs72.force.com/apex/EkycBiometricPage?randomNum=' + v.randomNum +'&amp;applicantId='+ v.applicantObj.Id+'&amp;fromObject=Applicant&amp;aadharNumber='+ v.encAadhar}" target="_blank" style="font-size:20px;">Biometric EKYC</a> 
+                </div>-->
+            </div>
+            <!--Bug 18669 End-->
+            <!-- rohit 16111 link changes S-->
+            <aura:if isTrue="{!v.isDSS}">              
+                <aura:if isTrue="{!v.isOpen}">
+                <!--Rohit : Bug 19712 added section for lightning modal Start-->    
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-align_absolute-center">
+                        <div class="slds-modal__container slds-align_absolute-center">
+                            <div id = "userConsentDiv" name="userConsentDiv1" style="display:block;margin-top: 15%;" class="modal-content"> <!--class="popBox-skin"-->
+                                <header class="slds-modal__header">
+                                    <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.hideModal }"
+                                                  alternativeText="close"
+                                                  variant="border-filled"
+                                                  class="slds-modal__close"/>
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Ekyc details</h2>
+                                </header>   
+                               <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                    <table border="1" id="vaultTable">
+                                        <aura:iteration items="{!v.vaultData}" var="obj"> 
+                                           <tr> 
+                                               <td><div style="column left">{!obj.Name}</div></td>
+                                               <td><div style="column middle"> {!obj.Value}</div></td>
+                                           </tr>       
+                                        </aura:iteration>                                                                      
+                                   </table>
+                              </div>
+                                  <br/>
+                                <br/>
+                                 <footer  class="slds-modal__footer">  
+                                  <center>
+                                      <div>
+                                        <lightning:button aura:id="SavePopUp" variant="brand" class="alignBtn" label="Save" onclick="{!c.saveEKYC}" />
+                                        <lightning:button aura:id="CancelPopUp" variant="brand" class="alignBtn" label="Cancel" onclick="{!c.generateOTP}" />
+                                      </div>    
+                                </center>  
+                                </footer>  
+                            </div>
+                        </div>
+                    </section>
+                     <div class="slds-backdrop slds-backdrop_open"></div>
+                <!--Rohit : Bug 19712 added section for lightning modal Stop-->     
+                </aura:if>
+            </aura:if> 
+            <!-- Bug 16111 Krish s -->
+            <aura:if isTrue="{!v.isDSS}"> 
+                <aura:if isTrue="{!v.isMobilityOpen}">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-align_absolute-center">
+                         <div class="slds-modal__container">
+                            <div id = "userConsentDiv" name="userConsentDiv1" style="display:block;margin-top: 15%;" class="modal-content"> <!--class="popBox-skin"-->
+                                <header class="slds-modal__header">
+                                    <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.hideModal }"
+                                                  alternativeText="close"
+                                                  variant="border-filled"
+                                                  class="slds-modal__close"/>
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Ekyc details</h2>
+                                </header>
+                                
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                	<table border="1" id="vaultTable">
+                                    	<aura:iteration items="{!v.vaultData}" var="obj"> 
+                                        	<tr> 
+                                            	<td><div style="column left">{!obj.Name}</div></td>
+                                                <td><div style="column middle"> {!obj.Value}</div></td>
+                                            </tr>       
+                                        </aura:iteration>                                             
+                                    </table>
+                                </div>
+                                  <!--</center> -->
+                                <br/>
+                                <br/>
+                               <footer  class="slds-modal__footer ">    
+                               		<center>
+                                        <!--rohit bug 16605 S-->
+                                        <lightning:button aura:id="SavePopUpDet" variant="brand"  label="Save" onclick="{!c.hideMoblilityModal}" />
+                                        <!--rohit bug 16605 E-->
+                                        <lightning:button aura:id="CancelPopUpDet" variant="brand" label="Cancel" onclick="{!c.cancelDetails}" />                               
+                               		</center>   
+                                </footer >
+                             </div>
+                        </div> 
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+
+            	</aura:if>
+            </aura:if> 
+            <div id="VaultFailure" style="display:none;">Aadhaar details not received successfully !</div><!--for bug id 16111-->
+            <!-- Bug 16111 Krish e -->
+            <div id="VaultSuccess" style="display:none;">Aadhaar details received successfully !</div><!--for bug id 16111-->
+             <div id="checkBoxId" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding:1%">
+                 <div id="IAgree" class="slds-form-element__control">
+                <lightning:input type="checkbox" name="IagreeChk" label="I Agree" aura:id="IagreeChk" class="slds:input" onchange="{!c.validateButton}" checked="{!v.AgreeFlag}"/>           
+                </div>
+             
+            <!-- rohit 16111 link changes E-->
+    		<!-- Ekyc 16111(Rohit) added consent agreement stop-->
+                <div class="slds-p-top--x-small">
+                    <lightning:button aura:id="generateOTP" variant="brand" label="Submit" onclick="{!c.generateOTP}" />
+                  <!--  <aura:if isTrue="{!and(((v.isPro == true) || (v.isDSS== true)),(v.isMobility == false))}"> --><!-- Bug 20761 added isMobility condition-->
+                 	<aura:if isTrue="{!v.isPro == true}"><!--changed for Pro-->
+                    <aura:if isTrue="{!v.aadharValue == 'Biometric'}">
+                    		<lightning:button aura:id="copyAadhaarDetails" variant="brand" label="Copy Aadhaar Data" onclick="{!c.copyAadhaarDetails}" /><!--Added for bug id 18669 for ProMobility-->
+                    	</aura:if>
+                    </aura:if>
+                </div>
+                 <div id="customToast" class=".slds-size_medium" style="display:none;">
+                     <br/>
+    				 <p><h2 style="color:#FF0000;">Details not found, Please initiate E-kyc</h2></p>
+   				 </div>
+           </div>
+           <div aura:id="otpDetails" class="slds-p-top--small slds-hide">
+                <div class="slds-form-element slds-is-required">
+                    <div class="slds-form-element__control">
+                        <label class="slds-form-element__label" for="aadharNumber">Enter OTP</label>
+                        <ui:inputText aura:id="otp" class="slds-input" placeholder="Enter OTP Recieved in mobile" maxlength="12" disabled="false"/>
+                    </div>
+                </div>   
+                <div id="otpSubmit" class="slds-p-top--medium">
+                    <lightning:button aura:id="submitOTP" variant="brand" label="Submit" onclick="{!c.submitOTP}" />
+                    <lightning:button aura:id="regenerateOTP" variant="brand" label="Regenerate OTP" onclick="{!c.generateOTP}" />
+                </div>
+            </div>    
+            
+            </aura:if>
+        </div>
+    </fieldset>
+    <div aura:id="waiting" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+     <aura:if isTrue="{!v.isBioEkycModalOpen}">
+    	 <iframe src="{!'/apex/EkycBiometricPage?randomNum=' + v.randomNum +'&amp;applicantId='+ v.parentId +'&amp;fromObject=Applicant&amp;aadharNumber='+ v.encAadhar}" frameBorder="0" width="100%" />
+     </aura:if>
+    
+</aura:component>

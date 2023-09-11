@@ -1,0 +1,245 @@
+.x-toolbar-default {
+border-color: #e8e8e9 !important;
+height: 35px; 
+padding-bottom: 5px; 
+padding-top: 5px; 
+}
+.x-btn-center
+{
+	text-align: center !important;
+}
+
+.x-tab-bar-body {
+border-style: none;
+border-color: #99bce8;
+position: initial;
+background-color: #FFFFFF;
+z-index: 1;
+zoom: 1;
+}
+.x-panel-body-default {
+    border:none;
+}
+.rf-tab-div {
+    padding: 5px 0px 0px;
+    
+}
+
+.x-toolbar-default {
+border-color: #e8e8e9;
+background-image: none;
+background-color: #e8e8e9;
+}
+/*.x-btn {
+font: 12px Arial,Helvetica,sans-serif !important;
+cursor: pointer;
+background: -ms-linear-gradient(top, #FCFCFC%, #E0E0E0 100%) !important;
+background: -moz-linear-gradient(top, #FCFCFC 0%, #E0E0E0 100%) !important;
+background: -o-linear-gradient(top, #FCFCFC 0%, #E0E0E0 100%) !important;
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FCFCFC ), color-stop(1, #E0E0E0)) !important;
+background: -webkit-linear-gradient(top, #FCFCFC 0%, #E0E0E0 100%) !important;
+background: linear-gradient(to bottom, #FCFCFC 0%, #E0E0E0 100%) !important;
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FCFCFC', endColorstr='#E0E0E0',GradientType=0 ) !important;
+border-color: #CCCCCC #666666 #666666 #CCCCCC !important;
+}
+.x-box-item {
+position: absolute!important;
+left: 0;
+top: 0;
+}
+.x-body {
+font-family: Arial,Helvetica,sans-serif;
+}*/
+.x-menu-icon-separator {
+border-left: 0px solid #F0F0F0 !important;
+left: 0px !important;
+}
+.x-menu-item-link {
+padding: 1px !important;
+}
+.x-menu-item-icon {
+background: none no-repeat scroll center center transparent !important;
+height: 0px !important;
+left: 0px !important;
+position: absolute !important;
+top: 5px !important;
+width: 0px !important;
+}
+/*
+.x-btn-default-toolbar-small {
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+-ms-border-radius: 3px;
+-o-border-radius: 3px;
+border-radius: 3px;
+padding: 2px 2px 2px 2px;
+border-width: 1px;
+border-style: solid;
+background-color: transparent;
+}
+.x-btn-default-toolbar-small .x-btn-inner {
+font-family: Arial,Helvetica,sans-serif;
+font-size: 11px;
+font-weight: bold;
+color: #333;
+background-repeat: no-repeat;
+padding: 0 2px;
+}
+*/
+
+.x-menu-item-text {
+font-size: 12px !important;
+font-family: Arial,Helvetica,sans-serif !important;
+color: #333 !important;
+}
+
+.x-menu-body {
+    background: white !important;
+}
+.x-menu-item-active .x-menu-item-link {
+    background-image: none !important;
+    background-color: #f5f5f5  !important;
+    border: 1px solid gray  !important; 
+}
+/*.x-btn-pressed,.x-btn-click{
+   border-color: #666666 #CCCCCC #CCCCCC #666666 !important;
+   background-image: -ms-linear-gradient(top, #E0E0E0%, #FCFCFC 100%) !important;
+   background-image: -moz-linear-gradient(top, #E0E0E0 0%, #FCFCFC  100%) !important;
+   background-image: -o-linear-gradient(top, #E0E0E0 0%, #FCFCFC 100%) !important;
+   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #E0E0E0 ), color-stop(1, #FCFCFC)) !important;
+   background-image: -webkit-linear-gradient(top, #E0E0E0 0%, #FCFCFC 100%) !important;
+   background-image: linear-gradient(to bottom, #E0E0E0 0%, #FCFCFC 100%) !important;
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#E0E0E0', endColorstr='#FCFCFC',GradientType=0 ) !important;
+}
+.x-btn:hover{
+    background-image: -ms-linear-gradient(top, #FCFCFC 0%, #D2E0F0 100%) !important;
+    background-image: -moz-linear-gradient(top, #FCFCFC 0%, #D2E0F0 100%) !important;
+    background-image: -o-linear-gradient(top, #FCFCFC 0%, #D2E0F0 100%) !important;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FCFCFC), color-stop(1, #D2E0F0)) !important;
+    background-image: -webkit-linear-gradient(top, #FCFCFC 0%, #D2E0F0 100%) !important;
+    background-image: linear-gradient(to bottom, #FCFCFC 0%, #D2E0F0 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FCFCFC', endColorstr='#D2E0F0',GradientType=0 ) !important;
+}*/
+.x-border-layout-ct {
+    background-color: #e0e3e6;
+}
+
+.x-boundlist {
+    border-color: gray;
+}
+
+
+.x-boundlist-selected, .x-boundlist-item-over  {
+    background: #f5f5f5;
+    border-color: gray;
+}
+.x-grid-dirty-cell {
+	background-image: none;
+}
+.x-panel-body {
+   border-color: #C5C5C5 !important;
+}
+.x-grid-header-ct {
+  border-color: #C5C5C5 !important;
+}
+.x-panel-header-default {
+  border-color: #C5C5C5 !important;
+}
+
+.popUpWindowClass .x-tool-close{
+	background: url(SDEFbuttons/b_close.png);
+    height: 20px;
+    width: 20px; 
+	margin-right: 5px;
+}
+
+.popUpWindowClass .x-window-header{
+	 background: url(SDEFimages/top-bottom.png) repeat 0px 0px transparent;
+	 height:30px;
+	 padding-top:5px;
+	 border:none;
+}
+
+.popUpWindowClass .x-tool-default
+{
+left: 460px !important;
+top: -1px !important;
+}
+.popUpWindowClass .x-box-inner
+{
+height :20px !important;
+}
+.x-nbr .x-btn-default-toolbar-small {
+	border-width: 1px !important;
+}
+.x-nlg .x-toolbar-default {
+	background-image: none !important;
+}
+.x-form-invalid-field, textarea.x-form-invalid-field {
+	background-color: white;
+	background-image: none;
+	background-repeat: no-repeat;
+	background-position: inherit;
+	border-color: #b5b8c8;
+}
+.x-grid-row .x-grid-cell {
+	font-size: 12px !important;
+	font-family: Salesforce sans !important;
+	vertical-align: middle;
+}
+.x-grid-row-selected .x-grid-cell{
+	background-color: rgba(0, 167, 157, 0.1) !important;
+	background-image: none !important;
+	border-color: rgba(0, 167, 157, 0.1) !important;
+}
+.bmc-menu .x-menu-item-link {
+	margin: 0px 15px 0px 15px !important;
+}
+.bmc-menu .x-menu-item-text {
+	font-size: 12px !important;
+	font-family: Salesforce Sans !important;
+}
+.refresh {
+	background-image: url(SDEFimages/icon-refresh.svg) !important;
+}
+#refreshBtn {
+	background-image: none !important;
+}
+.x-column-header-over, .x-column-header-sort-ASC, .x-column-header-sort-DESC {
+	background-image: none !important;
+	background-color: #e0e3e6 !important;
+}
+#AdvActionPanel-placeholder, #AdvActionPanel_header {
+	background-color: #414042 !important;
+	background-image: none !important;
+}
+#AdvActionPanel_header {
+	border-bottom: 3px solid #f86e00 !important;
+	top: -1px !important;
+}
+#AdvActionPanel_header .x-panel-header-text-default, #AdvActionPanel-placeholder_hd .x-panel-header-text-default{
+	color: white !important;
+	font-size: 12px;
+	font-family: Salesforce sans !important;
+}
+.x-menu-item-active .x-menu-item-text {
+	color: #00a79d !important;
+	font-size: 12px !important;
+}
+#detailViewToolbarId.x-toolbar-default{
+	border-bottom: none !important;
+}
+#AdvActionPanel-placeholder {
+	border: none !important;
+	border-right: 3px solid #f86e00 !important;
+	padding-right: 3px !important;
+	
+}
+.collapsed_class .x-tool img {
+	background: none !important;
+	background-image: url(SDEFicons/Expand_white.svg) !important;
+}
+#AdvActionPanel_header .x-tool img {
+	background: none !important;
+	background-image: url(SDEFicons/Collapse_white.svg) !important;
+}

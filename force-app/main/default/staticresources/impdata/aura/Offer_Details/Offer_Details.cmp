@@ -1,0 +1,63 @@
+<aura:component access="global">
+    
+    <aura:attribute name="cibilScore" type="String" default=""/>
+    <aura:attribute name="offerAmount" type="String" default=""/>
+    <aura:attribute name="segmentation" type="String" default=""/>
+    <aura:attribute name="loanNumber" type="String" default="Not Converted"/>
+    <aura:attribute name="loanId" type="String"/>	<!-- Bug 15855 -->
+    <aura:attribute name="showLoan" type="Boolean" default="false"/> <!-- Bug 15855 -->
+    <aura:attribute name="cibilID" type = "string" default=""/>
+    <aura:attribute name="strPOID" type = "string"/>
+    
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.setOffer}"/>
+    <aura:handler event="c:LoanConversionEvent" action="{!c.showLoanNumber}"/>
+    <!-- PSL changes : Nikhil Bugfix #11800 -->
+    <aura:handler event="c:DisplayOfferEvent" action="{!c.setOffer}"/>
+    <aura:registerEvent name="showCibilModal" type="c:showCibilModal"/>
+    
+    <fieldset aura:id="offerDetails" class="slds-form--stacked slds-hide">
+        <h3 class="slds-section-title--divider">OFFER DETAILS</h3>
+        <div class="slds-p-horizontal--large slds-p-top--small slds-p-bottom--small">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                <aura:if isTrue="{!and(v.cibilScore!='',v.cibilScore!=null)}">
+                    <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                        <label class="slds-form-element__label">Cibil Score: </label>
+                        <a href="javascript:void(0)" onclick="{!c.openmodalCibil }">
+                            <ui:outputText aura:id="CibilScore" value="{!v.cibilScore}"/>
+                        </a>
+                    </div>   
+                </aura:if>
+                <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <label class="slds-form-element__label">Offer Amount(in Lacs): </label>
+                    <ui:outputText value="{!v.offerAmount}"/>
+                </div> 
+                <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <label class="slds-form-element__label">Customer Segmentation: </label>
+                    <ui:outputText value="{!v.segmentation}"/>
+                </div>
+                <!--Bug 15855 S -Added By Pratik -->
+                <div aura:id="loanNumberField" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                    <strong>Loan Number: </strong>
+                    <!-- <ui:outputURL value="" label="{!v.loanNumber}" click="{!c.navigateToCPV}"/> -->
+                    <ui:outputText value="{!v.loanNumber}"/>
+                </div>  
+                <aura:renderIf isTrue="{!v.showLoan}">
+                    <div>
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+                            <div class="slds-modal__container popupadjust">
+                                <header class="slds-modal__header" style="padding-left : 90%">
+                                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.previous}" alternativeText="Close window." /> 
+                                </header>                            	
+                                <div class="slds-modal__content slds-p-around_medium" aura:id="oppVerificationDiv">
+                                    <!-- <c:VerificationImageUpload loanApplicationId="{!v.loanId}" parentObj="OPP"  /> -->
+                                </div>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open"></div>
+                    </div> 
+                </aura:renderIf>       
+				<!--Bug 15855 E -->
+            </div>
+        </div>
+    </fieldset>
+</aura:component>

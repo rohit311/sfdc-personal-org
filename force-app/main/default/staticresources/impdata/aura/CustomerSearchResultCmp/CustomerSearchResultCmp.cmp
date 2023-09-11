@@ -1,0 +1,102 @@
+<aura:component controller="SalariedInsuranceCntrl" implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    
+    <aura:attribute name="customerList" type="CUSTOMER_INFO__c[]" default="[]"/>
+    <aura:attribute name="customer" type="Object" default=""/>
+    <aura:attribute name="radioGrpValue" type="Boolean" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="shareCustomerInfo" type="c:shareCustomerInfo"/>
+    <aura:attribute name="PaginationList" type="CUSTOMER_INFO__c[]" default="[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer" />
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="2"/> 
+    
+    
+    
+    <!--<c:Custom_Toast_Mobility />-->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <div>
+        <div class="slds-size--5-of-6 slds-medium-size--5-of-6 slds-large-size--10-of-12">
+            <div class="slds-page-header" role="banner">
+                <div class="slds-align_absolute-center">            
+                    <lightning:button disabled="{!v.startPage == 0}"  variant="brand" label="Previous Page" onclick="{! c.previous }" />            
+                    <lightning:button disabled="{!v.endPage >= v.totalRecords}" variant="brand" label="Next Page" onclick="{! c.next }" />
+                </div>
+                
+            </div>    
+            
+            <lightning:card title="" class="applyColor">
+                <aura:iteration items="{!v.PaginationList}" var="customer">
+                    
+                    <table class="slds-table slds-table_bordered">
+                        <thead>                           
+                            <tr class="slds-line-height_reset">
+                                <th class="slds-text-title_caps header" scope="col">
+                                    <ui:inputRadio label="{!customer.Customer_ID__c}" name="custmRadio" change="{!c.handleRadioGroupChange}" />
+                                </th>
+                            </tr>
+                        </thead> 
+                        <tbody class= "slds-size--2-of-6 slds-medium-size--1-of-6 slds-large-size--2-of-12">
+                            <tr class="slds-hint-parent">
+                                <th style="width:0.05%;">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="{!customer.Id+'customerID'}">+&nbsp;&nbsp;&nbsp;</a>
+                                </th>
+                                <th data-label="Ever Write-off" scope="row">
+                                    <div class="slds-truncate WrapText" title="Cloudhub">                                           
+                                        <strong>First Name: </strong><ui:outputText value="{!customer.First_Name__c}"/>
+                                    </div>
+                                    
+                                    <div id="{!customer.Id+'customerID_valueDiv1'}" style="display:none;">    
+                                        
+                                        <div class="slds-truncate WrapText" title="Cloudhub">                                       
+                                            <strong>Customer ID: </strong><ui:outputText value="{!customer.Customer_ID__c}"/>
+                                        </div> 
+                                        <div class="slds-truncate WrapText" title="Cloudhub">
+                                            
+                                            <strong>Last Name: </strong><ui:outputText value="{!customer.Last_Name__c}"/>
+                                        </div>   
+                                        <div class="slds-truncate WrapText" title="Cloudhub">
+                                            
+                                            <strong>Gender: </strong><ui:outputText value="{!customer.GENDER__c}"/>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="slds-truncate WrapText" title="Cloudhub">                                       
+                                        <strong>PAN: </strong><ui:outputText value="{!customer.PAN__c}"/>
+                                    </div>
+                                    <div id="{!customer.Id+'customerID_valueDiv2'}" style="display:none;">
+                                        <div class="slds-truncate WrapText" title="Cloudhub">                                       
+                                            <strong>Mobile Number: </strong><ui:outputText value="{!customer.Mobile__c}"/>
+                                        </div>
+                                        <div class="slds-truncate WrapText" title="Cloudhub">                                  
+                                            <strong>Date Of birth: </strong><ui:outputText value="{!customer.DOB__c}"/>
+                                        </div>
+                                        <div class="slds-truncate WrapText" title="Cloudhub">                                  
+                                            <strong>Email ID: </strong><ui:outputText value="{!customer.Customer_Email__c}"/>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>                           
+                        </tbody>
+                    </table>
+                </aura:iteration>
+                
+            </lightning:card>
+        </div>
+    </div>
+    
+</aura:component>

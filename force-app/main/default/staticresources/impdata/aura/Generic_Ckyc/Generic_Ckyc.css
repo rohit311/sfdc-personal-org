@@ -1,0 +1,23 @@
+.THIS .slds-section-title_divider{
+    text-transform: unset;
+    letter-spacing: .0rem;
+}
+.THIS {
+    text-transform: none !important;
+    font-family: 'Salesforce Sans',Arial,sans-serif;
+    color: rgb(107, 109, 112);
+    font-size: .75rem;
+   
+}
+/*City CR s*/
+.THIS .requiredClass {
+    color: #c23934;
+    margin: 0 0.125rem;
+}
+/*City CR e*/
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS.applyMarginToCard {
+    
+}

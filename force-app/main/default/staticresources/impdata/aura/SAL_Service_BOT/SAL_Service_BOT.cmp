@@ -1,0 +1,12 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToParent"/>
+    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div class="slds-form-element__control">
+            <lightning:button aura:id="BackButtonId" iconName="utility:back" class="slds-theme_alt-inverse" variant="brand" label="Back" onclick="{!c.sendback}" />
+        </div>
+    </div>
+    
+	<div class="slds-grid slds-align_absolute-center">
+    	<lightning:button label="Service BOT" class="slds-theme_alt-inverse" variant="brand" title="Base action" onclick="{! c.openBOT }"/>
+    </div>
+</aura:component>

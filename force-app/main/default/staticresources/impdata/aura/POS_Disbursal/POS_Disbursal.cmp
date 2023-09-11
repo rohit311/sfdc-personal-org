@@ -1,0 +1,653 @@
+<aura:component controller="SFDCMobileLoanController">
+ <!--22141 S -->
+<aura:attribute name = "showConfirmAccount" type = "String" default = ""/>
+<!-- 22141 E -->
+<!-- 6863 S -->
+<aura:attribute name = "isFeesAndCharges" type = "Boolean" />
+<aura:attribute name = "isApplicantImg" type = "Boolean" />
+<!-- 6863 E -->    
+<aura:attribute name="recordId" type="String" default=""/>    
+<aura:attribute name="OppObj" type="Opportunity" default="{}"/>
+<aura:attribute name="oppError" type="String"/>
+<aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+<aura:attribute name="cddObj" type="Current_Disbursal_Details__c" />
+
+<!-- Recently Added: 20902 -->
+<aura:attribute name="oldCddObj" type="Current_Disbursal_Details__c" />
+<aura:attribute name="oldRmdObj" type="RePayment_mode_detail__c" />
+ <aura:attribute name="emandateDisabled" type="Boolean" default="true"/>
+
+<aura:attribute name="cddObjError" type="Current_Disbursal_Details__c" default="{}"/>
+<aura:attribute name="cddLocalMICRCode" type="String" default=""/>
+<aura:attribute name="cddId" type="String" default=""/>
+<aura:attribute name="rmdObj" type="RePayment_mode_detail__c" default="{'sObjectType':'RePayment_mode_detail__c'}"/>
+<aura:attribute name="rmdObjError" type="RePayment_mode_detail__c" default="{}"/>
+<aura:attribute name="rmdId" type="String" default=""/>
+<aura:attribute name="impsSuccess" type="String" default=""/>
+<aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+<aura:attribute name="isEagreementClicked" type="Boolean" default="false"/>
+<aura:attribute name="isDisbursmentSaved" type="Boolean" default="false"/>
+<aura:attribute name="isRepaymentSaved" type="Boolean" default="false"/>
+<aura:attribute name="SelectedOpsUser" type="String" default=""/>
+<aura:attribute name="feesNChargesListParent" type="Fees_and_Charge__c[]" default=""/>
+<aura:attribute name="isOpen" type="boolean" default="false"/>
+<aura:attribute name="shouldBeDisable" type="Boolean" />
+ <aura:attribute name="stageIconName" type="String"  default="action:reject"/>
+
+<!--<aura:attribute name="bankDetailsCheck" type="Boolean" default="true"/>-->
+
+
+ <!-- Recently Added: Harshal -->
+<aura:attribute name="isCddRmdBankDetailsSame" type="Boolean" default="false"/>
+<aura:attribute name="isConfirmBoxOpen" type="Boolean" default="false"/>
+<aura:attribute name="confirmBoxInvockedFrom" type="String" default=""/>
+
+<aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+<aura:registerevent name="DisableFormEvent" type="c:DisableFormEvent" />
+<aura:handler event="c:CalculateDisburseAmountEvent" action="{!c.calculateDisbursmentAmount}"/>
+
+
+<!-- IMPS attributes -->
+<aura:attribute name="isTransactionalError" type="Boolean" default="false"/>
+<aura:attribute name="isAPIError" type="Boolean" default="false"/>
+<aura:attribute name="oldIfscCode" type="String" default=""/>
+<aura:attribute name="oldBnkAcc" type="String" default=""/>
+<aura:attribute name="errroMsg" type="String" default=""/>
+<aura:attribute name="feesNChargesList" type="Fees_and_Charge__c[]"/>
+
+<!-- Generate Ops Attri -->
+<aura:attribute name="isOpenOps" type="boolean" default="false"/>
+<aura:attribute name="AddressChange" type="boolean" default="false"/>
+<aura:attribute name="ekycops" type="boolean" default="false" />
+<aura:attribute name="fileOpsCheck" type="String"/>
+
+<!--Added by Rohan for Send to Branch OPS checking conditions-->
+<aura:attribute name="allowIMPS" type="boolean" default="false"/>
+<aura:attribute name="allowNACH" type="boolean" default="false"/>
+<aura:attribute name="allowAgreement" type="boolean" default="false"/>
+<!--bugId 24528 s -->
+<aura:attribute name="ccEligible" type="String" default = "false"/>
+<!--bugId 24528 e -->
+<!--bugId 23801 s -->
+<aura:attribute name="cddApproved" type="String"/>
+<aura:attribute name="nsdlApproved" type="String" default = "false"/> 
+<aura:attribute name="impsApproved" type="String" default = "false"/>
+<aura:attribute name="creditCardApplied" type="String" default = "false"/>
+<aura:attribute name="repaymentApproved" type="String" default = "false"/>
+<!--bugId 23801 e -->
+    <!--Bug 24927 S -->
+    <aura:attribute name="isGCO" type="String" default = "false"/>
+    <aura:attribute name="isGCODisFlag" type="String" default = "false"/>
+    <aura:attribute name="isAddrchanged" type="String" default = "false"/>
+    <!--Bug 24927 E-->
+<!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->
+    <!-- US: 9537 USERSTORY_IMPS Initiation to be mandatory start -->
+     <aura:attribute name="IPAddressValue" type="String" default = "false"/>
+  <aura:attribute name="consentApp" type="String" default = "false"/>
+    <aura:attribute name="consentAgree" type="String" default = "false"/>
+<!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  end-->
+<div class="disbursal-container">
+<ui:scrollerWrapper class="disbursal-wrapper">
+<lightning:accordion >
+  <lightning:accordionSection label="Disbursement Bank Details" name="Disbursement Bank Details">
+      
+      <div class="slds-p-horizontal--small POS-card" style="background: rgb(243, 242, 242)">                
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="favouring">Favouring<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="favouring" class="slds-input" value="{!v.cddObj.Favouring__c}" maxlength="35"   placeholder="Enter Name" required="true" updateOn="keyup" />
+                </div>         
+            </div>   
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="bankAccountNumber">Bank Account Number<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="bankAccountNumber" maxlength="16" class="slds-input" value="{!v.cddObj.Bank_Account__c}"   placeholder="Enter Bank Account Number" required="true" updateOn="keyup" keyup="{!c.validateAccNumber}" change="{!c.setOldbankAcc}"/>
+                </div>         
+            </div>  
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="ifscCode">IFSC Code<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="ifscCode" value="{!v.cddObj.IFSC_Code__c}" class="slds-input" placeholder="Enter IFSC Code" required="true" updateOn="keyup" blur="{!c.fetchIfscMaster}" change="{!c.setOldIfscValue	}"  keyup="{!c.convertToUpperCase}"/>
+                </div>         
+            </div>  
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="bankName">Bank Name<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="bankName" value="{!v.cddObj.Bank_Name__c}" class="slds-input" required="true" disabled="true"/>
+                </div>         
+            </div>  
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="branckName">Branch Name<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="branckName" value="{!v.cddObj.Bank_Branch__c}" class="slds-input" required="true" disabled="true"/>
+                </div>         
+            </div>  
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="micrCode">MICR Code<span style="color:red">*</span></label>
+                    <!--<ui:inputText aura:id="micrCode" value="{!v.rmdObj.MICR_Code__c}" class="slds-input" disabled="true"/>-->
+                    <ui:inputText aura:id="micrCode" value="{!v.cddLocalMICRCode}" class="slds-input" disabled="true"/>
+                </div>         
+            </div>  
+
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control" style="padding-left: 5.00rem;padding-top: 1rem;">
+                    <button aura:id="validateIMPS" class="slds-button slds-button_neutral" onclick="{!c.validateImps}" disabled="{!or(v.OppObj.StageName != 'Post Approval Sales',or(v.cddObj.IMPS_Result__c == 'Successful Transaction',v.cddObj.IMPS_Transaction_No__c != null))}">Validate IMPS</button>
+                </div>
+            </div>
+            
+
+            <aura:If isTrue="{!v.cddObj.IMPS_Result__c == 'Successful Transaction'}">
+                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control" style="padding-left: 5.00rem;padding-top: 1rem;">
+                        <lightning:icon iconName="action:approval" size="xx-small" alternativeText="Indicates approval"/>
+                        <ui:outputText aura:id="impsSuccess" value="IMPS Success"/>
+                    </div>         
+                </div> 
+            </aura:If>
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="ifscCode">Disbursement Amount(Rs.)</label>
+                    <ui:inputText aura:id="disbursementAmount" value="{!v.cddObj.Disbursement_Amount__c}" class="slds-input" disabled="true"/>
+                </div>         
+            </div> 
+           
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="emiAmount">EMI Amount(Rs.)</label>
+                    <ui:inputText aura:id="emiAmount" value="{!v.OppObj.EMI_CAM__c}" class="slds-input" disabled="true"/>
+                </div>         
+            </div> 
+            
+        </div>
+        <br/>
+        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div class="slds-form-element__control">
+            <lightning:button aura:id="saveDisbursmentDetails" label="Save Details" class="slds-button slds-button--brand" onclick="{!c.saveDisbursmentDetails}"/>
+        </div> 
+    </div>
+    <!-- 22141 S -->
+     <br/>          
+      <aura:if isTrue="{!v.showConfirmAccount == 'true'}">    
+         <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <div class="slds-form-element__control">
+                <lightning:button aura:id="ConfirmBankDetails" label="Validate Bank Account" class="slds-button slds-button--brand" onclick="{!c.confirmDetails}"/>
+            </div> 
+        </div>
+    </aura:if>
+   <!-- 22141 E-->                
+    </div>         
+    </lightning:accordionSection>
+    
+    <lightning:accordionSection label="Repayment Bank Details" name="Repayment Bank Details">
+    <div class="slds-p-horizontal--small POS-card" style="background: rgb(243, 242, 242)">                
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">                                
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control "  style=" padding-left: 5.00rem; padding-top: 1rem;" >
+                    <lightning:button   aura:id="initiateOpenECS" label="Initiate Open ECS" class="slds-button slds-button_neutral" onclick="{!c.initiateOpenECS}"
+                                 disabled="{!or(v.OppObj.StageName == 'Branch Ops',v.rmdObj.Repayment_Mode__c!='ECS')}"/>
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div   style=" padding-left: 5.00rem; padding-top: 1rem;">
+                <!-- !!and(v.isDisbursmentSaved,v.isRepaymentSaved) -->
+                <c:E_Mandate id="{!v.OppObj.Id}" mobilityFlag="true"  posLaFlag="true" renderButton="true"  mandateProcessStage = "{!v.oldRmdObj.Mandate_Process_Stage__c}"
+                       isDisabled = "{!v.emandateDisabled}" />
+                </div>
+            </div>
+             <!--{!and(and( v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI'), v.isCddRmdBankDetailsSame )}
+              { !or(v.OppObj.StageName != 'Post Approval Sales',or(v.isCddRmdBankDetailsSame==false,or(v.rmdObj.Repayment_Mode__c!='SI',v.oldRmdObj.Repayment_Mode__c!='SI'))}
+            <div>{!v.isCddRmdBankDetailsSame}</div>
+            <div>{!v.rmdObj.Repayment_Mode__c}</div>
+            <div>{!v.oldRmdObj.Repayment_Mode__c}</div>
+            <div>{!v.OppObj.StageName}</div>
+            {!and(v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI')}
+            {!and(and( v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI'), v.isCddRmdBankDetailsSame)}
+            {!and(and( v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI'), and(v.isCddRmdBankDetailsSame,v.OppObj.StageName == 'Post Approval Sales'))}
+            {!and(v.OppObj.StageName == 'Post Approval Sales', and(v.isCddRmdBankDetailsSame , and( v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI')))}-->
+            
+            <!--<aura:if isTrue="{!and(v.rmdObj.Mandate_Process_Stage__c!=undefined, v.rmdObj.Mandate_Process_Stage__c!='')}"> -->
+            <aura:if isTrue="{!and(v.rmdObj.Repayment_Mode__c=='SI', v.oldRmdObj.Repayment_Mode__c=='SI')}"> 
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-grid slds-wrap">
+                <div class=" slds-col slds-size_6-of-12 slds-form-element__control">
+                    <label class="slds-form-element__label" for="mandateProcessStage">Mandate Process Stage</label>
+                    <ui:inputText aura:id="mandateProcessStage" value="{!v.oldRmdObj.Mandate_Process_Stage__c}" class="slds-input" disabled="true" />
+                </div> 
+                <div class="slds-col slds-size_2-of-12  slds-align_absolute-center">
+                    <span style="padding-top: 1.5rem;" ><lightning:icon iconName="{!v.stageIconName}"  alternativeText="{!v.oldRmdObj.Mandate_Process_Stage__c}" size="small"/></span>
+                </div>
+                <div class="slds-col slds-size_4-of-12  slds-align_absolute-center">
+                <span style="padding-top: 1.5rem;" ><lightning:icon iconName="utility:refresh" size="small"  onclick="{!c.refreshMandateProcess}" /></span>
+                </div>
+                </div>
+                
+            </div> 
+            </aura:if>
+          
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="pdcByName">PDC By Name<span style="color:red">*</span></label>
+                    <ui:inputText aura:id="pdcByName" class="slds-input" value="{!v.rmdObj.PDC_By_Name__c}"   placeholder="Enter Name" required="true" updateOn="keyup"/>
+                </div>         
+            </div>  
+
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="ecsBarcode">ECS Barcode<aura:if isTrue="{!and(v.rmdObj.Open_ECS_Facility__c != 'Existing',v.rmdObj.Repayment_Mode__c=='ECS')}"><span style="color:red">*</span></aura:if></label>
+                    <ui:inputText aura:id="ecsBarcode" maxlength="10" value="{!v.rmdObj.ECS_Barcode_No__c}" class="slds-input" placeholder="Enter ECS Barcode" required="true" updateOn="keyup" keyup="{!c.validateECSBarcode}"/>
+                </div>         
+            </div>  
+            
+           <!-- <div class="slds_form_element slds_is_required slds_p_top_x_small slds_p_horizontal__small slds-size__1_of_1 slds_medium_size__3_of_6 slds_large_size__4_of_12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="bankName">First Due Date<span style="color:red">*</span></label>
+                    <div class="slds_size__1_of_1 dateFieldContainer">
+                    	<ui:inputDate aura:id="firstDueDate" format="dd-MM-yyyy" value="{!v.rmdObj.ECS_Start_Date__c}" change="{!c.dateChange}" class="slds-input" displayDatePicker="true"/>
+                    </div>
+                </div>
+            </div>-->  
+
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="accountType">Account Type<span style="color:red">*</span></label>
+                    <ui:inputSelect aura:id="accountType" value="{!v.rmdObj.A_C_Type__c}" class="slds-input"  disabled="{!v.OppObj.StageName != 'Post Approval Sales' ? 'true':'false'}"/>
+                </div>         
+            </div> 
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="repaymentMode">Repayment Mode<span style="color:red">*</span></label>
+                    <ui:inputSelect aura:id="repaymentMode" value="{!v.rmdObj.Repayment_Mode__c}" class="slds-input" disabled="{!v.OppObj.StageName != 'Post Approval Sales' ? 'true':'false'}"  change="{!c.onChangeRepaymentMode}" />
+                </div>         
+            </div>
+                     
+            
+        </div>
+        <br/>
+        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal_small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+         <div class="slds-form-element__control">
+            <lightning:button aura:id="saverepaymentDetails" label="Save Details" class="slds-button slds-button--brand" onclick="{!c.saveRepaymentDetails}"/>
+         </div>  
+		</div>
+    </div>
+        
+    </lightning:accordionSection>
+    
+</lightning:accordion>
+    
+<fieldset aura:id="repaymentDetails" class="slds-form--stacked slds-p-bottom--medium">
+    <h3 class="slds-section-title--divider"></h3>
+    
+    <!--<p class="slds-p-horizontal_small">-->
+    
+</fieldset>
+
+
+  <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--medium">
+     <div aura:id="saveButtonIdDiv" class="slds-p-around--x-small">
+       <!-- Eagreement modal code -->  
+       <div class="slds-m-around--xxx-large">
+           <div class="slds-p-horizontal_medium">
+           <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->
+               <lightning:button variant="brand"  onclick="{!c.send_E_AggrementDIPOS}" aura:id="sendMailToCustomer" label="Send Mail To Customer" class="slds-button slds-button--brand" iconPosition="left" />
+             <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  end-->
+       	   </div>
+       </div>
+	 </div> 
+     <!--Added below by Rohan on 26-07-2018 for E-Mandate-->
+     <div aura:id="saveButtonIdDiv" class="slds-p-around--x-small">
+       <div class="slds-m-around--xxx-large">
+		<!--<c:E_Mandate id="{!v.recordId}"/>-->
+	   </div>
+	 </div> 
+     <!--Added below by Rohan on 26-07-2018 for E-Mandate-->
+     <div aura:id="saveButtonIdDiv" class="slds-p-around--x-small">
+       <!-- Eagreement modal code -->  
+       <div class="slds-m-around--xxx-large">
+           <div class="slds-p-horizontal_medium">
+           <lightning:button class="slds-button slds-button--brand" aura:id="generateOPSChecklist" label = "Generate Ops Checklist" onclick="{!c.openOpsModel}"></lightning:button>
+           </div>
+       </div>
+	</div> 
+    <div aura:id="saveButtonIdDiv" class="slds-p-around--x-small">
+        <div class="slds-p-horizontal_medium">
+            
+        <lightning:button  aura:id="sendToBranchOPS" class="slds-button slds-button--brand" label = "Send To Branch OPS" onclick="{!c.sendToBranchOPS}" disabled="{!or(or(v.OppObj.StageName == 'Branch Ops',v.OppObj.StageName == 'Moved To Finnone'),!and(v.isDisbursmentSaved,v.isRepaymentSaved))}"></lightning:button>
+        </div>
+    </div>  
+ </div>
+
+<div aura:id="submitToBranchOPSDiv" class="slds-hide">
+<fieldset class="slds-form--stacked slds-p-bottom--medium">
+    <h3 class="slds-section-title--divider">Submit to Branch OPS</h3>
+    
+    <!--<p class="slds-p-horizontal_small">-->
+    <div class="slds-p-horizontal--small POS-card" style="background: rgb(243, 242, 242)">                
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control" >
+                    <label class="slds-form-element__label" for="accountType">Select OPS User<span style="color:red">*</span></label>
+                    <ui:inputSelect aura:id="opsUserList" value="{!v.SelectedOpsUser}" class="slds-input"/>
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <!--<div class="slds-form-element__control" style="padding-left: 5.00rem;padding-top: 1rem;">-->
+                <div class="slds-p-horizontal_medium">    
+                	<button aura:id="submitToBranchOPS" class="slds-button slds-button--brand" onclick="{!c.submitToBranchOPSUser}">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>
+ </div>             
+    </ui:scrollerWrapper>
+</div>
+ <!-- commented by Sachin -->
+<!--<div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+    <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+</div>-->
+
+
+  <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="agreement" class="slds-modal slds-hide" style="width:100%;height:100%;padding:20px;max-width: 100%;">
+        <div class="slds-modal__container widthcss" style="height:100%;">
+            <div class="slds-modal__header">
+              
+            </div>
+            
+           
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="ModalbackdropUpload"></div>
+<div class="slds-m-around_xx-large">     
+<section role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="OPSChecklist" class="slds-modal slds-hide" style="width:100%;height:100%;padding:20px;max-width: 100%;">
+        <div class="slds-modal__container widthcss">
+           
+        	<header class="slds-modal__header">
+                <lightning:buttonIcon class="slds-button slds-modal__close slds-button--icon-inverse" iconName="utility:close" variant="bare-inverse" onclick="{!c.closeOpsModel}" alternativeText="Info" size="large" />
+                <h2 id="header43" class="slds-text-heading--medium">OPS Checklist</h2>
+            </header>
+           <ui:scrollerWrapper class="outerScroller"> 
+            <div class="slds-modal__content slds-p-around--medium">
+              
+                
+        <fieldset aura:id="commercialDetails" class="slds-form--stacked slds-p-bottom--medium">
+        <h3 class="slds-section-title--divider">OPS Checklist</h3>
+        
+      
+        <!--<p class="slds-p-horizontal_small">-->
+        <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">   
+          
+          <table border="1" style="background: rgb(243, 242, 242)">
+              <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->
+              <tr>
+                  <td> 
+                     Customer consent on Agreement and Commercials
+                  </td>
+                  
+                  <td>
+				  	<aura:if isTrue="{!v.consentAgree == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                              
+                          </aura:set>
+                      </aura:if>
+                     
+                  </td>
+              </tr>   
+			   <tr>
+                  <td> 
+                      Customer consent on Application Form
+                  </td>
+                  
+                  <td>
+				  	<aura:if isTrue="{!v.consentApp == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                              
+                          </aura:set>
+                      </aura:if>
+                  </td>
+              </tr>  
+               <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->    
+              
+              <tr>
+                  <td>
+                      Demographics captured through EKYC 
+                  </td>
+                  
+                   <td>
+                      <aura:if isTrue="{!and(v.ekycops == true , v.AddressChange == false)}" >
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                      </aura:if>
+                      <aura:if isTrue="{!and(v.ekycops == true, v.AddressChange == true)}" >
+                          <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>
+                      </aura:if>
+                      <aura:if isTrue="{!and(v.ekycops == false, v.AddressChange == false)}" >
+                          <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>
+                      </aura:if>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      Degree Certificate
+                  </td>
+                  <td>
+                      <aura:if isTrue="{!v.fileOpsCheck}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                              
+                          </aura:set>
+                      </aura:if>                    </td></tr>
+              <tr>
+                  <td>
+                      Repayment Details
+                  </td>
+                  <!-- Bug 23801 added repaymentApproved condition here -->
+                  <td>
+                      <aura:if isTrue="{!v.repaymentApproved == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                              
+                          </aura:set>
+                      </aura:if>
+                   </td>
+              
+              </tr>
+              <tr>
+                  <td>
+                      Disbursement Details
+                  </td>
+                  <td>
+				  <aura:if isTrue="{!v.cddApproved == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                              
+                          </aura:set>
+                      </aura:if>
+					  </td>
+              </tr>
+              <!-- Bug 23801 S-->
+               <tr>
+                  <td>
+                      NSDL Rule and Pan Validation Corrections
+                  </td>
+                  <td>
+                       <aura:if isTrue="{!v.nsdlApproved == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                          </aura:set>
+                      </aura:if>                     
+                  </td>
+              </tr>
+               <tr>
+                  <td>
+                      IMPS Validation of Applicant
+                  </td>
+                  <td>
+                       <aura:if isTrue="{!v.impsApproved == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                          </aura:set>
+                      </aura:if>                     
+                  </td>
+              </tr>
+				<!--Bug 24528  S-->
+                 <tr>
+				 <td>
+				 Eligible for Credit Card
+					</td>
+				 <td>
+				<aura:if isTrue="{!v.ccEligible == 'true'}">
+					<lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+				 <aura:set attribute="else">
+					<lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+					 </aura:set>
+					</aura:if>                     
+				</td>
+				</tr>
+              <!--Bug 24528  E-->   
+               <tr>
+                  <td>
+                      Applied for Credit Card
+                  </td>
+                  <td>
+                       <aura:if isTrue="{!v.creditCardApplied == 'true'}">
+                          <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          <aura:set attribute="else">
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                          </aura:set>
+                      </aura:if>                     
+                  </td>
+              </tr>
+             <!-- Bug 23801 E --> 
+               <!-- Bug 24927 S -->
+                  <tr>
+                      <td>
+                          Application is processed through Green Channel Offer
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isGCO == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                   <tr>
+                      <td>
+                          Residence Address Modifications Not Done
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isAddrchanged != 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                  
+                   <tr>
+                      <td>
+                          SPDC
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isGCODisFlag == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td> 
+                  </tr>
+              <!-- Bug 24927 E-->
+          </table>
+              
+    </div>
+                       </fieldset> 
+            </div>
+                </ui:scrollerWrapper> 
+                  
+            
+               
+            <div class="slds-modal__footer">
+            </div>
+        </div>
+            
+</section>
+    
+    </div>
+    <div class="slds-backdrop " aura:id="ModalbackdropUploadOps"></div> 
+    
+
+
+<div aura:id="alertDialog" class="slds-hide"> 
+    <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+                <h2 class="slds-text-heading--medium" id="prompt-heading-id">Alert</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <p><h2 class="slds-text-heading--medium" id="prompt-heading-id">IMPS Response</h2></p>
+            </div>
+            <div class="slds-modal__footer slds-theme--default">
+                <button class="slds-button slds-button--neutral" onclick="{!c.wait}">Wait</button>
+                <button class="slds-button slds-button--neutral" onclick="{!c.abort}">Abort</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open"></div>
+</div> 
+
+<!-- Confir Box Start here -->
+ <!--<aura:if isTrue="{!v.isConfirmBoxOpen}"> -->
+    <div  aura:id="eMandateConfirmBox" class="slds-m-around_xx-large   slds-hide">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open  ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Start ######-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeConfirmBox}"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><b>Please Confirm</b></h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_large" id="modal-content-id-1">
+                    <p> E-Mandate Record already exists. 
+                    <br></br> Do you want to replace the same? </p>
+                </div>
+                <!--###### MODAL BOX FOOTER Part Start ######-->
+                <footer class="slds-modal__footer">
+            <lightning:button variant="neutral"  label="Ok"  title="Ok" onclick="{! c.confirmOkTakeAction}"/>
+            <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.closeConfirmBox}"/>
+                </footer>
+            </div>
+        </section>
+    </div>
+<div class="slds-backdrop" aura:id="ModalbackdropeMandateConfirmBox"></div> 
+<!--</aura:if>-->
+<!-- Confir Box End here -->
+
+</aura:component>

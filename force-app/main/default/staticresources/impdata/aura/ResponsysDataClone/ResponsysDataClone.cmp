@@ -1,0 +1,67 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="ResponsysDataCntrl">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="products" type = "List" default="['SAL','SPL','PSBL']"/>
+    <aura:attribute name="prodList" type = "List" default="[]"/>
+    <aura:attribute name="selectedproducts" type = "List"/>
+    <aura:attribute name="startDate" type="Date" />
+    <aura:attribute name="endDate" type="Date" />
+    <aura:attribute name="minDate" type="Date"/>
+    <aura:attribute name="maxDate" type="Date"/>
+    <aura:attribute name="errors" type="List"/>
+    <aura:attribute name="LAN" type="Integer"/>
+    <aura:attribute name="smsTypes"  type="String[]" default="--None--,Internal,External"/>
+    <aura:attribute name="TypeOfReport"  type="String" default=""/>
+    <aura:attribute name="ResponseData" type="Object"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:registerEvent name="RespDataEvent" type="c:ResponsysDataTable"/>
+    
+     <!--loading spinner start... style=Brand Medium (blue dots)-->
+ 	<aura:if isTrue="{!v.Spinner}">
+    	<div aura:id="spinnerId" class="slds-spinner_container">
+        	<div class="slds-spinner--brand .slds-spinner_large slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         		<span class="slds-assistive-text">Loading</span>
+         		<div class="slds-spinner__dot-a"></div>
+         		<div class="slds-spinner__dot-b"></div>
+       		</div>
+    	</div>
+ 	</aura:if>
+  <!-- Loading spinner end-->   
+    
+    <lightning:card title="Responsys SMS Detailed Report"  iconName="utility:anchor">
+        <aura:set attribute="actions">
+            <!--<lightning:button variant="brand" label="Detailed Report"/>-->
+        </aura:set> 
+        <form class="slds-form">
+            <div class="slds-card__body slds-card__body_inner">
+                <p class="slds-p-horizontal_large" >
+                    <br/>
+                    <lightning:dualListbox aria-multiselectable="true" aura:id="selectProd" name="Products" label="Products" sourceLabel="Available Products" selectedLabel="Selected Products" value="{!v.selectedproducts}" options="{!v.products}" required="true"/>                        
+                    <br/>
+                    <div class="slds-grid slds-p-bottom_small">
+                        <div class="slds-col slds-p-right_x-small"><lightning:input type="date" aura:id="stDateId" name="input8" label="Start date:" value="{!v.startDate}" onchange="{!c.addMinDate}"  required="true" max="{!v.maxDate}"/></div>
+                        <div class="slds-col"><lightning:input type="date" name="input8" aura:id="enDateId" label="End date:" value="{!v.endDate}" min="{!v.minDate}" required="true" max="{!v.maxDate}"/></div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-p-right_small" style="width:10px;"><lightning:input type="String" name="LAN" label="LAN" value="{!v.LAN}" onchange="{!c.keyCheck}" messageWhenPatternMismatch="Please enter valid LAN number" pattern="^[0-9]{4,20}$"/></div>
+                        <div class="slds-col " style="width:10px;">
+                            <lightning:select aura:id="smsType" name="select" label="SMS Type" >
+                                <aura:iteration items="{!v.smsTypes}" var="smsType">
+                                    <option text="{!smsType}"></option>
+                                </aura:iteration>
+                            </lightning:select></div>
+                    </div>
+                </p>
+                <p class="slds-p-top_large slds-p-horizontal_large slds-p-bottom_large">
+                    <lightning:button aura:id="submitBtn" label="Submit" onclick="{!c.onSubmit}"/>&nbsp; &nbsp;
+                    <lightning:button variant="brand" label="Detailed Report" onclick="{!c.onDetailSubmit}"/>
+                    <br/>
+                    <aura:iteration items="{!v.errors}" var="error">
+                        <span class="slds-text-color_error">{!error}</span>
+                    </aura:iteration>
+                </p>
+            </div>
+        </form>
+    </lightning:card>
+</aura:component>

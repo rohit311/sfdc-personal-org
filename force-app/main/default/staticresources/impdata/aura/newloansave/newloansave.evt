@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to call new loan creation method of  landing page from nsdl component" >
+    <aura:attribute name="callfrom" type="String"/>
+</aura:event>

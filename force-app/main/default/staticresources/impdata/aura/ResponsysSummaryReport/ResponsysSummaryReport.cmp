@@ -1,0 +1,105 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="ResponsysDataCntrl">
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="IncorrAppl" type="boolean" default="false"/>
+    <aura:attribute name="selProd"  type="String" default="test"/>
+    <aura:attribute name="inCorrList"  type="List" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <aura:handler event="c:ResponsysDataTable" action="{!c.poplData}"/>
+    <lightning:card title="Summary Report" iconName="utility:table" class="height">
+        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+            <tr class="slds-text-title--caps">
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Srno"><b>#</b></span>  
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Product"><b>Product</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Total Disbursed"><b>Total Disbursed</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Mandatory SMS"><b>Mandatory SMS</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate slds-text-color_success" title="Correct App Count">&nbsp;&nbsp;<b>Correct<br/>App Count</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate slds-text-color_error" title="Incorrect App Count"><b>Incorrect<br/>App Count</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Total SMS Sent">&nbsp;&nbsp;&nbsp;<b>Total<br/>SMS Sent</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="Responsys"><b>Responsys</b></span>
+                </th>
+                <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                    <span class="slds-truncate" title="ValueFirst"><b>ValueFirst</b></span>
+                </th>
+            </tr>
+            <tbody>
+                <aura:iteration items="{!v.data}" var="smsData">
+                    <tr>
+                        <div style="display: none;">content</div>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.SrNum}">{!smsData.SrNum}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.product}">{!smsData.product}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.ApplCnt}">{!smsData.ApplCnt}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.MandCnt}">{!smsData.MandCnt}</div>
+                        </th>
+                        <th scope="row">
+                            <div  class="slds-truncate slds-align_absolute-center" title="{!smsData.CorrectCnt}">{!smsData.CorrectCnt}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.InCrrCnt}"><a  id="{!smsData.product+'|InCorrect'}" href="javascript:void(0);" onclick="{!c.onClickLink}">{!smsData.InCrrCnt}</a></div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.TotalSms}">{!smsData.TotalSms}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.ResponsysSms}">{!smsData.ResponsysSms}</div>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate slds-align_absolute-center" title="{!smsData.ValueFirst}">{!smsData.ValueFirst}</div>
+                        </th>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <!--<lightning:datatable
+                                 
+                                 keyField="id"
+                                 data="{!v.data}"
+                                 columns="{!v.columns}"
+                                 hideCheckboxColumn="true"
+                                 /-->
+        <aura:if isTrue="{!v.IncorrAppl}">
+            <br/>
+            <br/>
+            <h1>Incorrect Loan Applications :</h1> 
+            
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                <tr class="slds-text-title--caps">
+                    <th class="slds-is-sortable slds-text-title--caps" scope="col">
+                        <!-- <span class="slds-truncate" title="Product"><b>LAN </b></span>-->
+                    </th>
+                </tr>
+                <tbody>
+                    <aura:iteration items="{!v.inCorrList}" var="LANNo">
+                        <tr>
+                            <th scope="row">
+                                <div class="slds-truncate " title="{!LANNo}">{!LANNo}</div>
+                            </th>
+                        </tr>
+                    </aura:iteration>    
+                </tbody>    
+            </table>    
+        </aura:if>
+    </lightning:card>
+</aura:component>

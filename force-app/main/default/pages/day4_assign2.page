@@ -1,0 +1,69 @@
+<apex:page docType="HTML-5.0" controller="day4_assign2_controller">
+
+<apex:form id="formblock">
+    <apex:pageBlock id="pgblock">
+      Start Date: <apex:input type="date" value="{!startdate}"/>
+      <br/>
+      End Date : <apex:input type="date" value="{!enddate}"/>
+      <br/>
+      Employee id:<apex:input type="number" value="{!empid}"/>
+      
+      <apex:selectList size="1" >
+          <apex:actionSupport event="onchange" action="{!getLinemap}" />
+           <apex:selectOptions value="{!items}"/>
+
+      </apex:selectList>
+           <apex:commandButton value="Go" action="{!go1}"/>
+           
+      <br/>     
+           <apex:pageMessages ></apex:pageMessages>
+      <apex:commandLink rerender="tbl">
+      Refresh
+      </apex:commandLink>
+      </apex:pageBlock>
+       
+    <apex:pageBlock id="cases_block" >
+    
+
+            
+             <apex:repeat value="{!linemap}" var="line">
+        
+                Employee Id: <apex:outputField value="{!line.Id__c}">
+                               </apex:outputField>
+                <br/>
+                 Employee Name: <apex:outputField value="{!line.Name__c}">
+                               </apex:outputField>
+                <br/>
+
+               <apex:repeat value="{!linemap[line]}" var="item">
+                           From :    <apex:outputField value="{!item.From__c}">
+                                         </apex:outputField>                            
+                        <br/>
+                           To :      <apex:outputField label="To :" value="{!item.FromDate__c}">
+                                                 </apex:outputField>
+                        <br/>
+              </apex:repeat>
+
+        <br/>
+                </apex:repeat>
+
+ <apex:repeat value="{!linemap}" var="line">
+
+          <apex:pageBlockTable value="{!linemap[line]}" var="a" id="tbl">
+                          <apex:column >
+                      {!a.From__c}
+             </apex:column>
+             <apex:column >
+                      {!a.FromDate__c}
+             </apex:column>
+        </apex:pageBlockTable>
+
+</apex:repeat>
+
+    
+    </apex:pageBlock>      
+                
+                
+</apex:form>
+
+  </apex:page>

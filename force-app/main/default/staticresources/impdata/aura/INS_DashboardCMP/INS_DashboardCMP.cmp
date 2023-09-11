@@ -1,0 +1,65 @@
+<aura:component controller="InsMainCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+  
+   <!--Attributes-->
+    <aura:attribute name="isDashboardFlag" type="Boolean" default="true"/>
+    <aura:attribute name="PaginationList" type="Object[]" default=""/>
+    <aura:attribute name="isSpinner" type="Boolean" default="false"/>
+    
+    <!--Handlers-->
+	<aura:handler name="init" action="{!c.initDashboard}" value="{!this}"/>
+    <aura:registerEvent name="INSHomePgEvent" type="c:INS_GoToHomePgEvent"/>
+   
+    <ui:scrollerWrapper class="scrollerSize">
+        <aura:if isTrue="{!v.isSpinner}">
+            <lightning:spinner variant="brand"  size="large" class=""/>
+        </aura:if>
+	
+		<aura:if isTrue="{!v.isDashboardFlag}">
+		<div style="margin-left: 10px; margin-top:5px;">
+			<div class="slds-p-horizontal--small slds-theme_shade slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-left: 14px;margin-right: 14px;  ">
+				<div class="slds-grid slds-wrap slds-grid--pull-padded" style="margin-top: 7px;">
+					<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<lightning:button variant="brand"  label="Back" aura:id="back_btn" onclick="{!c.backToHome}" class="slds-theme--alt-inverse slds-float_left bckBtnClass" title="Back"> 
+							<lightning:icon iconName="utility:back" title="Back" size="x-small" variant="inverse"/>
+							</lightning:button>
+						</div>
+					</div>
+					<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<div  class="slds-align_absolute-center  slds-text-heading_small"><b>INSURANCE DASHBOARD</b></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			 <aura:if isTrue="{!v.PaginationList.length > 0}">
+                <aura:iteration items="{!v.PaginationList}" var="Obj" indexVar="objectIndex">
+                    <div class="slds-p-horizontal--small slds-p-top--x-small">
+						<div class="slds-grid slds-wrap">
+							<div class=" slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--12-of-12">
+								<lightning:card>
+									<div class="slds-grid slds-wrap">
+										<div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer ID"><b>Insurance Name:</b></dt>
+										</div>
+										<div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+											<dd class="slds-item_detail " title="{!Obj.Name}">{!Obj.Name}</dd>
+										</div>
+										<div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer Name"><b>Product:</b></dt>
+										</div>
+										<div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+											<dd class="slds-item_detail " title="{!Obj.Name}">{!Obj.Product__c}</dd>
+										</div>
+									</div>
+								</lightning:card>
+							</div>
+						</div>
+					</div>
+				</aura:iteration>
+			</aura:if>
+		</div>
+		</aura:if>
+	</ui:scrollerWrapper>
+</aura:component>

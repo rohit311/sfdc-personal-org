@@ -1,0 +1,268 @@
+<aura:component access="global" implements="flexipage:availableForAllPageTypes,force:appHostable" controller="SFDCMobileLoanController">
+    <!-- Attributes -->
+    <aura:attribute name="scheme" type="object" />   
+    <aura:attribute name="oppId" type="String" />
+    <!-- Bug 23801 S corrected to sobjectType instead of SObjectType-->
+    <aura:attribute name="oppObj" type="Opportunity" default="{'sobjectType':'Opportunity'}"/>
+    <!-- Bug 23801 E-->
+    <aura:attribute name="surrogateCamObj" type="SurrogateCAM__c" default="{}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{}"/>
+    <aura:attribute name="personalDiscussion" type="Personal_Discussion__c" default="{}"/>
+
+    <aura:attribute name="loanVariantList" type="String[]" default="[]"/>
+    <aura:attribute name="endUseList" type="String[]" default="[]"/>
+    <aura:attribute name="typeOfPDList" type="String[]" default="[]"/>
+    <aura:attribute name="officeCityList" type="String[]" default="[]"/>
+    <aura:attribute name="officeOwnershipList" type="String[]" default="[]"/>
+    <aura:attribute name="schemeList" type="List" />
+    <aura:attribute name="schemeRecords" type="List"/>
+    <aura:attribute name="officeAddress" type="String"/>
+    <aura:attribute name="filteredScheme" type="List" />    
+	<!-- 31 Jan 2019 -->    
+ 	<aura:attribute name="officeCitySearchKeyword" type="string" default=""/>
+    <aura:attribute name="officeCities" type="String[]" default="[]"/>
+    <aura:attribute name="filteredOfficeCities" type="String[]" default="[]"/>
+
+    <!-- 31 Jan 2019 -->
+     <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement start-->
+    <aura:attribute name = "conID" type = "String" default = ""/>
+    <!--Bug Id 23676 End-->
+    <aura:attribute name="schemeSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="showGST" type="Boolean" default="false" />
+<!--     <aura:attribute name="appliedAmtInLacs" type="Decimal" default=""/> -->
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+	<!-- Bug 23801 S-->
+    <aura:attribute name="typeOfLoanList" type="String[]" default="[]"/>
+	<aura:attribute name="OpportunityforPickList" type="Opportunity" default="{'sobjectType' : 'Opportunity'}"/>
+    <!-- Bug 23801 E-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler event="c:DisableFormEvent" action="{!c.disableLoanInfoForm}"/>
+    <aura:handler event="c:EnableFormEventOnSendBack" action="{!c.enableLoanInfoForm}"/>
+
+    <!-- Event handlers -->
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+		<div class="loanIfo-container">
+        <ui:scrollerWrapper class="loanInfoScroller">
+            <fieldset aura:id="loanInfoDetails" class="slds-form--stacked slds-p-bottom--medium">
+
+                <h3 class="slds-section-title--divider">LOAN PARAMETERS</h3>
+                <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="appliedAmountLabel">Applied Amount (in Lacs)<span style="color:red">*</span></label>
+                                <ui:inputNumber class="slds-input" aura:id="appliedAmount" value="{!v.surrogateCamObj.Loan_Amount__c}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}" /> <!-- change="{!c.storeValue}" -->
+                            </div>
+                        </div> 
+
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                 <label class="slds-form-element__label" for="loanVariantLabel">Loan Variant<span style="color:red">*</span></label>
+                                <ui:inputSelect class="slds-input" aura:id="loanVariant" change="{!c.loanVariantChange}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}">
+                                    <ui:inputSelectOption aura:id="loanVariant_SelectOption" text="" label="--Select--"/>
+                                    <aura:iteration items="{!v.loanVariantList}" var="loanVariantName">
+                                        <aura:if isTrue="{!v.oppObj.Loan_Variant__c == loanVariantName}" >
+                                            <ui:inputSelectOption aura:id="loanVariant_SelectOption" text="{!loanVariantName}" label="{!loanVariantName}" value="true" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            <aura:set attribute="else">
+                                                <ui:inputSelectOption aura:id="loanVariant_SelectOption" text="{!loanVariantName}" label="{!loanVariantName}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+						<!-- bugId 23801 S-->
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="typeOfLoanLabel">Type of Loan<span style="color:red">*</span></label>
+                                <ui:inputSelect class="slds-input" aura:id="typeOfLoan" change="{!c.typeOfLoanChange}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}">
+                                    <ui:inputSelectOption aura:id="typeOfLoan_SelectOption" text="" label="--Select--"/>
+                                    <aura:iteration items="{!v.typeOfLoanList}" var="typeOfLoanName">
+                                        <aura:if isTrue="{!v.oppObj.Type_Of_Loan__c == typeOfLoanName}" >
+                                            <ui:inputSelectOption aura:id="typeOfLoan_SelectOption" text="{!typeOfLoanName}" label="{!typeOfLoanName}" value="true" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            <aura:set attribute="else">
+                                                <ui:inputSelectOption aura:id="typeOfLoan_SelectOption" text="{!typeOfLoanName}" label="{!typeOfLoanName}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+						<!-- bugId 23801 E-->
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" aura:id="appliedTenorDiv">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="appliedTenorLabel">Applied Tenor (Months)<span style="color:red">*</span></label>
+                                <ui:inputText class="slds-input" aura:id="appliedTenor" value="{!v.surrogateCamObj.CY_Tenor__c}" disabled="{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}" maxlength="10" change="{!c.validateAppliedTenor}" keyup="{!c.validateAppliedTenor}"/>
+                            </div>
+                        </div>
+
+                        <aura:if isTrue="{!v.oppObj.Loan_Variant__c == 'HYBRID'}">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" aura:id="hybridFlexiTenorDiv">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="hybridFlexiTenorLabel">Pure Flexi Tenor (Months)<span style="color:red">*</span></label>
+                                <ui:inputText class="slds-input" aura:id="hybridFlexiTenor" value="{!v.applicantObj.Pure_Flexi_Period__c}" maxlength="10" updateOn="keyup"  keyup="{!c.validateHybridFlexiTenor}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                            </div>
+                        </div>
+                        </aura:if>
+
+                        <div aura:id="schemeSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="schemeLabel">Scheme<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="scheme" class="slds-input" updateOn="keyup" keyup="{!c.schemeKeyPressController}" value="{!v.schemeSearchKeyword}" placeholder="Select scheme" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>                               
+                                <!--This part is for Display typehead lookup result List-->  
+                                    <div class="slds-lookup__menu slds" id="schemeId">
+                                        <div aura:id="schemeMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.filteredScheme}" var="singleRec" indexVar="idx">
+                                                <li role="presentation">
+                                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                <div class="slds-lookup__result-text">
+                                                                    <a data-value="{!singleRec.Name}" data-record="{!idx}" onclick="{!c.selectScheme}">
+                                                                        {!singleRec.Name}
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </span>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                        </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="endUseLabel">End Use<span style="color:red">*</span></label>
+                                <ui:inputSelect class="slds-input" aura:id="endUse" change="{!c.endUseChange}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}">
+                                    <ui:inputSelectOption aura:id="endUse_SelectOption" text="" label="--Select--"/>
+                                    <aura:iteration items="{!v.endUseList}" var="endUseName">
+                                        <aura:if isTrue="{!v.oppObj.End_Use__c == endUseName}" >
+                                            <ui:inputSelectOption aura:id="endUse_SelectOption" text="{!endUseName}" label="{!endUseName}" value="true" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            <aura:set attribute="else">
+                                                <ui:inputSelectOption aura:id="endUse_SelectOption" text="{!endUseName}" label="{!endUseName}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <br/>
+
+                <h3 class="slds-section-title--divider">OFFICE ADDRESS DETAILS</h3>
+
+                <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="officeAddressLabel">Office Address<span style="color:red">*</span></label>
+                                <ui:inputTextArea class="slds-input" aura:id="officeAddr" rows="3" value="{!v.officeAddress}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                            </div>
+                        </div>
+                             <!-- 31 Jan 2019 -->                
+                            <div aura:id="officeCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="officeCityLabel">Office City<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="officeCity" class="slds-input" updateOn="keyup" keyup="{!c.officeCityKeyPressController}" value="{!v.officeCitySearchKeyword}" placeholder="Select Office City" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>                               
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="officeCityList">
+                                    <div aura:id="officeCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.filteredOfficeCities}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectOfficeCity}">{!singleRec}</a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                                </div>
+                            </div>
+							<!-- 31 Jan 2019 -->  
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="officePincodeLabel">Office Pincode<span style="color:red">*</span></label>
+                                <ui:inputText class="slds-input" aura:id="officePincode" value="{!v.oppObj.Account.Office_Pin_Code__c}" maxlength="6" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="officeOwnershipLabel">Office Ownership<span style="color:red">*</span></label>
+                                <ui:inputSelect class="slds-input" aura:id="officeOwnership" change="{!c.officeOwnershipChange}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}">
+                                    <ui:inputSelectOption aura:id="officeOwnership_SelectOption" text="" label="--Select--"/>
+                                    <aura:iteration items="{!v.officeOwnershipList}" var="officeOwnershipName">
+                                        <aura:if isTrue="{!v.oppObj.Account.Type_of_Ownership__c == officeOwnershipName}" >
+                                            <ui:inputSelectOption aura:id="officeOwnership_SelectOption" text="{!officeOwnershipName}" label="{!officeOwnershipName}" value="true" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            <aura:set attribute="else">
+                                                <ui:inputSelectOption aura:id="officeOwnership_SelectOption" text="{!officeOwnershipName}" label="{!officeOwnershipName}" disabled = "{!(v.oppObj.StageName != 'DSA/PSF Login') ? 'true':'false'}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br/>
+                <h3 class="slds-section-title--divider">GST</h3>
+
+                <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+								<aura:if isTrue="{!v.oppObj.StageName == 'DSA/PSF Login'}" >
+										<a href="javascript:void(0)" onclick="{!c.openGSTModal}" aura:id="gstDetails"> GST Details </a>
+									<aura:set attribute="else">
+										<ui:outputText aura:id="gstDetails" value="GST Details"/>
+									</aura:set>
+                                </aura:if>
+							</div>
+                        </div>
+                    </div>
+                </div>
+				<aura:if isTrue="{!v.oppObj.StageName == 'DSA/PSF Login'}">
+                <div class="slds-p-top--large"> 
+                    <div class="slds-p-horizontal_medium">
+                    	<button aura:id="saveOpp" class="slds-button slds-button--brand" onclick="{!c.saveLoanData}">Save Details</button> 
+                    </div>
+                 </div> 
+                </aura:if>
+
+            </fieldset>
+        </ui:scrollerWrapper>
+		</div>
+      
+    <!-- commented by Sachin -->
+    <!-- <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+            <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+        </div>
+    -->
+        <aura:if isTrue="{!v.showGST == true}">
+            <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal--large" aria-hidden="false" aria-labelledby="header43" aura:id="GSTModalbox">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around--medium slds-scrollable">
+                        <c:CaptureGSTData isDSSFlow="false" isMobileFlow="true" whatId="{!v.oppId}" whoId="{!v.applicantObj.Id}"/>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--brand slds-align_absolute-center" onclick="{!c.closeModalGST}">Close</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop " aura:id="GSTModalbackdrop"></div>
+        </aura:if>
+</aura:component>

@@ -1,0 +1,184 @@
+<aura:component controller="INSNTBCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<!--Attributes-->
+    <aura:attribute name="showNTBCmp" type="Boolean" default="true"/>
+    <aura:attribute name="searchObj" type="Map" default="{}"/>
+	<aura:attribute name="isSpinner" type="Boolean" default="false" />
+    <aura:attribute name="CustomerList" type="CUSTOMER_INFO__c[]" />
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="5"/>
+    <aura:attribute name="PaginationList" type="Object[]" default=""/>
+    <aura:attribute name="openCustDetails" type="Boolean" default="false" />
+    <aura:attribute name="childParam" type="Object"/>
+    <aura:attribute name="wrapperObj" type="Object"/>
+    <aura:attribute name="CustPgRecMap" type="Map" default="{}"/>
+    <aura:attribute name="showConfirm" type="Boolean" default="false" />
+    <aura:attribute name="assignMeMsg" type="String"/>
+    <aura:attribute name="assignMeCust" type="CUSTOMER_INFO__c" />
+	<aura:attribute name="assignToMeFlg" type="Boolean" default="false" />
+	
+	
+    <!--Handlers-->
+	<aura:registerEvent name="notficationEvent" type="c:InvokeNotificationEVT"/>
+    <aura:registerEvent name="INSHomePgEvent" type="c:INS_GoToHomePgEvent"/>
+	<aura:handler name="init" action="{!c.initNTBCmp}" value="{!this}"/>
+	
+	<aura:if isTrue = "{!v.showConfirm}">
+	    
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="width:100%;height:100%;margin-left: -30px;max-width: 100%;">
+			<div class="slds-modal__container slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+				
+					<header class="slds-modal__header">
+						<button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+							X
+							<span class="slds-assistive-text">Close</span>
+						</button>
+						
+						<h2 id="modal-heading-01" class="slds-text-heading_small slds-hyphenate">Assign To Me</h2>
+					</header>
+					<ui:scrollerWrapper class=""> 
+					<div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1">
+						<p>{!v.assignMeMsg}
+						</p>
+					   
+					</div>
+					</ui:scrollerWrapper> 
+					<footer class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" id ="idYes" onclick = "{!c.setAssignFlag}">Yes</button>
+						<button class="slds-button slds-button_brand" id="idNo" onclick = "{!c.setAssignFlag}">No</button>
+					</footer>
+				
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+		
+		</aura:if> 
+	<ui:scrollerWrapper class="">
+        <aura:if isTrue="{!v.isSpinner}">
+                <lightning:spinner variant="brand"  size="large" class=""/>
+        </aura:if>
+        <aura:if isTrue="{!v.showNTBCmp}">
+			<div style="margin-top:5px;">
+				<div class="slds-p-horizontal--small slds-theme_shade slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-left: 14px;margin-right: 14px;  ">
+					<div class="slds-grid slds-wrap slds-grid--pull-padded" style="margin-top: 7px;">
+						<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--2-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<lightning:button variant="brand"  label="Back" aura:id="back_btn" onclick="{!c.backToHome}" class="slds-theme--alt-inverse slds-float_left bckBtnClass" title="Back"> 
+								<lightning:icon iconName="utility:back" title="Back" size="x-small" variant="inverse"/>
+								</lightning:button>
+							</div>
+						</div>
+						<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--2-of-6 slds-large-size--4-of-12">
+						<div class="slds-form-element__control">
+							<div  class="slds-align_absolute-center slds-text-heading_small"><b>INTERNAL SEARCH</b></div>
+						</div>
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="slds-grid slds-wrap slds-grid--pull-padded" style="margin-left:10px; margin-right:10px;">
+				
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element__control">
+						<lightning:input aura:id="ntbSearchForm" name="firstName" value="{!v.searchObj.Fname}" label="First Name" placeholder="First Name" pattern="^[a-zA-Z ]*$" messageWhenPatternMismatch="Please Enter valid First Name" required="true" messageWhenValueMissing= "Please enter First Name"/>
+					</div>
+					</div>
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element__control">
+						<lightning:input aura:id="ntbSearchForm" name="LastName" value="{!v.searchObj.Lname}" label="Last Name" placeholder="Last Name"  pattern="^[a-zA-Z ]*$"  messageWhenPatternMismatch="Please Enter valid Last Name" />
+					</div>
+					</div>
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element__control">
+						<lightning:input aura:id="ntbSearchForm" type="date" name="DOB" value="{!v.searchObj.DOB}" label="DOB" placeholder="DOB" />
+					</div>
+					</div>
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element__control">
+						<lightning:input aura:id="ntbSearchForm" name="Mobile" value="{!v.searchObj.Mobile}" label="Mobile" placeholder="Mobile" pattern="^[6-9]\d{9}" maxlength="10" required="true" messageWhenValueMissing= "Please enter Mobile Number"/>
+					</div>
+					</div>
+					<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element__control">
+						<lightning:input label="PAN" value="{!v.searchObj.pan}" name="PAN" aura:id="ntbSearchForm" placeholder="PAN" maxlength="10" pattern="^([a-zA-Z]{5})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="please enter valid PAN" />
+					</div>
+					</div>
+					
+					
+				</div><br/>
+				<div class="" align="center">
+                    <div class="">
+                        <lightning:button aura:id="" variant="brand" label="Search" onclick="{!c.searchCust}" />
+                        <lightning:button aura:id="" variant="brand" label="Clear" onclick="{!c.clearFields}" />
+                        
+                    </div>
+			    </div>
+				
+                <aura:if isTrue="{!v.PaginationList.length > 0}">
+                    <aura:iteration items="{!v.PaginationList}" var="Obj" indexVar="objectIndex">
+                        <div class="slds-p-horizontal--small slds-p-top--x-small">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+									<lightning:card >
+										<dl class="slds-list_horizontal slds-wrap">
+											
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Name"><b>Customer ID :</b></dt>
+											<dd class="slds-item_detail " title="{!Obj.Name}">{!Obj.Name}</dd>
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Name"><b>Customer Name:</b></dt>
+											<dd class="slds-item_detail " title="{!Obj.First_Name__c + ' ' + Obj.Last_Name__c}">{!Obj.First_Name__c + ' ' + Obj.Last_Name__c}</dd>
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Mobile"><b>Mobile :</b></dt>
+											<dd class="slds-item_detail " title="{!Obj.Mobile__c}">{!Obj.Mobile__c}</dd>
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Lead Source"><b>Lead Source:</b></dt>
+											<dd class="slds-item_detail " title="{!Obj.Lead_Source__c}">{!Obj.Lead_Source__c}</dd>
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small " title="Lead Source"><b>Customer Segment :</b></dt>
+											<dd class="slds-item_detail " title="{!Obj.Bureau_Segment__c}">{!Obj.Bureau_Segment__c}</dd>
+											<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small slds-p-bottom_x-small" title="Lead Type"><b>Lead Type:</b></dt>
+											<dd class="slds-item_detail " title="NTB Lead">New Lead</dd>
+										</dl>
+										
+										<div class="slds-p-top--xx-small">
+										
+											<button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="cust_assignMe_btn" name="{!Obj.Id}" aura:id="cust_assignMe_btn" onclick="{!c.assignToMe}" title="AssignToMe" ><lightning:icon iconName="utility:change_owner" title="AssignToMe" size="small" variant="inverse" /></button>
+												
+											<button class="slds-button slds-button_brand slds-theme--alt-inverse" name="{!Obj.Id}" id="{!'cust_prof_btn_'+ Obj.Id}" aura:id="cust_prof_btn" onclick="{!c.openCustInfo}" title="cust_prof_btn" disabled="{!Obj.BtnDisableFlag}"><lightning:icon iconName="utility:identity" title="Profile" size="small" variant="inverse" /></button>
+											
+											<button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="{!'cust_intr_btn_'+ Obj.Id}" name="{!Obj.Id}" aura:id="cust_intr_btn" onclick="{!c.openCustInfo}" title="cust_intr_btn"  disabled="{!Obj.BtnDisableFlag}"><lightning:icon iconName="utility:chat" title="Interaction" size="small" variant="inverse" /></button>
+											
+											<button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="{!'cust_prod_btn_'+ Obj.Id}" name="{!Obj.Id}" aura:id="cust_prod_btn" onclick="{!c.openCustInfo}" title="cust_prod_btn"  disabled="{!Obj.BtnDisableFlag}"><lightning:icon iconName="utility:ad_set" title="Products" size="small" variant="inverse" /></button>
+										</div>	
+									</lightning:card>
+								</div>
+							</div>
+						</div>
+                    </aura:iteration><br/>
+				    <aura:set attribute="else">
+                        <ui:message severity="warning" closable="false">
+                            <lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+                            <ui:outputText class="slds-text-heading--label" value="No records found currently"/>
+                        </ui:message>
+                    </aura:set>
+				
+                    
+				<lightning:buttonGroup class="slds-align_absolute-center">
+					<lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+									  onclick="{!c.previous}" variant="brand" iconName='utility:back'/> &nbsp; &nbsp; &nbsp;
+					<lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+									  onclick="{!c.next}" variant="brand" iconName='utility:forward' iconPosition='right'/>
+					
+				</lightning:buttonGroup>
+                    
+				<div class="slds-align_absolute-center slds-text-body_regular">
+					Page {!v.currentPage} of {!v.totalPages}
+				</div>
+				</aura:if>
+			</div>
+		</aura:if>
+        <aura:if isTrue="{!v.openCustDetails == true}">
+            <c:INS_CustomerDetails objParam = "{!v.childParam}" aura:id="custCmpId"/>
+        </aura:if>
+	</ui:scrollerWrapper>
+</aura:component>

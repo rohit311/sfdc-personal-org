@@ -1,0 +1,122 @@
+<aura:component implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable" access="global" controller="AutoQueueAllocationUtility">
+    <aura:attribute name="coqmObj" type="Credit_Officer_Queue_Mapping__c" />
+    <aura:attribute name="oppObj" type="Opportunity" />
+    <aura:attribute name="userInfo" type="User" />
+    <aura:attribute name="availableValues" type="List" />
+    <aura:attribute name="areDetailsFetched" type="Boolean" />
+    <aura:attribute name="isUpdated" type="Boolean" default="false" />
+    <!-- pankaj 6th feb S   23550 S-->
+    <aura:attribute name = "QDetails" type ="Object[]" default = "{}"/>
+      <!-- pankaj 6th feb E  23550 E-->
+    <!-- rajendra S--> 
+    <aura:attribute name = "strExceptionQValues" type="String" default =""/>
+    <aura:attribute name = "exceptionQDetails" type ="Object[]" default = "{}"/>
+    <!-- rajendra E-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:if isTrue="{!v.areDetailsFetched == true}">
+
+        <!--         <div class="slds-form slds-form_horizontal">
+
+
+ -->
+        <h3 class="slds-section-title--divider slds-text-heading_medium slds-align_absolute-center">Credit User Details</h3>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_4-of-12"></div>
+                <div class="slds-col slds-size_4-of-12">
+                 <div class="slds-grid slds-wrap">
+                     <div class="slds-col slds-size_2-of-4">
+                         <label class="slds-form-element__label slds-section__title"><b>Credit User Name : </b></label>
+                     </div>
+                     <div class="slds-col slds-size_2-of-4">
+                         <ui:outputText class="slds-form-element__label slds-section__title" value="{!v.userInfo.Name}" />
+                     </div>
+                 </div>
+                 <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_2-of-4">
+                         <label class="slds-form-element__label slds-section__title"  ><b>Credit User Profile : </b></label>
+                     </div>
+                   <div class="slds-col slds-size_2-of-4">
+                         <ui:outputText class="slds-form-element__label slds-section__title" value="{!v.userInfo.Profile.Name}" />
+                     </div>
+                 </div>
+
+                 <div class="slds-grid slds-wrap">
+                     <div class="slds-col slds-size_2-of-4">
+                         <label class="slds-form-element__label slds-section__title"><b>Capacity : </b></label>
+                     </div>
+                  <div class="slds-col slds-size_2-of-4">
+                         <ui:outputText class="slds-form-element__label slds-section__title" value="{!v.coqmObj.Capacity__c}" />
+                     </div>
+                 </div>
+
+                 <div class="slds-grid slds-wrap">
+                     <div class="slds-col slds-size_2-of-4">
+                         <label class="slds-form-element__label slds-section__title"><b>Occupied : </b></label>
+                     </div>
+                  <div class="slds-col slds-size_2-of-4">
+                         <ui:outputText class="slds-form-element__label slds-section__title" value="{!v.coqmObj.Occupied__c}" />
+                     </div>
+                 </div>
+
+                 <div class="slds-grid slds-wrap">
+                      <div class="slds-col slds-size_2-of-4">
+                         <label class="slds-form-element__label slds-section__title"><b>Available : </b></label>
+                     </div>
+                     <div class="slds-col slds-size_2-of-4">
+                         <lightning:select aura:id="a_Select" name="a_Select" label="" messageWhenValueMissing="Please Select Value" onchange="{!c.onChangeValue}">
+                             <option value="">-- Select --</option>
+                             <aura:iteration items="{!v.availableValues}" var="a">
+                                 <option value="{!a}" text="{!a}" selected="{!v.coqmObj.isAvailable__c == a}"></option>
+                             </aura:iteration>
+                         </lightning:select>
+                     </div>
+                 </div>
+                    </div>
+                <div class="slds-col slds-size_4-of-12"></div>
+        </div>
+        <br/><br/>
+
+        <div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center">
+        <fieldset class="slds-form-element">
+            <div class="slds-form-element__control">
+                <span class="slds-checkbox">
+                    <button aura:id="saveId" class="slds-button slds-button--brand" onclick="{!c.handleSaveRecord}">Save</button>
+                </span>
+                <br/>
+                <aura:if isTrue="{!v.isUpdated}">
+                    <span class="slds-checkbox">
+                        <button aura:id="getAppId" class="slds-button slds-button--brand" onclick="{!c.getApp}">Get Loan Application</button>
+                    </span>
+                </aura:if>
+            </div>
+        </fieldset>
+        </div>
+        <br/><br/>
+        <!-- 23550 S -->
+        <c:getQueueDetails QDetails = "{!v.QDetails}" ExceptionQDetails = "{!v.exceptionQDetails}"/>
+        <!-- 23550 E -->
+    </aura:if>
+
+    <div aura:id="waiting" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details" />
+    </div>
+
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</aura:component>

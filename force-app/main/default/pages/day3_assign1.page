@@ -1,0 +1,6 @@
+<apex:page controller="MyFirstClass">
+<apex:pageBlock >
+    <apex:outputText value="{!str}"></apex:outputText>
+</apex:pageBlock>>
+
+ </apex:page>

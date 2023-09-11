@@ -1,0 +1,17 @@
+.THIS iframe{
+    margin : 80px;
+}
+.THIS .parentDiv{
+    float:left;
+}
+.THIS img{
+   
+    margin : 80px;
+}
+.THIS p{
+    font-size:120%;
+    text-align: center;
+    margin : 10px;
+    margin-left : 50px;
+    font-weight: bold;
+}

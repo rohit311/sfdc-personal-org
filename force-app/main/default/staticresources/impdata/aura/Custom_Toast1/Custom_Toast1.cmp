@@ -1,0 +1,21 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="hideDiv" type="Boolean" default="false"/>
+    <!--<aura:handler event="c:ShowCustomToast" action="{!c.showCustomToast}" /> bug Id : 24716-->
+    <aura:attribute name="fadeTimeout" type="Integer" default="5000" description="This stores fade out time in millisecond"/>
+      <div aura:id="customToast" class="slds-hide">
+		<!-- added upper 2 divs for Bug 17795 -->
+                <div class="slds-notify_container " >
+                    <div aura:id="toastTheme" class="slds-notify slds-notify--toast " style="min-width: 20.5rem !important;padding-right: 0rem !important;padding-left: 0rem !important;font-size: 11.5px !important;margin-top:0.5rem !important;" role="alert" ><!-- added style tag for Bug 17795 -->
+                        <lightning:icon aura:id="messageicon" iconName="" variant="success" size="small" Class="iconContainer"/>&nbsp;
+            			<lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." /><div class="slds-notify__content">
+                            <div class="slds-align-middle">
+                                <h2 class="slds-text-heading--x-small">
+                                    <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                                    <ui:outputText aura:id="toastText" value=""/>
+                                </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</aura:component>

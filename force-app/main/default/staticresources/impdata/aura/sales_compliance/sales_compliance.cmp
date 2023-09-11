@@ -1,0 +1,58 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL" controller="Sales_Compliance_Cntrl">
+    
+    <aura:attribute name="WeakAcc" type="Weak_Account__c" default=""/>
+    <aura:attribute name="appObj" type="Applicant__c" default=""/>
+    <aura:attribute name="CoappList" type="List" default=""/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="camObj" type="CAM__c" default=""/>
+    <aura:attribute name="isUnderwitercmp" type="boolean" default="false"/>
+    <aura:attribute name="accordian_name" type="String" default=""/>
+    <aura:attribute name="verTypeList" type="List" default=""/>
+    <aura:attribute name="verificationObj" type="object[]"/>
+    <aura:attribute name="recidentialGeoLocation" type="String"/>   
+    <aura:attribute name="OfficelGeoLocation" type="String"/>
+    <aura:attribute name="isOfficeGeoavailable" type="boolean" default="false"/>
+    <aura:attribute name="isResiGeoavailable" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="isModal" type="boolean" default="false"/>
+    <aura:registerEvent name="getAuditResultEvt" type="c:getAuditResult"/>
+    <c:LoaderForMobility />
+    <c:Custom_Toast_Mobility/>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <div style="position:relative" id="mainForm">
+            <div class="innerDivWrapper">
+                <lightning:card title="" class="applyColor" >
+                    <lightning:accordion aura:id="accordion" activeSectionName="{!v.accordian_name}" >
+                        <lightning:accordionSection name="CustInfo" label="Customer Information" >
+                            <c:Sales_CustomerInfo WeakAccn="{!v.WeakAcc}" applObj="{!v.appObj}" camObj="{!v.camObj}" CoappList="{!v.CoappList}" isModal="{!v.isModal}"/>
+                        </lightning:accordionSection> 
+                        <lightning:accordionSection name="Questin" label="Questionnaire" >
+                            <div class="slds-list--vertical slds-has-block-links" style="padding-top: 1%; padding-bottom: 1%">
+                                <a href="javascript:void(0)" onclick="{!c.openQuestions}">
+                                    Click here to open questionnaire
+                                </a>
+                                {!v.body}
+                            </div>                            
+                         </lightning:accordionSection>
+                        <lightning:accordionSection name="AuditCPV" label="Audit CPV">
+                            <c:AuditCPV oppId="{!v.oppId}" WeakAccn="{!v.WeakAcc}" verTypeList="{!v.verTypeList}" recidentialGeoLocation="{!v.recidentialGeoLocation}"  OfficelGeoLocation="{!v.OfficelGeoLocation}" isOfficeGeoavailable="{!v.isOfficeGeoavailable}" isResiGeoavailable="{!v.isResiGeoavailable}"/> 
+                        </lightning:accordionSection>
+                        <lightning:accordionSection name="resultAccrn" label="Result">
+                            <c:SalesComplianceResult  WeakAcc="{!v.WeakAcc}" oppId="{!v.oppId}" isOfficeGeoavailable="{!v.isOfficeGeoavailable}" isResiGeoavailable="{!v.isResiGeoavailable}"/>
+                        </lightning:accordionSection>
+                    </lightning:accordion>  
+                           
+
+                </lightning:card>     
+                
+            </div>
+            <div class="slds-hidden" style="height:200px;" ></div> 
+            <!-- <aura:if isTrue='{!v.isModal}'>
+           <div class="slds-backdrop slds-backdrop_open" style="z-index:12;"></div> 
+    </aura:if>-->
+        </div>
+    </ui:scrollerWrapper>
+
+</aura:component>

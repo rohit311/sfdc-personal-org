@@ -1,0 +1,177 @@
+<aura:component 
+                access="global" controller="SAL_PricingCtrlV2"> 
+    <aura:attribute name="disbList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute type="Current_Disbursal_Details__c" name="disb"/>
+        <aura:attribute type="Current_Disbursal_Details__c" name="disbursment"/>
+    <aura:attribute type="Opportunity" name="loan"/>
+    <aura:attribute type="Id" name="loanId"/>
+    <aura:handler event="c:updateDisbursementList" action="{!c.handleUpdateDisbursement}"/>
+    <aura:attribute name="isTransactionalError" type="Boolean" default="false"/>
+    <aura:attribute name="isAPIError" type="Boolean" default="false"/>
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Current_Disbursal_Details__c" name="disbObj"/>
+    <aura:attribute type="String" name="BranchName"/>
+
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--24315-->
+    
+    <!--Bug:20391 Start(to handle visibility of Initiate Open ECS) -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="showIMPSResponse" type="Boolean" default="true"/>
+    <aura:attribute name="userProfile" type="String"/>
+    <aura:attribute name="accntValidateList" type="List"/>
+    <!--Bug:20391 End -->
+    
+    <!--Bug 21287-S -->
+    <aura:attribute name="impsBankMap" type="list" />
+    <!-- Bug 21287-E -->
+     <!--Bug 25677-S -->
+    <aura:attribute type="List" name="IMPSRenderMap"/>
+    <!-- Bug 25677-E -->
+    
+    <aura:attribute name="isDisbDashboard" type="boolean" default="false"/> <!-- Bug 20391 : Bug 22062 : Added isDisbDashboard -->
+    
+    <aura:handler event="c:SetCloneBankRecord" action="{!c.setdisbursallist}"/>
+    <a onclick="{!c.cloneBankDetails}" style="width:100%;color:red" >Clone Banking Details</a>
+    <aura:iteration items="{!v.disbList}" var="disbObj">
+            
+        <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+            <div class="applyColor">
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--5-of-6">
+                        <div class="" role="">
+                            <button value="{!disbObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse " aura:id="edit_btn" onclick="{!c.editRecord}" title="Edit" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                            <button value="{!disbObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                          
+                           <aura:if isTrue="{! and(v.showIMPSResponse==true,(lessthan(disbObj.IMPS_Count__c, 2) || disbObj.IMPS_Count__c== null))}"><!--22828: Added disbObj.IMPS_Count__c== null condition since lessthan was failing if value was null-->
+                            
+                                <aura:if isTrue="{! disbObj.Disbursal_Mode__c=='IMPS' || disbObj.Disbursal_Mode__c=='NEFT' || disbObj.Disbursal_Mode__c=='RTGS' }">
+                                	<!-- Bug 21287-S -->
+                                   
+                                    <aura:iteration items="{!v.impsBankMap}" var="banks" indexVar="key">
+                                     
+                                    	<aura:if isTrue="{! equals(banks.key,disbObj.Id)}">
+                                            <!-- Bug 25677-S -->
+                                        
+                                            <aura:iteration items="{!v.IMPSRenderMap}" var="imps" indexVar="key1">
+                                              
+                                                <aura:if isTrue="{! equals(imps.key1,disbObj.Id)}">
+                                    		<lightning:button value="{!disbObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" aura:id="validateIMPS" onclick="{! c.validateImps }"  disabled="false" title="Validate" ><!--lightning:icon iconName="utility:thunder" size="x-small" variant="inverse"/--> Validate IMPS</lightning:button>
+                                    	</aura:if>
+                                	</aura:iteration>
+                                            <!-- Bug 25677-E -->
+                                        </aura:if>
+                                    </aura:iteration>
+                                    <!-- Bug 21287-E -->
+                                </aura:if>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Bank Name:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disbObj.Bank_Name__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Bank Branch:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disbObj.Bank_Branch__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Bank Account:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disbObj.Bank_Account__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Favouring:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disbObj.Favouring__c}"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p>
+            </div>
+            <!-- Bug:20391 IMPS Details section -->
+    <aura:if isTrue="{! and(v.showIMPSResponse==true,greaterthan(disbObj.IMPS_Transaction_No__c.length,1))}">
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+    	<div class="applyColor">
+        	<p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="demo-only" style="padding: 0.5rem; background: rgb(22, 50, 92);">
+                	<h3 class="slds-text-color_inverse">IMPS Response</h3>
+                </div>
+            
+                <table class="slds-table ">
+	<tr class="slds-hint-parent"> 
+        <td>Transaction Status</td>
+		<td>	
+        <lightning:input label=" " value="{!disbObj.IMPS_Result__c}" disabled="true" style="width: 100%;"/>
+        </td>
+		<td>Transaction Reference no.</td>
+		<td>	
+        <lightning:input label=" " value="{!disbObj.IMPS_Transaction_No__c}" disabled="true" style="width: 100%;"/>
+        </td>
+        
+		<td>Name of Recipient</td>
+		<td>	
+        <lightning:input label=" " value="{!disbObj.IMPS_Beneficiary_Name__c}" disabled="true" style="width: 100%;"/>
+        </td>
+	</tr>
+	<tr class="slds-hint-parent"> 
+        <td>Account Number</td>
+		<td>	
+        <lightning:input label=" " value="{!disbObj.Bank_Account__c}" disabled="true" style="width: 100%; margin-top: 1em"/>
+        </td>
+		<td>IMPS Account Validate</td>
+        <td>                                                                                          
+			<lightning:select class="slds-size--3-of-5 slds-col" aura:id="accValidate" name="accValidate" label=" " required="true" messageWhenValueMissing="Please Select Value" value="{!disbObj.IMPS_Account_Validate__c}">
+				<option value="" text="--None--" />
+                    <aura:iteration items="{!v.accntValidateList}" var="accV">
+                        <option value="{!accV}" text="{!accV}" selected="{!disbObj.IMPS_Account_Validate__c == accV}"></option>
+                    </aura:iteration>
+            </lightning:select>
+        </td>
+	</tr>
+</table>
+        	</p>
+        </div>
+    </div>
+    
+        <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--5-of-6 slds-align--absolute-center">
+            <aura:if isTrue="{! and(greaterthan(disbObj.IMPS_Transaction_No__c.length,1))}">
+            <!--aura:if isTrue="{! and(greaterthan(disbObj.IMPS_Transaction_No__c.length,1),disbObj.IMPS_Result__c != 'Successful Transaction')}"-->
+                 <!-- Bug-25677 s-->
+                <aura:iteration items="{!v.IMPSRenderMap}" var="imps" indexVar="key1">
+                   <aura:if isTrue="{! equals(imps.key1,disbObj.Id)}">
+                <button value="{!disbObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" id="recheckIMPS" onclick="{! c.recheckImps }"  title="Validate" >
+                    <lightning:icon iconName="utility:thunder" size="x-small" variant="inverse"/> 
+                    Recheck IMPS
+                </button> 
+                    </aura:if>
+                </aura:iteration>
+                <!-- Bug-25677 E-->
+            </aura:if>
+            <!-- Bug-22785(Related to 20391) start -->
+                <button value="{!disbObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" name="{!disbObj.IMPS_Account_Validate__c}" id="saveIMPS" onclick="{! c.saveIMPS }"  title="save" ><lightning:icon iconName="utility:save" size="x-small" variant="inverse"/> Save</button> 
+        <!-- Bug-22785(Related to 20391) end -->
+    	</div>
+        
+    </aura:if>
+        </div>
+        
+    </aura:iteration>
+    <div class="slds-button-group slds-align--absolute-center" style="margin-top: 10px;" role="group">
+        <button class="slds-button slds-theme--alt-inverse slds-button--brand" aura:id="add_btn" onclick="{!c.addNewRecord1}" title="Add New" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:add" size="small" variant="inverse"/></button>
+    </div>
+                                        <div class="one" style="
+    height: 100x;
+"></div>
+
+    {!v.body}
+</aura:component>

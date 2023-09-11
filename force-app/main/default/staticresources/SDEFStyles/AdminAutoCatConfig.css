@@ -1,0 +1,303 @@
+.innovationSuiteUrl {   
+		width: 491px;
+		height:28px;
+		margin-left: 6px;
+		padding: 3px 5px;
+		color: #555;
+		font-size: 1.2em;
+		border-radius: 2px;
+   		border: solid 1px #d9d9d9;
+	}
+.adminHeaderContainer{
+		overflow: hidden;
+		background-color: #414042;
+		top: 0;
+		height: 28px;
+		line-height: 28px;
+		width: 100%;
+		border-bottom: 2px solid #f86e00;
+	}
+.adminHeaderText {
+		padding: 0 10px;
+		width: 165px;
+	    height: 17px;
+		font-size: 13px;
+	    font-weight: 600;
+	    font-style: normal;
+	    font-stretch: normal;
+	    line-height: normal;
+	    letter-spacing: normal;
+	    color: #ffffff;
+	}
+.adminLabel {
+		width: 131px;
+		height: 18px;
+		font-size: 12px;
+		font-weight: 600;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		color: #666666;
+		margin: 10px 0px 0px 4px;
+		white-space: nowrap;
+	}
+.requiredField{
+		color: #f86e00;
+		font-size: 12px;
+		padding-left: 5px;
+		font-weight:600
+	}
+.d-button_primary {
+		color: #fff;
+		border-radius: 2px;
+  		border: solid 1px #de6800;
+		background-color: #f86e00;   
+		font-size: 12px;
+		padding: 7px 14px;
+		cursor:pointer;
+		font-family: 'Salesforce Sans',Arial,sans-serif !important;
+    	font-weight: normal;
+    	font-style: normal;
+    	font-stretch: normal;
+    	line-height: 1.42;
+    	letter-spacing: normal;
+    	text-align: center;
+	}
+.d-button_primary_disabled{
+		background-color: #f86e00;
+		cursor: not-allowed;
+		opacity: 0.6;
+		filter: alpha(opacity=60);
+	}
+.d-icon-info_circle{
+		padding: 10px;
+		font-size: 18px;
+		font-family: dpl-iconfont;
+	    color: #666666;
+	}
+.paddingTop10px{
+		padding-top:10px;
+	}
+.rfDPL-section-underline {
+		position: inherit !important;
+	}
+.hyperlink{
+	    height: 18px;
+	    font-size: 12px;
+	    font-weight: normal;
+	    font-style: normal;
+	    font-stretch: normal;
+	    line-height: normal;
+	    letter-spacing: normal;
+	    color: #00aaa2;
+		cursor:pointer;
+		display: inline-block;
+	}
+.bmc-message-default .x-message-box-question {
+	   background-image: none;
+	}		
+.bmc-message-default .x-message-box-question:before {
+	   content: "\E646";
+	   font-family: "dpl-icon-font";
+	   font-weight: normal;
+	   font-style: normal;
+	   font-variant: normal;
+	   line-height: 1;
+	   vertical-align: baseline;
+	   text-transform: none;
+	   speak: none;
+	   -webkit-font-smoothing: antialiased;
+	   font-size:32px;
+	   color: #F1B521;
+	}
+.inlineError{
+		width: 170px;
+		height: 28px;
+		font-size: 11px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		text-align: center;
+		color: #f83200;
+	}
+.d-icon-exclamation_triangle{
+		color:#f83200;
+		margin-left: -20px;
+	}
+.paddingTopLeft10px{
+		padding: 10px 0px 0px 12px; 
+	}
+.paddingTop15px{
+   		padding-top:15px;
+   	}
+.paddingTop5px{
+		padding-top:5px;
+	}
+.paddingTop10pxLeft5px{
+		padding-top:10px;
+		padding-left:5px;
+	}
+td {
+		padding: 10px;
+	}
+.d-icon-question_circle{
+		float:right;
+		color:white;
+		cursor:pointer;
+		font-size: 16px;
+		padding-right: 10px;
+	}
+.sectionHeader{
+        white-space: nowrap;
+        font-size: 14px;
+        color: #333;
+        font-weight: 600;
+        width: 340px;
+        height: 24px;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+        padding-left:12px;
+	}
+
+.trainStatusMsg{
+   		height: 18px;
+	    font-size: 12px;
+	    font-weight: normal;
+	    font-style: normal;
+	    font-stretch: normal;
+	    line-height: normal;
+	    letter-spacing: normal;
+	    color: #666666;
+   	}
+.refreshIcon{
+   		color: #89c341;
+   		font-size: 18px;
+   		cursor: pointer;
+   	}
+.hyperLabel{
+		width: 333px;
+		height: 18px;
+		font-size: 12px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		color: #333330;
+   	}
+body a:hover {
+	    text-decoration: underline;
+	    color: #00aaa2;
+	}
+
+
+/* css for loading icon beside train and test button */	
+.rf-inline-loading {
+		position:absolute;
+		margin: 5px 0px 0px 10px;
+		display:inline-block;
+		border: 2px solid #D5D5DC;
+		border-radius: 50%;
+		border-top: 2px solid #313538;
+		width: 20px;
+		height: 20px;
+		-webkit-animation: spin 1s linear infinite; /* Safari */
+		animation: spin 1s linear infinite;
+	}
+
+/* Safari */
+@-webkit-keyframes spin {
+		0% { -webkit-transform: rotate(0deg); }
+		100% { -webkit-transform: rotate(360deg); }
+	}
+
+@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+	
+/*css end for loading icon */
+
+
+/* css for slider start here */
+.slidecontainer {
+		width: 27%; /* Width of the outside container */
+		padding-left:5px;
+	}
+.slider {
+		-webkit-appearance: none;
+		width: 100%;
+		height: 8px;
+		border-radius: 3px;   
+		background: #d3d3d3;
+		outline: none;
+		-webkit-transition: .2s;
+		transition: opacity .2s;
+	}
+
+
+.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: #fff;
+/* 		border: 1px solid #d9d9d9;  */
+/* 		background: #fafafa; */
+		cursor: pointer;
+/* 		width: 14px; */
+/* 		height: 12px; */
+		border: 4px solid #00a79d;
+	}
+
+.slider::-moz-range-thumb {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		border: 4px solid #00a79d;
+		background: #fff;
+		cursor: pointer;
+	}
+	
+.slider::-ms-thumb {
+		width: 0px;
+		height: 12px;
+		border-radius: 50%;
+		border: 13px solid #00a79d;
+		background: #fff;
+		cursor: pointer !important;
+}
+
+.slider::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent; 
+  border-color: transparent;
+  color: transparent;
+}
+
+.slider::-ms-fill-lower {
+  background: #d3d3d3;
+  border-radius: 3px;
+}
+
+.slider::-ms-fill-upper {
+  background: #d3d3d3;
+  border-radius: 3px;
+}
+
+#autofillScoreSlider, #suggestedScoreSlider{
+		width:27%;
+	}
+
+/*css for slider ends here */
+
+ 

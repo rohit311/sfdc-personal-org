@@ -1,0 +1,458 @@
+<aura:component access="global" controller="SAL_PricingCtrlV2"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"  >
+    <!--Bug 24668 start-->
+    <aura:attribute name="curAppId" type="String" default=""/>
+    <aura:attribute name="finAppl" type="Applicant__c"/>
+    <aura:attribute name="appType" type="String" default="Primary"/>
+    <aura:attribute name="appTypeLst" type="List" default="['Primary']"/>
+    <aura:attribute name="DeDupeList" type="List" default=""/>
+    <aura:attribute name="isPerRespForFinApp" type="Boolean" default="false"/>
+    <aura:attribute name="isDeDupeForFinApp" type="Boolean" default="false"/>
+    <aura:attribute name="checklistMapForFinApp" type="List"/>
+    <aura:attribute name="mapOfIconsForFinApp" type="List"/>
+    <!--Bug 24668 stop-->
+	
+	<aura:attribute name="isBankAccMatch" type="Boolean" default="false"/><!--24315-->
+    <aura:attribute name="isPerfiosSameAsSalary" type="Boolean" default="false"/><!--24315-->
+    <aura:attribute name="allowToSendBack" type="Boolean" default="false"/><!--24315-->
+    <aura:attribute name="bankApprovedByCredit" type="Boolean" default="false"/><!--24315-->
+
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="rateApprDone" type="Boolean" default="true"/> <!--22624 -->
+    <aura:attribute name="uploadRateApprDone" type="Boolean" default="false"/> <!--22624 -->
+    <aura:attribute name="oppObj" type="Opportunity" default=""/>
+    <aura:attribute name="isCustomerConsent" type="Boolean" default="false"/>
+    <aura:attribute name="isEkyc" type="Boolean" default="false"/>
+    <aura:attribute name="isPerfiosResponse" type="Boolean" default="false"/>
+    <aura:attribute name="isDeDupe" type="Boolean" default="false"/>
+    <aura:attribute name="isAppForm" type="Boolean" default="false"/>
+    <aura:attribute name="isBanking" type="Boolean" default="false"/>
+    <aura:attribute name="isInsurance" type="Boolean" default="false"/>
+    <aura:attribute name="isDiscrepancyClosed" type="Boolean" default="false"/>
+    <aura:attribute name="isEmandate" type="Boolean" default="false"/><!--//E-mandate check begins-->
+    <aura:attribute name="isSPDCApplicable" type="Boolean" default="false"/>
+    <aura:attribute name="isPermanentAddressVerified" type="Boolean" default="false"/>
+    <aura:attribute name="isBankVerified" type = "Boolean" default="false"/>
+    <aura:attribute name="isCurrentAddressVerified" type="Boolean" default="false"/>
+    <aura:attribute name="isOfficeVerified" type="Boolean" default="false"/>
+    <aura:attribute name="isIMPS" type="Boolean" default="false"/>
+    <aura:attribute name="impsNotDone" type="Boolean" default="false"/>
+     <aura:attribute name="isConsent" type="Boolean" default="true"/><!--24313-->
+    <aura:attribute name="isGeoTagging" type="Boolean" default="true"/>
+    <aura:attribute name="stage" type="String" default="false"/>
+    <aura:attribute name="isUploadCustomerConsent" type="Boolean" default="false"/>
+	<aura:attribute name="isUploadCkyc" type="Boolean" default="false"/><!-- 23578 -->
+    <aura:attribute name="isUploadAppForm" type="Boolean" default="false"/>
+    <aura:attribute name="aggStatus" type="String" default="N/A"/><!--24673 -->
+    <aura:attribute name="isUploadRentalAgreement" type="Boolean" default="false"/> <!--24673 -->
+    <aura:attribute name="isRentalAgreement" type="Boolean" default="false"/><!--24673 change to false later -->
+    <aura:attribute name="isUploadeKyc" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadInsurance" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadPerfios" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadeMandate" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadBanking" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadSPDC" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadIMPS" type="Boolean" default="false"/> 
+    <aura:attribute name="isGeoTaggingToBranchOps" type="Boolean" default="false"/>
+    <aura:attribute name="isUploadCompleted" type="Boolean" default="false"/>
+    <aura:attribute name="isSendToFinnOne" type="Boolean" default="false"/>
+    <aura:attribute name="showComments" type="Boolean" default="false"/>
+    <aura:attribute name="isSendToBranchOps" type="Boolean" default="false"/>
+   <aura:attribute name="isrepaywithoutsecurity" type="Boolean" default="false"/>
+ <!--  added by swapnil for  Centralized Sampling changes Epic Id User Story ID 5331 s -->    
+     <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+     <aura:attribute name="Accobj" type="Account" default="{}"/>
+    <aura:attribute name="CentralisedSOL" type="SOL_Policy__c"/>
+    <aura:attribute name="centralisedSampling" type="string"/>
+     <aura:attribute name="allVeriList" type="Verification__c[]" default=""/>
+    <!--  dded by swapnil for  Centralized Sampling changes Epic Id User Story ID 5331 e -->
+    
+    <!--send to branch ops functionality -->
+    
+    <aura:attribute name="selectedCreditOfficer" type="String" default="-- None --"/>
+    <aura:attribute name="showCOSelectPanel" type="Boolean" default="false"/>
+    <aura:attribute name="creditOfficerList" type="List" default="no records"/>
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <aura:attribute name="primaryapplicant" type="Applicant__c" default=""/>
+    <!--send to branch ops functionality ends-->
+    <aura:attribute name="nameTheme" type="string"/>
+    <aura:attribute name="mapOfIcons" type="List"/>
+    <aura:attribute name="checklistMap" type="List"/>
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.documentUploaded}"/>
+    <!--Start of Bug:20391 functionality of removing header if called from ops screen using Flag variable-->
+    <aura:attribute name="opsDashboard" type="Boolean" default="false"/>
+    <!--End of Bug:20391 functionality of removing header if called from ops screen-->
+    <aura:attribute name="isCommunityUser" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>    
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="rcuFlag" default="false"/><!--US_5574-->
+    
+    <!-- s 24981 -->
+    <aura:attribute name="isLineUtilized" type="Boolean" default="false"/>
+   	<aura:attribute name="isAddressChanged" type="Boolean" default="false"/>
+    <!-- e 24981 -->
+    <!--DMS added by swapnil 24317 s-->
+     <!-- <aura:handler event="c:DMSUploadStamping"  name="DMSUploadStamping" action="{!c.DMSUpload}" />-->
+      <aura:attribute name="DMSDocmap" type="Map" default="{}"/>
+    <aura:attribute name="CKYCPOI" type="String"/>
+    <aura:attribute name="CKYCPOA" type="String"/>
+    <aura:attribute name="POIList" type="List"/>
+    <aura:attribute name="POAList" type="List"/>
+    <aura:attribute name="locationFlag" type="Boolean" default="false"/>
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+     <!--DMS added by swapnil 24317 e-->
+    <div aura:id="dashboardModel" class="slds-size--12-of-12 slds-align_absolute-center" id="dashboardModelId"> 
+        <div aura:id="deviceBasedDiv" id="deviceBasedDiv" role="dialog" tabindex="-1" aria-describedby="MainPopUp" aria-labelledby="header99" class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large align-dashboard':'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large'}">
+            <div class="slds-modal__container slds-size--12-of-12"  style="overflow:auto;">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.onCrossButton}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <!---Bug 20391- Added aura if -->
+                    <aura:if isTrue="{!! v.opsDashboard}">
+                    	<h2 id="header99" class="slds-text-heading--medium"> Pricing Dashboard </h2>
+                    </aura:if>
+                    <!-- Bug 21770-S -->
+                    <aura:if isTrue="{! v.opsDashboard}">
+                    	<h2 id="header99" class="slds-text-heading--medium"> Ops Dashboard </h2>
+                    </aura:if>
+                    <!-- Bug 21770-E -->
+                </div>
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div style="position:relative">
+                        <div class="innerDivWrapper">
+                            <div aura:id='MainPopUp' class="{!(v.oppId == null || v.oppId == '') ? 'dashboardContent slds-modal__content slds-p-around--medium  slds-scrollable_x slds-scrollable_y' : 'slds-modal__content slds-p-around--medium  slds-scrollable_x slds-scrollable_y'}" style="top:1rem;">
+                                
+                                <!--24668 start -->
+                                 <div class="slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <lightning:select aura:id="appType"  label="Applicant" name="appType" value="{!v.appType}" onchange="{!c.onAppChange}">
+                                        <aura:iteration items="{!v.appTypeLst}" var="pl">
+                                            <option value="{!pl}" text="{!pl}" selected="{!pl == 'Primary'}"></option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                                </div>
+                                <!--24668 stop -->
+                                
+                                <!-- <lightning:button title="Check" onclick="{!c.onclickbutton}">Check</lightning:button> -->
+                                <div class="slds-scrollable_y " style="font-size: 14px;">
+                                    <div id="mytable" class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                                         <aura:if isTrue="{!v.appType == 'Primary'}">
+                                        
+                                        <ul class="slds-m-left_xx-small slds-grid slds-wrap slds-grid_pull-padded">  
+                                            <aura:iteration items="{!v.checklistMap}" var="checklist" indexVar="indx">
+                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                    <aura:if isTrue="{!and(icons.name == checklist.name,icons.value == 'action:approval')}">
+                                                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-3">
+                                                            <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                <div id="margin">
+                                                                </div>
+                                                                <div class="slds-media__figure">
+                                                                    <span class="{!'slds-icon_container' + icons.value}" title="Description of icon when needed">
+                                                                        
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">{!checklist.name}</span>
+                                                                        
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <div class="slds-grid slds-grid_align-spread">
+                                                                        <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                            {!checklist.name}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div class="{!if(checklist.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                                                                        <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>-->
+                                                                            <dd class="slds-size_1-of-1 slds-item_detail fontColor" style="width: 150%;" title="">
+                                                                                <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklist.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.primaryapplicant.Id}"  fileName="{!checklist.name}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklist.showUpload}" stage="{!v.stage}" isDeleteInsert="true"/><!-- Need to add showUploadButton="false" --><!--DMS added Parent Id changed by swapnil 24317-->
+                                                                            </dd>
+                                                                            
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Disposition: </dt>-->
+                                                                            <dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:50%;">
+                                                                                <lightning:input class="fontColor" type="toggle" checked="{!if(checklist.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                            </dd>
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                        </li>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:iteration>
+                                            <aura:iteration items="{!v.checklistMap}" var="checklist" indexVar="indx">
+                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                    
+                                                    <aura:if isTrue="{!and(checklist.showDocUploader == 'false',and(icons.name == checklist.name,icons.value == 'action:close'))}">
+                                                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-3">
+                                                            <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                <div id="margin">
+                                                                </div>
+                                                                <div class="slds-media__figure">
+                                                                    <span class="{!'slds-icon_container' + icons.value}" title="Description of icon when needed">
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">{!checklist.name}</span>
+                                                                        
+                                                                        
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <div class="slds-grid slds-grid_align-spread">
+                                                                        <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                            {!checklist.name}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div class="{!if(checklist.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                                                                        <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>-->
+                                                                            <dd class="slds-size_1-of-1 slds-item_detail fontColor" style="width: 150%;" title="">
+                                                                                <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklist.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.primaryapplicant.Id}" fileName="{!checklist.name}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklist.showUpload}" stage="{!v.stage}" isDeleteInsert="true"/><!-- Need to add showUploadButton="false" -->
+                                                                            </dd>
+                                                                            
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Disposition: </dt>-->
+                                                                            <dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:50%;">
+                                                                                <lightning:input class="fontColor" type="toggle" checked="{!if(checklist.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                            </dd>
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                        </li>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:iteration>
+                                            <aura:iteration items="{!v.checklistMap}" var="checklist" indexVar="indx">
+                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                    <aura:if isTrue="{!and(checklist.showDocUploader == 'true',and(icons.name == checklist.name,icons.value == 'action:close'))}">
+                                                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-3">
+                                                            <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                <div id="margin">
+                                                                </div>
+                                                                <div class="slds-media__figure">
+                                                                    <span class="{!'slds-icon_container' + icons.value}" title="Description of icon when needed">
+                                                                        
+                                                                        
+                                                                        
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">{!checklist.name}</span>
+                                                                        
+                                                                        
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <div class="slds-grid slds-grid_align-spread">
+                                                                        <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                            {!checklist.name}<!--24673 s --><aura:if isTrue="{!checklist.name == 'Rental Agreement'}">  (Status - {!v.aggStatus})</aura:if><!--24673 e -->
+                                                                        </h3>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div class="{!if(checklist.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                                                                        <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>-->
+                                                                            <!-- 23578 Start -->
+                                                                            <aura:if isTrue="{!and(checklist.name == 'C-KYC',icons.value == 'action:close')}">
+                                                                                <b style="color:white;">Proof of identity</b>
+																					<c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklist.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.primaryapplicant.Id}" fileName="{!v.CKYCPOI}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklist.showUpload}" stage="{!v.stage}" isDeleteInsert="false"/><!--File name chagned by swapnil 24317-->
+																			     <aura:set attribute="else">
+                                                                                    <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklist.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.primaryapplicant.Id}" fileName="{!checklist.name}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklist.showUpload}" stage="{!v.stage}" isDeleteInsert="false"/><!-- Need to add showUploadButton="false" --> <!--DMS ParentId added by swapnil 24317-->
+                                                                                   </aura:set>                                                          
+                                                                            </aura:if>
+                                                                            <!--<dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Disposition: </dt>-->
+																			<dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:45%;">
+                                                                                <lightning:input class="fontColor" type="toggle" checked="{!if(checklist.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                            </dd>
+                                                                            <!--24673 s -->
+																			<dd class="slds-m-top_xx-small slds-m-left_xx-small slds-size_1-of-1 slds-item_detail fontColor" title=""  style="width:50%;">
+																			<aura:if isTrue="{!checklist.name == 'Rental Agreement'}">
+																				<lightning:button class="slds-theme_alt-inverse" title="Check" variant="brand" onclick="{!c.checkAggStatus}">Check Status</lightning:button>
+																			</aura:if>
+																			</dd>
+                                                                            <!--24673 e -->
+                                                                            <!-- 23578 Start -->
+																			<aura:if isTrue="{!and(checklist.name == 'C-KYC',icons.value == 'action:close')}">
+                                                                         		 <dd class="slds-size_1-of-1 slds-item_detail fontColor" style="width: 150%;" title="">
+                                                                                <b style="color:white;">Proof of address</b>
+                                                                                     <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklist.type}" forPricingDashboard="yes" instance="{!indx+'_img'}" uploadType="Attachment" parentId="{!v.primaryapplicant.Id}" fileName="{!v.CKYCPOA}" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklist.showUpload}" stage="{!v.stage}" isDeleteInsert="false" imageUpload="false"/><!-- Need to add showUploadButton="false" --><!--DMS parentId and filename  added by swapnil 24317-->
+                                                                            </dd>
+																			
+                                                                            <dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:50%;">
+                                                                                <lightning:input class="fontColor" type="toggle" checked="{!if(checklist.toggle_img == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                            </dd>
+																			 </aura:if>
+                                                                            <!-- 23578 stop -->
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                        </li>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:iteration>
+                                        </ul>
+										 </aura:if> 
+										 
+										   <!-- 24668 start -->
+                                        <aura:if isTrue="{!v.appType == 'Financial Co-Applicant'}">
+                                        	<ul class="slds-m-left_xx-small slds-grid slds-wrap slds-grid_pull-padded">
+                                                <aura:iteration items="{!v.checklistMapForFinApp}" var="checklistFin" indexVar="indx">
+                                                	<aura:iteration items="{!v.mapOfIconsForFinApp}" var="icons" >
+                                                        <aura:if isTrue="{!and(checklistFin.showDocUploader == 'false',and(icons.name == checklistFin.name,icons.value == 'action:approval'))}">
+                                                            <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-3">
+                                                                <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                	<div id="margin">
+                                                                    </div>
+                                                                    <div class="slds-media__figure">
+                                                                        <span class="{!'slds-icon_container' + icons.value}" title="Description of icon when needed">
+                                                                            <lightning:icon  iconName="{!icons.value}" />
+                                                                            <span class="slds-assistive-text">{!checklistFin.name}</span>
+                                                                            
+                                                                            
+                                                                        </span>
+                                                                    </div>
+                                                                     <div class="slds-media__body">
+                                                                        <div class="slds-grid slds-grid_align-spread">
+                                                                            <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                                {!checklistFin.name}
+                                                                            </h3>
+                                                                        </div>
+                                                                        <br/>
+                                                                        <div class="{!if(checklistFin.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                                                                        	 <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                                 <dd class="slds-size_1-of-1 slds-item_detail fontColor" style="width: 150%;" title="">
+                                                                                     <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklistFin.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.finAppl.Id}" fileName="{!checklistFin.name}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklistFin.showUpload}" stage="{!v.stage}" isDeleteInsert="true"/>
+                                                                                 </dd>
+                                                                                 <dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:50%;">
+                                                                                 	<lightning:input class="fontColor" type="toggle" checked="{!if(checklistFin.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                                 </dd>
+                                                                             </dl>    
+                                                                        </div>
+                                                                    </div>
+                                                                </article>
+                                                            </li>
+                                                        </aura:if>
+                                                    </aura:iteration>
+                                                </aura:iteration>
+                                                <aura:iteration items="{!v.checklistMapForFinApp}" var="checklistFin" indexVar="indx">
+                                                	<aura:iteration items="{!v.mapOfIconsForFinApp}" var="icons" >
+                                                        <aura:if isTrue="{!and(checklistFin.showDocUploader == 'false',and(icons.name == checklistFin.name,icons.value == 'action:close'))}">
+                                                            <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-3">
+                                                                <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                	<div id="margin">
+                                                                    </div>
+                                                                    <div class="slds-media__figure">
+                                                                        <span class="{!'slds-icon_container' + icons.value}" title="Description of icon when needed">
+                                                                            <lightning:icon  iconName="{!icons.value}" />
+                                                                            <span class="slds-assistive-text">{!checklistFin.name}</span>
+                                                                            
+                                                                            
+                                                                        </span>
+                                                                    </div>
+                                                                     <div class="slds-media__body">
+                                                                        <div class="slds-grid slds-grid_align-spread">
+                                                                            <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                                {!checklistFin.name}
+                                                                            </h3>
+                                                                        </div>
+                                                                        <br/>
+                                                                        <div class="{!if(checklistFin.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                                                                        	 <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                                                                 <dd class="slds-size_1-of-1 slds-item_detail fontColor" style="width: 150%;" title="">
+                                                                                     <c:DocumentUploader displayReadOnly="{!v.displayReadOnly}" aura:id="{!'file-uploader-'+checklistFin.type}" forPricingDashboard="yes" instance="{!indx}" parentId="{!v.finAppl.Id}" fileName="{!checklistFin.name}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!checklistFin.showUpload}" stage="{!v.stage}" isDeleteInsert="true"/>
+                                                                                 </dd>
+                                                                                 <dd class="slds-size_1-of-1 slds-item_detail slds-truncate fontColor" title=""  style="width:50%;">
+                                                                                 	<lightning:input class="fontColor" type="toggle" checked="{!if(checklistFin.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                                                                 </dd>
+                                                                             </dl>    
+                                                                        </div>
+                                                                    </div>
+                                                                </article>
+                                                            </li>
+                                                        </aura:if>
+                                                    </aura:iteration>
+                                                </aura:iteration>
+                                            </ul>    
+                                        </aura:if>
+                                        <!-- 24668 stop -->
+										 
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+											<!--dded by swapnil for  Centralized Sampling changes Epic Id User Story ID 5331 s -->
+                                            <div class="slds-p-around--x-small" align="center">
+                                                <lightning:button class="slds-theme_alt-inverse"   aura:id="chkSample" variant="brand" label="Mark Complete" onclick="{!c.chk1}" />  <!--checkCentralizedSampling 5331 -->
+                                            </div>
+                                            	<!--dded by swapnil for  Centralized Sampling changes Epic Id User Story ID 5331 s -->
+												
+                                            <div class="slds-p-around--x-small" align="center">
+                                                <lightning:button class="slds-theme_alt-inverse" aura:id="sendBackToCred"  variant="brand" label="Send Back" onclick="{!c.showComments}" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                            </div>
+                                            <!-- Bug 21771 Added aura if to hide Send to Branch ops button on Ops dashboard-->
+                                            <aura:if isTrue="{!! v.opsDashboard}">
+                                            <div class="slds-p-around--x-small" align="center">
+                                                <lightning:button class="slds-theme_alt-inverse" aura:id="BranchOpsButtonId"  variant="brand" label="Send To Branch Ops" onclick="{!c.selectOpsCreditOfficer}" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                            </div>
+                                            </aura:if>
+                                            <div class="slds-p-around--x-small" align="center">
+                                                <lightning:button class="slds-theme_alt-inverse" aura:id="FinnOneButtonId"  variant="brand" label="Send To FinnOne" onclick="{!c.submit}" disabled=""/> <!-- CR 22307 -->
+                                            </div>
+                                        </div>
+                                        <aura:if isTrue="{!v.showComments}" >
+                                            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="left">
+                                                <div class="slds-size_2-of-2">
+                                                    
+                                                    <div class="slds-box slds-box_x-small slds-text-align_left slds-m-around_x-small">
+                                                        
+                                                        <div class="slds-form-element__control" style="margin-bottom:5px;">
+                                                            <lightning:textarea value="{!v.oppObj.COO_Comments__c}" label="Send back comments :" name="reommcomments"/>
+                                                        </div>
+                                                        
+                                                        <lightning:button class="slds-theme_alt-inverse" aura:id="submitButtonId" name="submitButton" variant="brand" label="Done" onclick="{!c.sendBack}" />
+                                                        <lightning:button class="slds-theme_alt-inverse" aura:id="sendbackcancelButton" name="cancelButton" variant="brand" label="Cancel" onclick="{!c.sendbackCancel}" />
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!and(v.showCOSelectPanel,v.isConsent)}" ><!--Added isConsent for bug 24313-->
+                                            <lightning:select aura:id="coPicklistId" name="select" label="Select Branch Officer :" value="{!v.selectedCreditOfficer}" required="true" messageWhenValueMissing="Please select the Approver before submitting">
+                                                <option value="-- None --" text="-- None --"></option>
+                                                <aura:iteration items="{!v.creditOfficerList}" var="creditOfficer" indexVar="key">
+                                                    <option value="{!creditOfficer.value}" text="{!creditOfficer.value}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                            <div style="margin-top:5px;">
+                                                <lightning:button aura:id="finalSubmitBranchOpsButtonId" onclick="{!c.finalSubmitBranchOps}" variant="brand" label="Submit" class="slds-theme_alt-inverse"/>
+                                            </div>
+                                        </aura:if>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </div>
+            <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open" id="backGroundSectionId"></div>
+    </div>
+    
+    <div aura:id="overrideModalbox" class="slds-hide slds-align_absolute-center slds-p-around--medium " id="dummyId">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="{!$Browser.isIOS == true ? 'slds-modal slds-fade-in-open slds-modal_large slds-is-fixed slds-align_absolute-center slds-border_bottom slds-border_top slds-border_left slds-border_right align-dashboard':'slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center slds-border_top slds-border_left slds-border_right'}" style="position: fixed;">
+            <div class="slds-modal__container ">
+                <div class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12 alignModal':' slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12'}" style="margin-bottom: 0px;margin-top: 0px; height: 150px">
+                    <div class="slds-p-around--medium">Loan application will now submit to Ops team. Do you want to continue?</div>
+                </div>
+                <div class="{!$Browser.isIOS == true ? 'slds-modal__footer slds-size--8-of-12 slds-align_absolute-center alignModal':' slds-modal__footer slds-size--8-of-12 slds-align_absolute-center'}" style="margin-bottom: 0px;margin-top: 0px; height: 50px">
+                    
+                    <button class="slds-button slds-button--neutral" onclick="{!c.callSubmitToBranchOps}">Yes</button>
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

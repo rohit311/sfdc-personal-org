@@ -1,0 +1,286 @@
+<aura:component controller="VerificationImageUploadCntrl" access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId">
+    <!-- Attributes S-->
+    <!-- <aura:attribute name="verificationList" type="SFDCMobilePOUtility.VerificationWrapper" default="{}"/> -->
+    <aura:attribute name="verificationType" type="String[]"/>
+    <aura:attribute name="flowV3forPricing" type="String"/>  <!--17556 -->
+    <aura:attribute name="verificationList" type="Object[]" />
+    <aura:attribute name="flowV2" type="String"/>   <!-- Bug 18961 -->
+    <aura:attribute name="flow" type="String" required="true" default=""/>
+    <aura:attribute name="parentId" type="String" required="true" default=""/>
+    <aura:handler event="c:passVerificationList" action="{!c.doInit}"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="salesStatus" type="List"/>
+    <aura:attribute name="credStatus" type="List"/>
+    <aura:attribute name="creditStatus" type="List"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="isUnderwitercmp" type="Boolean" default="false" />
+    <!-- <aura:handler name="change" value="{!v.flow}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.parentId}" action="{!c.doInit}"/> -->
+    <!-- Attributes E   required="true" default="" -->
+    
+    <!-- Event handlers S-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler event="c:UpdateVerificationList" action="{!c.doInit}"/> <!-- Bug 15855 - Hemant Keni -->
+    <!--  <aura:registerEvent name="UpdateVerificationList" type="c:UpdateVerificationList"/>Bug 15855 - Hemant Keni -->
+    <!-- Event handlers E-->
+    <!--17556 s-->
+    <aura:if isTrue="{!and(v.flowV3forPricing == 'mobilityv2_pricing',(empty(v.verificationList)))}">
+        <ui:message severity="warning" closable="false">
+            <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+            <span> No records present currently </span>
+        </ui:message>
+    </aura:if>
+    <!--17556 e-->
+    <aura:if isTrue="{!v.flowV2 == 'mobilityV2'}">
+        <!--Hrushikesh added for Mobility Flow V2 Start , Bug 1896 -->
+        <strong>Verifications List</strong>
+        <table class="slds-table slds-hyphenate slds-table_bordered slds-size--12-of-12 slds-wrap" aura:id="verifications">    
+            <thead  class="slds-grid slds-hyphenate slds-wrap">
+                <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                    <th class="{!if(v.flowV3forPricing == 'mobilityv2_pricing' ,'WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate','WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate')}">
+                        Name                        
+                    </th>
+                    <!--29296 start-->
+                    <th class="{!if(v.flowV3forPricing == 'mobilityv2_pricing' ,'WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate','WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate')}">
+                        Veri Type
+                    </th>
+                    <aura:if isTrue="{!v.flowV3forPricing == 'mobilityv2_pricing'}">
+                     <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                       Status
+                    </th>
+                     <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                        RSA Reason
+                    </th>
+                    </aura:if>
+                     <!--29296 end-->
+                </tr>
+                
+                
+            </thead>
+            <tbody class="slds-grid slds-wrap">
+                <aura:iteration items="{!v.verificationList}" var="obj">
+                    <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right"> 
+                        <td class="{!if(v.flowV3forPricing == 'mobilityv2_pricing' ,'WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left','WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left')}">
+                            <a onclick="{!c.toggleAssVersion}" id="{! obj.verification.Id }" style="text-decoration: none;">
+                                <aura:if isTrue="{!v.class =='hideCls'}">
+                                    
+                                    <span class="font-weight-bold important-message" id="{! obj.verification.Id }">+ </span>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.myid == obj.verification.Id}">
+                                            <span class="font-weight-bold slds-p-right_x-small important-message" id="{! obj.verification.Id }">-</span> 
+                                            
+                                            <aura:set attribute="else"  >
+                                                <span class=" important-message">+
+                                                </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            <aura:if isTrue="{!v.flow == 'PO'}">
+                                <ui:outputText value="{!obj.verification.LApplicant_Name__c}" /> 
+                                <aura:set attribute="else">
+                                    <ui:outputText value="{!obj.verification.Contact_Name__c}" />
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                        <td class="{!if(v.flowV3forPricing == 'mobilityv2_pricing' ,'WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left','WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left')}">
+                            {!obj.verification.Verification_Type__c }
+                        </td>
+                        <!--29296 start-->
+                         <aura:if isTrue="{!v.flowV3forPricing == 'mobilityv2_pricing'}">
+                         <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            {!obj.verification.Status__c }
+                        </td>
+                         <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            {!obj.verification.RSA_Reason__c }
+                        </td>
+                        </aura:if>
+                        <!--29296 end-->
+                    </tr>
+                    <aura:if isTrue="{!v.myid == obj.verification.Id}">
+                        <aura:if isTrue="{!v.class == 'showCls' }">
+                            <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                <div style="width:100%;">
+                                    <fieldset class="slds-form--compound">
+                                        <div class="slds-form-element__row slds-m-top--x-small ">
+                                            <div class="slds-box slds-box_x-small slds-theme_default slds-size--12-of-12" >
+                                                <lightning:card class=" slds-size--12-of-12" >
+                                                    <header class="slds-hide"></header>
+                                                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                                        <aura:if isTrue="{!obj.verification.Geo_Tagging__c}">
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    Image Count:
+                                                                    <b>{!obj.imagesCount}</b>
+                                                                </div>
+                                                            </div> 
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!v.flowV3forPricing != 'mobilityv2_pricing'}">
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:select disabled="{!obj.verification.Geo_Tagging__c || obj.verification.Verification_Type__c == 'Bank Statements' || v.isUnderwitercmp}" label="{!if(v.isUnderwitercmp,'Sales Status:','Status:')}" messageWhenValueMissing="Please select a value" required="true" aura:id="salesStatus" name="salesStatus" value="{!obj.verification.Sales_Status__c}">
+                                                                        
+                                                                        <option value="" >--Select--</option>
+                                                                        
+                                                                        
+                                                                        <aura:iteration var="option" items="{!v.salesStatus}">
+                                                                            <option value="{!option}">{!option}</option>
+                                                                        </aura:iteration>     
+                                                                    </lightning:select>
+                                                                </div>
+                                                            </div>
+                                                            <aura:set attribute="else">
+                                                            	<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        
+                                                                        <lightning:select disabled="true" label="Credit Status" messageWhenValueMissing="Please select a value" required="true" aura:id="credStatus" name="credStatus" value="{!obj.verification.Credit_Status__c}">
+                                                                            
+                                                                            <option value="" >--Select--</option>
+                                                                            
+                                                                            
+                                                                            <aura:iteration var="option" items="{!v.creditStatus}">
+                                                                                <option value="{!option}">{!option}</option>
+                                                                            </aura:iteration>     
+                                                                        </lightning:select>
+                                                                    </div>
+                                                                </div>
+                                                                <aura:if isTrue="{!obj.verification.Verification_Type__c == 'Residence Verification' || obj.verification.Verification_Type__c == 'Office verification'}">
+                                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                        <div class="slds-form-element__control">        
+                                                                            <lightning:select disabled="{!obj.verification.Geo_Tagging__c}" label="Sales Status" messageWhenValueMissing="Please select a value" required="true" aura:id="salesStatus" name="salesStatus" value="{!obj.verification.Sales_Status__c}">
+                                                                                
+                                                                                <option value="" >--Select--</option>
+                                                                                
+                                                                                
+                                                                                <aura:iteration var="option" items="{!v.salesStatus}">
+                                                                                    <option value="{!option}">{!option}</option>
+                                                                                </aura:iteration>     
+                                                                            </lightning:select>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <aura:set attribute="else">
+                                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                            <div class="slds-form-element__control">
+                                                                                <lightning:select disabled="true" label="Status" messageWhenValueMissing="Please select a value" required="true" aura:id="bankStatus" name="bankStatus" value="{!obj.verification.Status__c}">
+                                                                                    
+                                                                                    <option value="" >--Select--</option>
+                                                                                    
+                                                                                    
+                                                                                    <aura:iteration var="option" items="{!v.credStatus}">
+                                                                                        <option value="{!option}">{!option}</option>
+                                                                                    </aura:iteration>     
+                                                                                </lightning:select>	
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                            <div class="slds-form-element__control">
+                                                                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="agRem" label="Agency Remarks" value="{!obj.verification.FCU_report_remark__c}" disabled="true" name="agRem"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                                
+                                                            </aura:set>
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!v.isUnderwitercmp}">
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:select label="Status:" messageWhenValueMissing="Please select a value" required="true" aura:id="salesStatus" name="salesStatus" value="{!obj.verification.Status__c}">
+                                                                    
+                                                                    <aura:iteration var="option" items="{!v.credStatus}">
+                                                                        <option value="{!option}">{!option}</option>
+                                                                    </aura:iteration>     
+                                                                </lightning:select>
+                                                            </div>
+                                                        </div>  
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control slds-grid">
+                                                                <div class="slds-size--1-of-4">Documents Uploaded: </div>
+                                                                <div class="slds-size--3-of-4">
+                                                                    <aura:iteration var="doc" items="{!obj.docList}">
+                                                                        <a href="{!'/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&amp;versionId='+doc.Id+'&amp;operationContext=CHATTER&amp;contentId='+doc.Id}" target="_blank">{! doc.Title ? doc.Title : doc.Name}</a><br/>
+                                                                    </aura:iteration>  
+                                                                </div>
+                                                            </div>
+                                                        </div>  
+                                                        </aura:if>
+                                                        
+                                                    </div>
+                                                    
+                                                </lightning:card>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                
+                            </tr>
+                        </aura:if>
+                    </aura:if>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <!--17556 added if -->
+        <aura:if isTrue="{!v.flowV3forPricing != 'mobilityv2_pricing'}">
+        <div class="slds-p-top--x-small slds-align_absolute-center">
+            <lightning:button variant="brand" label="Save" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveVeri}" disabled="{!or(v.displayReadOnly,and(v.flowV3forPricing == 'mobilityv2_pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+        </div>
+        </aura:if>
+        <!--Hrushikesh added for Mobility Flow V2 Stop -->
+        <aura:set attribute="else">
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Verifications List</strong>
+                <div aura:id="verifications" class="slds-p-around--medium">
+                    
+                    <div class="slds-grid slds-has-divider--top">
+                        <div class="slds-col slds-size--4-of-12 slds-hyphenate"><b>Name</b></div>
+                        <div class="slds-col slds-m-around--xx-small slds-size--3-of-12 slds-hyphenate slds-border--left"><b>Veri Type</b></div>
+                        <div class="slds-col slds-m-around--xx-small slds-size--2-of-12 slds-hyphenate slds-border--left"><b>Images</b></div>
+                        <div class="slds-col slds-m-around--xx-small slds-size--3-of-12 slds-hyphenate slds-border--left"><b>Visit Status</b></div>
+                    </div>
+                    <aura:iteration items="{!v.verificationList}" var="obj">
+                        <div class="slds-grid slds-has-divider--top">
+                            <div class="slds-col slds-size--4-of-12 slds-hyphenate">
+                                <aura:if isTrue="{!v.flow == 'PO'}">
+                                    <ui:outputText value="{!obj.verification.LApplicant_Name__c}" /> 
+                                    <aura:set attribute="else">
+                                        <ui:outputText value="{!obj.verification.Contact_Name__c}" />
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-col slds-m-around--xx-small slds-size--3-of-12 slds-hyphenate slds-border--left">{!obj.verification.Verification_Type__c }</div>
+                            <div class="slds-col slds-m-around--xx-small slds-size--2-of-12 slds-hyphenate slds-border--left">{!obj.imagesCount}</div>
+                            <div class="slds-col slds-m-around--xx-small slds-size--3-of-12 slds-hyphenate slds-border--left">{!obj.verification.Sales_Status__c }</div>
+                        </div> 
+                    </aura:iteration>
+                </div>
+            </div>
+            </aura:set>
+    </aura:if>
+    
+    <!-- Custom Toast S -->
+    <div aura:id="customToast1" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme1" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close Alert</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle1" value=""/></strong>
+                        <ui:outputText aura:id="toastText1" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <!-- Custom Toast E-->
+    
+</aura:component>

@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="appList" type="Applicant__c[]"/>
+</aura:event>

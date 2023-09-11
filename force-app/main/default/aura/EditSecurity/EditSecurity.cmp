@@ -1,0 +1,53 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId">
+    <aura:attribute name="newSecurity" type="Security__c"/>
+    <aura:attribute name="newSimpleSec" type="Security__c"/>
+    <aura:attribute name="newSecurityError" type="String"/>
+    <aura:attribute name="conId" type="String"/>
+    <aura:attribute name="SecName" type="String"/>
+    <aura:attribute name="symbol" type="String"/>
+    <aura:attribute name="type" type="String"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    
+    <force:recordData aura:id="SecurityRecordCreator"
+    layoutType="FULL"
+    targetRecord="{!v.newSecurity}"
+    targetFields ="{!v.newSimpleSec}"
+    targetError="{!v.newSecurityError}"
+    />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+        <div class="slds-m-around_xx-large">
+         	<aura:if isTrue="{!v.isOpen}">   
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                	<div class="slds-modal__container"> 
+                        <header class="slds-modal__header">
+                        	<lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        	<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.title}</h2>
+                    	</header>
+                        	<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="Create Security">
+                                    <lightning:card title="Create Security"> 
+                                        <div class="slds-p-horizontal--small">
+                                            <lightning:input aura:id="SecurityField1" label="Quantity" value="{!v.newSimpleSec.Quantity__c}" required="true"/>
+                                            <lightning:input aura:id="SecurityField2" label="Security Name" value="{!v.SecName}" required="true" disabled="true"/>
+                                            <lightning:input aura:id="SecurityField3" label="Symbol" value="{!v.symbol}" required="true" disabled="true"/>
+                                            <lightning:input aura:id="SecurityField4" label="Type" value="{!v.type}" required="true" disabled="true"/>
+                                            <br/>
+                                            <lightning:button label="Save Security" variant="brand" onclick="{!c.handleSaveSecurity}"/>
+                                        </div>
+                                    </lightning:card>                                                                       
+                                </div>
+                        	</div>
+                    </div>
+                 </section>
+                 <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>           
+        </div>
+    	
+</aura:component>

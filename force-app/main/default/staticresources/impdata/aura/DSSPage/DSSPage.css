@@ -1,0 +1,83 @@
+.THIS .offer-pg-cont{
+    width: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+ .THIS .lightningtoast{
+    padding-top: 130px !important;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    }
+  
+.THIS .applywidth{
+       /* width: opx;*/
+    }
+.THIS .offer-pg > .stage_item{
+    overflow-x: auto;
+    background-color:blue;
+    margin-left:10px;
+    float:left;
+}
+.THIS .offer-pg{
+    width: 1500px;
+}
+.THIS .divWidth
+{
+      width: 600px;
+      padding-right: 45px;
+}
+@media only screen and (max-width: 450px){
+   .THIS .offer-pg{
+        
+        width: 600px;
+        padding-right: 45px;
+}
+
+.THIS .offer-pg-cont{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+    
+}
+ .THIS .applywidth{
+        width: 100px;
+    }
+}
+@media only screen and (max-width: 740px) and (min-width: 450px){
+   .THIS .offer-pg{
+        
+        width: 950px;
+}
+
+.THIS .offer-pg-cont{
+    width: 120%;
+    margin: 0px;
+    overflow: hidden;
+    
+}
+   .THIS .applywidth{
+        width: 100px;
+    }
+   
+}
+.THIS .slds-accordion__list-item{
+    border-top: 0px solid;
+}
+@media only screen and (max-width: 900px) and (min-width: 740px){
+   .THIS .offer-pg{
+        
+        width: 1300px;
+}
+
+.THIS .offer-pg-cont{
+    width: 120%;
+    margin: 0px;
+    overflow: hidden;
+    
+}
+    .THIS .applywidth{
+        width: 100px;
+    }
+   
+}

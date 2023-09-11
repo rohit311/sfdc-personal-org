@@ -1,0 +1,15 @@
+.THIS {
+}
+
+.THIS .applyColor{
+    /*background-color:rgb(249, 249, 250) !important;*/
+}
+.THIS .rightPadding{
+    padding-right: 50%;
+}
+
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}

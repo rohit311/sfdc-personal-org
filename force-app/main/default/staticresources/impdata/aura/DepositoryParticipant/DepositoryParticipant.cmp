@@ -1,0 +1,120 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" controller ="DepositoryParticipantController">
+	<!-- +-+-+-+-+-+-+-+- START : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oppId" type="String" default="0065D000004adh5"/>
+    <aura:attribute name="applicantList" type="List"/>
+    <aura:attribute name="appRecords" type="Applicant__c[]"/>
+    <aura:attribute name="depositoryOptions" type="List"/>
+    <aura:attribute name="isMilesIntegration" type="Boolean" default="true"/>
+    <aura:attribute name="depositoryData" type="DepositoryParticipantController.depositoryWrapper[]"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false"/>
+    <aura:attribute name="recordsDeleted" type="DepositoryParticipantController.depositoryWrapper[]"/>
+    <aura:attribute name="productName" type="String" default="FAS"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+     
+    <!-- +-+-+-+-+-+-+-+- START : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Spinner and Toast  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <aura:if isTrue="{! v.isProcessing }">
+		<lightning:spinner/>
+	</aura:if>
+    <c:Toast aura:id="toastCmp"/>
+     <!-- +-+-+-+-+-+-+-+-+-+- END   : Spinner and Toast +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    <!-- +-+-+-+-+-+-+ START: Body +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{! v.productName =='FAS'}">
+        <div class="slds-grid slds-section-header" style="color: white;background-color: #0072bc;font-size: 120%;padding-top:.3em;padding-bottom:.3em">
+            <p>Depository Participant</p>
+        </div>
+		<table class="slds-table slds-table_bordered slds-table_col-bordered slds-m-around_xxx-small slds-m-right_small slds-border_right slds-border_left">
+            <thead class="slds-m-around_xxx-small">
+                <tr class="slds-m-around_xxx-small" scope="row">
+					<th scope="col" class="slds-cell-wrap">	   
+                        Applicant/Co-Applicant
+                    </th>
+					<th scope="col" class="slds-cell-wrap">	   
+                        Type of Applicant
+                    </th>
+					<th scope="col" class="slds-cell-wrap">	   
+                        Depository
+                    </th>
+					<th scope="col" class="slds-cell-wrap">	   
+                        DP Id
+                    </th>
+					<th scope="col" class="slds-cell-wrap">	   
+                        Client Id
+                    </th>
+					<th scope="col" class="slds-cell-wrap">	   
+                        Select
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration  items="{! v.depositoryData }" var="dpObj" indexVar="ind">
+                    <tr>
+                        <td scope="col" class="slds-cell-wrap">
+                                <lightning:select aura:id="DP_Name" name="{!ind}" label="" onchange="{!c.onChangeApplicant}" value="{!dpObj.dpRec.Applicant__r.ContactName__c}" disabled="{!if(dpObj.isEditable == false,true,false)}" required ="true" >  
+                                    <aura:iteration items="{!v.applicantList}" var="options">
+                                        <option value = "{!options.value}" 
+                                                label = "{!options.label}" 
+                                                selected = "{!options.value == !dpObj.dpRec.Applicant__r.ContactName__c}"/>
+                                    </aura:iteration>
+                                </lightning:select>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <div style="margin-top:5%;margin-left:20%">
+                                <lightning:formattedText value="{!dpObj.dpRec.Applicant_type__c}" label=""/>
+                            </div>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <lightning:select name="selectDepository" label="" value="{!dpObj.dpRec.Depository__c}" disabled="{!if(dpObj.isEditable == false,true,false)}">  
+                                <aura:iteration items="{!v.depositoryOptions}" var="options">
+                                    <option value = "{!options.value}" 
+                                            label = "{!options.label}" 
+                                            selected = "{!options.value == dpObj.dpRec.Depository__c}"/>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <div onkeyup="{!c.validateValue}" data-id="{!ind + ':DPID'}" data-record="{!dpObj.dpRec.DP_Id__c}" >
+                                <aura:if isTrue="{!dpObj.dpRec.Depository__c=='NSDL'}">
+                                    <lightning:input  label=" " value="{!dpObj.dpRec.DP_Id__c}"  maxlength = "8" pattern ="[a-zA-Z0-9]{0,8}" messageWhenPatternMismatch="Please enter correct value" disabled="{! if((dpObj.isEditable == false || dpObj.dpRec.Depository__c=='' || dpObj.dpRec.Depository__c==null),true,false)}"/>
+                                    <aura:set attribute="else">
+                                        <lightning:input label=" " value="{!dpObj.dpRec.DP_Id__c}"  pattern ="[0-9]{0,8}" messageWhenPatternMismatch="Please enter correct value" disabled="{! if((dpObj.isEditable == false || dpObj.dpRec.Depository__c=='' || dpObj.dpRec.Depository__c==null),true,false)}"/>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <lightning:input aura:id ="ClientID" value="{!dpObj.dpRec.Client_Id__c}"  maxlength = "8" pattern ="[0-9]{0,8}" messageWhenPatternMismatch="Please enter correct value" disabled="{! if((dpObj.isEditable == false || dpObj.dpRec.Depository__c=='' || dpObj.dpRec.Depository__c==null),true,false)}" label=""/>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <div style="margin-top:3%;font-weight:bold;font-size:medium">
+                                <!--a onclick="{!c.addRow}">Add</a-->
+                                <aura:if isTrue="{!!v.isProcessing}">
+                                    <a onclick="{!c.editRow}" id="{!dpObj.dpRec.Id}" >Edit</a>&nbsp;/&nbsp;
+                                    <a data-index="{!ind}" onclick="{!c.deleteRow}" >Delete</a>
+                                    <aura:set attribute="else">
+                                        Edit&nbsp;/&nbsp;Delete  
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <div style="margin-left:40%;padding-top:1%;padding-bottom:1%;" >
+        	<lightning:button variant="brand" label="Add" title="Save" onclick="{!c.addRow}" disabled="{! v.isProcessing }"/>
+            <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.onSave}" disabled="{! v.isProcessing }"/>
+        </div>
+        <aura:set attribute="else">
+            <c:InsuranceDetails oppId="{! v.oppId }" flow="financialScreen" /> <!--Passed flow to identify is called from csv screen or financial screen -->
+        </aura:set>
+    </aura:if>
+        
+    <c:DP_DocUploader oppId="{! v.oppId }" />
+	<!-- +-+-+-+-+-+-+ START: Body +-+-+-+-+-+-+  -->
+</aura:component>

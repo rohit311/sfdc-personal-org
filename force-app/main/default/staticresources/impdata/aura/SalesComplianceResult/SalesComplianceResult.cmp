@@ -1,0 +1,162 @@
+<aura:component controller="Sales_Compliance_Cntrl"  access="GLOBAL">
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="WeakAcc" type="Weak_Account__c" default=""/>
+    <aura:attribute name="officeList" type="List[]" default=""/>
+    <aura:attribute name="resList" type="List[]" default=""/>
+    <aura:attribute name="ComplianceStatus" type="boolean" default="false"/>
+    <aura:attribute name="ResOne" type="String" default=""/>
+     <aura:attribute name="ResTwo" type="String" default=""/>
+    <aura:handler event="c:getAuditResult" action="{!c.getResultData}" />
+    <aura:attribute name="isOfficeGeoavailable" type="boolean" default="true"/>    
+    <aura:attribute name="isResiGeoavailable" type="boolean" default="true"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:registerEvent name="getAuditResultEvt" type="c:getAuditResult"/>
+    <div style="position:relative" id="mainForm">
+        <div class="innerDivWrapper">
+            <lightning:card class="applyMarginToCard slds-section-title--divider applyColor "  title="OFFICE VERIFICATION"> 
+               <aura:if isTrue="{!v.isOfficeGeoavailable}">
+                <table class="slds-table slds-table_bordered   slds-size_4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class ="slds-grid slds-hyphenate slds-size_4-of-4">
+                            <th class="slds-col slds-size_1-of-4 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                Serial No.
+                            </th>
+                            
+                            <th class=" slds-col slds-size_3-of-4 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate" style="margin-right:0px;margin-left:0px">
+                                Result
+                            </th>
+                        </tr>             
+                        
+                    </thead>
+                    <tbody class="slds-grid slds-wrap">
+                        
+                        <aura:iteration items="{!v.officeList}" var="obj" indexVar="index">
+                            <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                                
+                                <td class="WrapText slds-col slds-size_1-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!index+1}
+                                </td>
+                                <td class="WrapText slds-col slds-size_3-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!obj}
+                                </td>
+                                
+                            </tr>
+                            <!-- End row -->
+                            
+                        </aura:iteration>
+                    </tbody>
+                <p></p>    
+                </table>
+                    <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_1-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                   Final Result
+                                </td>
+                                <td class="WrapText slds-col slds-size_3-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!v.ResOne}
+                                </td>
+                        </tr>             
+                        
+                    </thead>
+                </table>
+                   <aura:set attribute="else">
+                   			<table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_4-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                               NOT APPLICABLE
+                            </td> 
+                        </tr>             
+                        
+                    </thead>
+                </table>
+                   </aura:set>
+                </aura:if> 
+            </lightning:card>
+            <lightning:card class="applyMarginToCard slds-section-title--divider applyColor " title="RESIDENTIAL VERIFICATION" >
+                <aura:if isTrue="{!v.isResiGeoavailable}">
+                <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4" label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class ="slds-grid slds-hyphenate slds-size--4-of-4">
+                            <th class="slds-col slds-size_1-of-4 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                Serial No.
+                            </th>
+                            
+                            <th class=" slds-col slds-size_3-of-4 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate" style="margin-right:0px;margin-left:0px">
+                                Result
+                            </th>
+                        </tr>             
+                        
+                    </thead>
+                    <tbody class="slds-grid slds-wrap">
+                        
+                        <aura:iteration items="{!v.resList}" var="obj" indexVar="index">
+                            <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                                
+                                <td class="WrapText slds-col slds-size_1-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!index+1}
+                                </td>
+                                <td class="WrapText slds-col slds-size_3-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!obj}
+                                </td>
+                                
+                            </tr>
+                            <!-- End row -->
+                            
+                        </aura:iteration>
+                    </tbody>
+                </table>
+               <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_1-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                   Final Result
+                                </td>
+                                <td class="WrapText slds-col slds-size_3-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!v.ResTwo}
+                                </td>
+                        </tr>    
+                        
+                    </thead>
+                </table>
+                 <aura:set attribute="else">
+                    <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_4-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                               NOT APPLICABLE
+                            </td> 
+                        </tr>             
+                        
+                    </thead>
+                </table>
+                   </aura:set>
+                </aura:if> 
+            </lightning:card>
+            
+            <lightning:card class="applyMarginToCard slds-section-title--divider applyColor " title="Compliance Status" >
+                
+                <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--4-of-4"  label=" ">    
+                    <thead  class="slds-grid slds-hyphenate">
+                        <tr class="slds-grid slds-hyphenate slds-size--4-of-4 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_4-of-4 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                              
+                                <aura:if isTrue='{!v.ComplianceStatus}'>
+                                        Memo Completed
+                                    <aura:set attribute='else'>
+                                        Memo Not Completed
+                                    </aura:set>
+                                </aura:if>
+                            </td> 
+                        </tr>             
+                        
+                    </thead>
+                </table>
+                
+                
+            </lightning:card>
+        </div>
+    </div>
+    
+</aura:component>

@@ -1,0 +1,37 @@
+.THIS .uiInputDate .datePicker-openIcon {
+    position: absolute;
+    left: 95%;
+    top: 30%;
+} 
+
+.THIS .uiInputDefaultError li {
+   	list-style: none;
+}
+
+.THIS .kyc-container{
+    position:fixed;
+}
+
+.THIS .kyc-wrapper{
+    height: 91vh;
+    width: 100%;
+}
+
+.THIS .kyc-modal-wrapper{
+    max-height: 61vh;
+}
+
+.THIS .kyc-wrapper1{
+   height: 40vh;
+   width: 100%;
+}
+.THIS .mobilecolour {
+    width:200px;
+}
+.THIS .mobilelabel {
+    width:200px;
+}
+.THIS .avoidClick {
+    pointer-events:none;
+    opacity: 0.5;
+}

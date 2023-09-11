@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event to NOTIFY INITIAL SAVE OF LEAD AND PRODUCT OFFERING RECORD" >
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="po" type="Product_Offerings__c"/>
+	<aura:attribute name="lead" type="Lead"/>
+    <aura:attribute name="offer" type="Object"/>
+    <aura:attribute name="isSubmitted" type="Boolean"/>
+</aura:event>

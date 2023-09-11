@@ -1,0 +1,196 @@
+<aura:component  implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="global" controller="SAL_PricingCtrlV2"> 
+    <aura:attribute name="accntValidateList" type="List"/><!-- 22018 -->
+    <aura:attribute name="bankSearchKeyword" type="string" default=""/><!-- 24673-->
+    <aura:attribute name="showUMRNBtn" type="Boolean" default="false" /><!-- US 5374 -->
+    <aura:attribute name="Status__c" type="List"/>
+    <aura:attribute type="Integer" name="maxLoanAmt" default=""/> <!-- SAL 2.0 CR's -->
+    <aura:attribute name="oppId" type="Id"/>
+	<aura:attribute name="activeSectionName" type="string" default=""/>
+    <aura:attribute name="recordId" type="Id"/>
+ <aura:attribute name="accordian_name" type="String" default=""/><!-- 1652 -->
+   <aura:handler name="change" value="{!v.activeSectionName}" action="{!c.callaccordianmethod}"/><!-- 1652 -->
+    <aura:attribute name="theme" type="String"/>
+    <aura:attribute name="iscommunityUser" type="String"/>
+    <aura:attribute name="loan" type="Opportunity"/>
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute name="approvedRate" type="Decimal"/>
+    <aura:attribute name="approvedPF" type="Decimal"/>
+    <aura:attribute name="StampDuty" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType':'Applicant__c'}"/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{}"/>
+    <aura:attribute name="acc" type="Account" default="{}"/>
+    <aura:attribute name="sanctionList" type="Discrepancy__c[]"/>
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:attribute name="disbList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+    <aura:attribute name="addOnSolList" type="List" /><!-- 24667-->
+    <aura:attribute name="NoOfAddCards" type="String" /><!-- 24667-->
+	<aura:attribute name="DisableAdd" type="Boolean" default="false" /><!-- 24667-->
+    <aura:attribute name="landlordGenderList" type="List" /> <!--24673 -->
+    <aura:attribute name="landlordAgreementTypeList" type="List" /><!-- 24673-->
+    <aura:attribute name="landlordDepositByList" type="List" /><!-- 24673-->
+    <aura:attribute name="solObjLandLord" type="SOL_Policy__c"/><!-- 24673-->
+    <aura:attribute name="lineoptedList" type="List" />
+    <aura:attribute name="proposedLoan" type="List" />
+    <aura:attribute name="preferredMode" type="List" />
+            <aura:attribute name="disableApproveButton" type="Boolean" default="false"/>
+
+    <aura:attribute name="custId" type="String"/>
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="isPreapproved" type="Boolean" default="false"/><!--re-used for 24667-->
+    <aura:attribute type="Boolean" name="isEkycDone" default="false"/>
+    <aura:attribute name="TatTime" type="String"/>
+    <aura:attribute name="credStatus" type="List"/>
+    <aura:attribute name="creditStatusVer" type="List"/>
+    <aura:attribute name="salesStatus" type="List"/> 
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute name="hideBiometricOption" type="Boolean" default="true"/><!--18669-->
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--  added for bug id 22047-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="elitecardoption" type="List"/><!--22017-->
+    <aura:attribute name="emicardoption" type="List"/><!--22017-->
+    <aura:attribute type="String" name="maxLimitROI" default=""/> <!-- Sprint 5C 22624 -->
+    <aura:attribute type="Opportunity" name="oldloan"/><!-- Sprint 5c-->
+     <aura:attribute type="String" name="locationCategory" default=""/> <!-- added for 1652--> 
+    <aura:attribute name="isUnderwitercmp" type="Boolean" default="false" />
+     <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--22017-->
+    <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+        <div class="slds-align_absolute-center" style="height: 5rem;">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--check component loading Aman end-->
+    
+    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+        <ui:scrollerWrapper class="scrollerSize">
+            <div >
+                <div class="innerDivWrapper">
+                   <c:IdentifierForMobility /><!-- user stoty 978-->
+                    <c:LoaderForMobility />
+                    <c:Custom_Toast_Mobility />
+                    <lightning:button variant="brand" label="Back" iconName="utility:back" class="slds-theme--alt-inverse backBottom" iconPosition="left" onclick="{!c.sendback}"/> <!--Added Function sendback for Bug 18566-->     
+                    <div aura:id="boxBorder" >
+                        <c:LACard flow="pricing" stageName="{!v.stageName}" oppObj="{!v.loan}" stageCompletion="{!v.stageCompletion}"  TATtime="{!v.TatTime}"/>
+                    </div>               
+                    <lightning:tabset >
+                        <lightning:tab label="Pricing Details" class="slds-border_right borderColor ">
+                            <ui:scrollerWrapper class="scrollerSize">
+                                <div class="innerDivWrapper"><!-- 1652 -->
+                                    <lightning:accordion  aura:id="accordion" activeSectionName="{!v.activeSectionName}"><!--22624 -->
+                                        <lightning:accordionSection name="InsuranceDetails" label="Insurance Details">
+                                            <div class="slds-box" style="background: #f4f6f9;">
+                                                INSURANCE DETAILS
+                                                <c:GenericRecordDetails  isCommunityUsr="{!v.iscommunityUser}" stageName="{!v.stageName}" loanAppID="{!v.oppId}" isProgressVisible="false"/>
+                                            </div><br/>  
+                                        </lightning:accordionSection>
+                                        <lightning:accordionSection name="CrossSellCart" label="Cross Sell Cart">
+                                            <div class="slds-box" style="background: #f4f6f9;">
+                                                OFFERS
+                                                <c:Sal_Pricing_OfferDetails NoOfAddCards= "{!v.NoOfAddCards}"  isPreapproved= "{!v.isPreapproved}" addOnSolList= "{!v.addOnSolList}" emicardoption="{!v.emicardoption}" elitecardoption="{!v.elitecardoption}" stageName="{!v.stageName}" lineoptedList="{!v.lineoptedList}" applicantObj="{!v.applicantObj}" scam="{!v.scam}" oppId="{!v.oppId}" /><!--Added NoOfAddCards,isPreapproved,addOnSolList attributes for Bug 24667-->
+                                            </div>
+                                        </lightning:accordionSection> 
+                                        
+                                        <lightning:accordionSection name="LoanDetails" label="Loan Details">
+                                            <!-- SAL 2.0 CR's added maxLoanAmt-->
+                                            <!-- 22624 maxLimitROI added-->    <!--1652 id added -->  <c:Sal_Pricing_LoanDetails disableApproveButton="{!v.disableApproveButton}" aura:id="loanDetail" EMI="{!v.EMI}" maxLoanAmt="{!v.maxLoanAmt}" maxLimitROI="{!v.maxLimitROI}" stageName="{!v.stageName}" acc="{!v.acc}" proposedLoan="{!v.proposedLoan}" preferredMode="{!v.preferredMode}" applicantPrimary="{!v.applicantObj}" isHybirdFlexi="{!v.loan.Scheme_Master__r.IsHybridFlexi__c}" loan="{!v.loan}" oldloan="{!v.oldloan}" approvedRate="{!v.approvedRate}" proposedRate="{!v.loan.Approved_Rate__c}" approvedPF="{!v.approvedPF}" proposedPF="{!v.loan.Processing_Fees__c}" loanVarient="{!v.loan.Loan_Variant__c}"  locationCategory="{!v.locationCategory}"/><!--added loanVarient,locationCategory for 1652-->
+                                        </lightning:accordionSection>
+                                        <lightning:accordionSection name="POS" label="POS">
+                                            <c:Fetch_POS stageName="{!v.stageName}" page="pricing" oppId="{!v.oppId}" isCredit="false" account="{!v.acc}" oppObj="{!v.loan}"/> 
+                                            
+                                        </lightning:accordionSection>
+                                        <!--Bug 22624 s -->
+                                        <lightning:accordionSection name="Documents" label="Documents">
+                                            <aura:if isTrue="{!if(v.activeSectionName == 'Documents',true,false)}">
+                                                
+                                                <c:SAL_OppDocument isPricingcmp="true" stageName="{!v.stageName}" isUnderwitercmp="false" nameTheme="{!v.theme}" Accobj="{!v.acc}" Conobj="{!v.ConObj}" primaryApp="{!v.applicantObj}" oppId="{!v.oppId}" Oppobj="{!v.loan}" />
+                                            </aura:if>
+                                        </lightning:accordionSection>
+                                        <!--Bug 22624 e -->
+                                        <lightning:accordionSection name="Other Details" label="Other Details">
+                                            <c:Generic_Ckyc hideresidential="true" stageName="{!v.stageName}" page="pricing" tatMasterRecord="{!v.tatMasterRecord}" forprimeAPP="true" oppObj="{!v.loan}" oppId="{!v.oppId}" accObj="{!v.acc}" appObj="{!v.applicantObj}"/>                               
+                                        </lightning:accordionSection>
+                                        <!--Bug 24673 s-->
+                                        
+                                        <aura:if isTrue="{!v.loan.Product__c == 'RDPL'}">
+                                            <lightning:accordionSection name="Landlord Details" label="Landlord Details">
+                                                
+                                                <aura:if isTrue="{!v.activeSectionName == 'Landlord Details'}">
+                                                    <c:sal_pricing_rentalDetails bankSearchKeyword="{!v.bankSearchKeyword}" solObjLandLord="{!v.solObjLandLord}" loan="{!v.loan}" oppId="{!v.oppId}" landlordGenderList="{!v.landlordGenderList}" landlordAgreementTypeList="{!v.landlordAgreementTypeList}" landlordDepositByList="{!v.landlordDepositByList}"/><!-- 24673 -->
+                                                </aura:if>
+                                            </lightning:accordionSection>
+                                        </aura:if>
+                                        <!--Bug 24673 e-->
+                                        <lightning:accordionSection name="RepaymentDetails" label="Repayment Details">
+                                            <c:Sal_Pricing_Repayment showUMRNBtn="{!v.showUMRNBtn}" stageName="{!v.stageName}" page="pricing" disbList="{!v.disbList}" repayList="{!v.repayList}" loanId="{!v.oppId}" loan="{!v.loan}"  primaryAppId="{!v.applicantObj.Id}" bankAccount="{!v.bankAccount}"/>
+                                        </lightning:accordionSection>
+                                        <lightning:accordionSection name="Disbursement Details" label="Disbursement Details"><!--22018 -->
+                                            <c:Sal_Pricing_DisbursementDetails accntValidateList="{!v.accntValidateList}" stageName="{!v.stageName}" page="pricing" disbList="{!v.disbList}" loanId="{!v.oppId}" loan="{!v.loan}" bankAccount="{!v.bankAccount}" repayList="{!v.repayList}" /> <!-- added bank,repay for 24315 -->   
+                                        </lightning:accordionSection>
+                                        <lightning:accordionSection name="C" label="Verification" aura:id="VerificationImageUpload" class="">
+                                            <c:VerificationImageUpload creditStatusVer="{!v.creditStatusVer}" displayReadOnly="{!v.displayReadOnly}" stageName="{!v.stageName}" isUnderwitercmp="{!v.isUnderwitercmp}" credStatus="{!v.credStatus}" salesStatus="{!v.salesStatus}" loanApplicationId="{!v.oppId}" flowV2="mobilityV2" flowV3forPricing="mobilityv2_pricing"/>
+                                        </lightning:accordionSection>
+                                        <lightning:accordionSection name="Customer Consent" label="Customer Consent">
+                                            <!--SAL 2.0 CR added parameters-->
+                                            
+                                            <c:Sal_Pricing_CustomerConsent account="{!v.acc}" isCommunityUsr="{!v.iscommunityUser}" appObj="{!v.applicantObj}" stageName="{!v.stageName}" page="pricing" loan="{!v.loan}" EMI="{!v.EMI}" StampDuty="{!v.StampDuty}" nameTheme = "{!v.theme}" loanid="{!v.oppId}" disbusmentList="{!v.disbList}" aura:id="commercialconsent" repayList="{!v.repayList}" />
+                                            
+                                        </lightning:accordionSection>  
+                                        <div class="one" style="height: 100px;"></div>
+                                        
+                                        
+                                        <!--    <lightning:accordionSection name="Disbursement Details" label="Disbursement Details">
+                                <c:ObligationRecordDetailsCmpV2 loanAppID="{!v.oppId}"/>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection name="Repayment Details" label="Repayment Details">
+                                <c:Sal_Pricing_Repayment_V2 loanAppID="{!v.oppId}"/>
+                            </lightning:accordionSection> -->
+                                    </lightning:accordion>
+                                </div></ui:scrollerWrapper>
+                        </lightning:tab>
+                        <!--  <lightning:tab label="Offers and Consent" class="slds-border_right borderColor">
+                        <lightning:accordion activeSectionName="">
+                            <lightning:accordionSection name="CrossSellCart" label="Cross Sell Cart">
+                                <div class="slds-box" style="background: #f4f6f9;">
+                                    OFFERS
+                                    <c:Sal_Pricing_OfferDetails lineoptedList="{!v.lineoptedList}" applicantObj="{!v.applicantObj}" scam="{!v.scam}" oppId="{!v.oppId}" />
+                                </div>
+                            </lightning:accordionSection> 
+                            
+                            <lightning:accordionSection name="Customer Consent" label="Customer Consent">
+                                <c:Sal_Pricing_CustomerConsent loanid="{!v.oppId}" disbusmentList="{!v.disbList}"/>
+                            </lightning:accordionSection>  
+                        </lightning:accordion>
+                        
+                    </lightning:tab>-->
+                        <!-- <lightning:tab  label="Customer Consent" class="slds-border_right borderColor">
+                    </lightning:tab>-->
+                        <lightning:tab label="Sanction Conditions" class="slds-border_right borderColor">
+                            <c:SAL_Pricing_SanctionConditions Status__c="{!v.Status__c}" flow="pricing" stageName="{!v.stageName}" existingDisList="{!v.existingDisList}" loan="{!v.loan}" loanid="{!v.oppId}" discrepancyList="{!v.sanctionList}"/>
+                        </lightning:tab>
+                        <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added for ug id 22047-->
+                            <lightning:tab label="EKYC Details" class="slds-border_right borderColor">
+                                <c:EkycComponent page="Pricing2" stageName="{!v.stageName}" custId="{!v.custId}" appNew="{!v.applicantObj}" kyc="{!v.kyc}" isEkycDone="{!v.isEkycDone}" isPreapproved="{!v.isPreapproved}" hideBiometricOption = "true"/> <!-- added hideBiometricOption for bug id 18669-->
+                            </lightning:tab>
+                        </aura:if>
+                        
+                    </lightning:tabset>
+                    
+                    
+                </div>
+            </div>
+        </ui:scrollerWrapper>
+    </aura:if>
+    <div aura:id = "childCmpbody"> {!v.body}     
+        
+    </div> 
+</aura:component>

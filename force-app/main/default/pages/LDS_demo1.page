@@ -1,0 +1,27 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="HTML-5.0">
+  
+  <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+  
+    <head>
+    <title>Salesforce Lightning Design System Trailhead Module</title>
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS100,'assets/styles/salesforce-lightning-design-system-vf.css')}"/>  
+    </head>
+    
+    <body>
+    
+      <div class="slds">
+         
+         <div class="slds-grid">
+           
+           <div class="slds-col-size--4-of-6">Column 1</div>
+           <div class="slds-col-size--1-of-6">Column 2</div>
+           <div class="slds-col-size--1-of-6">Column 3</div>
+           
+         </div>
+         
+      </div>
+       
+    </body>  
+  
+  </html>
+</apex:page>

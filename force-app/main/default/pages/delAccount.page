@@ -1,0 +1,18 @@
+<apex:page controller="DelAccount" >
+  <apex:form >
+  <apex:pageBlock >
+  <apex:actionFunction action="{!DelAcc}" name="methodOneInJavascript" rerender="showstate" reRender="pb">
+        <apex:param name="firstParam" assignTo="{!DelID}" value="" />
+    </apex:actionFunction>
+
+  <apex:pageBlockTable value="{!Ac}" var="a" id="pb">
+  <apex:column HeaderValue="Name" value="{!a.Name}"/>
+  <apex:column headerValue="Del">
+      <apex:outputPanel onclick="methodOneInJavascript('{!a.id}')" styleClass="btn"> 
+        Del 
+    </apex:outputPanel>
+  </apex:column>
+  </apex:pageBlockTable>
+  </apex:pageBlock>
+  </apex:form>
+</apex:page>

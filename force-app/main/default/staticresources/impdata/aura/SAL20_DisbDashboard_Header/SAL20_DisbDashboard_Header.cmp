@@ -1,0 +1,91 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global"  controller="SAL20_DisbController">
+    <!-- +-+-+-+-+-+- START: Attributes -+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oId" 		type="String" access="GLOBAL"/>
+    <aura:attribute name="record" 	type="Opportunity" access="GLOBAL" />
+    <aura:handler name="init" value="{!this}" action="{! c.onInit }" />
+    <!--22552-->
+    <aura:attribute name="GTResponse" type="String" access="GLOBAL" default="abs"/>
+    <aura:attribute name="MobTab1" type="String" access="GLOBAL" default="abs"/>
+    <aura:attribute name="MobTab2" type="String" access="GLOBAL" default="abs"/>
+    <aura:attribute name="MobTab3" type="String" access="GLOBAL" default="abs"/>
+    <aura:attribute name="SALMV2" type="Boolean" access="GLOBAL" default="false"/>
+     <aura:handler name="init" value="{!this}" action="{! c.onInit }" />
+    <aura:registerEvent name="SAL20_DisbNavigator" type="c:SAl20_DisbDashboard_Navigator"/>
+    <!-- +-+-+-+-+-+- END  : Attributes -+-+-+-+-+-+-+-+-+ -->
+    
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">            
+            <div class="slds-col">
+                <div class="slds-media slds-media--center slds-no-space slds-grow">
+                    <div class="slds-media__figure">
+                        <button class="slds-button" onclick="{! c.goToHome }" >
+                            <lightning:icon  title="Go to Home Page" iconName="standard:home" size="large" />
+                        </button>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-heading--label">{!v.record.Loan_Application_Number__c}</p>
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle" title="{!v.record.Name}">{!v.record.Name}</h1>
+                    </div>
+                </div>
+                <div>
+                    <ul class="slds-grid slds-page-header__detail-row">
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-heading__label-normal slds-m-bottom__xx-small" title="Stage Name"><b>Stage Name</b></p>
+                            <p class="slds-text-body__regular" title="{! v.record.StageName }">{! v.record.StageName }</p>
+                        </li>
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-heading__label-normal slds-m-bottom__xx-small" title="Loan Amount">
+                                <b>Loan Amount</b>
+                            </p>
+                            <p class="slds-text-body__regular" title="{! '₹' + v.record.Loan_Amount__c}">₹ {!v.record.Loan_Amount__c}</p>
+                        </li>
+                        <!-- tabset container : Start -->
+                        <!--22552-->
+                        <li class="slds-page-header__detail-block">
+                            <div class="slds-grid">
+                                <div class="slds-col ">
+                                    
+                                    <div class="slds-tabs_default slds-tabs_medium dss-screen-tabset" style="{!if(v.SALMV2, 'display:none', 'display:block')}">
+                                        <ul class="slds-tabs_default__nav" role="tablist">
+                                            <li class="slds-button slds-button_brand" title="Demographic Details" role="presentation" aura:id="demographic_tab" data-value="demographic_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item" >Demographic Details</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Financial Details" role="presentation" aura:id="financial_tab" data-value="financial_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item" >Financial Details</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Pricing Details" role="presentation" aura:id="pricing_tab" data-value="pricing_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item" >Pricing Details</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Go to Opportunity" role="presentation" aura:id="opportunity_tab" data-value="opportunity_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item" >Go to Opportunity</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="slds-tabs_default slds-tabs_medium dss-screen-tabset" style="{!if(v.SALMV2, 'display:block', 'display:none')}">
+                                        <ul class="slds-tabs_default__nav" role="tablist">
+                                            <li class="slds-button slds-button_brand" title="Demographic Details" role="presentation" aura:id="sales_V2" data-value="sales_V2" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item" >{!v.MobTab1}</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Financial Details" role="presentation" aura:id="credit_tab" data-value="credit_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item" >{!v.MobTab2}</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Pricing Details" role="presentation" aura:id="pricing_V2" data-value="pricing_V2" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item" >{!v.MobTab3}</a>
+                                            </li>
+                                            <li class="slds-button slds-button_brand" title="Go to Opportunity" role="presentation" aura:id="opportunity_tab" data-value="opportunity_tab" onclick="{!c.goToDSS}">
+                                                <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item" >Go to Opportunity</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- tabset container : End -->
+
+                    </ul>
+                </div>
+            </div>       
+        </div>
+       
+    </div>
+</aura:component>

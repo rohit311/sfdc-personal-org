@@ -1,0 +1,7 @@
+<aura:event type="COMPONENT" description="Event to trigger file upload">
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="fileName" type="String"/>
+    <aura:attribute name="contentType" type="String"/>
+    <aura:attribute name="description" type="String"/>
+    <aura:attribute name="base64Data" type="String"/>
+</aura:event>

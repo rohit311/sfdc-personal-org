@@ -1,0 +1,18 @@
+.THIS .requiredClass {
+        color: #c23934;
+    	margin: 0 0.125rem;
+}
+
+.THIS .uiInputDate{
+    margin-top:100px;
+    font-size : 10px;
+}
+
+.THIS .fllwDate{
+    font-size : 15px !important;
+}
+
+.THIS .applyText{
+    color:black;
+    font-weight:900;
+}

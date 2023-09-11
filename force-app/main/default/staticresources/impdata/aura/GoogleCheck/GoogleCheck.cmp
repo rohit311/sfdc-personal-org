@@ -1,0 +1,104 @@
+<aura:component controller="GoogleCheckController" >
+    
+     <aura:attribute name="loanId" type="String" default="0060l000002RIbP"/>
+     <aura:attribute name="appLst" type="Applicant__c" default=""/>
+     <aura:attribute name="loan" type="Opportunity" default=""/>
+     <aura:attribute name="GooglecheckOption" type="String[]" default=""/>
+     <aura:attribute name="NonPostitiveOption" type="String[]" default=""/>
+    
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+	<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/> 
+      <!-- PAGE HEADER -->
+    <div class="slds-page-header" style=" background-color: #0072bc" role="banner">
+      <div class="slds-grid">
+        <div class="slds-col">
+          <p class="slds-text-heading--label" style="color:white">Google Check</p>
+          
+        </div>
+      </div>
+    </div>
+    <!-- / PAGE HEADER -->
+    
+    
+   <div class="slds-scrollable--x">
+    <table class="slds-scrollable slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered table--stacked-horizontal" border="1.5px" style="height: 5rem; width: 14rem;">
+    <tr>
+    <th >Customer</th> 
+    <th>Applicant Type</th>
+    <th>City</th>
+    <th>Google Check Button*</th>    
+    <th>View Result</th>
+    <th>Search Result*</th>
+    <th>Non-Positive Result Category</th>
+    <th>URL(separated by ',')</th>
+    <th>Remarks(if any)</th>
+    </tr>
+      
+     <aura:iteration items="{!v.appLst}" var="app">
+      <tr>
+          <td>
+              <ui:outputText class="slds-input" value="{!app.Contact_Name__r.Name}"/>  
+          </td>   
+          <td>
+              <ui:outputText class="slds-input" value="{!app.Applicant_Type__c}"/>  
+          </td> 
+			<!-- change added for bugId-17136 -->
+           <td>
+			   <ui:outputText aura:id="City" class="slds-input" value="{!app.Applicant_Type__c == 'Primary'?((app.Contact_Name__r.Account.Group_Type__c=='selfemployed'|| app.Contact_Name__r.Account.Group_Type__c==''||app.Contact_Name__r.Account.Group_Type__c==null)?app.Contact_Name__r.Residence_City__c:app.Contact_Name__r.Account.Office_City__c):app.Contact_Name__r.AppCity__c}"/>  
+          </td> 
+          <td>
+              <div onclick="{!c.googleCheck}" data-value="{!app.Id}">
+                <lightning:button label="Search" aura:id="googleCheckButton" iconName="utility:search" iconPosition="left"  variant="brand" value="123"/>
+            </div>
+             
+          </td> 
+          	<td>
+         		<ui:outputURL value="{!'/servlet/servlet.FileDownload?file='+app.Attachments[0].Id}" label="Click here" target="_new" disabled="{!!app.Attachments[0].Id}"/>
+            </td>
+         
+          <td>
+              <ui:inputSelect aura:id="googleCheckResult" class="slds-input" value="{!app.Google_Check_Result__c}" required="true"/>
+          </td>
+         
+          <td>
+              <ui:inputSelect aura:id="nonPositiveResult" class="slds-input" value="{!app.NonPositive_Result_Category__c}" required="true"/>
+             </td> 
+          <td>
+              <ui:inputTextArea aura:id="GoogleCheckURL" value="{!app.Google_Check_URL__c}" rows="2"/>
+          </td>
+          <td>
+              <ui:inputTextArea value="{!app.Any_other_Remarks__c}" rows="2"/>
+          </td>
+          
+      </tr>
+     </aura:iteration>   
+    </table>
+    </div>
+    <br/>
+<center><lightning:button aura:id="saveButton" onclick="{!c.saveData}" label="Save Details" iconName="utility:save" iconPosition="left"  variant="brand"/></center>
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    
+     <div aura:id="waiting" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    
+</aura:component>

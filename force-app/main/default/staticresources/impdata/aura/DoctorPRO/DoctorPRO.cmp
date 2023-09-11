@@ -1,0 +1,57 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="poId" type="String" default=""/>
+    <aura:attribute name="isSubmitted" type="Boolean" default="false"/>
+    <aura:attribute name="productFlow" type="String" default="PROMOBILITY"/> <!-- Bug 14509  -->
+    <aura:attribute name="rdlFlow" type="String" />
+    
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.enableDocAndDispos}"/>
+    <aura:handler event="c:GotoNextTab" action="{!c.gotoNextTab}"/>
+    
+    <div class="slds-tabs--scoped">
+        <ul class="slds-tabs--scoped__nav" role="tablist">
+            <li aura:id="customerTab" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Customer" role="presentation">
+                <a id="customerTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="0" aria-selected="true" aria-controls="customerTabContent">
+                    Customer
+                </a>
+            </li>
+            <li aura:id="documentTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Documents" role="presentation">
+                <a id="documentTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-1" aria-selected="false" aria-controls="documentTabContent">
+                    Documents
+                </a>
+            </li>
+            <li aura:id="dispositionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Disposition" role="presentation">
+                <a id="dispositionTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-1" aria-selected="false" aria-controls="dispositionTabContent">
+                    Disposition
+                </a>
+            </li>
+        </ul>        
+        <div aura:id="customerTabContent" class="slds-tabs--scoped__content" role="tabpanel" aria-labelledby="customerTab">
+            <c:KYC poId="{!v.poId}" productFlow="{!v.productFlow}"/>	<!-- Bug 14509 -->    			
+        </div>
+        <div aura:id="documentTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="documentTab">
+            <c:Documents />
+        </div>
+        <div aura:id="dispositionTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="dispositionTab">
+            <c:ProductOffering />
+        </div>
+    </div>
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong>Info : </strong>
+                        Please save customer details to access documents and disposition tab.
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

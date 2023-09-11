@@ -1,0 +1,35 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" 
+                controller="SAL20_DisbController"
+                >
+    
+    <aura:attribute name="oId" type="String" default="0060k000006buaV" />
+    <aura:attribute name="db_elements" type="List" />
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name="allowSentToFinnone" type="Boolean" default="false" description="This button will enable/disable the sent-to-finnone button" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.onInit}" />
+    
+
+   <div class="slds">
+       <aura:if isTrue="{! v.isProcessing }">
+           <lightning:spinner size="large" />
+       </aura:if>
+       
+        <div class="slds-grid slds-wrap">
+            <aura:iteration items="{!v.db_elements}" var="oDBE">
+                <c:SAL20_DisbDashboard_Element Name="{! oDBE.Name }" Event="{! oDBE.Event}" IsComplete="{! oDBE.IsComplete }"  />
+            </aura:iteration>   
+        </div>
+       
+		<!-- Bug 22065 - S Added Finnone and reverse upload section -->
+		<div>
+           <c:SAL20_Sent_To_Finnone oId="{! v.oId }"  isSentToFinnoneAllowed="{! !v.allowSentToFinnone}"/>
+		</div>
+		<div>
+           <c:SAL20_ReverseUpload oppId ="{! v.oId }" />
+		</div>
+       <!-- Bug 22065 - E Added Finnone and reverse upload section -->
+   </div>
+       
+</aura:component>

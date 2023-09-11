@@ -1,0 +1,157 @@
+<aura:component  controller="SAL_PricingCtrlV2"> 
+    <aura:attribute type="Opportunity" name="oldloan"/><!-- Sprint 5c-->
+    	<aura:method name="checkHierarchyCondtions" action="{!c.checkHierarchyCondtions}" /><!-- 1652 -->
+    <aura:attribute name="acc" type="Account" default="{}"/>
+    <aura:attribute name="isHybirdFlexi" type="boolean" default="false"/> 
+    <aura:attribute type="Opportunity" name="loan"/>
+    <aura:attribute type="Integer" name="maxLoanAmt" default=""/> <!-- SAL 2.0 CR's -->
+    <aura:attribute type="Sales_Officer_Limit__c[]" name="solList"/>
+    <aura:attribute type="Decimal" name="approvedRate" />
+    <aura:attribute type="Decimal" name="proposedRate" />
+    <aura:attribute type="Decimal" name="approvedPF" />
+    <aura:attribute type="Decimal" name="proposedPF" />
+    <aura:attribute name="proposedLoan" type="List" />
+    <aura:attribute name="preferredMode" type="List" />
+    <aura:attribute name="selectedValue" type="string"/>
+        <aura:attribute name="disableApproveButton" type="Boolean" default="false"/>
+    <aura:attribute name="selectApproval" type="Boolean" default="false"/>
+    <aura:attribute name="applicantPrimary" type="Applicant__c" default=""/>
+    <aura:handler name="change" value="{!v.applicantPrimary.Pure_Flexi_Period__c}" action="{!c.calculateDroplinePeriod}"/>
+    <aura:attribute type="Boolean" name="showApprove" default="true"/>
+	 <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+     <aura:attribute type="String" name="maxLimitROI" default=""/> <!-- Sprint 5C 22624 -->  
+    <aura:attribute type="String" name="loanVarient" default=""/> <!--added for 1652-->
+     <aura:attribute type="String" name="locationCategory" default=""/> <!-- added for 1652--> 
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="EMI" type="String"/><!--prod issue-->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <div style="position:relative">
+        <ui:scrollerWrapper class="scrollerSize">
+            <div class="innerDivWrapper">
+                <div class="slds-box" style="background: #f4f6f9;">
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="loanAmount" label="Loan amount" value="{!v.loan.Approved_Loan_Amount__c}" name="LoanAmount" disbaled="false"/><!--SAL 2.0 CR's removed disabled attribute -->
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="ROI" type="decimal" label="ROI" value="{!v.loan.Approved_Rate__c}"  name="ROI" placeholder="ROI" onchange="{!c.checkRate}" maxlength="6" messageWhenPatternMismatch="Please enter valid ROI" pattern="^[1-9]\d*(\.\d+)?$"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="PF" type="decimal" label="PF%" value="{!v.loan.Processing_Fees__c}" maxlength="6"  onchange="{!c.checkRate}" messageWhenPatternMismatch="Please enter valid Sales Approved PF%" messageWhenBadInput="Sales Approved PF% should contain only digits." name="ProcessingFees" placeholder="PF%" pattern="^[0-9]\d*(\.\d+)?$"/>
+                                    
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control" id="tenordiv">
+                                    <lightning:input aura:id="tenorLoan" label="Approved Tenor" value="{!v.loan.Approved_Tenor__c}" name="ApprovedTenor" disabled="true"/>
+                                    
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.isHybirdFlexi}">
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" id="pureFlexiDiv">    
+                                            <lightning:input aura:id="PureFlexPeriod1" label="Pure Flexi Period" value="{!v.applicantPrimary.Pure_Flexi_Period__c}" name="PureFlexiPeriod"  type="text" maxlength="4" messageWhenPatternMismatch="Please enter valid Pure Flexi Period" pattern="[0-9]*" messageWhenBadInput="Pure Flexi Period should contain only digits." placeholder="Pure Flexi Period"/>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" >
+                                            <lightning:input label="Pure Flexi Period EMI" value="{!v.applicantPrimary.Pure_Flexi_EMI__c}" name="PureFlexi" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input aura:id="DropLinPeriod1" label="Drop Line Flexi Period" value="{!v.applicantPrimary.Drop_Line_Flexi_Period__c}" name="DropLineFlexi" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                             <!-- 29286 start-->
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" >
+                                            <lightning:input label="DSA subventions amount" value="{!v.loan.MonthlyBonus__c}" name="PureFlexi" disabled="false"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control" >
+                                            <lightning:input label="DSA subventions %" value="{!v.loan.DSA_Sharing__c}" name="PureFlexi" disabled="false"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            <!-- 29286 end-->
+                        </div>
+                      <div class="slds-form-element__control">
+                            <lightning:select aura:id="purpose" label="Purpose of Loan" value="{!v.acc.Purpose_of_Facility__c}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.proposedLoan}" var="pro">
+                                    <option value="{!pro}" text="{!pro}" selected="{!v.acc.Purpose_of_Facility__c == pro}"></option>
+                                </aura:iteration>
+                            </lightning:select>                   
+                            
+                        </div> 
+                         <div class="slds-form-element__control">
+                            <lightning:select aura:id="preferredMode" label="Preferred Mode to Connect" value="{!v.acc.Preffered_Mode_to_Connect__c}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.preferredMode}" var="pre">
+                                    <option value="{!pre}" text="{!pre}" selected="{!v.acc.Preffered_Mode_to_Connect__c == pre}"></option>
+                                </aura:iteration>
+                            </lightning:select>                   
+                            
+                        </div>
+                    </div>
+                        
+
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                               <aura:if isTrue="{! or (v.showApprove , v.loan.Product__c=='RSL')}">
+                                    <lightning:button variant="brand" iconName="utility:package_org" onclick="{!c.approveData}" aura:id="approve" label="Approve" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                   <aura:set attribute="else">
+                                        <lightning:button variant="brand" iconName="utility:email" aura:id="sendMail" label="Send Mail To Heirarchy" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" onclick="{!c.sendEmailToHeirarchy}" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!and (v.selectApproval  , v.loan.Product__c !='RSL')}">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="left">
+                            <div class="slds-size_2-of-2">
+                                
+                                <div class="slds-box slds-box_x-small slds-text-align_left slds-m-around_x-small">
+                                    
+                                    <div class="slds-form-element__control" style="margin-bottom:5px;">
+                                        <lightning:select aura:id="wrapId" class="" name="wrapName" label="Select Approval Hierarchy" required="true" messageWhenValueMissing="Please Select Approval Hierarchy" value="{!v.selectedValue}">
+                                           
+                                            <aura:iteration items="{!v.solList}" var="wrap">
+                                                <option value="{!wrap.value}" text="{!wrap.label}" selected="{!v.creditofficerList.label == wrap}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                    
+                                    <lightning:button class="slds-theme--alt-inverse" aura:id="doneButtonId" name="doneButton" variant="brand" label="Done" onclick="{!c.sendApprMail}" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                    <lightning:button class="slds-theme--alt-inverse" aura:id="cancelButtonId" name="cancelButton" variant="brand" label="Cancel" onclick="{!c.Cancel}" disabled="{!v.stageName== 'Post Approval Sales'?false:true}"/> <!-- CR 22307 -->
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+        </ui:scrollerWrapper>
+    </div>
+</aura:component>

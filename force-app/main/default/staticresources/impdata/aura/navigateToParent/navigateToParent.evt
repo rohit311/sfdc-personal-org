@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="display" type="Boolean"/>
+    <aura:attribute name="view" type="String"/>
+    <aura:attribute name="showgrabcomp" type="Boolean"/>
+    <aura:attribute name="productOfferingId" type="String"/>
+</aura:event>

@@ -1,0 +1,87 @@
+<aura:component controller="SalariedInsuranceCntrl" implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <aura:attribute name="openSection" type="String" default="CustInfo"/>
+    <aura:attribute name="customer" type="Object" default=""/>
+    <aura:attribute name="merMap" type="Object" default=""/>
+    <aura:attribute name="leadObj" type="Object" default=""/>
+    <aura:attribute name="insObj" type="Object" default=""/>
+    <aura:attribute name="products" type="List" default=""/>
+    <aura:attribute name="premLst" type="List" default=""/>
+    <aura:attribute name="sumAsrLst" type="List" default=""/>
+    <aura:attribute name="totalAmt" type="String" default=""/>
+    <aura:attribute name="cityList" type="List" default=""/>
+    <aura:attribute name="tenorList" type="List" default=""/>
+    <aura:attribute name="cityLst" type="List" default=""/>
+    <aura:attribute name="currentDate" type="String" default=""/>
+    <aura:attribute name="FFRAmt" type="String" default=""/>
+    <aura:attribute name="payRequest" type="String" default=""/>
+    <aura:attribute name="payRecord" type="String" default=""/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isNew" type="Boolean" default="false"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>    
+    <aura:attribute name="isFromHomePg" type="Boolean" default="false"/>
+    <aura:attribute name="isPayLinkSend" type="Boolean" default="false"/><!-- CR 24406 -->
+    <aura:attribute name="isdataChanged" type="boolean" default="false"/><!-- CR 24406 -->
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToParent"/> <!-- CR 24286 -->
+    <aura:handler name="shareSearchInfo" event="c:shareSearchInfo" action="{!c.handleShareEvent}"/>
+    <aura:handler name="shareLeadInfo" event="c:shareLeadInfo" action="{!c.handleLeadShareEvent}"/>
+    <aura:handler name="sharePaymentInfo" event="c:sharePaymentInfo" action="{!c.handlePayShareEvent}"/><!-- CR 24406 -->
+    <aura:handler name="shareCibilInfo" event="c:shareCibilInfo" action="{!c.handleCibilShareEvent}"/><!-- CR not given -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!-- CR 24286 start -->
+    <aura:if isTrue="{!v.isFromHomePg}">
+        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <div class="slds-form-element__control">
+                <lightning:button aura:id="BackButtonId" iconName="utility:back" class="slds-theme_alt-inverse" variant="brand" label="Back" onclick="{!c.sendback}" />
+            </div>
+        </div>
+    </aura:if>
+    <!-- CR 24286 stop -->
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <div style="position:relative;overflow-y:scroll !important;min-height:80vh;overflow-x:hidden !important" class="" aura:id="StandAloneDiv">
+            <div class="slds-page-header slds-align_absolute-center slds-text-heading_medium">
+                <strong>Standalone Cross Sell for SAL/PL</strong>             
+            </div>
+            
+            <div class="slds-col slds-size_1-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12 slds-float_right">
+                <a id="info" onclick="{!c.openDashboard}" href="" style="text-decoration: none;">
+                    <lightning:icon iconName="utility:info" />
+                </a>
+            </div>
+            <hr/>
+            <br/>
+            <lightning:accordion aura:id="accordion" activeSectionName="{!v.openSection}">
+                
+                <lightning:accordionSection aura:id="CustInfoId" name="CustInfo" label="Internal Search" >
+                    <c:CustomerSearch/>
+                </lightning:accordionSection>
+                
+                <lightning:accordionSection class="slds-hide" aura:id="CustdetailsId" name="Custdetails" label="Customer Details" >
+                    
+                    <c:CustomerDetailsCmp aura:id="detailsCmp" customer="{!v.customer}" currentDate = "{!v.currentDate}" cityList="{!v.cityList}" cityLst="{!v.cityLst}" isPayLinkSend="{!v.isPayLinkSend}"/><!--CR 24406 added isPayLinkSend -->
+                </lightning:accordionSection>
+                <lightning:accordionSection class="slds-hide" aura:id="ProddetailsId" name="Proddetails" label="Product Details" >
+                    <c:ProductDetailsCmp aura:id="ProdDetailsCmp" products="{!v.products}" premLst="{!v.premLst}" sumAsrLst="{!v.sumAsrLst}" leadObj="{!v.leadObj}" tenorList="{!v.tenorList}" FFRAmt="{!v.FFRAmt}" totalAmt="{!v.totalAmt}" payRequest="{!v.payRequest}" payRecord="{!v.payRecord}" merMap="{!v.merMap}" isdataChanged="{!v.isdataChanged}"/> <!-- Added isdataChanged for CR 24406 -->
+                </lightning:accordionSection>
+                
+            </lightning:accordion>
+            <div>{!v.body}</div> 
+        </div>
+        
+    </ui:scrollerWrapper>
+    
+</aura:component>

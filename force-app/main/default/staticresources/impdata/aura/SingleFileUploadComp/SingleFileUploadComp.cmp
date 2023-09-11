@@ -1,0 +1,89 @@
+<aura:component controller="BLMobilityController">
+	<ltng:require scripts="{!$Resource.PO_APP_EXIF}"/>
+	<aura:attribute name="instance" type="String"/>
+	<aura:attribute name="fileName" type="String" default="No file chosen"/>
+	<aura:attribute name="isUploaded" type="Boolean" default="false"/>
+	<aura:attribute name="allowUpload" type="Boolean" default="false"/>
+	<aura:attribute name="filePrefix" type="String"/>
+	<aura:attribute name="parentId" type="String"/>
+	<aura:attribute name="latitude" type="Object" default="null"/>
+    <aura:attribute name="longitude" type="Object" default="null"/>
+    <aura:attribute name="uploadType" type="String" default="null"/>
+    <aura:method name="doUpload" action="{!c.doUpload}" />
+    <aura:method name="refresh" action="{!c.init}" />
+	<aura:attribute name="isconvert" type="boolean"/>
+    <aura:handler event="c:BLMobilityPOCardEvent" action="{!c.showOfferData}"/>
+	<aura:registerEvent name="GridRefresh" type="c:SingleFileGridRefreshEvt"/>
+	<aura:registerEvent name="enableSubmitButtonEvent" type="c:EnableSubmitButtonEvent"/>
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	
+	<div class="slds">
+        <div class="slds-form-element slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+            <div class="slds-form-element__control ">                  
+                <div class="slds-file-selector slds-file-selector--files">
+                    <div class="slds-file-selector__dropzone">
+                        <input disabled = "{!v.isUploaded}" type="file" accept="image/*"  aura:id="file-upload-input" id="{!'file_'+v.instance}" class="slds-file-selector__input slds-assistive-text" aria-describedby="file-selector-id" onchange="{!c.onFileSelect}"/>
+                        <label class="slds-file-selector__body" for="{!'file_'+v.instance}">
+                             <span class="slds-file-selector__button slds-button slds-button--neutral inputSelector" >
+                                <lightning:icon iconName="utility:upload" size="x-small" alternativeText="Upload File" class="slds-p-right--small uploader"/>
+                                Choose File 
+                            </span>
+                        </label>
+                    </div>
+                </div>
+			</div>
+		</div>
+        	<ui:outputText aura:id="latitude" class="slds-file-selector__text" value=""/>
+            <ui:outputText aura:id="longitude" class="slds-file-selector__text" value=""/>
+        <aura:if isTrue="{!v.uploadType == 'feed'}">
+        <div class="slds-hide">
+		<div aura:id="lat-log-div" class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hide">
+              <ui:outputText aura:id="lat-log" class="slds-file-selector__text" value=""/>
+        </div></div>
+        </aura:if>
+        <aura:renderIf isTrue="{!v.uploadType != 'feed'}">
+		<div class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+              <ui:outputText aura:id="file-name" class="slds-file-selector__text" value="No file chosen"/>
+        </div>
+        </aura:renderIf>
+        <div class="slds-hide">	
+            <ui:inputText aura:id="Declattitude" class="slds-hide"/>
+            <ui:inputText aura:id="Declongitude" class="slds-hide"/>
+            <ui:inputText aura:id="Binarystring" class="slds-hide"/>
+        </div>
+        <aura:if isTrue="{! !v.isUploaded}">
+	        <div class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+				<div aura:id="previewBlock" class = "slds-hide">
+			        <div style="max-width:100px">
+			            <img class="image slds-p-top--small " aura:id="imagePreview" src=""/>
+					</div>
+				</div>
+	        </div>
+	        
+	        <div class="slds-p-top--small">
+				<aura:if isTrue="{!v.allowUpload}">
+					<aura:if isTrue="{!v.uploadType != 'feed'}">
+                        <aura:renderIf isTrue="{!!v.isconvert}">
+							<lightning:button aura:id="saveButtonId" variant="brand" label="Upload" onclick="{!c.save}" />
+						</aura:renderIf>
+                    </aura:if>
+		        </aura:if>
+                <aura:renderIf isTrue="{!!v.isconvert}">
+	            	<lightning:button aura:id="cancelButtonId" variant="brand" label="Cancel" onclick="{!c.reset}" />
+                </aura:renderIf>
+			</div>
+		</aura:if>
+		<div aura:id="customToast" class="slds-notify_container slds-hide">
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+            </div>
+        </div>
+        </div>
+	<div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+</aura:component>

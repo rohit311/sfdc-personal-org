@@ -1,0 +1,6 @@
+<aura:component >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    
+    <p>button</p>
+    {!v.body}
+</aura:component>

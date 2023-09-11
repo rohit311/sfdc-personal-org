@@ -1,0 +1,15 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId">
+	<lightning:card title="Display, Create, or Edit Records">
+        
+        <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="Account">
+            <lightning:messages />
+            <lightning:inputField fieldName="Name" />
+            <lightning:button class="slds-m-top_small" type="submit" label="Create new" />
+        </lightning:recordEditForm>
+        
+        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="Account">
+            <lightning:messages />
+            <lightning:outputField fieldName="Name" />
+        </lightning:recordViewForm>
+    </lightning:card>
+</aura:component>

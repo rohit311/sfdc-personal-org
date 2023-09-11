@@ -1,0 +1,71 @@
+<aura:component controller="OpportunityDetailsOperator">
+
+    <!-- -+-+-+-+-+-+-+ Employee Loan 20934	Start -+-+-+-+-+-+-+-+-+-+ -->
+    <aura:method name="employeeLoanDirectCall" action="{!c.onInitiateEmandate}" />
+    <aura:attribute name="employeeLoanFlag" type="Boolean"  default = "true" /><!--20934 -->
+    <!-- -+-+-+-+-+-+-+ Employee Loan 20934 Stop-+-+-+-+-+-+-+-+-+-+ -->
+
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- -+-+-+-+-+-+-+ START: Attribute declaration -+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="id" type="Id" />
+    <aura:attribute name="rObj" type="RePayment_mode_detail__c" />
+	<aura:attribute name="isDisabled"   type="Boolean"  default = "false" />    
+    <aura:attribute name="showSpinner"  type="Boolean"  default = "false" />
+    <aura:attribute name="renderButton" type="Boolean"  default = "false"  />
+    <aura:attribute name="mobilityFlag" type="Boolean"  default = "false" />
+   <!-- <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>-->
+     <!-- Added for Emandate 20902 -->
+    <aura:attribute name="mandateProcessStage" type="String" />
+    
+    <!-- Added for Emandate 20902 -->
+    <aura:attribute name="posLaFlag" type="Boolean"  default = "false" />
+    <aura:attribute name="eMandateButtonClass" type="String"  default = "slds-theme--alt-inverse" />
+     <!-- <c:Custom_Toast_Mobility />-->
+	<!-- -+-+-+-+-+-+-+ END  : Attribute declaration -+-+-+-+-+-+-+-+-+-+ -->
+   
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div aura:id="customToast" class="slds-notify_container slds-hide" style="IF(!$Browser.isPhone,'margin-top:100% !important;z-index:300;','')" >
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert" >
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">  
+                            <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ --> 
+    <aura:if isTrue = "{! v.showSpinner }">
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Sending SMS...Please wait!" /> -->
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+  
+    
+    <!-- -+-+-+ Initiate E_Mandate Button - Show only if Product is enabled +-+-+-+-+-+-+- -->
+    <aura:if isTrue="{!v.renderButton}">
+          <aura:if isTrue="{!v.employeeLoanFlag}">    <!--20934 -->  
+    	<lightning:button aura:id="eMandateButton"  label="Initiate E-Mandate"  class="{!v.eMandateButtonClass}"  variant="brand" 
+                            value="{!v.id}"             onclick="{! c.onInitiateEmandate }" 
+                            disabled = "{! v.isDisabled }"
+                            />
+       </aura:if>
+    </aura:if>
+    <!-- -+-+-+ Initiate E_Mandate Button - Show only if Product is enabled +-+-+-+-+-+-+- -->
+    
+</aura:component>

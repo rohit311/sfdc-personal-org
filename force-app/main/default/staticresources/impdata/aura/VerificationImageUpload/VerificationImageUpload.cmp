@@ -1,0 +1,148 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="VerificationImageUploadCntrl">
+	<ltng:require scripts="{!$Resource.PO_APP_EXIF}"/>
+    
+    <!-- Bug 15855 - Changed parentId Attribute to verificationId
+	<aura:attribute name="parentId" type="Id"/>
+	-->
+    <aura:attribute name="creditStatusVer" type="List"/>
+    <aura:attribute name="flowV3forPricing" type="String"/> <!--17556 -->
+    <aura:attribute name="flowV2" type="String" default=""/><!--17138 -->
+    <aura:attribute name="flow" type="String" default=""/><!--17138 -->
+    <aura:attribute name="isUnderwitercmp" type="Boolean" default="false" /><!--17138 -->
+	<aura:attribute name="verificationId" type="Id"/> <!-- Bug 15855-->
+    <aura:attribute name="applicantList" type="String[]" default="All Contacts,Others"/>
+    <aura:attribute name="selectedApplicant" type="String" />
+    <aura:attribute name="credStatus" type="List"/> <!--17138 removed select value below-->
+    <aura:attribute name="verificationType" type="String[]" default="Residence Verification,Office Verification"/>
+    <aura:attribute name="selectedVerification" type="String" />
+    <!--<aura:attribute name="salesStatus" type="String[]" default="Select,Positive,Deferral,Negative"/>--> 
+    <aura:attribute name="salesStatus" type="String[]" default="Positive,Deferral,Negative"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute name="loanApplicationId" type="Id" default=""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:attribute name="selectedStatus" type="String" />
+    
+    <!--Bug 15855 S - December_2017_CPV for PRO - Hemant Keni -->
+    <aura:attribute name="parentObj" type="String" default="OPP"/>	
+    <!--Bug 15855 E -->
+    
+    <!--	YK event listener to check if image is browsed or not	-->
+    <aura:registerEvent name="verificationInsertEvent" type="c:VerificationInsertEvent"/>
+    <aura:registerEvent name="UpdateVerificationList" type="c:UpdateVerificationList"/><!-- Bug 15855 - Hemant Keni -->
+    <aura:handler event="c:FileBrowseEvent" action="{!c.countFilesBrowsed}"/>
+    <aura:handler event="c:EnableSubmitButtonEvent" action="{!c.enableSubmitButton}"/>
+     <aura:handler event="c:LoanConversionEvent" action="{!c.disableSubmitButton}"/>
+    
+    <aura:attribute name="showSubmitButtonFlag" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- Bug 15855 S - Hemant Keni - Showing Verifications List  -->
+      
+    <!--Bug 15855 S added by pratik -->
+    <ui:scrollerWrapper class="scrollerSize"> 
+        <div>
+            <!--17556 added flowV3forPricing -->
+            <c:VerificationsList creditStatus="{!v.creditStatusVer}" displayReadOnly="{!v.displayReadOnly}" stageName="{!v.stageName}" flowV3forPricing="{!v.flowV3forPricing}" isUnderwitercmp="{!v.isUnderwitercmp}" credStatus="{!v.credStatus}" salesStatus="{!v.salesStatus}" flow="{!v.parentObj}" flowV2="{!v.flowV2}" parentId="{!v.loanApplicationId}" verificationType="{!v.verificationType}"/>
+        </div> 
+    </ui:scrollerWrapper>
+    <!-- Bug 15855 E -->
+    <div class="{!if(v.isUnderwitercmp,'slds-hide','slds-show')}"> 
+    <div class="{!if(and(v.verificationType.length == 0 ,v.flowV2 == 'mobilityV2'),'slds-hide','slds-show')}"> 
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div>
+						<!--Bug 15855 S -->
+                        <aura:if isTrue="{!v.parentObj == 'PO'}">
+                            <ui:outputText value="Lead Applicant :"/>
+                            <aura:set attribute="else">
+                        		<ui:outputText value="Applicant :"/>
+                            </aura:set>
+                        </aura:if> 
+						<!--Bug 15855 E -->      
+                        <ui:inputSelect aura:id="applicant_Select" change="{!c.onApplicantChange}" >
+                            <aura:iteration items="{!v.applicantList}" var="app">
+                                <ui:inputSelectOption text="{!app}" label="{!app}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div>
+                        Verification Type:
+                        <ui:inputSelect aura:id="verificationType_Select" change="{!c.onVerificationChange}">
+                         <ui:inputSelectOption text="--Select--" label="--Select--"/>
+                            <aura:iteration items="{!v.verificationType}" var="verification">
+                                <ui:inputSelectOption text="{!verification}" label="{!verification}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Bug 15855 S -->
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <c:DocumentUploader flow="{!v.flow}" poId="{!v.loanApplicationId}" parentId="{!v.verificationId}" aura:id="file-uploader-11" instance="11" fileName="Premise_Picture1" uploadType="feed" displayUpload="false" uploadImageFilesOnly="true" showUploadButton="false" isFromCPV = "true" selectFileErrorFlag = "true"/><!-- Need to add showUploadButton="false" -->
+        </div>
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <c:DocumentUploader flow="{!v.flow}" poId="{!v.loanApplicationId}" parentId="{!v.verificationId}"  aura:id="file-uploader-12" instance="12" fileName="Premise_Picture2" uploadType="feed" displayUpload="false" uploadImageFilesOnly="true" showUploadButton="false" isFromCPV = "true" selectFileErrorFlag = "true"/><!-- Need to add showUploadButton="false" -->
+        </div>        
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <c:DocumentUploader flow="{!v.flow}" poId="{!v.loanApplicationId}" parentId="{!v.verificationId}" aura:id="file-uploader-13" instance="13" fileName="Premise_Picture3" uploadType="feed" displayUpload="false" uploadImageFilesOnly="true" showUploadButton="false" isFromCPV = "true" selectFileErrorFlag = "true"/><!-- Need to add showUploadButton="false" -->
+        </div>
+        <!--Bug 15855 E -->
+        <div style="padding-top: 30px; padding-left: 20px;">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div>
+                        Visit Status:
+                        <ui:inputSelect aura:id="salesStatus_Select" change="{!c.salesStatusChange}">
+                            <ui:inputSelectOption text="--Select--" label="--Select--" />
+                            <aura:iteration items="{!v.salesStatus}" var="salesStatusText">
+                                <ui:inputSelectOption text="{!salesStatusText}" label="{!salesStatusText}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+		<aura:renderIf isTrue="{!v.showSubmitButtonFlag}">
+            <div style="padding-top: 60px; padding-left: 20px;padding-bottom: 100px" class="slds-p-top--large">
+                <lightning:button aura:id="saveButtonId" variant="brand" label="Submit" onclick="{!c.saveData}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </aura:renderIf>
+        
+        <!-- Below Breaklines are commented for bug 15858 - Hemant Keni - For Mobility 
+  			<br/><br/><br/><br/><br/> 
+  		-->
+       <!-- <aura:if isTrue = "{!v.flow != 'mobilityV2'}">-->
+        <div aura:id="customToast" class="slds-notify_container slds-hide">
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close closeicon" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--   </aura:if>-->
+    </div>
+    </div>
+</aura:component>

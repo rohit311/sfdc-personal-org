@@ -1,0 +1,104 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+ access="global"  controller="SAL20_DisbController">
+	<!-- +-+-+-+-+-+-+-+- START : Attributes +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<aura:attribute name="record" type="Object" />
+	<aura:attribute name="simpleRecord" type="Object" />
+	<aura:attribute name="recordError" type="String" />
+	<aura:attribute name="oId" type="String" />
+	<aura:attribute name="appRecordId" type="String"  />
+	
+	<aura:attribute name="optionsNC" type="List" description="To hold the picklist values for Note code"/>
+	<aura:attribute name="optionsPT" type="List" description="To hold the picklist values for Payment type"/>
+	<aura:attribute name="isProcessing" type="Boolean" default="false" />
+
+    <aura:handler name="init"  value="{!this}"  action="{! c.onInit }" />
+
+	<force:recordData 	aura:id="recordHandler" 
+						recordId="{!v.appRecordId }" 
+						fields = "Note_code__c , Note_details__c, Payment_type__c, Cross_Collateral_LAN__c"
+						targetRecord="{!v.record}" 
+						targetFields="{! v.simpleRecord }"
+						targetError="{!v.recordError}" 
+						mode="EDIT" 
+						/>
+	<!-- +-+-+-+-+-+-+-+- END  : Attributes  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+
+	<!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+	<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+		<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Credit Status</h1>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+
+	<!-- +-+-+-+-+-+-+ START: Body/Content part +-+-+-+-+-+-+  -->			
+	<aura:if isTrue="{! v.isProcessing }">
+		<lightning:spinner  size="large"/>
+	</aura:if>
+
+	<table class=" slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+		<thead>
+			<tr class="slds-text-title_caps">
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Note Code">Note Code</div>
+				</th>
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Note Details">Note Details</div>
+				</th>
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Payment Type">Payment Type</div>
+				</th>
+                <th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Cross Collateral LAN">Cross Collateral LAN</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<lightning:select name="selectNC" label="" value="{! v.simpleRecord.Note_code__c }">
+						<aura:iteration items="{!v.optionsNC}" var="oNC">
+							<option value = "{!oNC.value}" 
+									label = "{!oNC.label}" 
+									selected = "{! oNC.value ==  v.simpleRecord.Note_code__c }"
+									/>
+						</aura:iteration>
+					</lightning:select>
+				</td>
+				<td>
+					<lightning:input label=" " maxlength="255" type="text" placeholder="Note Details" value="{! v.simpleRecord.Note_details__c }" />
+				</td>
+				<td>
+					<lightning:select name="selectPT" label="" value="{! v.simpleRecord.Payment_type__c }">
+						<aura:iteration items="{!v.optionsPT}" var="oPT">
+							<option value="{!oPT.value}" label="{!oPT.label}" 
+							selected="{! oPT.value ==  v.simpleRecord.Payment_type__c }" />
+						</aura:iteration>
+					</lightning:select>
+				</td>
+                <td>
+                    <lightning:input label=" " maxlength="20" type="text" placeholder="Cross Collateral LAN" value="{! v.simpleRecord.Cross_Collateral_LAN__c }" />
+                </td>
+			</tr>
+			<tr>
+				<td></td>
+				<td class="slds-align_absolute-center">
+					<lightning:button 	variant="brand" 
+										label="Save Credit Status" 
+										title="Save Credit Status" 
+										disabled="{! v.isProcessing }"
+										onclick="{!c.handleSaveRecord}" />
+				</td>
+				<td></td>
+                <td></td>
+			</tr>
+		</tbody>
+	</table>
+	<!-- +-+-+-+-+-+-+ END : Body/Content part +-+-+-+-+-+-+  -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->    
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+	<!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

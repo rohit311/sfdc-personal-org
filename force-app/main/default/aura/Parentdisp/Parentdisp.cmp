@@ -1,0 +1,6 @@
+<aura:component >
+    <aura:attribute name="p1" type="Parent1__c" required="true"/>
+    
+    <ui:outputText value="{!v.p1.Name}"/>
+    <ui:outputText value="{!v.p1.Occupation__c}"/>
+</aura:component>

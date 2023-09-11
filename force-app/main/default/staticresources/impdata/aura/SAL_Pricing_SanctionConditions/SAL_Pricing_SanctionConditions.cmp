@@ -1,0 +1,68 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="Status__c" type="List"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:handler name="AddRowEvt" event="c:SAL_Opp_PerfiosEvent" action="{!c.addNewRow}"/> 
+    <aura:attribute name="callChilddoinit" type="boolean" default="false"/>
+    <aura:attribute name="discrepancy" type="Discrepancy__c"/>
+    <aura:attribute name="discrepancyList" type="Discrepancy__c[]"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="flow" type="String" default="pricing"/>
+    <aura:attribute name="loan" type="Opportunity"/>
+    <!--aura:handler name="init" value="{!this}" action="{!c.doInit}"/-->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="loanid" type="ID" default="" /> 
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->	
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+
+    <aura:attribute type="Boolean" name="isDisbDashboard" default="false"/> <!--Bug 20391 -->
+    
+    <!-- 20391 heading ***S*** -->
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{!v.isDisbDashboard == true}">
+		<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Sanction Conditions</h1>
+		</div>
+    </aura:if>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    <!-- 20391 heading ***E*** -->
+    
+    
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" style="background: #f4f6f9;" >
+         <aura:if isTrue="{!empty(v.discrepancyList)}"> <!--   22307 {!and(v.loan.StageName == 'Post Approval Sales',(empty(v.discrepancyList)))}-->
+        <ui:message severity="warning" closable="false">
+            <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+            <span> No records present currently </span>
+        </ui:message>
+         </aura:if>
+        <aura:iteration items="{!v.discrepancyList}" var="discrepancy" indexVar="index">
+            <c:SAL_Pricing_SanctionRecord displayReadOnly="{!v.displayReadOnly}" Status__c="{!v.Status__c}" instance="{!index}" aura:id="bankListCmp" discrepancy="{!discrepancy}"
+                                      loan="{!v.loan}" discrepancyList="{!v.discrepancyList}" loanid="{!loanid}" rowIndex="{!index}" />
+        </aura:iteration>
+        <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+            <aura:if isTrue="{!v.flow == 'credit'}"> <!-- 22307 {!v.loan.StageName != 'Post Approval Sales'} -->
+            <lightning:button variant="brand" label="Add Record" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{! c.addNewRow }" disabled="{!or(v.displayReadOnly,and(v.flow == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+             </aura:if>
+            <lightning:button variant="brand" aura:id="saveSanc" label="Save Sanction Details" class="{!if(v.discrepancyList.length == 0,'slds-theme--alt-inverse slds-hide','slds-theme--alt-inverse slds-show')}" iconName="utility:save" iconPosition="left" onclick="{! c.SaveSanctionDetails }" disabled="{!or(v.displayReadOnly,and(v.flow == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+        </div>
+    </div>
+
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+    	<lightning:card class="applyColor" title="Existing Discrepancies List">
+            <c:SAL_Pricing_Dicrepancies Status__c="{!v.Status__c}" loan="{!v.loan}" existingDisList="{!v.existingDisList}" />
+             <aura:if isTrue="{!(empty(v.existingDisList))}">  <!-- 22307  {!and(v.loan.StageName == 'Post Approval Sales',(empty(v.existingDisList)))} --> 
+          <ui:message severity="warning" closable="false">
+            <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+            <span> No records present currently </span>
+           </ui:message>
+         </aura:if>
+        </lightning:card>
+    </div>    
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

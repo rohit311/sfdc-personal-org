@@ -1,0 +1,276 @@
+<aura:component controller="InsMainCtrl" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">    <!--Attributes-->
+
+    <!--Attributes -->
+    <aura:attribute name="tileId" type="String" />
+    <aura:attribute name="ListCustomer" type="CUSTOMER_INFO__c[]" default=""/>
+    <aura:attribute name="ListMem" type="Service_To_Sales__c[]" default=""/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="5"/>
+    <aura:attribute name="PaginationList" type="Object[]" default=""/>
+    <aura:attribute name="InsMainFlag" type="Boolean" default="true"/>
+    <!--<aura:attribute name="custid" type="CUSTOMER_INFO__c" default=""/>-->
+    <aura:attribute name="isSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute name="searchList" type="Object[]" default=""/>
+    <aura:attribute name="fltrList" type="Object[]" default=""/>
+    
+    <aura:attribute name="tileName" type="String" />
+    <aura:attribute name="totalRec" type="String" />
+    <aura:attribute name="objParam" type="Object"/>
+    <aura:attribute name="childParam" type="Object"/>
+    <aura:attribute name="openCustDetails" type="Boolean" default="false"/>
+    <aura:attribute name="showFltrSec" type="Boolean" default="false"/>
+	<aura:attribute name="FilterObj" type="Map" default="{}"/>
+	<aura:attribute name="lstLeadSource" type="String[]"/>
+	<aura:attribute name="lstDisposition" type="String[]"/>
+	
+	
+    <!--Handlers-->
+    <aura:handler name="init" action="{!c.initMainCmp}" value="{!this}"/>
+    <aura:registerEvent name="INSHomePgEvent" type="c:INS_GoToHomePgEvent"/>
+    <aura:handler name="INSMainCmpvent" event="c:INS_GoToMainCMP" action="{!c.handleMainCmpEvt}"/>
+    
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <aura:if isTrue="{!v.isSpinner}">
+                <lightning:spinner variant="brand"  size="large" class=""/>
+            </aura:if>
+        <aura:if isTrue="{!v.InsMainFlag}">
+           
+            <div style="margin-left: 10px; margin-top:5px;">
+				<div class="slds-p-horizontal--small slds-theme_shade slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-left: 14px;margin-right: 14px;  ">
+					<div class="slds-grid slds-wrap slds-grid--pull-padded" style="margin-top: 7px;">
+						
+					  <div class="slds-col--padded slds-size--1-of-3 slds-medium-size--2-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<lightning:button variant="brand"  label="Back" aura:id="back_btn" onclick="{!c.backToHome}" class="slds-theme--alt-inverse slds-float_left bckBtnClass" title="Back"> 
+								<lightning:icon iconName="utility:back" title="Back" size="x-small" variant="inverse"/>
+								</lightning:button>
+							</div>
+						</div>
+						<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--2-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<div  class="slds-align_absolute-center  slds-text-heading_small"><b>{!v.tileName}</b></div>
+							</div>
+						</div>
+						<div class="slds-col--padded slds-size--1-of-3 slds-medium-size--2-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<div  class="slds-text-align_right slds-text-heading_small"><b>{!v.totalRec}</b></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+                <div class="slds-grid slds-wrap ">
+                    <div class="slds-col--padded slds-p-top_xx-small slds-size_2-of-3 slds-medium-size--4-of-6 slds-large-size--6-of-12">
+						
+						<div class="slds-form-element slds-input-has-icon slds-input-has-icon_right">
+						<lightning:input aura:id="searchText" label="" name="searchText" value="{!v.searchText}" placeholder="Search Text" ></lightning:input>
+						<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right " title="Clear" onclick = "{!c.clearSearch}" style="margin-top: 2px;" >
+						<lightning:icon iconName="utility:clear" title="Clear" size="x-small" variant="warning" />
+						</button>
+						</div>
+						
+                      
+                    </div> 
+                    <div class="slds-col--padded slds-p-top_xx-small slds-p-left_xxx-small slds-size--1-of-3 slds-medium-size--1-of-6 slds-large-size--6-of-12">
+                        <div class="slds-form-element__control " style="margin-top: 19px">
+                            <lightning:button variant="brand" class="slds-theme--alt-inverse" aura:id="search_btn" onclick="{!c.searchCust}" title="Search" > <lightning:icon iconName="utility:search" title="Search" size="x-small" variant="inverse"/>
+                            </lightning:button>  
+							<lightning:button variant="brand" class="slds-theme--alt-inverse" aura:id="filter_btn" onclick="{!c.filterCust}" title="Filter" > <lightning:icon iconName="utility:filterList" title="Filter" size="x-small" variant="inverse"/>
+                            </lightning:button>  
+                        </div>
+						 
+                    </div>
+					
+					
+				</div>
+				
+				<!--Filter Section -->
+				<aura:if isTrue="{!v.showFltrSec}">
+					<div class="slds-grid slds-wrap"> 
+						<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<lightning:input aura:id="idPincode" name="Pincode" value="{!v.FilterObj.pincode}" label="PinCode" placeholder="PinCode" pattern="^[1-9][0-9]{5}$" messageWhenPatternMismatch="Please Enter valid PinCode"/>
+							</div>
+						</div>
+						<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+							<lightning:select aura:id="idLeadSrc" name="Lead Source" label="Lead Source" value="{!v.FilterObj.leadSource}">
+								<option value="">-- None --</option>
+								<aura:iteration items="{!v.lstLeadSource}" var="strLdSrc">
+									<option value="{!strLdSrc}" text="{!strLdSrc}" selected="{!v.FilterObj.leadSource == strLdSrc}"></option>
+								</aura:iteration>
+							</lightning:select>
+							</div>
+						</div>
+						<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+								<lightning:input aura:id="idCustSeg" name="custSeg" value="{!v.FilterObj.custSeg}" label="Customer Segment" placeholder="Customer Segment" />
+							</div>
+						</div>
+						<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+							<lightning:select aura:id="idDispo" name="Disposition" label="Disposition" value="{!v.FilterObj.Disposition}">
+								<option value="">-- None --</option>
+								<aura:iteration items="{!v.lstDisposition}" var="strDispo">
+									<option value="{!strDispo}" text="{!strDispo}" selected="{!v.FilterObj.Disposition == strDispo}"></option>
+								</aura:iteration>
+							</lightning:select>
+							</div>
+						</div>
+						<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+							<div class="slds-form-element__control">
+							<lightning:select aura:id="idLeadType" name="Lead Type" label="Lead Type" value="{!v.FilterObj.LeadType}" >
+								
+								<option value="New Lead">New Lead</option>
+								<!--<option value="NTB Lead">NTB Lead</option>-->
+								
+							</lightning:select>
+							</div>
+						</div>
+						
+					</div>
+					<div class="slds-p-top--xx-small slds-align_absolute-center">
+						<button class="slds-button slds-button_brand slds-theme--alt-inverse" aura:id="idApplyBtn" onclick="{!c.applyFilter}" title="Apply">Apply</button>
+						
+						<button class="slds-button slds-button_brand slds-theme--alt-inverse" aura:id="idRemvBtn" onclick="{!c.removeFilter}" title="Remove">Remove</button>
+					</div>
+				
+				</aura:if>
+               
+                <aura:if isTrue="{!v.PaginationList.length > 0}">
+                    <aura:iteration items="{!v.PaginationList}" var="Obj" indexVar="objectIndex">
+                        
+                        <div class="slds-p-horizontal--small slds-p-top--x-small">
+                            <div class="slds-grid slds-wrap">
+                                <div class=" slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                                    <aura:if isTrue="{!Obj.type == 'Customer'}">
+                                      <lightning:card>
+                                       
+                                            <!-- <dl class="slds-list_horizontal slds-wrap"> -->
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer ID"><b>Customer ID:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Name}">{!Obj.Name}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer Name"><b>Customer Name:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.First_Name__c + ' ' + Obj.Last_Name__c}">{!Obj.First_Name__c + ' ' + Obj.Last_Name__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Mobile"><b>Mobile:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Mobile__c}">{!Obj.Mobile__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Lead Source"><b>Lead Source:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Lead_Source__c}">{!Obj.Lead_Source__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer Segment"><b>Customer Segment:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Bureau_Segment__c}">{!Obj.Bureau_Segment__c}</dd>
+                                                </div>
+												<div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer Segment"><b>Wealth Surplus:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Wealth_Surplus__c}">{!Obj.Wealth_Surplus__c}</dd>
+                                                </div>
+												<div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer Segment"><b>Pattern Name:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!Obj.Pattern_Name__c}">{!Obj.Pattern_Name__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Lead Type"><b>Lead Type:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="New Lead">New Lead</dd>
+                                                </div>
+                                            </div>
+											 <div class="slds-p-top--xx-small">
+                                                <button class="slds-button slds-button_brand slds-theme--alt-inverse slds-p-left_x-small" name="{!Obj.Id}" id="cust_prof_btn" aura:id="cust_prof_btn" onclick="{!c.openCustInfo}" title="Profile"><lightning:icon iconName="utility:identity" title="Profile" size="small" variant="inverse"/></button>
+                                                
+                                                <button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="cust_intr_btn" name="{!Obj.Id}" aura:id="cust_intr_btn" onclick="{!c.openCustInfo}" title="Interaction"><lightning:icon iconName="utility:chat" title="Interaction" size="small" variant="inverse"/></button>
+                                                
+                                                <button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="cust_prod_btn" name="{!Obj.Id}" aura:id="cust_prod_btn" onclick="{!c.openCustInfo}" title="Products"><lightning:icon iconName="utility:ad_set" title="Products" size="small" variant="inverse"/></button>
+												
+                                            </div>	
+                                       
+										</lightning:card>
+                                        <aura:set attribute="else">
+                                            <lightning:card>
+                                                <dl class="slds-list_horizontal slds-wrap">
+                                                    
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Name"><b>Name</b></dt>
+                                                    <dd class="slds-item_detail " title="">{!Obj.First_Name__c + ' ' + Obj.Last_Name__c}</dd>
+                                                    
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Mobile"><b>Mobile</b></dt>
+                                                    <dd class="slds-item_detail " title="{!Obj.Mobile__c}">{!Obj.Mobile__c}</dd>
+                                                    
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Lead Source"><b>Lead Source</b></dt>
+                                                    <dd class="slds-item_detail " title="{!Obj.Lead_Source__c}">{!Obj.Lead_Source__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-p-left_x-small slds-p-bottom_x-small" title="Lead Type"><b>Lead Type</b></dt>
+                                                    <dd class="slds-item_detail " title="NTB Lead">NTB Lead</dd>
+                                                </dl>
+                                                
+                                                <div class="slds-p-top--xx-small">
+                                                    
+                                                    <button class="slds-button slds-button_brand slds-theme--alt-inverse" id ="mem_prof_btn"  name="{!Obj.Id}" aura:id="mem_prof_btn" onclick="{!c.openCustInfo}" title="Profile"><lightning:icon iconName="utility:identity" title="Profile" size="small" variant="inverse"/></button>
+                                                    
+                                                    <lightning:button variant="brand" label="" aura:id="mem_intr_btn" onclick="{! c.openCustInfo }" class="slds-theme--alt-inverse " title="Interaction" ><lightning:icon iconName="utility:chat" title="Interaction" size="small" variant="inverse"/>
+                                                    </lightning:button>  
+                                                    <lightning:button variant="brand" label="" aura:id="mem_prod_btn" onclick="{! c.openCustInfo }" class="slds-theme--alt-inverse " title="Products"><lightning:icon iconName="utility:ad_set" title="Products" size="small" variant="inverse"/>
+                                                    </lightning:button>
+                                                </div>	
+                                                
+                                            </lightning:card>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                </div>
+                            </div>
+                        </div> 
+                    </aura:iteration><br/>
+                    <aura:set attribute="else">
+                        <ui:message severity="warning" closable="false">
+                            <lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+                            <ui:outputText class="slds-text-heading--label" value="No records found currently"/>
+                        </ui:message>
+                        
+                    </aura:set>
+                    
+                    <lightning:buttonGroup class="slds-align_absolute-center">
+                        <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+                                          onclick="{!c.previous}" variant="brand" iconName='utility:back'/> &nbsp; &nbsp; &nbsp;
+                        <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                                          onclick="{!c.next}" variant="brand" iconName='utility:forward' iconPosition='right'/>
+                        
+                    </lightning:buttonGroup>
+                    
+                    <div class="slds-align_absolute-center slds-text-body_regular">
+                        Page {!v.currentPage} of {!v.totalPages}
+                    </div>
+               </aura:if>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.openCustDetails == true}">
+            <c:INS_CustomerDetails objParam = "{!v.childParam}" aura:id="custCmpId"/>
+        </aura:if>
+    </ui:scrollerWrapper>
+ </aura:component>

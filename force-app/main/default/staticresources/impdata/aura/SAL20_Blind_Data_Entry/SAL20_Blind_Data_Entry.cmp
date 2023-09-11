@@ -1,0 +1,343 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="SAL20_DisbController">
+	<!-- +-+-+-+-+-+-+-+- START : Attributes +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<ltng:require scripts="{!$Resource.jquery224}" afterScriptsLoaded="{! c.onInit }" />
+	<aura:attribute name="isOpen" type="boolean" default="false" />
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name="noBlindDataEntry" type="Boolean" description="No blind data entry required for given scheme."  default="false"/>
+
+    <aura:attribute name="oId" type="String"  description="Opportunity Id, required for all processing"/>
+	<aura:attribute name="primaryApplicant" type="Applicant__c"  />
+    <aura:attribute name="opp" type="Opportunity" />
+	<aura:attribute name="repayObj" type="RePayment_mode_detail__c" />
+    <aura:attribute name="pdObj" type="Personal_Discussion__c" />
+
+    <aura:attribute name="optionsDF" type="List" description="To hold the picklist values for Defferal Flag"/>
+    <aura:attribute name="optionsAT" type="List" description="To hold the picklist values for Account type"/>    
+	<!-- +-+-+-+-+-+-+-+- END   : Attributes +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+
+	<!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+	<div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+		<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Blind Data Entry</h1>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+
+	<!-- +-+-+-+-+-+-+ START: Modal part +-+-+-+-+-+-+  -->
+	<div class="slds-m-around_xx-large" id="modalContainer">
+	
+        <!-- START : Check if scheme is allowed to bypass the Blind data entry -->
+        <aura:if isTrue="{! !v.noBlindDataEntry}">
+            <lightning:button variant="brand" label="Blind Data Entry" title="Blind Data Entry" onclick="{! c.openModel }" />
+            <aura:set attribute="else">
+                For the given scheme, no need of Blind data entry. In case of discrepancy, please contact to your administrator!
+            </aura:set>
+        </aura:if>
+        <!-- END : Check if scheme is allowed to bypass the Blind data entry -->
+        
+		<!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->
+		<aura:if isTrue="{!v.isOpen}">
+	
+            <aura:if isTrue="{! v.isProcessing }">
+                <lightning:spinner  size="large"/>
+            </aura:if>
+            
+			<!--###### MODAL BOX Start######-->
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1"
+			 class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container" id="myModal">
+
+					<!-- ###### MODAL BOX HEADER Start ######-->
+					<header class="slds-modal__header">
+						<lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="close" variant="bare-inverse"
+						 class="slds-modal__close" />
+						<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Blind Data Entry</h2>
+					</header>
+					<!--###### MODAL BOX BODY Part Start######-->
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						<table>							
+							<tbody>
+								<tr>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Contact_Name__r.Customer_Type__c == 'Individual' }">
+                                            Date of Birth<abbr style="color:red;">*</abbr>
+                                        </aura:if>
+                                        
+                                        <aura:if isTrue="{! v.primaryApplicant.Contact_Name__r.Customer_Type__c == 'Corporate' }">
+                                            Date of Incorporation<abbr style="color:red;">*</abbr>
+                                        </aura:if>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" " type="date" 
+                                                             aura:id="dob_Val" 
+                                                             value="{! v.pdObj.Date_of_Birth__c  }" 
+                                                             placeholder="{! v.primaryApplicant.Contact_Name__r.Customer_Type__c == 'Corporate' ?'Please enter Date of Incorporation.' : 'Please enter Date of Birth.' }"
+                                                             required="true"															
+                                                             messageWhenValueMissing="{! v.primaryApplicant.Contact_Name__r.Customer_Type__c == 'Corporate' ?'Please fill proper Date of Incorporation.' : 'Please fill proper Date of Birth.' }"
+                                                             messageWhenBadInput="{! v.primaryApplicant.Contact_Name__r.Customer_Type__c == 'Corporate' ?'Please fill proper Date of Incorporation.' : 'Please fill proper Date of Birth.' }"
+                                                             tabindex="1"
+                                                             />
+                                        </aura:if>
+                                        <!--Using different aura:if for more readability instead of using ELSE -->
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Date_of_Birth__c }
+                                        </aura:if>
+									</td>
+								</tr>
+                                
+								<tr>
+									<td>
+										Mobile Number<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Mobile_No__c  }
+                                        </aura:if>
+                                        
+                                        <!--Using different aura:if for more readability instead of using ELSE -->
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	
+                                                             aura:id="mobile_number_Val"
+                                                             value="{! v.pdObj.Mobile_No__c }" 
+                                                             minlength="10"
+                                                             placeholder="Please enter mobile number."
+                                                             required="true"
+                                                             pattern="^([6-9]{1})(\d{9})$"
+                                                             messageWhenPatternMismatch="Please enter correct mobile number."
+                                                             messageWhenValueMissing="Please fill mobile number."
+                                                             tabindex="2"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Email Id
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Email_Id__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input 	label=" " type="email" 
+                                                             aura:id="formId" 
+                                                             placeholder="Please enter Email id."
+                                                             pattern="^[a-z0-9!#$%'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+                                                             value="{! v.pdObj.Email_Id__c }" 
+                                                             messageWhenPatternMismatch="Please enter correct email id."
+                                                             tabindex="3"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Nominee Name
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Nominee_Name__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	type="text" 
+                                                             aura:id="formId"
+                                                             placeholder="Please enter Nominee Name."
+                                                             value="{! v.pdObj.Nominee_Name__c }" 
+                                                             tabindex="3"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										MICR<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.MICR_Number__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	type="number" 
+                                                             aura:id="formId"
+                                                             placeholder="Please enter MICR code."
+                                                             value="{! v.pdObj.MICR_Number__c }" 															
+                                                             required="true"
+                                                             min="99999999"
+                                                             max="1000000000"
+                                                             messageWhenRangeUnderflow="Please enter correct MICR number"
+                                                             messageWhenRangeOverflow="Please enter correct MICR number"
+                                                             messageWhenValueMissing="Please fill MICR code."
+                                                             tabindex="4"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Customer Account Number<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Customer_Account_Number__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	type="text" 
+                                                             aura:id="formId"
+                                                             placeholder="Please enter Customer Account Number."
+                                                             value="{! v.pdObj.Customer_Account_Number__c }" 
+                                                             required="true"
+                                                             messageWhenValueMissing="Please fill customer account number."
+                                                             tabindex="5"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Account Holder Name<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Account_Holder_Name__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	type="text" 
+                                                             aura:id="formId"
+                                                             value="{! v.pdObj.Account_Holder_Name__c }"
+                                                             placeholder="Please enter Account Holder Name."
+                                                             required="true"
+                                                             messageWhenValueMissing="Please fill account holder name."
+                                                             tabindex="6"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Account Type<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Account_Type__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:select	name="selectDF" 
+                                                              	label="" 
+                                                              	aura:id="formId"
+                                                              	value="{! v.pdObj.Account_Type__c }"
+                                                              	required="true"
+                                                              	messageWhenValueMissing="Please choose Account type."
+                                                              	tabindex="7"
+                                                              >
+                                                <aura:iteration items="{!v.optionsAT}" var="oDF">
+                                                    <option value = "{!oDF.value}" 
+                                                            label = "{!oDF.label}" 
+                                                            selected = "{! oDF.value ==  v.pdObj.Account_Type__c }"
+                                                            />
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										IFSC Code<abbr style="color:red;">*</abbr>
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.IFSC_Code__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:input label=" "	type="text" 
+                                                             aura:id="formId" 
+                                                             placeholder="Please enter IFSC code."
+                                                             value="{! v.pdObj.IFSC_Code__c }" 
+                                                             required="true"
+                                                             messageWhenValueMissing="Please fill IFSC code."
+                                                             tabindex="8"
+                                                             />
+                                        </aura:if>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Deferral Flag
+									</td>
+									<td>
+                                        <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            {! v.pdObj.Deferral_Flag__c  }
+                                        </aura:if>
+                                        <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                            <lightning:select	name="selectDF"
+                                                              	label=""
+                                                              	aura:id="formId"
+                                                              	value="{! v.pdObj.Deferral_Flag__c }"
+                                                              	required="true"
+                                                              	messageWhenValueMissing="Please choose Deferral Flag."
+                                                              	tabindex="9"
+                                                              >
+                                                <aura:iteration items="{!v.optionsDF}" var="oDF">
+                                                    <option value = "{!oDF.value}" 
+                                                            label = "{!oDF.label}" 
+                                                            selected = "{! oDF.value ==  v.pdObj.Deferral_Flag__c }"
+                                                            />
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:if>
+									</td>
+								</tr>
+                                <aura:if isTrue="{! and(v.repayObj != NULL , v.repayObj.ECS_Barcode_No__c != NULL) }">
+                                    <tr>
+                                        <td>
+                                            ECS Barcode Number<abbr style="color:red;">*</abbr>
+                                        </td>
+                                        <td>
+                                            <aura:if isTrue="{! v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                                {! v.pdObj.Blind_ECS_Barcode_No__c  }
+                                            </aura:if>
+                                            <aura:if isTrue="{! !v.primaryApplicant.Blind_Data_Entry_Flag__c }">
+                                                <lightning:input label=" "	type="text" 
+                                                                 aura:id="formId"
+                                                                 placeholder="Please enter ECS Barcode Number."
+                                                                 value="{! v.pdObj.Blind_ECS_Barcode_No__c }" 
+                                                                 required="true"
+                                                                 messageWhenValueMissing="Please fill ECS Barcode Number."
+                                                                 tabindex="10"
+                                                                 />
+                                            </aura:if>
+                                        </td>
+                                    </tr>
+                                </aura:if>
+							</tbody>
+						</table>
+					</div>
+					<!--###### MODAL BOX FOOTER Part Start ######-->
+					<footer class="slds-modal__footer">
+						<lightning:button	variant="neutral"
+                                          	label="Close"
+                                          	title="Close"
+                                          	onclick="{! c.closeModel }" 
+                                          />
+						<lightning:button 	variant="brand"
+                                          	label="Save"
+                                          	title="Save"
+                                          	onclick="{! c.SavenClose }"
+                                          	disabled="{! v.primaryApplicant.Blind_Data_Entry_Flag__c  || v.isProcessing}"
+                                          />
+					</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+			<!--###### MODAL BOX Part END Here ######-->
+		</aura:if>
+	</div>
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+	<!-- +-+-+-+-+-+-+ END  : Modal part +-+-+-+-+-+-+  -->	
+	<!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

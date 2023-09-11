@@ -1,0 +1,7 @@
+<aura:component >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+     <aura:attribute name="title" type="String" default="Child2"/>
+     <aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>
+     <aura:handler name="change" value="{!v.num}" action="{!c.valueChanged}"/>
+    <div>Child2</div>
+</aura:component>

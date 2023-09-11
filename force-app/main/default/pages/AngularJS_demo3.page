@@ -1,0 +1,29 @@
+<apex:page docType="HTML-5.0">
+ <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+
+
+  <body ng-app="testapp" ng-controller="MainCtrl as Ctrl">
+  
+     <!--<input type="text" ng-model="name" placeholder="Enter your name"/> -->
+     <h3>Hello {{Ctrl.msg1}}</h3>
+     <br/>
+     <button ng-click="Ctrl.changeMessage()">Click</button>
+  </body>
+<script>
+   angular.module('testapp',[]).controller('MainCtrl',[function(){
+              var self=this;
+              self.msg1='AngularJS';
+              self.changeMessage=function(){
+              
+                if(self.msg1==='Angular JS')
+                {  
+                 self.msg1='VisualForce';
+                 }
+                 else
+                 {
+                    self.msg1='Angular JS';
+                 }
+              };
+   }]);
+</script>
+</apex:page>

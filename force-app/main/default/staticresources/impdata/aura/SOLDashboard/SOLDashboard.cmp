@@ -1,0 +1,128 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="oppObj" type="Opportunity" />
+    <aura:attribute name="stageName" type="String" default=""/>
+    <aura:attribute name="SOLList" type="Sales_Officer_Limit__c[]" />
+    <aura:attribute name="SOLobj" type="Sales_Officer_Limit__c" default="" />
+    
+    <aura:attribute name="selectedSolId" type="String" />
+    <aura:attribute name="solPicDisable" type="boolean" default='false'/>
+      <aura:attribute name="fetchSOLSuccess" type="boolean" default='false'/>
+    <aura:attribute type="Integer" name="currentRating"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <div aura:id="dashboardModel" class="slds-size--12-of-12 slds-align_absolute-center" id="dashboardModelId">    
+        <div aura:id="deviceBasedDiv" id="deviceBasedDiv" role="dialog" tabindex="-1" aria-describedby="MainPopUp" aria-labelledby="header99" class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large align-dashboard':'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large'}">  
+            <div class="slds-modal__container slds-size--12-of-12"  style="overflow:auto;">
+                <div class="slds-modal__header slds-theme_alt-inverse" >
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.onCrossButton}" style="color:white">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium" style="color:white">Business Dashboard </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1">
+                    <ui:scrollerWrapper class="scrollerSize">
+                        <div class="slds-m-left_medium slds-box">
+                            <div class="slds-grid slds-wrap ">
+                                 
+                                <div class="slds-section slds-is-open slds-p-around--x-small slds-small-size_3-of-3  slds-medium-size_2-of-3 slds-large-size_1-of-3">
+                                    <h3 class="slds-section__title">Customer Rating</h3>
+                                    <div class="slds-section__content" style ="pointer-events:none">   
+                                        <aura:if isTrue="{!and(v.fetchSOLSuccess==true,v.SOLobj)}">
+                                            <c:StarRating currentRating="{!v.SOLobj.Customer_Rating__c}"/>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                                <div class="slds-section slds-is-open slds-p-around--x-small slds-small-size_1-of-1 slds-large-size_1-of-3 slds-medium-size_2-of-3">
+                                    <h3 class="slds-section__title">Portfolio Health</h3>
+                                    <lightning:input type="text" class="" name="Portfoliohealth" label="Portfolio Health" value="{!v.SOLobj.Portfolio_Health__c}" disabled="true"/>
+                                </div>
+                                </div>
+                            </div>
+                        <div class="slds-m-left_medium slds-m-top--x-small slds-box">
+                        <article class="slds-card ">
+                        <div class="slds-card__header slds-grid ">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__body">
+                                    <h2 class="slds-card__header-title">
+                                        <span>Sales Officer Details</span>
+                                    </h2>
+                                </div>
+                            </header>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-grid slds-wrap">  
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="SalesOfficerList" label="Select Sales Officer" value = "{!v.selectedSolId}" onchange ="{!c.selectUserData}" disabled='{!v.solPicDisable}'>
+                                            
+                                            <aura:iteration items="{!v.SOLList}" var="sol">
+                                                <option value="{!sol.Id}" text="{!sol.Sales_Officer_Name__r.Name +' - '+sol.Product__c}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>                   
+                                    </div>
+                                </div> 
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="CasesDisbursed" label="Cases Disbursed" value="{!v.SOLobj.Total_Number_Of_Cases__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="AmountDisbursed" label="Amount Disbursed (in Lakhs)" value="{!v.SOLobj.Sum_of_Approved_Loan_Amount_CurrMonth__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="WIRR" label="WIRR" value="{!v.SOLobj.WIRR__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="WPF" label="WPF" value="{!v.SOLobj.WPF__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="FFRPenetrationPercent" label="FFR Penetration % " value="{!v.SOLobj.FFR_Penetration__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="CPPPercent" label="CPP % " value="{!v.SOLobj.CPP_Percent__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="LIPercent" label="LI Percent" value="{!v.SOLobj.LI_Percent__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="LIPremium" label="LI Premium" value="{!v.SOLobj.LI_PREMIUM__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="GIPercent" label="GI Percent" value="{!v.SOLobj.HI_Percent__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" name="GIPremium" label="GI Premium" value="{!v.SOLobj.HI_PREMIUM__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </article></div>
+                        
+                       
+                    </ui:scrollerWrapper>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</aura:component>

@@ -1,0 +1,40 @@
+<!--
+****************************************************************************************************************************************************
+Comp Name : referralDashboard.cmp
+Controller: ReferralMobilityControllerapxc
+****************************************************************************************************************************************************-->
+
+<aura:component implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes"  access="global" controller="ReferralMobilityController" >
+    <aura:attribute name="selectedRadio" type="String" default="15"/>
+    <aura:registerEvent name="referradDashboardSearchEvent" type="c:referradDashboardSearch"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+     <div class="innerDivWrapper slds-box slds-box_x-small slds-theme_shade">
+         <aura:if isTrue="{!v.newRefWindow}">
+                <c:Custom_Toast_Mobility />
+                <c:LoaderForMobility />
+            </aura:if>
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+           <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <div class="slds-text-heading_small"> Duration : </div>
+               <div class="slds-form-element__control" style="margin-top:15px">  
+                                <lightning:input type="radio"  aura:id ="radioValue" label="Last 15 days" name="radioValue" value="15"  checked="true" onchange="{!c.fetchFifteenDays}" />
+                                <lightning:input type="radio"  aura:id ="radioValue" label="Last 30 days" name="radioValue" value="30" onchange="{!c.fetchThirtyDays}"  />
+                                <lightning:input type="radio"  aura:id ="radioValue" label="Last month (Business month)" name="radioValue" value="lastmonth" onchange="{!c.fetchLastMonth}"  />
+                            </div>
+                            <br/><br/>
+                        </div>
+               <div class="slds-grid slds-wrap slds-grid--pull-padded slds-grid_align-center" align="center" style="float:centre">
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:side_list" variant="brand" label="Fetch" onclick="{!c.fetchProductOfferings}" />
+                        </div>
+                    </div>
+        </lightning:card>
+        
+    </div>
+      <div  aura:id="newtag">
+        {!v.body}
+    </div>
+    
+   
+</aura:component>

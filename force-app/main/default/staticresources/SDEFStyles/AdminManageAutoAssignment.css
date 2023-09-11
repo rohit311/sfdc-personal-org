@@ -1,0 +1,123 @@
+
+	.x-toolbar-default {
+		background-image:none !important;
+		background-color: #DEE0E0;
+	}
+	
+	.saveCls {
+		background: url("SDEFbuttons/b_save.gif") no-repeat scroll 0 0 transparent !important;
+	}
+	
+	#saveBtn {
+		margin-left: 10px;
+	}	
+	
+	.gridPanelCls{
+		border: solid 1px #808080;		
+	}
+	
+	#mainDiv {
+		margin: 20px;
+		height: 80%;
+		width : 95%;
+	}
+	
+	#qDiv {
+		height: 100%;
+		width: 40%;
+		display: inline-block; 
+	}
+	
+	#rightDiv {
+		height: 100%;
+		width: 52%;
+		margin-left: 30px;
+		display: inline-block; 
+		vertical-align : top;
+	}
+	
+	#rightTopDiv {
+		width: 100%;
+	}
+	
+	#staffDiv {
+		height: 70%;
+		width: 100%;
+	}
+	
+	#selectedQueueLblId {
+		font-weight: bold;
+	}
+	
+	#footerDiv {
+		margin: 20px;
+		font-weight: bold;
+	}
+	#headerDiv {
+		margin-bottom: 10px;
+	}
+	
+	.columnCls ,.x-nlg .x-column-header {
+		background: #007AA5 !important;
+		background-image: none !important;
+		font-weight: bold;
+		color: white;
+	}
+	
+	.hbox {
+		display: -webkit-box !important;
+		-webkit-box-orient: horizontal;
+		-webkit-box-align: stretch;
+		display: -moz-box !important;
+		-moz-box-orient: horizontal;
+		-moz-box-align: stretch;
+		display: box !important;
+		box-orient: horizontal;
+		box-align: stretch;
+		display: inline-block;
+	}
+	
+	.x-btn-inner{
+		padding-left : 0px !important;
+		padding-right : 0px !important;
+	}
+	
+	.x-grid-empty {
+		color: #000;
+		text-align: center;
+	}
+
+	#AutoStaffAssignDiv {
+		margin-left: 2%;
+		margin-top: 1%;
+	}
+
+	#AutoStaffAssignLabel {
+		font-weight: bold;
+		margin-bottom: 5%;
+		color: #004376;
+	}
+
+	.staffAssignmentCls {
+		margin-top: 0.5%;
+	}
+
+	.staffAssignmentCls input:first-of-type{
+		margin-bottom: 1.5%;
+	}
+
+	.staffAssignmentCls input:last-of-type{
+		position: absolute;
+    	top: 10.2%;
+	}
+
+	.staffAssignmentCls label:first-of-type{
+		position: absolute;
+    	top: 8.1%;
+    	left: 3.5%;
+	}
+
+	.staffAssignmentCls input[type="radio"]{
+		vertical-align: middle;
+	}
+

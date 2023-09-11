@@ -1,0 +1,21 @@
+<apex:page >
+ <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+ 
+ <body ng-app="Testapp2">
+    <div ng-controller="Ctrl2">
+       <div ng-repeat="name in Ctrl2.array">
+          <span ng-bind="name"></span>
+       </div>
+    </div>
+ </body>
+ 
+ <script>
+   angular.module('Testapp2',[]).controller('Ctrl2',[function(){
+              
+              var self=this;
+              self.array=['rohit','robin','rushi'];
+   
+   }]);
+    
+ </script>
+</apex:page>

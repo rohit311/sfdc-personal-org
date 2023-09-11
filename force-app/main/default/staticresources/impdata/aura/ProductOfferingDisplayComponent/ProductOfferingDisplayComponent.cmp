@@ -1,0 +1,218 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2" 
+                implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="item" type="Product_Offerings__c"/>
+    <aura:attribute name="currentUser" type="String" default=""/> 
+    <aura:attribute name="button_id" type="String" default=""/> 
+    <aura:attribute name="poID" type="String"/> 
+    <aura:handler event="c:afterSubmitotp" action="{!c.grabOffer}"/>
+    <aura:attribute name="otpsectioFlag" type="Boolean" default="false"/>
+    <aura:attribute name="oldotpValue" type="String" default="123456"/>
+    <aura:registerEvent name="setotpvalue" type="c:setOtp"/>
+    <aura:attribute name="phonenumber" type="String" default=""/>
+    <aura:attribute name="showparentcomp" type="Boolean" default="true"/>
+    <aura:registerEvent name="navigatetograboffer" type="c.navigateToParent"/>
+    <aura:attribute name="showgraboffer" type="Boolean" default="false"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="SetPOId" type="c:SetPOId"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="sbsBranch" type="String"/><!--Bug 17930-->
+    <aura:attribute name="userBranchCity" type="String"/><!--Bug 17930-->
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+      <!--23064 by swapnil s-->
+    <aura:attribute name="userInfo" type="user"/>
+     <aura:attribute name="displayExotel" type="boolean" default="false"/> 
+    <aura:attribute name="validExotelProd" type="String[]" default=""/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<!--23064 by swapnil e -->
+    <p class="slds-p-horizontal_small">
+                    
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                <aura:if isTrue="{!v.item.Lead__r.FirstName != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+               		  	Customer Name:
+                         
+                           <b> <ui:outputText aura:id="custname" value="{!(v.item.Lead__r.FirstName + ' ' + v.item.Lead__r.LastName)}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.item.Lead__r.Customer_Mobile__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Mobile Number:
+                            
+                            <b><a href="{!(' tel: ' + ' (' + v.item.Lead__r.Customer_Mobile__c + ')' )}">
+                                <ui:outputText value="{!v.item.Lead__r.Customer_Mobile__c}">
+                                </ui:outputText></a></b>
+                            <!--23064 start -->
+                            <!--removed exotel button-->
+                            <!--23064 start -->
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.item.Lead_Source__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Lead Source:
+                            <b><ui:outputText value="{!v.item.Lead_Source__c}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.item.Ref__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Reference ID:
+                            <b><ui:outputText value="{!v.item.Ref__c}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.item.Owner.FirstName != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Owner:
+                            <b><ui:outputText value="{!v.item.Owner.FirstName}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.item.Data_Mart_Status__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Status: 
+                            <b><ui:outputText value="{!v.item.Data_Mart_Status__c}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.isFieldAgent}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        Field Disposition Status: 
+                        <b><ui:outputText value="{!v.item.Field_Disposition_1__c}"/></b>
+                    </div>
+                </div>
+                </aura:if>
+                <aura:if isTrue="{!v.isTeleCaller}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        Tele Calling Disposition Status: 
+                        <b><ui:outputText value="{!v.item.TeleCalling_Desposition_Status__c}"/></b>
+                    </div>
+                </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!and(v.item.Opportunity__c,v.item.Opportunity__r.CreatedDate != null)}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Login Date: 
+                            <b><ui:outputDate value="{!v.item.Opportunity__r.CreatedDate}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                  <aura:if isTrue="{!v.item.Opportunity__r.Loan_Application_Number__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            LAN: 
+                            <b> <ui:outputText value="{!v.item.Opportunity__r.Loan_Application_Number__c}"/></b>
+                        </div>
+                    </div>
+                </aura:if>
+               <!-- Bug 18537 Start--> 
+               <aura:if isTrue="{!v.item.Opportunity__r.Loan_Application_Number__c != null}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            Stage: 
+                            <b> <ui:outputText value="{!v.item.Opportunity__r.StageName}"/></b>
+                        </div>
+                    </div>
+                </aura:if> 
+              <!-- Bug 18537 End--> 
+                <!--24997 s-->
+                <aura:if isTrue="{!and(!v.isTeleCaller,and(and(!v.item.New_line_assigned__c,!v.item.Product_Offering_Converted__c),((v.item.Owner.Id!=v.currentUser)))) }">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        Product Offering Name: 
+                        <b> <ui:outputText value="{!v.item.Name}"/></b>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        Campaign Type : 
+                        <b> <ui:outputText value="{!v.item.Campaign_Type__c}"/></b>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        Offer Amount: 
+                        <b> <ui:outputText value="{!v.item.Offer_Amount__c}"/></b>
+                    </div>
+                </div>
+                </aura:if>
+                <!--24997 e-->
+            </div>
+    </p>
+   <p class="slds-p-horizontal_small" align="center" style="float:centre;">
+        <div class="slds-p-horizontal--small ">                
+            <div class="slds-grid slds-wrap slds-grid--pull-padded"  id="testDiv">     
+                
+                 <aura:if isTrue="{!and(!v.isTeleCaller,and(and(!v.item.New_line_assigned__c,!v.item.Product_Offering_Converted__c),((v.item.Owner.Id!=v.currentUser)))) }">
+                    <div class="slds-form-element slds--top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 ">
+                        <div class="slds-form-element__control">
+                            <lightning:button aura:id="{!v.item.Id}" class="slds-theme_alt-inverse" variant="brand" label="Grab Offer" onclick="{!c.generatenewOTP}" name="{!v.item.Lead__r.Customer_Mobile__c}" value="{!v.item.Id}" />
+                        </div>
+                    </div>  
+                </aura:if>
+                
+                
+               
+                <aura:if isTrue="{!and(!v.isTeleCaller,and(and(v.item.New_line_assigned__c,!v.item.Product_Offering_Converted__c),(v.item.Owner.Type!='QUEUE'))) }">
+                    <div class="slds-form-element slds--top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" data-record="{!v.button_id}">
+                        <div class="slds-form-element__control">
+                            <lightning:button aura:id="Assign2TC" class="slds-theme_alt-inverse"  variant="brand" label="Assign to Telecaller " onclick="{!c.assign2telecaller}" value="{!v.item.Id}" />
+                        </div>
+                    </div>  
+
+                </aura:if> 
+         
+
+                <aura:if isTrue="{!or(and(v.item.Owner.Id == v.currentUser,!v.item.New_line_assigned__c),and(v.isTeleCaller,v.item.Owner.Name == 'Salaried Tele Calling Team'))}">
+                    <div class="slds-form-element slds--top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" >
+                        <div class="slds-form-element__control">
+                            <lightning:button aura:id="ViewOffer" class="slds-theme_alt-inverse" variant="brand" label="View Offer" onclick="{!c.clickViewOffer}" value="{!v.item.Id}"/>
+                            
+                        </div>
+                    </div>  
+                    
+                </aura:if> 
+                
+            </div>
+        </div>
+    </p>
+    
+    
+        
+    
+    <div aura:id="graboffermodal" class="slds-hide slds-align_absolute-center" id="dummyId">
+        <div role="dialog"  style="height:600px" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center">
+            <div class="slds-modal__container" style="margin-left: 5%;" id="dummyDiv"><!-- bug id 17845 margin-top:-200px;" -->
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> OTP Section </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium" style="visibility:visible;">
+                    <c:generateOtp phonenumber="{!v.phonenumber}" aura:id="childCmp"/>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</aura:component>

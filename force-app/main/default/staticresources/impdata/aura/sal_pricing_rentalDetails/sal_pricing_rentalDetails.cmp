@@ -1,0 +1,489 @@
+<!--Component Owner: Hrushikesh, Created for 24673 -->
+<aura:component  controller="SAL_PricingCtrlV2"> 
+    <aura:attribute type="Opportunity" name="loan"/>
+    <aura:attribute name="solObjLandLord" type="SOL_Policy__c"/><!-- 24673-->
+    <aura:attribute type="String" name="oppId"/>
+    <aura:attribute name="salutationList" type="List" default="['Mr','Mrs','Miss','Shrimati']"/> 
+    <aura:attribute name="unitList" type="List" default="['Sq. Feet','Sq. Meter','Hector Aar']"/> 
+    <aura:attribute name="housenotypeList" type="List" default="['CTS','Survey no.','House no.','Plot no.']"/> 
+    <aura:attribute name="landlordGenderList" type="List" /> <!--24673 -->
+    <aura:attribute name="landlordAgreementTypeList" type="List" /><!-- 24673-->
+    <aura:attribute name="landlordDepositByList" type="List" /><!-- 24673-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+     <aura:attribute name="bankSearchKeyword" type="string" default=""/>
+     <aura:attribute name="ValidSourceChannel" type="Boolean" default="false"/>
+     <aura:attribute name="bankList" type="IFSC_Master__c[]" default="[]"/>
+     <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+     <aura:attribute name="rent1" type="string" default=""/>
+    <aura:attribute name="rent2" type="string" default=""/>
+    <aura:attribute name="rent3" type="string" default=""/>
+    <aura:attribute name="rent4" type="string" default=""/>
+    <aura:attribute name="rent5" type="string" default=""/>
+    <aura:attribute name="month1" type="string" default=""/>
+    <aura:attribute name="month2" type="string" default=""/>
+    <aura:attribute name="month3" type="string" default=""/>
+    <aura:attribute name="month4" type="string" default=""/>
+    <aura:attribute name="month5" type="string" default=""/>
+    <aura:attribute name="galleryArea" type="string" default=""/>
+    <aura:attribute name="parkingArea" type="string" default=""/>
+    <aura:attribute name="areaUnit" type="string" default=""/>
+    <aura:attribute name="buildingName" type="string" default=""/>
+    <aura:attribute name="flatNo" type="string" default=""/>
+    <aura:attribute name="floorNo" type="string" default=""/>
+    <aura:attribute name="sector" type="string" default=""/>
+    <aura:attribute name="locality" type="string" default=""/>
+    <aura:attribute name="village" type="string" default=""/>
+    <aura:attribute name="houseNumberType" type="string" default=""/>
+     <aura:attribute name="houseNumberValue" type="string" default=""/>
+    <aura:attribute name="pinCode" type="string" default=""/>
+    
+    <aura:attribute name="fan" type="string" default=""/>
+    <aura:attribute name="tubelight" type="string" default=""/>
+    <aura:attribute name="bed" type="string" default=""/>
+    <aura:attribute name="sofa" type="string" default=""/>
+    <aura:attribute name="table" type="string" default=""/>
+    <aura:attribute name="chair" type="string" default=""/>
+     <aura:attribute name="geyser" type="string" default=""/>
+    <aura:attribute name="ac" type="string" default=""/>
+    <aura:attribute name="sourcesearching" type="Boolean" default="false"/>
+     <aura:attribute name="isVarRent" type="Boolean" default="false"/>
+    <aura:attribute name="activeSectionName" type="String" default="A"/>
+    <div class="slds-box slds-box_x-small slds-theme_default slds-theme_shade" >
+          <!--<lightning:accordion aura:id="accordion" activeSectionName="{!v.activeSectionName}">
+              <lightning:accordionSection name="Landlord Personal Details" label="Landlord Personal Details">
+                  <aura:if isTrue="{!v.activeSectionName == 'Landlord Personal Details'}">-->
+        <section class="slds-accordion__section">
+                    <div class="slds-accordion__summary">
+                        <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                             <div aria-controls="subsection1Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_default" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection5">
+                                <b><span id="subicon1" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                <span id="subname1" class="slds-truncate slds-theme_default" title="Accordion summary">Landlord Personal Details</span>
+                            </div>
+                        </h3>
+            </div>
+            <div aria-hidden="true" class="slds-hide" aura:id="subsection1Content">
+        <p class="slds-p-horizontal_small slds-theme_shade">
+            <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="salutation" name="Salutation" label="Salutation" required="true" messageWhenValueMissing="Please select a value"  value="{!v.solObjLandLord.Salutation__c}" disabled="" >
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.salutationList}" var="gen">
+                                    <option value="{!gen}" text="{!gen}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="firstName" type="text" label="Landlord First Name" value="{!v.solObjLandLord.Landlord_First_Name__c}" placeholder="" required="true" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter a valid name" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="midName" type="text" label="Landlord Middle Name" value="{!v.solObjLandLord.Landlord_Middle_Name__c}"  name="" placeholder="" pattern="^([a-zA-Z ]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="lastName" type="text" label="Landlord Last Name" value="{!v.solObjLandLord.Landlord_Last_Name__c}" placeholder="" required="true" pattern="^([a-zA-Z ]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="pan" type="text" label="PAN" value="{!v.solObjLandLord.Landlord_PAN__c}" required="true" placeholder="" messageWhenValueMissing="Please enter a value" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please enter a valid PAN"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="mob" type="text" label="Mobile" value="{!v.solObjLandLord.Landlord_Mobile__c}"  name="" required="true" placeholder="" pattern="^([0-9]{10})" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid mobile"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="lAddress" type="text" label="Landlord Address" value="{!v.solObjLandLord.Landlord_Address__c}" placeholder="" required="true" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid address"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="lCity" type="text" label="Landlord City" value="{!v.solObjLandLord.Landlord_City__c}" required="true" placeholder="" messageWhenValueMissing="Please enter a value" pattern="^([a-zA-Z 0-9]+$)" messageWhenPatternMismatch="Please enter a valid city"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="lPin" type="text" label="Landlord PinCode" value="{!v.solObjLandLord.Landlord_Pincode__c}"  name="" required="true" placeholder="" pattern="^([0-9]{6})" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid pincode"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              
+            <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:textarea aura:id="propAddress" type="textarea" label="Property Address" value="{!v.solObjLandLord.Property_Address__c}" required="true" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenPatternMismatch="Please enter a valid address" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="Gender" name="Gender" label="Gender" required="true" messageWhenValueMissing="Please select a value"  value="{!v.solObjLandLord.Landlord_Gender__c}" disabled="" >
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.landlordGenderList}" var="gen">
+                                    <option value="{!gen}" text="{!gen}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input required="true" aura:id="DOB" type="date" label="Date of Birth" value="{!v.solObjLandLord.Landlord_DOB__c}" placeholder="" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                     <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input required="true" aura:id="emailId" type="text" label="Email ID" value="{!v.solObjLandLord.Landlord_Email_Id__c}" placeholder=""  pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid email"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="builtUpArea" type="text" label="Approx. Built Up Area" value="{!v.solObjLandLord.Approx_Built_Up_Area__c}" required="true"  name="" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="aggType" name="Agreement" label="Agreement" messageWhenValueMissing="Please select a value" required="true"  value="{!v.solObjLandLord.Agreement_Type__c}" disabled="">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.landlordAgreementTypeList}" var="ag">
+                                    <option value="{!ag}" text="{!ag}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="aggStartDate" type="date" label="Agreement Start Date" value="{!v.solObjLandLord.Agreement_Start_Date__c}" required="true" placeholder="" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="aggEndDate" type="date" label="Agreement End Date" value="{!v.solObjLandLord.Agreement_End_Date__c}" required="true" placeholder="" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="refAmt" type="text" label="Refundable Deposit Amount" value="{!v.solObjLandLord.Refundable_Deposit_Amount__c}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-p-horizontal--small">
+                 <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                          <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input name="varRentCheck" label="Variable Rent" type="checkbox" class="" checked="{!v.isVarRent}" aura:id="isVarChecked" onchange="{!c.toggleCheck}"/> 
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <aura:if isTrue="{!v.isVarRent}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rent1" type="text" label="Rent1" value="{!v.rent1}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rent2" type="text" label="Rent2" value="{!v.rent2}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rent3" type="text" label="Rent3" value="{!v.rent3}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rent4" type="text" label="Rent4" value="{!v.rent4}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rent5" type="text" label="Rent5" value="{!v.rent5}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                         <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="month1" type="text" label="Month1" value="{!v.month1}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="month2" type="text" label="Month2" value="{!v.month2}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="month3" type="text" label="Month3" value="{!v.month3}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="month4" type="text" label="Month4" value="{!v.month4}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="month5" type="text" label="Month5" value="{!v.month5}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        <aura:set attribute="else">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input  aura:id="rentAmt" type="text" label="Rent" value="{!v.solObjLandLord.Rent__c}" required="true" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                        </aura:set>
+                    </aura:if>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="chqNo" type="text" label="Cheque/Transaction Number" value="{!v.solObjLandLord.Cheque_Transaction_Number__c}" required="true" name="" placeholder="" pattern="^([0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="chqDate" type="date" label="Cheque / Transaction Date" value="{!v.solObjLandLord.Cheque_Transaction_Date__c}" required="true" placeholder="" messageWhenValueMissing="Please enter a value"/>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+             <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">             
+                        <div aura:id="bankSearchResult" class="slds-form-element slds-p-top--x-small slds-is-close slds-lookup slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="bankName"><span class="requiredClass">*</span>Bank Name</label>
+                                <ui:inputText aura:id="bankName" required="true" class="slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.bankSearchKeyword}" placeholder="Enter Bank Name" />                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="bankList">
+                                    <div aura:id="bankMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.bankList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectBank}">{!singleRec.Bank__c } </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                   
+                            </div>
+                        </div>
+                             <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="bankBranch" type="text" label="Bank Branch" value="{!v.solObjLandLord.Branch_Name__c}" required="true" placeholder="" pattern="^([a-zA-Z ]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid bank branch"/>
+                        </div>
+                           </div>
+                             <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="depoType" name="DepositBy" label="Deposit By" messageWhenValueMissing="Please select a value" required="true"  value="{!v.solObjLandLord.Deposit_By__c}" disabled="">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.landlordDepositByList}" var="ag">
+                                    <option value="{!ag}" text="{!ag}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                        </div>
+                    </div>
+                 </div>
+				
+            </div>
+        </p>
+            </div>
+        </section>
+                <!--  </aura:if>
+              </lightning:accordionSection>
+              <lightning:accordionSection name="Rental Property Details" label="Rental Property Details">
+                   <aura:if isTrue="{!v.activeSectionName == 'Rental Property Details'}">-->
+        <section class="slds-accordion__section">
+                    <div class="slds-accordion__summary">
+                        <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                             <div aria-controls="subsection2Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_default" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection5">
+                                <b><span id="subicon2" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                <span id="subname2" class="slds-truncate slds-theme_default" title="Accordion summary">Rental Property Details</span>
+                            </div>
+                        </h3>
+            </div>
+            <div aria-hidden="true" class="slds-hide" aura:id="subsection2Content">
+        <div class="slds-p-horizontal--small" >
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+             <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="galleryArea" type="text" label="Gallery Area" value="{!v.galleryArea}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="parkingArea" type="text" label="Parking Area" value="{!v.parkingArea}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="areaUnit" name="Area Unit" label="Area Unit" messageWhenValueMissing="Please select a value" required="true"  value="{!v.areaUnit}" disabled="">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.unitList}" var="un">
+                                    <option value="{!un}" text="{!un}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="buildingName" type="text" label="Building Name" value="{!v.buildingName}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="flatNo" type="text" label="Flat No" value="{!v.flatNo}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="floorNo" type="text" label="Floor No" value="{!v.floorNo}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="sector" type="text" label="Sector" value="{!v.sector}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="locality" type="text" label="Locality" value="{!v.locality}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div><div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="village" type="text" label="Village" value="{!v.village}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid name"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="houseNumberType" name="House No Type" label="House No Type" messageWhenValueMissing="Please select a value" required="true"  value="{!v.houseNumberType}" disabled="">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.housenotypeList}" var="hn">
+                                    <option value="{!hn}" text="{!hn}" selected=""></option>
+                                </aura:iteration>
+                            </lightning:select>  
+                            
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="houseNumberValue" type="text" label="House Number" value="{!v.houseNumberValue}" required="true"  name="" placeholder="" pattern="^([a-zA-Z 0-9]+$)" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid house number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="pinCode" type="text" label="Pincode" value="{!v.pinCode}" required="true"  name="" placeholder="" pattern="^([0-9]{6})" messageWhenValueMissing="Please enter a value" messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    </div>
+					</div>
+            </div>
+        </section>
+                  <!--</aura:if>
+              </lightning:accordionSection>
+               <lightning:accordionSection name="Rental Accessories Details" label="Rental Accessories Details">
+                   <aura:if isTrue="{!v.activeSectionName == 'Rental Accessories Details'}">-->
+               <section class="slds-accordion__section">
+                    <div class="slds-accordion__summary">
+                        <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                             <div aria-controls="subsection3Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_default" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection5">
+                                <b><span id="subicon3" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                <span id="subname3" class="slds-truncate slds-theme_default" title="Accordion summary">Rental Accessories Details</span>
+                            </div>
+                        </h3>
+            </div>     
+        <div aria-hidden="true" class="slds-hide" aura:id="subsection3Content">
+        <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+		    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="fan" type="text" label="Fan" value="{!v.fan}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="tubeLight" type="text" label="Tubelight" value="{!v.tubelight}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="bed" type="text" label="Bed" value="{!v.bed}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="sofa" type="text" label="Sofa" value="{!v.sofa}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="table" type="text" label="Table" value="{!v.table}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="chair" type="text" label="Chair" value="{!v.chair}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="geyser" type="text" label="Geyser" value="{!v.geyser}"  name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="ac" type="text" label="AC" value="{!v.ac}"   name="" placeholder="" pattern="^([0-9]+$)"  messageWhenPatternMismatch="Please enter a valid number"/>
+                        </div>
+                    </div>
+                    </div>
+					</div>
+                   <!--</aura:if>-->
+                   </div>    
+         </section>
+         <div class="slds-p-horizontal--small">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">                         
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--412-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:button variant="brand" label="Save Details" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveDetails}" disabled="" aura:id=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--  </lightning:accordionSection>
+        </lightning:accordion>-->
+         
+    </div>
+</aura:component>

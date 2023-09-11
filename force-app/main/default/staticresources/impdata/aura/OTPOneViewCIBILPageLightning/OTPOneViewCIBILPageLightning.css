@@ -1,0 +1,11 @@
+.THIS {
+}
+
+.THIS .WrapText
+{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+}

@@ -1,0 +1,20 @@
+<aura:component controller="ContactController">
+	<aura:attribute name="newContact" type="Contact"
+                default="{ 'sobjectType': 'Contact',
+                            'FirstName': '',
+                            'LastName': '',
+                            'Phone': ''
+                            }"/>
+<aura:attribute name="idCon" type="String"/>    
+<div class="slds-modal__content">
+            <lightning:input type="text" label="Prénom" value="{!v.newContact.FirstName}" name="prenom" class="input" />
+            <lightning:input type="text" label="Nom" value="{! v.newContact.LastName}" name="nom" class="input" />
+            <lightning:input type="text" label="Téléphone" value="{!v.newContact.Phone}" name="tel" class="input"/>
+        </div>
+        <div class="slds-modal__footer">
+            <div class="slds-x-small-buttons--horizontal">
+                <lightning:button variant="brand" label="Annuler" onclick="{! c.hideModalBox }" />
+                <lightning:button variant="brand" label="Enregistrer" onclick="{!c.saveContact}" />                     
+            </div>
+        </div>
+</aura:component>

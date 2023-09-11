@@ -1,0 +1,9 @@
+<aura:component implements="lightning:isUrlAddressable,flexipage:availableForAllPageTypes">
+  <aura:attribute  name="customerObj" type="Customer__c" default="{'sobjectType':'Customer__c','Name':''}"/>
+  <aura:attribute  name="exampleId" type="String" default="abc"/>
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Handler for valueInit event fired when the component has been initialised"/>
+  <!--<lightning:input  type="text" aura:id="Emp_name" label="Employee Name" value="{!v.customerObj.Name}"/>
+
+  <lightning:button label="Neutral" title="Neutral action" onclick="{! c.saveRec }"/>-->
+  <c:attributeChild recordId="{!v.exampleId}"></c:attributeChild>
+</aura:component>

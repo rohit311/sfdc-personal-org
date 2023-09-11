@@ -1,0 +1,153 @@
+<aura:component controller="SALMobilityController" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <!--Rohit EKYC added AadharTab -->
+    <aura:attribute name="activePath" type="String" default=""/><!--commented default AadharTab for bug id 21851-->
+    <aura:attribute name="pathList" type="String[]" default=""/><!--commented default ['AadharTab','commercialTab','InsuranceTab','LineEligibilityTab','feesTab','DisbursementTab','dummy'] for bug id 21851-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pricingId" type="String"/>
+    <aura:attribute name="loanApplication" type="Opportunity" default="{'sobjectType': 'Opportunity'}"/>
+    <aura:attribute name="disbusment" type="Current_Disbursal_Details__c" default="{'sobjectType': 'Current_Disbursal_Details__c'}"/>
+    <aura:attribute name="EMI1stDate" type="String"/>
+    <aura:attribute name="EMILastDate" type="String"/>
+    <aura:attribute name="BPI" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+    <aura:attribute name="helpmessage" type="String"/>
+    <aura:attribute name="loanTypeList" type="List"/>
+    <aura:attribute name="disablePrev" type="boolean" default="" /><!--commented default true for bug id 21851-->
+    <aura:attribute name="disableNext" type="boolean" default="" /><!--commented default false for bug id 21851-->
+    <aura:attribute name="StageNum" type="Integer" default="1" />
+    <aura:handler name="cmpEvent" event="c:Sal_Pricing_Event" action="{!c.handleDisbusmentAttr}"/>
+    <aura:attribute name="loanstage" type="String" default=""/>
+    <aura:attribute name="contObj" type="Contact" default="{'sobjectType':'Contact'}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType':'Applicant__c'}"/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{}"/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:attribute name="lineoptedList" type="List" />
+    <aura:handler name="change" value="{!v.showspinnerflag}" action="{!c.showorhidespinner}"/>
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/>        
+	<aura:attribute name="DropLineFlexi" type="Integer" default="" />
+    <aura:attribute name="disAmount" type="Integer" default="" />
+    <aura:attribute name="aadharValuePricing" type="String" default="Biometric"/><!-- Bug 18669 -->
+    <aura:attribute name="randomNum" type="String" /><!-- Bug 18669 -->
+    <aura:attribute name="kyc" type="eKYC__c" default="{'sobjectType':'eKYC__c'}"/><!-- Bug 18669-->
+    <aura:attribute name="showAadharComp" type="Boolean" default="false"/><!-- Bug 18669 -->  
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851  -->
+    <div>
+        <div align="right">
+          <aura:if isTrue ="{!(v.hideAadhaarSection == false)}">  <h1><b>Current Stage : {!v.StageNum} out of 6</b> </h1></aura:if><!--added if for bug id 21851  -->
+          <aura:if isTrue ="{!(v.hideAadhaarSection == true)}">  <h1><b>Current Stage : {!v.StageNum} out of 5</b> </h1></aura:if><!--added if for bug id 21851  -->
+        </div>
+    </div>
+    <br/>
+    <div class="demo-only" style="position:static">
+        <div class="slds-path">
+            <div class="slds-grid slds-path__track slds-has-overflow">
+                <div class="slds-grid slds-path__scroller-container">
+                    <div class="slds-path__scroller offer-pg-cont " role="application" id="PathId">
+                        <div class="slds-path__scroller_inner offer-pg" aura:id="offer-pg">
+                            <ul class="slds-path__nav" role="tablist" id="parentlist">
+                                <!--Rohit EKYC S-->
+                                <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+                                <li aura:id="AadharTab" id="eKYCSection" class="slds-path__item slds-is-current slds-is-active stage_item" role="presentation">
+                                    <a title="Aadhaar section" id="AadharTab"  aria-controls="AadharTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="AadharTab">Aadhaar section</span>
+                                    </a>
+                                </li> 
+                                </aura:if>
+                                <!--Rohit EKYC E-->
+                                <li aura:id="commercialTab" id="newcommercialTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="Commercials" id="commercialTab" aria-controls="commercialTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title " id="commercialTab">Commercials</span>
+                                    </a>
+                                </li>
+                                
+                                <li aura:id="InsuranceTab" id="newInsuranceTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="Insurance" id="InsuranceTab" aria-controls="InsuranceTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="InsuranceTab">Insurance</span>
+                                    </a>
+                                </li>
+                                <li aura:id="LineEligibilityTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="Line Eligibility" id="LineEligibilityTab" aria-expanded="true" aria-controls="LineEligibilityTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="LineEligibilityTab">Line Eligibility</span>
+                                    </a>
+                                </li>
+                                <li aura:id="feesTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="Fees and Charges" id="feesTab" aria-controls="feesTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="feesTab">Fees and Charges</span>
+                                    </a>
+                                </li> 
+                                <li aura:id="DisbursementTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="Disbursement Details" id="DisbursementTab" aria-expanded="true" aria-controls="DisbursementTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="DisbursementTab">Disbursement Details<span style="visibility: hidden;"> testing disbursement section  testing disbursement section</span></span>
+                                    </a>
+                                </li>
+                               
+                            </ul>
+                        </div>
+                        
+                        <div class="slds-path__scroll-controls">
+                            <!-- <lightning:icon iconName="utility:left" size="large" alternativeText="sss"/>-->
+                            <lightning:button variant="brand" label="" iconName="utility:left" iconPosition="left" onclick="{!c.prevStage}" disabled="{!v.disablePrev}"/>
+                            <!--	<span class="slds-assistive-text">Scroll left</span>-->
+                            
+                            <!--<lightning:icon iconName="utility:right" size="large" alternativeText="sss"/>-->
+                            <lightning:button variant="brand" label="" iconName="utility:right" iconPosition="left" onclick="{!c.nextStage}" disabled="{!v.disableNext}"/>
+                            <!--<span class="slds-assistive-text slds-button slds-button_icon slds-button_icon-border-filled">Scroll right</span>-->
+                        </div>
+                         <div role="tooltip" id="tooltip" aura:id="tooltip" class="slds-popover slds-hide slds-popover_tooltip slds-nubbin--top" style="position: absolute;z-index: 9999;background-color: #54698d;top:5px;width: 180px;">
+                                    {!v.helpmessage}
+                   		 </div>
+                    
+                    </div>
+                </div>
+                
+                
+            </div>
+           <!--Rohit EKYC S--> 
+            <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added for bug id 22047-->
+           <div aria-labelledby="AadharTab" class="slds-path__content" aura:id="AadharTabContent" role="tabpanel">
+                <aura:if isTrue="{! and(!v.applicantObj.eKYC_Processing__c,v.showAadharComp)}">
+                    <!--Rohit added parentObj & parentId for linking-->
+                  
+                	<c:AadharVerification aura:id="aadharCompId" isDSS="true" parentId="{!v.applicantObj.Id}" isMobility="true" parentObj="Applicant" stageName="{!v.loanstage}" randomNum="{!v.randomNum}" aadharValue="{!v.aadharValuePricing}" flowis="OpenMarketMobility"/><!-- Bug 18669 stageName Added-->
+                 	<aura:set attribute="else">
+                       <div id="aadharDone" style="margin-top:20px"> Aadhaar details have been received successfully! </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+            </aura:if>
+            <!--Rohit EKYC E-->
+            <!--Rohit added SLDS hide -->
+            <div aria-labelledby="commercialTab" class="slds-path__content slds-hide" aura:id="commercialTabContent" role="tabpanel">
+                <c:SAL_Pricing_Commercials oppId="{!v.pricingId}" Loan="{!v.loanApplication}" applicantPrimary="{!v.applicantObj}" DropLineFlexi="{!v.DropLineFlexi}" isHybirdFlexi="{!v.loanApplication.Scheme_Master__r.IsHybridFlexi__c}" showspinnerflag="{!v.showspinnerflag}"/>  
+            </div>
+            
+            <div aria-labelledby="InsuranceTab" class="slds-path__content slds-hide" aura:id="InsuranceTabContent" role="tabpanel">
+                <div style="padding-top:5px;">
+                    <c:GenericRecordDetails loanAppID="{!v.pricingId}"/>
+                </div>
+            </div>
+            
+            <div aria-labelledby="LineEligibilityTab" class="slds-path__content slds-hide" aura:id="LineEligibilityTabContent" role="tabpanel">
+                <c:Lineeligibility_mobility scam="{!v.scam}" lineoptedList="{!v.lineoptedList}" showspinnerflag="{!v.showspinnerflag}"/>               
+            </div>
+            
+            <div aria-labelledby="feesTab" class="slds-path__content slds-hide" aura:id="feesTabContent" role="tabpanel">
+                <c:Fees_and_charges oppId="{!v.pricingId}" contObj="{!v.contObj}" applicantObj="{!v.applicantObj}" loanstage="{!v.loanstage}" showspinnerflag="{!v.showspinnerflag}"/>
+            </div>
+            
+            <div aria-labelledby="DisbursementTab" class="slds-path__content slds-hide" aura:id="DisbursementTabContent" role="tabpanel">
+                <c:Sal_Pricing_DisbusmentCmp loanTypeList="{!v.loanTypeList}" pricingId="{!v.pricingId}" loanApplication="{!v.loanApplication}" disbusment="{!v.disbusment}" showspinnerflag="{!v.showspinnerflag}"/>
+            </div>
+        </div>
+    </div>
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+</aura:component>

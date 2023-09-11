@@ -1,0 +1,132 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="global" controller="SAL_PricingCtrlV2"> 
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute type="String" name="header"/>
+    <aura:attribute type="boolean" name="ifscActive" default="true"/><!--US_1476-->
+    <aura:attribute type="Current_Disbursal_Details__c" name="disb"/>
+    <aura:attribute type="String" name="disbId"/>
+    <aura:attribute type="Id" name="loanId"/>
+        <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--24315-->
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/><!--24315-->
+    <aura:handler action="{!c.doInit}" value="{!this}" name="init"/>
+    <aura:registerEvent name="updateDisbursementList" type="c:updateDisbursementList"/>
+    <aura:attribute name="isTransactionalError" type="Boolean" default="false"/>
+    <aura:attribute name="isAPIError" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isDisbDashboard" type="Boolean" default="false"/> <!-- Bug 20391 : Bug 22060 : -->
+    <aura:attribute name="allow_sum_Disbursement_Amount" type="Double" default="0.0"/> <!-- Bug 20391 : Bug 22062  --> 
+    
+    
+    <aura:attribute name="isRepayAndDisb_Different" type="Boolean" default="true"/>
+    <aura:attribute name="isTopup" type="String" />
+    <aura:attribute name="BranchName" type="String"/>
+    <aura:attribute name="disbModeList" type="List"/>
+    <aura:attribute name="impsList" type="List"/>
+     <aura:attribute type="Opportunity" name="opp"/> <!--Added for 1643 -->
+    <aura:method name="fetchData" action="{!c.fetchData}" access="PUBLIC"/>
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header mobHeader">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <a onclick="{!c.goBack}" href="" style="text-decoration: none;">
+                        <lightning:icon iconName="utility:close" variant="inverse"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </a>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.header}</h2>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1"  >
+                <ui:scrollerWrapper class="wrapStyle">
+                     <!-- For 1643 Start-->
+                    <div class="slds-p-horizontal--small">
+                     <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <lightning:input label="Change Details" type="checkbox" class="" checked="{!v.disb.Repay_Disb_Diff__c}" aura:id="Repay_Disb_Diff__c" onchange="{! c.makeFieldsEditable }" /> 
+                    <aura:if isTrue="{!v.opp.Scheme_Master__r.flexi_flag__c}">
+                         <lightning:input name="flexiRepaynew" label="Flexi Adjustment" type="checkbox" class="" checked="{!v.disb.Flexi_Adjustment__c}" aura:id="flexiRepaynew"/> <!-- For 1643 -->
+                       </aura:if>
+                         </div>
+                    </div>
+                         <div class="slds-p-horizontal--small">
+                     <div class="slds-grid slds-wrap slds-grid--pull-padded">
+			<!-- For 1643 End -->
+
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="disbursalMode" name="disbursalMode" onchange="{!c.displayMandatoryFields}" label="Disbursal Mode" required="true" messageWhenValueMissing="Please Select Value" value="{!v.disb.Disbursal_Mode__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.disbModeList}" var="disbM">
+                                            <option value="{!disbM}" text="{!disbM}" selected="{!v.disb.Disbursal_Mode__c == disbM}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                            <div class=" demo-only demo-only--sizing slds-grid slds-wrap slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <lightning:input label="Favouring" value="{!v.disb.Favouring__c}" aura:id="favouring" messageWhenValueMissing="Please Enter Value" required="" pattern="[a-zA-Z ]*" messageWhenPatternMismatch="Please enter correct value" />                                
+                            </div>
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="IFSC Code" value="{!v.disb.IFSC_Code__c}" aura:id="ifscCode" messageWhenValueMissing="Please Enter Value" onfocusout = "{!c.ifscOnBlur}" disabled="" required=""/>
+                                
+                                </div>
+                            </div>
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <!-- 23710 ::: Added bank name validation of 60 characters  max --> 
+                                    <lightning:input label="Bank Name" value="{!v.disb.Bank_Name__c}" aura:id="bankName" messageWhenValueMissing="Please Enter Value" disabled="" required="" 
+                                                     pattern="[a-zA-Z ]{1,60}" messageWhenPatternMismatch="Please enter correct value(Bank name shall be alphabets of max. 60 characters)." 
+                                                     />
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control"><!--24315 added disable condition-->
+                                    <lightning:input label="Bank Account" value="{!v.disb.Bank_Account__c}" aura:id="bankAccount" messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter correct value" disabled="" required=""/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Bank Branch" value="{!v.disb.Bank_Branch__c}" aura:id="bankBranch" messageWhenValueMissing="Please Enter Value" disabled="" required=""/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                              <!-- Added step while deploying #22552 - Prod observations step="0.00001" -->      
+                                    <lightning:input step="0.001" type="number"  label="Disbursement Amount" value="{!v.disb.Disbursement_Amount__c}" aura:id="disbAmount" messageWhenValueMissing="Please Enter Value" disabled="" required=""/>
+                                </div>
+                            </div>
+                           
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                               <!-- IMPS Flag code not moved from UAT1 here -->
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Payable at" value="{!v.disb.Payable_at__c}" aura:id="payableAt" messageWhenValueMissing="Please Enter Value" disabled="" required="" pattern="[a-zA-Z ]*" messageWhenPatternMismatch="Please enter correct value"/>
+								</div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-large slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="Date" label="{!v.isDisbDashboard==true ? 'Disbursal Date' : 'FinnOne Disbursement Date'}" value="{!v.disb.FinnOne_Disbursement_Date__c}" aura:id="finnoneDisbDate" messageWhenValueMissing="Please Enter Value" disabled="" required=""/>
+                                    <!-- Bug 20391 : Bug 22060 : Added condition for label -->
+                                </div>
+                            </div>
+                            <!---Bug: 23361 IMPS Account Validate **S**-->
+                            <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-large slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <p style="margin-top:1em;">Account Validated</p>
+                                    <lightning:input type="checkbox" checked="{!v.disb.Account_Validated__c}" value="{!v.disb.Account_Validated__c}" aura:id="accountValidated" disabled="" required=""/>
+                                </div>
+                            </div>
+                            <!---Bug: 23361 IMPS IMPS Account Validate **E**-->
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </div>
+            <footer class="slds-modal__footer mobFooter">
+                <div class="slds-align_absolute-center">
+                    <lightning:button class="slds-m-top_small  slds-theme--alt-inverse" iconName="utility:clear" variant="brand" label="Cancel" onclick="{! c.goBack }" />
+                    <lightning:button class="slds-m-top_small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Save" onclick="{!c.saveDisbursement }" disabled="{!if(v.disb.Is_BFL_Splitted__c, 'true', 'false')}" /><!--added disabled for 1643-->
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

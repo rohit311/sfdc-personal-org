@@ -1,0 +1,26 @@
+<template>
+    <lightning-card title="Stock search" icon-name="custom:custom63">
+        <template if:true={showLoading}>
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+       </template>
+       <div if:true={errorMsg}>
+           <p style="color: red;">{errorMsg}</p>
+       </div>
+
+        <lightning-layout multiple-rows="true" vertical-align="end">
+            <lightning-layout-item size="12" small-device-size="10" medium-device-size="8" large-device-size="6" padding="around-small">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning-input type="text" label="Enter Security name" onchange={handleSearchChange} ></lightning-input>
+                    </div>
+                </div> 
+            </lightning-layout-item>
+
+            <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+                <lightning-button label="Search" variant="brand" onclick={handleSearch}></lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+
+        
+    </lightning-card>
+</template>

@@ -1,0 +1,74 @@
+<aura:component access="global" controller="SFDCMobilePOController">
+    
+    <aura:attribute name="loan" type="Opportunity"/>
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="loanId" type="String" default=""/>
+    <aura:attribute name="Flow" type="String" default=""/>
+    <aura:attribute name="uploadedAttachments" type="ContentVersion[]"/>
+    <aura:attribute name="Filename"  type="String"/>
+    
+    <!-- PSL changes : Nikhil Bugfix #11766 -->
+    
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />    
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.showUploadedDocs}"/>
+    <aura:handler event="c:POS_LA_PassParam" action="{!c.setLoanParam}"/>
+    <aura:handler event="c:POS_PO_PassParam" action="{!c.setPOParam}"/>
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/> 
+    
+    <div id = "POS_LADocument_MainDIV" class="doc-container" style="background:rgb(243, 242, 242);">
+        <ui:scrollerWrapper class="doc-wrapper">                         
+            <div class="slds-grid slds-wrap">
+                <div class="slds-form-element  slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">     <!-- Bug 22425 CC Code changes SME added clsses -->                        
+                    <label class="slds-form-element__label" for="Documents">Select The Document<span style="color:red">*</span></label>
+                    <ui:inputSelect aura:id="Documents" class="slds-input" value="{!v.Filename}" required="true">
+                        <!--<option value="Adhaar Card" text="Adhaar Card" selected=""></option>
+                  <option value="Pan Card" text="Pan Card" selected=""></option>
+                 <option value="Property Details" text="Property Details" selected=""></option>
+                    <option value="Degree" text="Degree" selected=""></option>-->
+                    </ui:inputSelect>                                                                
+                </div> 
+            </div>
+            <div class="slds-box slds-box--small alert">
+                <strong>Please note:</strong> Maximum attachment size should be 5 MB per file.
+            </div>
+            
+            <div class="slds-box slds-box--small slds-m-top--small">             
+                <c:DocumentUploader forPOSDocument="true" aura:id="file-uploader-1" showUploadButton="{!v.Filename}" selectFileErrorFlag="{!((v.Filename != null &amp;&amp; v.Filename !='Select Document Type'  &amp;&amp;v.Filename !='' )?'true':'false')}" parentId="{!v.loanId}" instance="14" fileName="{!v.Filename}" uploadType="attachment"/>
+               <!-- <c:POS_DocumentUploader aura:id="file-uploader-1" showUploadButton="{!v.Filename}" selectFileErrorFlag="{!((v.Filename != null &amp;&amp; v.Filename !='Select Document Type'  &amp;&amp;v.Filename !='' )?'true':'false')}" parentId="{!v.loanId}" instance="14" fileName="{!v.Filename}" uploadType="attachment"/>-->
+            </div>
+
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Uploaded Documents</strong>
+                <div aura:id="uploadedDocs" class="slds-p-around--medium slds-hide">
+					<!-- PSL changes : Nikhil Bugfix #11891 : Removed table, added grid structure -->
+                    <div class="slds-grid slds-has-divider--top">
+                        <div class="slds-col slds-size--2-of-12">Action</div>
+                        <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Name</div>
+                        <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Created Date</div>
+                    </div>
+                    <aura:iteration items="{!v.uploadedAttachments}" var="obj">
+                        <div class="slds-grid slds-has-divider--top">
+                            <div class="slds-col slds-size--2-of-12 slds-text-align--center">
+								<lightning:buttonIcon class="del-btn" aura:id="del-btn" iconName="utility:delete" variant="bare" alternativeText="Delete Attachment." value="{!obj.ContentDocumentId}" onclick="{!c.deleteAttachment}"/>
+                            </div>
+                            <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">{!obj.Title}</div>
+                            <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><ui:outputDateTime value="{!obj.CreatedDate}"/></div>
+                        </div> 
+                    </aura:iteration>
+                </div>
+            </div>
+                      
+            <br/><br/>
+        </ui:scrollerWrapper>
+    </div>
+    <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    
+    <div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+   
+   
+</aura:component>

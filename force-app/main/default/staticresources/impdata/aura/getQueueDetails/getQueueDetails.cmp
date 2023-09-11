@@ -1,0 +1,79 @@
+<aura:component  implements="force:LightningQuickAction,force:hasRecordId">
+	<aura:attribute name="SolPolicy1" type="Object[]" default="{}"/>
+	<aura:attribute name = "QDetails" type ="Object[]" default = "{}"/>
+    <aura:attribute name = "ExceptionQDetails" type="Object[]" default = "{}" />
+	<div class="slds-border_top slds-border_right  slds-border_left  slds-p-horizontal--large slds-p-top--small slds-p-bottom--small slds-form_horizontal">
+		<div class="slds-section slds-is-open">
+			<h3 class="slds-section__title">
+				Queue Volumes: 
+  			</h3>
+			<div aria-hidden="false" class="slds-section__content" >
+				<table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped slds-table_col-bordered">
+					<thead>
+						<tr class="slds-text-title_caps">
+							<th scope="col" style="background-color:rgb(0, 95, 178)">
+								<div class="slds-truncate" style="color: white;"  title="Queue Name">Queue Name</div>
+							</th>
+							<th scope="col" style="background-color:rgb(0, 95, 178)">
+								<div class="slds-truncate" style="color: white;" title="Count Of Cases">Count Of Cases</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<aura:iteration items="{!v.QDetails}" var="QVar" >
+							<tr>
+								<th scope="row" style="background-color: #F5EEEE" data-label="Queue Name">
+									<div class="slds-truncate" title="Queue Name">
+                  						{!QVar.qName}
+                					</div>
+								</th>
+								<td data-label="Count Of Cases" style="background-color: #F5EEEE" >
+									<div class="slds-truncate" title="Count Of Cases">
+                                        {!QVar.caseCount}
+                                    </div>
+								</td>
+							</tr>
+						</aura:iteration>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="slds-border_top slds-border_right  slds-border_left  slds-p-horizontal--large slds-p-top--small slds-p-bottom--small slds-form_horizontal">
+		<div class="slds-section slds-is-open">
+			<h3 class="slds-section__title">
+				Exception Queue Volumes: 
+  			</h3>
+			<div aria-hidden="false" class="slds-section__content" >
+				<table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped slds-table_col-bordered">
+					<thead>
+						<tr class="slds-text-title_caps">
+							<th scope="col" style="background-color:rgb(0, 95, 178)">
+								<div class="slds-truncate" style="color: white;"  title="Exception Queue Name">Queue Name</div>
+							</th>
+							<th scope="col" style="background-color:rgb(0, 95, 178)">
+								<div class="slds-truncate" style="color: white;" title="Exception Queue count">Count Of Cases</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<aura:iteration items="{!v.ExceptionQDetails}" var="QVar" >
+							<tr>
+								<th scope="row" style="background-color: #F5EEEE" data-label="Policy Number">
+									<div class="slds-truncate" title="Policy Number">
+                  						{!QVar.qName}
+                					</div>
+								</th>
+								<td data-label="Effective Date" style="background-color: #F5EEEE" >
+									<div class="slds-truncate" title="Effective Date">
+                                        {!QVar.caseCount}
+                                    </div>
+								</td>
+							</tr>
+						</aura:iteration>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</aura:component>

@@ -1,0 +1,4 @@
+<!-- Sal_Opp_Perfios -->
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="bankAccountPerfios" type="boolean"/>
+</aura:event>

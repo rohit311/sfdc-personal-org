@@ -1,0 +1,26 @@
+<aura:component controller="Expenses2Controller">
+    
+    <aura:attribute name="expenses" type="Expense__c[]"/>
+
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+
+    
+	<ui:inputText aura:id="expname" label="Expense Name"
+    value="{!v.newExpense.Name}" required="true"/>
+
+	<ui:inputNumber aura:id="amount" label="Amount"
+    value="{!v.newExpense.Amount__c}" required="true"/>
+
+	<ui:inputText aura:id="client" label="Client"
+    value="{!v.newExpense.Client__c}" placeholder="ABC Co."/>
+
+	<ui:inputDate aura:id="expdate" label="Expense Date"
+    value="{!v.newExpense.Date__c}" displayDatePicker="true"/>
+
+	<ui:inputCheckbox aura:id="reimbursed" label="Reimbursed?"
+    value="{!v.newExpense.Reimbursed__c}"/>
+
+	<ui:button label="Create Expense" press="{!c.clickCreateExpense}"/>
+
+</aura:component>

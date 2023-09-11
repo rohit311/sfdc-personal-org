@@ -1,0 +1,32 @@
+<aura:component >
+    <aura:attribute name="toastid" type="String" default=""/> 
+    <aura:attribute name="messageid" type="String" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <!--<aura:handler name="init" value="{!this}" action="{!c.displayMessage}"/>-->
+    <aura:handler event="c:InvokeNotificationEVT" action="{!c.handleNotificationEVT}"/>
+    
+	<div id="ErrorToast1" style="display:none;">
+	<div id="ErrorToast" class="" style="padding : 10px 20px 10px 20px; position: fixed;width: 100%; left: 0; top: 0; z-index: 10000;text-align: center;" >
+        <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+            <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+            <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+            <div class="slds-notify__content">
+                <h2 id ="errormsg1"></h2>
+            </div>
+        </div>
+    </div>
+    </div>
+	
+    <!--slds-notify_container-->
+	<div id="SuccessToast1" style="display:none; ">
+    <div id="SuccessToast" class="" style="padding : 10px 20px 10px 20px; position: fixed;width: 100%; left: 0; top: 0; z-index: 10000;text-align: center;" >
+        <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+            <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+            <div class="slds-notify__content">
+                <h2 id ="successmsg1"></h2>
+            </div>
+        </div>
+    </div>
+    </div>
+</aura:component>

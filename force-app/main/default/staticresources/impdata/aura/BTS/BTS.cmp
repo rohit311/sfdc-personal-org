@@ -1,0 +1,108 @@
+<aura:component controller="BTS_apxc">
+    <aura:attribute name="brnCode" type="String"/>
+    <aura:attribute name="brnName" type="String"/>
+    <aura:attribute name="MobileNo" type="String"/>
+    <aura:attribute name="isErrorMsg" type="Boolean"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="msgType" type="String" default="confirm"/>
+    
+    <aura:attribute name="isSpinnerActivated" type="String" default="false" />
+    
+    <aura:handler action="{! c.doInit }" name="init" value="{!this}" />
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+
+    
+    <!-- +-+-+- START : Spinner component -+-+-+- -->
+    <aura:if isTrue="{! v.isSpinnerActivated }">
+       <!-- <div class="demo-only" style="height: 6rem;">
+          <div role="status" class="slds-spinner slds-spinner_medium">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+          </div>
+        </div> -->
+        <lightning:spinner variant="brand" size="large"/> 
+    </aura:if>
+    <!-- +-+-+- START : Spinner component -+-+-+- -->
+    
+    <!-- +-+-+- START : ERROR MESSAGE[if Branch code is incorrect] +-+-+- -->
+    <div class="slds">
+    	<aura:if isTrue="{!v.isErrorMsg}" >
+            <ui:message title="Error" severity="error" closable="false">
+            	<h2>Please Refresh the Page and Enter Proper Branch Code...!!!</h2>
+            </ui:message>
+        </aura:if>
+    </div>
+    <!-- +-+-+- END : ERROR MESSAGE[if Branch code is incorrect] +-+-+- -->
+    
+
+    <div class="slds">
+        <aura:if isTrue="{!!v.isErrorMsg}" >
+            <!-- +-+-+-+-+-+-+- START : Page Header -+-+-+-+-+-+-+- -->
+			<div class="slds-page-header">
+				<div class="slds-grid">
+					<div class="slds-col slds-has-flexi-truncate">
+						<div class="slds-grid">
+							<div class="slds-grid slds-type-focus slds-no-space">
+                                <div class="slds-col slds-float--left">
+                                    <img src="/resource/1463410105000/BajajLogoIns"  alt="Bajaj Finserv" title="Bajaj Finserv" align="right" border="0" />
+                                </div>
+								
+                                <div class="slds-col slds-align_absolute-center slds-grid_align-center slds-text-align_center">
+                                    <h1 class="slds-text-heading--large slds-p-left_xx-large slds-truncate" title="Branch Details">
+                                        Branch Details - <span style="font-weight:bold;">{!v.brnName}</span>
+                                    </h1>
+                                </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+            <!-- +-+-+-+-+-+-+- End  : Page Header -+-+-+-+-+-+-+- -->
+    		
+            <div class="slds-col--padded slds-p-top--large">
+                
+                <!-- -+-+-+ START : form to process inputs -+-+-+ -->
+        		<form>
+    				<div>
+						<ui:inputText aura:id="MobileNumber" label="Mobile Number"
+                        			class="slds-input"
+                        			labelClass="slds-form-element__label"
+                        			value="{!v.MobileNo}"
+                        			required="true"/>
+            
+					</div>
+					
+                    <div> 
+            			<ui:button label="Generate Token" 
+                       				class="slds-m-top--medium"
+                       				labelClass="label"
+                   	   				press="{!c.createToken}"
+                       	/>
+						<ui:button label="Reset" 
+                       				labelClass="label"
+                       				class="slds-m-top--medium"
+                       				press="{!c.resetData}"
+                       />
+					</div>
+        		</form>
+                <!-- -+-+-+ END : form to process inputs -+-+-+ -->
+                
+				
+                <!-- +-+-+- START : Status message if SMS sent/not sent -+-+-+- -->
+                <div id="successMsgId" style="display:none;" class="slds-col--padded slds-p-top--large"> 
+                    <span>
+                        <ui:message severity="{!v.msgType}" title="Status" closable="true">
+                            {! v.errorMessage}  
+                        </ui:message> 
+                    </span>
+                </div>
+                <!-- +-+-+- END : Status message if SMS sent/not sent -+-+-+- -->
+                
+
+			</div>
+		</aura:if>
+	</div>  
+</aura:component>

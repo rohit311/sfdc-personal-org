@@ -1,0 +1,94 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2" 
+                implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="items" type="Product_Offerings__c[]" default=""/>
+    <aura:attribute name="userInfo" type="user"/> 
+	<aura:attribute name="defaultShow" type="Boolean" default=""/><!--Bug 17583-->
+    <aura:attribute name="PANString" type="String" default=""/> 
+    <aura:attribute name="NAMEString" type="String" default=""/> 
+    <aura:attribute name="MOBILEString" type="String" default=""/> 
+    <aura:attribute name="currentUser" type="String" default=""/> 
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToParent"/>
+    <aura:attribute name="showgrabcomp" type="Boolean" default="true"/>
+    <aura:handler event="c:navigateToParent" action="{!c.navigateToMyPO}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:SetPOId" action="{!c.removerecord}"/>
+    <aura:handler event="c:DestroyChild" action="{!c.DestroyChildCmp}"/>
+    <!--added for 23064-->
+    <aura:attribute name="validExotelProd" type="String[]" default=""/> 
+    <!--added for 23064-->
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <ui:scrollerWrapper class="scrollerSize">
+        <div class="innerDivWrapper" >
+            
+            <aura:if isTrue="{!v.showgrabcomp}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:button aura:id="BackButtonId" iconName="utility:back" class="slds-theme_alt-inverse" variant="brand" label="Back" onclick="{!c.sendback}" />
+                    </div>
+                </div>
+				<br/>
+                <lightning:card title="" class="applyMarginToCard slds-section-title--divider " >
+                  <div class="slds-text-heading_small">Search Customer Details</div>
+
+                    <p class="slds-p-horizontal_small">
+                        <div class="slds-p-horizontal--small">                
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="PANString" label="Enter PAN" value="{!v.PANString}" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="please enter valid PAN" name="PANString" placeholder="Enter PAN"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="NAMEString" label="Enter NAME" pattern="^[a-zA-Z ]+$" messageWhenPatternMismatch="Please Enter valid Name" value="{!v.NAMEString}" name="NAMEString" placeholder="Enter Name"/><!--added pattern,messageWhenPatternMismatch attribute for bug id 17585-->        
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="MOBILEString" label="Enter Mobile Number" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile Number" maxlength="10" value="{!v.MOBILEString}" name="MOBILEString" placeholder="Enter Mobile Number"/>  
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>
+                    </p>
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:search" variant="brand" label="Search" onclick="{!c.searchWithPan}" />
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="resetButtonId" iconName="utility:clear" variant="brand" label="Reset" onclick="{!c.resetFields}" />
+                        </div>
+                    </div>
+                </lightning:card>
+                
+                <div aura:id="polist">
+                    {!v.body}
+                    
+                    <aura:if isTrue="{!v.items != null}">
+                        <lightning:card title="Product Offerings" class="applyMarginToCard slds-section-title--divider"/>
+                    </aura:if>
+					<!--Bug 17583 Start-->
+                    <aura:if isTrue="{!v.defaultShow}">
+							<lightning:card title="No Records Found" class="applyMarginToCard slds-section-title--divider"/>
+					</aura:if>
+					<!--Bug 17583 End--> 
+                    <aura:iteration items="{!v.items}" var="PerItem">
+                        <lightning:card class="applyMarginToCard slds-section-title--divider sentence" >
+                            <c:ProductOfferingDisplayComponent isTeleCaller="{!v.isTeleCaller}" isFieldAgent="{!v.isFieldAgent}" item="{!PerItem}" currentUser="{!v.currentUser}" sbsBranch="{!PerItem.Lead__r.SBS_Branch__r.Name}" userBranchCity="{!v.userInfo.Branch_City__c}" validExotelProd="{!v.validExotelProd}"/><!--Added srcChennel and userBranchCity for Bug 17930(CR)--><!--Added validExotelProd for Bug 23064-->
+                        </lightning:card>
+                    </aura:iteration>
+                </div>
+            </aura:if> 
+           <div aura:id="grabcmp"> 
+            {!v.body}
+           </div>
+        
+        </div>
+    </ui:scrollerWrapper>
+    
+</aura:component>

@@ -1,0 +1,23 @@
+.THIS {
+}
+.THIS .header{
+         background:#1C86EE !important;
+    	 /*background:#F6F6D8 !important;*/
+         color:#ffffff !important;
+         font-weight:bold !important;
+         font-size:12px !important;
+}
+
+.THIS .labelColor{
+    
+    color:#000000 !important;
+}
+
+.THIS .fontsize{
+    font-size:20px;
+}
+
+.THIS a {
+text-decoration: none !important;
+}.THIS {
+}

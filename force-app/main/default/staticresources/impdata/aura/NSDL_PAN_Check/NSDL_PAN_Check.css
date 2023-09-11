@@ -1,0 +1,47 @@
+.THIS .bgclr {
+  background: #e1e5f4 ;
+}
+.THIS .bgclr1 {
+  background: #1589ee;
+}
+
+.THIS .bgyellow {
+    background: #FFFF00;
+}
+
+.THIS .bgBlue {
+    background: #b2b2ff !important;
+}
+
+.THIS .bglightBlue {
+    background: #ADD8E6  !important;
+}
+
+.THIS .wrapStyle {
+    height:50vh;
+    overflow-x:hidden;
+    overflow-y:scroll;
+}
+
+
+.THIS .requiredCss {
+    border-style: solid;
+    border-width: medium;
+    border-left-color: red;
+}
+.THIS .BFLStyle {
+    color: white !important; 
+    background-color: #0072bc !important;
+    text-align: center;
+}
+
+/*
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+   .THIS .IEclass { width: 85% !important; }
+} 
+
+*/
+
+.THIS .disable {
+    pointer-events : none;
+}

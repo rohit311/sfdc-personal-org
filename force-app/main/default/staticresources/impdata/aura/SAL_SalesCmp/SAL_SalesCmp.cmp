@@ -1,0 +1,192 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL" controller="SALMobilityCntrl_V2">
+    <aura:attribute name="productList" type="String[]" default="SPL,SAL,SEL,RSL"/> <!--24673 -->
+        <aura:attribute name="camObj" type="CAM__c" /><!--1652 -->
+    <aura:attribute name="cibilReinitiated" type="Boolean" default="false"/> <!--SAL 2.0 CR's-->
+    <aura:attribute name="cityList" type="List"/> <!--City CR -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="secondaryCibilRecs" type="CIBIL_secondary_match__c[]"/><!--10647 -->
+    <aura:attribute name="loanVariantList" type="String[]"/><!-- US 1652 -->
+    <aura:attribute name="appTypeLst" type="List" default="['Primary']"/><!--24668 -->
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="cibDetails" type="Object" /><!--Bug 22624 Rohit -->
+	 <aura:attribute name="ckycFlow" type="Object" default=""/> <!--23578 -->
+    <aura:attribute name="currentDate" type="String" default=""/><!--23578 -->
+    <aura:attribute name="dataSource" type="String" default=""/><!--23578 -->
+    <aura:attribute name="isCkycReadOnly" type="Boolean" default="false"/><!--23578 -->
+		<aura:attribute name="preLangList" type="List"/><!--Bug 24675 -->
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+   	<aura:handler event="c:MCPRejectEvent" action="{!c.MCPRejectEvent}"/>
+    <aura:attribute name="theme" type="String"/>
+    <aura:attribute name="custId" type="String"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+    <aura:attribute name="salesRejectStage" type="Boolean" default="true"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="oppObj" type="Opportunity" />
+    <aura:attribute name="accObj" type="Account" />
+    <aura:attribute name="priAppObj" type="Applicant__c" default="{}"/>
+    <aura:attribute name="priConObj" type="Contact" />
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibilExt" type="CIBIL_Extension__c"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c"/>
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute name="openTab" type="Boolean" default="false"/>
+    <aura:attribute name="homeFlag" type="Boolean" default="true"/>
+    <aura:attribute name="newloanFlag" type="Boolean" default="true"/>
+    <aura:attribute name="toggleI" type="Boolean" default="false"/>
+    <aura:attribute name="dsaUser" type="Boolean" default="false"/>
+    <aura:attribute name="isPreapproved" type="Boolean" default="false"/>
+    <aura:attribute name="MCPRejectON1" type="Boolean" default="true"/>
+    <aura:attribute name="fromcloneflag" type="Boolean" default="false"/> <!--Added for Bug 23577-->
+    <aura:attribute name="tabVisiblityclone" type="boolean" default="false"/><!--Added for Bug 23577-->
+	<aura:attribute name="Sendbacklist" type="List"/><!-- User Story 985-->
+    <!--ckyc start-->
+    <aura:attribute name="maritalStatusList" type="List"/>
+    <aura:attribute name="fatherSpouseList" type="List"/>
+    <aura:attribute name="F_S_salutationlist" type="List"/>
+    <aura:attribute name="documentTypeList" type="List"/>
+    <aura:attribute name="employmentTypeList" type="List"/>
+    <aura:attribute name="genderList" type="List"/>
+    <aura:attribute name="residenceTypeList" type="List"/>
+    <aura:attribute name="OccupationList" type="List"/>
+    <aura:attribute name="permDocumentList" type="List"/>
+    <aura:attribute name="TatTime" type="String"/>
+    <aura:attribute name="mcpRejFlag" type="boolean" default="false"/>
+    <!--ckyc end-->
+    <aura:attribute name="randomNum" type="String" /><!-- Bug 18669 -->
+	<aura:attribute name="hideBiometricOption" type="Boolean" default="false"/><!--18669-->
+    <!-- updated by swapnil Bug : 20884 default value set to Aadhar OTP -->
+    <aura:attribute name="aadharValueDss" type="String" default="Aadhaar OTP"/><!-- Bug 18669 --><!--changed default value for bug id 20884-->
+    <!--Rohit submit to sales & ekyc start-->
+    <aura:attribute name="isSalesVisible" type="boolean" default="false"/>
+    <aura:attribute type="Boolean" name="isEkycDone" default="false"/>
+    <!--Rohit submit to sales & ekyc stop-->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="fireDynOffer" type="c:fireDynOffer"/>
+    <aura:registerEvent name="firePanBreCheck" type="c:firePanBreCheck"/>
+    <aura:registerEvent name="checkSOlPolicy" type="c:checkSOlPolicy"/> <!-- 20939 -->
+    <aura:registerEvent name="initiateKYCFormEvent" type="c:InitiateKYCForm"/><!--18669-->
+    <aura:attribute type="String" name="stageName" default="DSA/PSF Login"/> <!-- CR 22307 -->
+    <aura:handler event="c:navigateToParent" action="{!c.navigateToMyPO}"/>
+    <aura:handler event="c:ShowToastEvent" action="{!c.showToast}"/>
+ 	<!--check component loading Aman start-->
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <!--check component loading Aman end-->
+    <aura:attribute name="officeAddress" type="String" default=""/>
+    <!--check component loading Aman start-->
+    <aura:handler event="c:UpdateConAcc" action="{!c.setConAcc}"/><!-- sal 2.0 adhoc-->
+     <aura:attribute name="mobilityversion" type="String"/>
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--  added for bug id 22047-->
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--partial CR-->
+    
+    <aura:attribute name="finApplCon" type="Contact"/><!--Bug 24668 983-->
+    <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 983-->
+    
+    <!-- US 983 rohit start -->
+    <aura:attribute name="obligLst" type="List"/>
+    <aura:attribute name="oblType" type="List"/>
+    <aura:attribute name="statusLst" type="List"/> 
+    <aura:attribute name="finLst" type="List"/>
+    <aura:attribute name="loanTypeLst" type="List"/>
+    <aura:attribute name="allApps" type="List"/>
+    <!-- US 983 rohit end -->
+    
+    <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+    <div class=" slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+       <!-- <div class="slds-align_absolute-center" style="height: 5rem;">-->
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-wrap slds-align-middle" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--check component loading Aman end-->
+    
+    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+        <ui:scrollerWrapper class="scrollerSize">
+    	<div style="position:relative">
+    	<div class="innerDivWrapper">
+            <c:IdentifierForMobility /><!--user story 978-->
+            <aura:if isTrue="{!v.newloanFlag}">
+               <c:Custom_Toast_Mobility />
+                <c:LoaderForMobility />
+            </aura:if>
+            <aura:if isTrue="{!v.homeFlag}">
+                        <div aura:id="boxBorder" ><!--24668 added priAppObj & finAppl -->
+                          <c:LACard priAppObj="{!v.priAppObj}" finAppl="{!v.finAppl}" stageName="{!v.stageName}" oppObj="{!v.oppObj}" stageCompletion="{!v.stageCompletion}" TATtime="{!v.TatTime}"/>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.openTab}">
+                            <lightning:tabset >
+                                <!--SAL 2.0 CR's added getDataOnReinitiation --><!-- 24675 - added preLangList-->
+                                <lightning:tab label="Landing Page" class="slds-border_right borderColor " onactive="{!c.fetchEkycDetails}"><!--added onactive="{!c.fetchEkycDetails}" for bug id 18669-->
+                                    <!--22624 added cibDetails-->
+									<!--23578 added current date,isCkycReadOnly & ckycflow --><!-- 10647-->
+                                    <!-- 24673 added productList 10647-->
+									<c:SAL_OpportunityLanding_Clone productList="{!v.productList}" secondaryCibilRecs="{!v.secondaryCibilRecs}" aura:id="landPg" cibilTemp="{!v.cibilTemp}" dataSource="{!v.dataSource}" isCkycReadOnly="{!v.isCkycReadOnly}" ckycFlow="{!v.ckycFlow}" tabVisiblityclone="{!v.tabVisiblityclone}" fromcloneflag ="{!v.fromcloneflag}" cibDetails="{!v.cibDetails}" cityList="{!v.cityList}" stageName="{!v.stageName}"  preLangList="{!v.preLangList}" iscommunityUser="{!v.iscommunityUser}" tatMasterRecord="{!v.tatMasterRecord}" kyc="{!v.kyc}" salesRejectStage="{!v.salesRejectStage}" stageCompletion="{!v.stageCompletion}" cibilobj="{!v.cibilobj}" cibilExt="{!v.cibilExt}" cibilExt1="{!v.cibilExt1}" nameTheme="{!v.theme}" oppId="{!v.recordId}" loan="{!v.oppObj}" account="{!v.accObj}" contact="{!v.priConObj}" applicant="{!v.priAppObj}"/><!-- added tabVisiblityclone and fromcloneflag for Bug 23577-->
+                                    </lightning:tab>
+                                
+                               <aura:if isTrue="{!and(v.MCPRejectON1,!v.hideAadhaarSection)}"><!--hideAadhaarSection condition added for Bug 22047-->
+                              <lightning:tab label="EKYC Details" class="slds-border_right borderColor" onactive="{!c.fetchEkycDetails}">
+                                <c:EkycComponent page="Sales2" stageName="{!v.stageName}" custId="{!v.custId}" appNew="{!v.priAppObj}" kyc="{!v.kyc}" isEkycDone="{!v.isEkycDone}" isPreapproved="{!v.isPreapproved}" randomNum="{!v.randomNum}" aadharValueDss="{!v.aadharValueDss}" hideBiometricOption = "false"/> <!--18669--> 
+                                </lightning:tab>
+                                </aura:if>
+                                <aura:if isTrue="{!and(and(and(v.recordId, v.salesRejectStage),v.MCPRejectON1),v.tabVisiblityclone)}"><!--Added tabVisiblityclone for Bug 23577-->
+                                    <lightning:tab onactive="{!c.fireCKYCDemographic}" label="Demographic Details" class="slds-border_right borderColor">
+                                        <c:SAL_Opp_Demographic cibilReinitiated="{!v.cibilReinitiated}" cityList="{!v.cityList}" isUnderwitercmp="false" stageName="{!v.stageName}" oppId="{!v.recordId}" priAppObj="{!v.priAppObj}" oppObj="{!v.oppObj}" accObj="{!v.accObj}" conObj="{!v.priConObj}"/>
+                                    </lightning:tab>
+                                    <lightning:tab label="Employment Details" class="slds-border_right borderColor" onactive="{!c.fetchEkycDetails}">
+                                        <c:SALOpportunityEmployment_Page cityList="{!v.cityList}" isUWCheck="false" stageName="{!v.stageName}" stageCompletion="{!v.stageCompletion}" priAppObj="{!v.priAppObj}" aura:id="sourcedetails" officeAddress ="{!v.officeAddress}" empAccount="{!v.accObj}" empOpp="{!v.oppObj}" empContact="{!v.priConObj}"/>
+                                    </lightning:tab>
+                                    <lightning:tab onactive="{!c.fireCKYCDemographic}" label="Other Details" class="slds-border_right borderColor"><!-- 24675 added isSalMob -->
+                                        <c:Generic_Ckyc hideSections="true" isSalMob="true"  cityList="{!v.cityList}" isUWCheck="false" stageName="{!v.stageName}" tatMasterRecord="{!v.tatMasterRecord}" forprimeAPP="true" oppObj="{!v.oppObj}" oppId="{!v.recordId}" accObj="{!v.accObj}" contObj="{!v.priConObj}" appObj="{!v.priAppObj}"/>
+                                    </lightning:tab>
+                  <!--removed onactive="{!c.fireFinalOff}"1652 -->                
+                                    <lightning:tab  label="Offer" class="slds-border_right borderColor"><!--23578 added ckycflow,currentdate-->
+                                    <!-- passed bankaccount partial CR    <c:Final_Offer_Details bankAccount="{!v.bankAccount}"  currentDate="{!v.currentDate}" ckycFlow="{!v.ckycFlow}" cityList="{!v.cityList}" isCredit="false" stageName="{!v.stageName}" iscommunityUser="{!v.iscommunityUser}" stageCompletion="{!v.stageCompletion}" dsaUser="{!v.dsaUser}" isSalesVisible="{!v.isSalesVisible}" isPreapproved="{!v.isPreapproved}" nameTheme="{!v.theme}" oppId="{!v.recordId}" loan="{!v.oppObj}" account="{!v.accObj}" contact="{!v.priConObj}" applicant="{!v.priAppObj}" primaryApp="{!v.priAppObj}"/> -->
+                                       <!-- US 983 added obligLst,oblType,statusLst--><!-- 1652 added loanvariant --><!-- 24668 added finAppl -->
+                                         <!-- passed bankaccount partial CR-->  <!-- 24668 added finAppl -->
+										 <c:Final_Offer_Details cityList="{!v.cityList}" camObj="{!v.camObj}" profileName="{!v.profileName}" finApplCon="{!v.finApplCon}" bankAccount="{!v.bankAccount}" finAppl="{!v.finAppl}" finLst="{!v.finLst}" loanVariantList="{!v.loanVariantList}"  loanTypeLst="{!v.loanTypeLst}" allApps="{!v.allApps}" statusLst="{!v.statusLst}" oblType="{!v.oblType}" obligLst="{!v.obligLst}" currentDate="{!v.currentDate}" ckycFlow="{!v.ckycFlow}" isCredit="false" stageName="{!v.stageName}" iscommunityUser="{!v.iscommunityUser}" stageCompletion="{!v.stageCompletion}" dsaUser="{!v.dsaUser}" isSalesVisible="{!v.isSalesVisible}" isPreapproved="{!v.isPreapproved}" nameTheme="{!v.theme}" oppId="{!v.recordId}" loan="{!v.oppObj}" account="{!v.accObj}" contact="{!v.priConObj}" applicant="{!v.priAppObj}" primaryApp="{!v.priAppObj}"/>                                    
+                                    </lightning:tab>
+                                    <lightning:tab onactive="{!c.fireCKYCDemographic1}" label="Document Section" class="slds-border_right borderColor">
+                                        <!--24668 added finAppl,appTypeLst,appTypeLst -->
+                                        <c:SAL_OppDocument finApplCon="{!v.finApplCon}" appTypeLst="{!v.appTypeLst}" finAppl="{!v.finAppl}" Sendbacklist = "{!v.Sendbacklist}" isUnderwitercmp="false" stageName="{!v.stageName}" profileName="{!v.profileName}" nameTheme="{!v.theme}" Accobj="{!v.accObj}" Conobj="{!v.priConObj}" primaryApp="{!v.priAppObj}" oppId="{!v.recordId}" Oppobj="{!v.oppObj}" isSalesVisible="{!v.isSalesVisible}"/><!--User story 985 added Sendbacklist-->
+                                    </lightning:tab>    
+                                </aura:if> 
+                                                                          
+                              
+                            </lightning:tabset>
+                        </aura:if>
+            
+            </aura:if>
+         <div aura:id = "childCmpbody"> {!v.body} </div> 
+        </div>
+            
+            </div>
+            </ui:scrollerWrapper>
+    
+    </aura:if>
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close1111</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

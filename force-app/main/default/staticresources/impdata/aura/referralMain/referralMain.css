@@ -1,0 +1,74 @@
+.THIS {
+}
+.THIS th{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+.THIS .alignCenter{
+   text-align:center;
+}
+.THIS .WrapText
+{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+   -moz-hyphens: auto;
+}
+.THIS .titleSize {
+    font-size:14px;
+    min-width:150px;
+    
+}
+.THIS .fleft{
+    float:left;
+}
+.THIS .floatLeft
+{
+padding-left: 0.5px;
+}
+
+.THIS .important-message {
+   font-weight: bold;
+        font-size: 150%;
+
+}
+
+.THIS .slds-card__header 
+{
+    padding: 0px;
+}
+
+.THIS .a {
+    text-decoration: none;
+}
+
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS .blue-color{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+
+.THIS .borderColor {
+    border-top: 1px solid rgb(187, 188, 189);
+   
+}
+.THIS .slds-scope {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS .slds-theme_alt-inverse {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}

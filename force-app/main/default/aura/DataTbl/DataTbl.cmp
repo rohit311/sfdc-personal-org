@@ -1,0 +1,23 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+	<aura:attribute name="headers" type="List" default="['a','b']"/>
+    <aura:attribute name="dataRows" type="List" default="['x','y']"/>
+    
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead>
+            <tr class="slds-line-height_reset">
+            	<aura:iteration items="{!v.headers}" var="item">
+    				<th>{!item}</th>
+  				</aura:iteration>
+        	</tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.dataRows}" var="row">
+                <tr>
+                    <aura:iteration items="{!row}" var="dataMap">
+                        <td>{!dataMap.value}</td>
+                    </aura:iteration>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+</aura:component>

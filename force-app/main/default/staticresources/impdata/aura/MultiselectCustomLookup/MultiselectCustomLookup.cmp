@@ -1,0 +1,123 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="MultiSelectComponentCtrl">
+    <aura:attribute name="mydata" type="Object" />
+    <aura:attribute name="mycolumns" type="List" />
+    <aura:attribute name="lookupField" type="String" />
+    <aura:attribute name="showSetsPagination" type="boolean" default="false" />
+
+    <aura:attribute name="selectedValues" type="List" />
+    <aura:attribute name="objectApiName" type="String" />
+    <aura:attribute name="refNumber" type="Decimal" />
+    <aura:attribute name="setValue" type="List" />
+
+    <aura:attribute name="currentSelected" type="List" />
+    <aura:attribute name="SelectedData" type="Map" default="{}" />
+    <aura:attribute name="currentPageNo" type="Integer" />
+
+    <!-- <aura:attribute name="alreadySelectedList" type="List"/> -->
+    <aura:attribute name="showMainTable" type="boolean" default="false" />
+    <aura:attribute name="listToBeDisplayed" type="Object" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Register the component level event-->
+    <aura:registerEvent name="oSelectedRecordIdListEvent" type="c:SelectedRecordIdListEvent" />
+
+    <!--declare attributes-->
+    <aura:attribute name="lstSelectedRecords" type="sObject[]" default="[]" description="Use,for store SELECTED sObject Records" />
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class" />
+    <aura:attribute name="SearchKeyWord" type="string" />
+    <!--     <aura:attribute name="objectAPIName" type="string" default=""/> -->
+    <aura:attribute name="IconName" type="string" default="" />
+    <aura:attribute name="label" type="string" default="" />
+
+    <!--declare events hendlers-->
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordsEvent" action="{!c.handleComponentEvent}" />
+    <aura:attribute name="Message" type="String" default="" />
+
+    <!-- Pagination attribute start -->
+    <aura:attribute name="currentPage" type="Integer" />
+    <aura:attribute name="prevPage" type="Integer" />
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer" />
+    <aura:attribute name="totalRecords" type="Integer" />
+    <aura:attribute name="pageSize" type="Integer" default="10" />
+    <aura:attribute name="pagenumber" type="Integer" />
+    <aura:attribute name="page" type="integer" default="0" description="used to store page Number" />
+    <!-- Pagination attribute end -->
+    <aura:if isTrue="{!v.showSetsPagination}">
+        <div class="">
+            <div class="slds-p-horizontal--small ">
+                <div class="slds-grid slds-grid_align-center ">
+                    <lightning:buttonGroup>
+                        <lightning:button label="Previous" disabled="{!v.startPage == 0}" onclick="{!c.getPreviousElements}" variant="brand" iconName='utility:back'/>&nbsp;&nbsp;&nbsp;
+                        <lightning:button label="Next" disabled="{!v.endPage >= (v.totalRecords) }" onclick="{!c.getNextElements}" variant="brand" iconName='utility:forward' iconPosition='right' />
+                    </lightning:buttonGroup>                    
+                </div>
+            </div>
+            <br/>
+
+            <!-- search -->
+
+            <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close">
+                <label class="slds-form-element__label">{!v.label}</label>
+                <!--This part is for display search bar for lookup-->
+                <div class="slds-form-element__control">
+                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                        <!-- This markup is for when an record is selected -->
+                        <div aura:id="lookup-pill" class="slds-pill-container">
+                            <div aura:id="lookupField" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" style="width: 100%;">
+
+                                <ui:inputText click="{!c.onfocus}" updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input inputSize" value="{!v.SearchKeyWord}" placeholder="search.." />
+
+                                <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                            <lightning:icon iconName="utility:search" size="x-small" alternativeText="icon"/>
+                        </span>
+                            </div>
+                            <!--Selected Records Pills Section-->
+                            <aura:iteration items="{!v.lstSelectedRecords}" var="sr">
+                                <lightning:pill class="slds-m-around_xx-small" label="{!sr.Name}" name="{!sr.Id}" onremove="{! c.clear }">
+                                    <!-- <aura:set attribute="media">
+                                <lightning:icon size="x-small" alternativeText="icon"/>
+                            </aura:set>-->
+                                </lightning:pill>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                </div>
+
+                <!--This part is for Display typehead lookup result List-->
+                <ul style="min-height:40px;margin-top:0px !important" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                    <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner" />
+                    <center> {!v.Message}</center>
+                    <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                        <!--Child Component-->
+                        <c:reUsableMultiSelectLookupResult oRecord="{!singleRec}" IconName="{!v.IconName}" />
+                    </aura:iteration>
+                </ul>
+            </div>
+
+            <br/>
+            <lightning:datatable aura:id="dtId" data="{!v.listToBeDisplayed}" keyField="Id" columns="{!v.mycolumns}" onrowselection="{!c.onChangeOfCheckedStatus}" />
+            <br/>
+            <lightning:button class="slds-button slds-button_brand" name="InsertSelected" label="Insert Selected" onclick="{!c.setSelectedValues}" />
+        </div>
+    </aura:if>
+
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</aura:component>

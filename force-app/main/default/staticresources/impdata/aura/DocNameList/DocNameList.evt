@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="DocNameList" type="string[]" default=""/>
+    <aura:attribute name="DocumentNameMap" type="Map" default="{}" /> 
+    <aura:attribute name="AllDocumentNameMap" type="Map" default="{}" />
+    <aura:attribute name="docCountMap" type="Map" default="{}" />
+</aura:event>

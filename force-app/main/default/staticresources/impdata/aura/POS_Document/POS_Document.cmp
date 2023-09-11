@@ -1,0 +1,36 @@
+<aura:component access="global" controller="SFDCMobilePOController">
+    
+    <ltng:require scripts="/resource/jqueryformobility1" />
+    <aura:attribute name="po" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="uploadedAttachments" type="ContentVersion[]"/>
+    <!-- PSL changes : Nikhil Bugfix #11766 -->
+    <aura:attribute name="offer" type="SFDCMobilePOUtility.OfferDetails" default="{}"/> 
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.getDetails}"/>
+    <aura:attribute name="areDetailsFetched" type="Boolean" default="false" />
+    
+    <!-- PSL changes : Nikhil Bugfix #11766 -->
+    <aura:handler event="c:LoanConversionEvent" action="{!c.setOfferConverted}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:if isTrue="{!v.areDetailsFetched}">
+    <div id = "POS_CPV_MainDIV" class="doc-container" style="background:rgb(243, 242, 242);">
+        <ui:scrollerWrapper class="doc-wrapper">
+        
+            <c:VerificationImageUpload parentObj = "PO"  loanApplicationId = "{!v.po.Id}" />
+         
+            
+            <br/><br/>
+            <br/><br/>
+        </ui:scrollerWrapper>
+    </div>
+    </aura:if>
+    
+    <div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+   
+</aura:component>

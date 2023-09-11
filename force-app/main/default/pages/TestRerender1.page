@@ -1,0 +1,11 @@
+<apex:page standardController="Contact">
+<apex:form >
+  <apex:pageblock >
+      <apex:pageblocksection >
+         <apex:inputField value="{!Contact.Salutation}"> 
+             <apex:actionSupport event="onchange" reRender="pb"/>
+        </apex:inputField> 
+      </apex:pageblocksection>
+  </apex:pageblock>
+</apex:form>
+</apex:page>

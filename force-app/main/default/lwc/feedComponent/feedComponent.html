@@ -1,0 +1,23 @@
+<template>
+    <template if:true={isValidResponse}>
+        <template if:true={listOfFeeds}>
+            <lightning-carousel>
+                <template for:each={listOfFeeds} for:item="feed">
+                    <lightning-carousel-image
+                    class="autoHeightCls"
+                    key={feed.title}
+                    src = {feed.image}
+                    header = {feed.title}
+                    description = ""
+                    alternative-text = {feed.title}
+                    href = {feed.url}>
+                </lightning-carousel-image>
+                        
+                </template>
+            </lightning-carousel>
+        </template>
+    </template>
+    <template if:false={isValidResponse}>
+        {label.serverError}
+    </template>
+</template>

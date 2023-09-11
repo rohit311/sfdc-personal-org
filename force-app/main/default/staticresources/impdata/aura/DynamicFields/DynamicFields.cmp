@@ -1,0 +1,624 @@
+<aura:component controller="DynamicFieldsController" implements="force:appHostable" access="global">
+    <!-- Load SLDS library from static resource -->
+    <ltng:require styles="{!$Resource.SLDSv2 + '/assets/styles/salesforce-lightning-design-system.css'}"/>
+    
+    <!--SAL mobility events--> 
+    <aura:registerEvent name="salMobileFlowEvent" type="c:SalMobFlowEvent"/>
+    <!-- 23556 S -->
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+    <!-- 23556 E -->
+    <aura:attribute name="displayReadOnlyEmployeeLoan" type="boolean" default="false"/><!-- 20934 added by hrushikesh-->    
+
+    <!-- attributes used for SAL mobility -YK-->
+    <aura:attribute name="isSalMobilityFlow" type="Boolean" default="false" access="public" description="This flag will be true when it's SalMobility flow"/>
+    
+    <!--POS LA 17664 mobility events-->
+    <aura:registerEvent name="posLAFlowEvent" type="c:PosLAFlowEvent"/>
+    <aura:registerEvent name="passInsuranceListEvt" type="c:PassInsuranceListEvent"/>
+    
+    <!--attribute for DI POS LA flow 17664-->
+    <aura:attribute name="isPosLaFlow" type="Boolean" default="false" access="public" description="This flag will be true when it's POS LA flow"/>
+    <aura:attribute name="isInsurancePosLaFlow" type="Boolean" default="false" access="public" description="This flag will be true when it's POS LA flow for insurance component"/>
+    <aura:attribute name="posLaApprInsurance" type="Decimal" default="false" access="public" description="This is approved insurance amount when it's POS LA flow for insurance component"/>
+	
+    <!-- Attributes of type Object or List -->
+    <aura:attribute name="ObjectList" type="Object[]" access="private" description="This contains a list of JSON objects where every object contains list of fields JSON"/>
+	<aura:attribute name="ObjectListELA" type="Object[]" access="private" description="This contains a list of JSON objects where every object contains list of fields JSON"/> <!-- Added for 22181. Copy of ObjectList without last element -->
+    <aura:attribute name="FieldList" type="Object[]" description="This contains a list of field configuration"/>
+    <aura:attribute name="ObjectVar" type="Object" access="private" description="This acts as a referrence to the current record opened in the modal"/>
+    <aura:attribute name="IdList" type="String[]" description="This contains a list of id which are used to get records"/>
+	<aura:attribute name="sliderParams" type="Object"/> <!-- Added for 22181 -->
+    <aura:attribute name="MyContenHomePremMap" type="Object" access="private" description="This contains mapping of Premium Amount based on Sum Insured Option and Policy Tenure for product MY CONTENT-HOME"/>
+    <!-- Attributes of type String -->
+    <aura:attribute name="ObjectName" type="String" description="This contains an object name for which records are to be retrieved"/>
+    <aura:attribute name="LookupField" type="String" access="private" description="This contains API name of lookup field"/>
+    <aura:attribute name="Index" type="String" access="private" description="This contains an index of record which is selected from list"/>
+    <aura:attribute name="validationMsg" type="String" access="private" description="This contains a validation message to be displayed in case of insurance premium validation"/>
+    <aura:attribute name="flow" type="String" access="public"/>
+    <aura:attribute name="InsuranceProduct" type="String" access="public"/>
+    
+    <!-- Attributes of type Boolean -->
+    <aura:attribute name="isOpen" type="Boolean" default="false" access="private" description="This flag indicates status modal window which can be open or close"/>
+    <aura:attribute name="isNewRecord" type="Boolean" default="false" access="private" description="This flag will be true for new record to be inserted"/>
+    <aura:attribute name="isViewRecord" type="Boolean" default="false" access="public" description="This flag will be true for view mode"/>
+    <aura:attribute name="isValidRecord" type="Boolean" default="false" access="private" description="This flag will be true when the record to be inserted or updated is valid"/>
+    <aura:attribute name="isDisabled" type="Boolean" default="false" access="private" description="This flag will controls disablity of add new, save and cancel buttons"/>
+    <aura:attribute name="isDoneRendering" type="Boolean" default="false" access="private" description="This flag will be true when the component is rendered completely"/>
+    <aura:attribute name="isProgressVisible" type="Boolean" default="true" access="public" description="This flag is used to toggle visibility of circular progress bar"/>
+    <aura:attribute name="isAddInsView" type="Boolean" default="false" access="private" description="This flag will be true on click of Add Insurance"/>
+    
+    <!-- Attributes of type Integer -->
+    <aura:attribute name="CalculatedHeight" type="Integer" default="50" access="public" description="This contains maximum height for individual row of table displayed"/>
+    <aura:attribute name="DefaultRecords" type="Integer" default="5" access="private" description="This contains maximum number of records to be displayed in window"/>
+    <aura:attribute name="enabledFieldsCount" type="Integer" default="1" access="private" description="This contains total number of fields which are enabled"/>
+    <aura:attribute name="filledFieldsCount" type="Integer" default="1" access="private" description="This contains total number of fields for which values are entered properly"/>
+    <aura:attribute name="percentFilled" type="Integer" default="0" access="private" description="This contains percentage of fields for which values are entered properly"/>
+    <aura:attribute name="LoanAmount" type="Integer" default="0" access="private"/> <!-- Added for 22181 -->
+	
+    <!-- Attributes of type Object -->
+    <aura:attribute name="PicklistValuesMapping" type="Object" access="public" description="This contains mapping of controlling field value to dependent field values for all dependent picklists"/>
+    <aura:attribute name="FieldPropertiesMap" type="Object" access="private" description="This contains map of field API name to field property JSON object"/>
+    
+    <!-- Event handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="This event is handled when the component is initialized"/>
+    <aura:handler name="SelectedRecordEvent" event="c:SelectedRecordEvent" action="{!c.getRecordId}" description="This event is handled when the record is selected for any lookup field"/>
+
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    <aura:attribute name="isReadOnlyPOSLA" type="Boolean" default="false"/>
+<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+   
+ <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="product" type="String"/>
+      <aura:attribute name="RSAPage" type="String"/>
+    	<aura:attribute name="isDisbDashboard" type="Boolean" default="false"/><!-- Bug 22835-->
+         <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+
+    {!v.body}
+    <!-- Start of parent div for SLDS -->
+     
+    <div>
+        <div class="slds">
+          <ui:scrollerWrapper >
+               
+              <div style="{!if(v.isDisbDashboard==true, 'height:100%', 'height:' + v.CalculatedHeight + 'px' ) }">
+                 <!--div style="{!'height:' + v.CalculatedHeight + 'px'}" -->
+                    
+                     <aura:if isTrue="{!and(!empty(v.RSAPage), or(v.isSalMobilityFlow, v.isInsurancePosLaFlow))}">
+                         <aura:if isTrue="{!v.ObjectName == 'DPLinsurance__c'}">
+                            <iframe src="{!v.RSAPage}" width="100%"/>
+                        </aura:if>
+                     </aura:if>  
+                     
+            <!-- Start of default message panel -->
+            <aura:if isTrue="{!and(v.isDoneRendering, empty(v.ObjectList))}">
+                <aura:if isTrue="{!or(v.isSalMobilityFlow == true, v.isPosLaFlow == true)}">
+                    <ui:message severity="warning" closable="false">
+                        <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+                        <span> No records added currently </span>
+                    </ui:message>
+                    <aura:set attribute="else">
+                        <ui:message severity="warning" closable="false">
+                            <lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+                            <ui:outputText class="slds-text-heading--label" value="No records added currently"/>
+                        </ui:message>
+                    </aura:set>
+                </aura:if>
+            </aura:if>
+            <!-- End of default message panel -->
+            
+			<!-- Start of changes - 22181 -->
+            <aura:if isTrue="{!v.flow == 'ELA'}">
+                <div class="slds-button-group slds-align--absolute-center" style="margin-top: 10px;" role="group" aura:id="addBtnDiv">
+                    <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="add_btn" onclick="{!c.addNewRecord}" title="Add New" disabled="{!or(or(v.isDisabled, v.isReadOnlyPOSLA),v.displayReadOnlyEmployeeLoan)}">
+						<aura:if isTrue="{!v.flow != 'ELA'}">
+							<lightning:icon iconName="utility:add" size="small" variant="inverse"/>
+							<aura:set attribute="else">
+								Add Insurance
+							</aura:set>
+						</aura:if>
+					</button>
+                </div>
+            </aura:if>
+            <!-- End of changes - 22181 -->
+			
+            <!-- Start of scrollable div for table -->
+            <div class="slds-grid slds-wrap" aura:id="tableDiv"> <!-- Added aura:id for 22181 -->         
+                <!-- Start of div for table -->
+				
+                <aura:if isTrue="{!and(v.isDoneRendering, !empty(v.ObjectList))}">
+                    <aura:if isTrue="{!and(v.isSalMobilityFlow == false, v.isPosLaFlow == false)}">	<!--Sal mobility change YK-->
+                            <!-- Start of column div for table -->
+                            <div class="slds-col slds-p-around_small">
+                                <div class="slds-grid slds-wrap" > 
+                                <!-- Start of table -->
+                                <table class="slds-table table--stacked-horizontal slds-table_bordered slds-table_cell-buffer slds-table_col-bordered" border="1.5px">
+                                    <!-- Start of table column heading -->
+                                    <thead>
+                                        <tr class="slds-text-title--caps">
+                                            <!-- Start of second column heading common for all flows -->
+                                            <th scope="col" class="slds-text-heading--label tdWrapper BFLStyle" style="{!if(v.flow == 'ELA', 'background-color: #16325C !important;', '')}" role="banner">
+                                                <div class="slds-truncate" title="Action">
+                                                    <ui:outputText value="Action"/>
+                                                </div>
+                                            </th>
+                                            <!-- End of second column heading common for all flows -->
+                                            <!-- Start of remaining columns heading common for all flows -->
+                                            <aura:iteration items="{!v.ObjectList[0].fields}" var="Field"> 
+                                                <aura:if isTrue="{!Field.FieldVisibleInTable}">
+                                                    <th scope="col" class="slds-text-heading--label BFLStyle" style="{!if(v.flow == 'ELA', 'background-color: #16325C !important;', '')}" role="banner">
+                                                            <div class="slds-truncate" title="{!Field.FieldLabel}">
+                                                                <ui:outputText value="{!Field.FieldLabel}"/>
+                                                            </div>
+                                                        </th>
+                                                </aura:if>    
+                                            </aura:iteration>
+                                            <!-- End of remaining columns heading common for all flows -->
+                                        </tr>
+                                    </thead>
+                                    <!-- End of table column heading -->
+                                    <!-- Start of table body -->
+                                    <tbody>
+										<aura:if isTrue="{!and(v.flow == 'ELA', v.isAddInsView == true)}">
+                                        <aura:iteration items="{!v.ObjectListELA}" var="Object" indexVar="ObjectIndex">                             
+                                            <tr data-index="{!ObjectIndex}" onchange="{!c.selectRecord}">
+                                                <!-- Start of button group for individual row common for all flows -->
+                                                <td class="tdWrapper">
+                                                    <div class="slds-button-group slds-align--absolute-center" role="group">
+                                                        <aura:if isTrue="{!v.ObjectName == 'DPLinsurance__c'}">
+                                                            <!-- Start of changes - 22181 -->
+                                                            <aura:if isTrue="{!v.flow != 'ELA'}">
+                                                                <button class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="add_member_btn" data-index="{!ObjectIndex}" onclick="{!c.addPolicyMembers}" title="Manage Members" disabled="{!Object.addMemBtnDisabled}"><lightning:icon iconName="utility:groups" size="x-small" variant="inverse"/></button>
+                                                            </aura:if>	
+                                                            <!-- End of changes - 22181 -->
+                                                            <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="fdQuest_btn" data-index="{!ObjectIndex}" onclick="{!c.openFDQuestion}" title="Medical Question" disabled="{!Object.medQueBtnDisabled}"><lightning:icon iconName="utility:work_order_type" size="x-small" variant="inverse"/></button>
+                                                        </aura:if>
+                                                        
+                                                        <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="edit_btn" data-index="{!ObjectIndex}" onclick="{!c.editRecord}" title="Edit" disabled="{!Object.editBtnDisabled}"><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>                                                        
+                                                        <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="delete_btn" data-index="{!ObjectIndex}" onclick="{!c.deleteRecord}" title="Delete" disabled="{!Object.deleteBtnDisabled}"><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                                                        <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="view_btn" data-index="{!ObjectIndex}" onclick="{!c.viewRecord}" title="View" disabled="{!Object.viewBtnDisabled}"><lightning:icon iconName="utility:preview" size="x-small" variant="inverse"/></button>
+                                                    </div>
+                                                </td>
+                                                <!-- End of button group for individual row common for all flows -->
+                                                <!-- Start of fields common for all flows -->
+                                                <aura:iteration items="{!Object.fields}" var="Field" indexVar="FieldIndex">
+                                                    <aura:if isTrue="{!Field.FieldVisibleInTable}">
+                                                        <td>
+                                                            <!-- Start of custom tooltip -->
+                                                            <div class="CustomTooltip" style="width:100%">
+                                                                <ui:inputText class="slds-input" labelClass="slds-form-element__label" disabled="true" value="{!Field.FieldValue}"/>
+                                                                <span class="CustomTooltipText">{!Field.FieldValue}</span>
+                                                            </div>
+                                                            <!-- End of custom tooltip -->
+                                                        </td>
+                                                    </aura:if>    
+                                                </aura:iteration>
+                                                <!-- End of fields common for all flows -->
+                                            </tr>
+                                        </aura:iteration>
+										<aura:set attribute="else">
+											
+											<aura:iteration items="{!v.ObjectList}" var="Object" indexVar="ObjectIndex">                             
+												<tr data-index="{!ObjectIndex}" onchange="{!c.selectRecord}">
+													<!-- Start of button group for individual row common for all flows -->
+													<td class="tdWrapper">
+														<div class="slds-button-group slds-align--absolute-center" role="group">
+															<aura:if isTrue="{!v.ObjectName == 'DPLinsurance__c'}">
+																<!-- Start of changes - 22181 -->
+																<aura:if isTrue="{!v.flow != 'ELA'}">
+																	<button class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="add_member_btn" data-index="{!ObjectIndex}" onclick="{!c.addPolicyMembers}" title="Manage Members" disabled="{!Object.addMemBtnDisabled}"><lightning:icon iconName="utility:groups" size="x-small" variant="inverse"/></button>
+																</aura:if>	
+																<!-- End of changes - 22181 -->
+																<button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="fdQuest_btn" data-index="{!ObjectIndex}" onclick="{!c.openFDQuestion}" title="Medical Question" disabled="{!Object.medQueBtnDisabled}"><lightning:icon iconName="utility:work_order_type" size="x-small" variant="inverse"/></button>
+															</aura:if>
+															
+															<button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="edit_btn" data-index="{!ObjectIndex}" onclick="{!c.editRecord}" title="Edit" disabled="{!Object.editBtnDisabled}"><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+															<button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="delete_btn" data-index="{!ObjectIndex}" onclick="{!c.deleteRecord}" title="Delete" disabled="{!Object.deleteBtnDisabled}"><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+															<button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ButtonStyle ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="view_btn" data-index="{!ObjectIndex}" onclick="{!c.viewRecord}" title="View" disabled="{!Object.viewBtnDisabled}"><lightning:icon iconName="utility:preview" size="x-small" variant="inverse"/></button>
+														</div>
+													</td>
+													<!-- End of button group for individual row common for all flows -->
+													<!-- Start of fields common for all flows -->
+													<aura:iteration items="{!Object.fields}" var="Field" indexVar="FieldIndex">
+														<aura:if isTrue="{!Field.FieldVisibleInTable}">
+															<td>
+																<!-- Start of custom tooltip -->
+																<div class="CustomTooltip" style="width:100%">
+																	<ui:inputText class="slds-input" labelClass="slds-form-element__label" disabled="true" value="{!Field.FieldValue}"/>
+																	<span class="CustomTooltipText">{!Field.FieldValue}</span>
+																</div>
+																<!-- End of custom tooltip -->
+															</td>
+														</aura:if>    
+													</aura:iteration>
+													<!-- End of fields common for all flows -->
+												</tr>
+											</aura:iteration>
+										</aura:set>
+										</aura:if>
+                                    </tbody>
+                                    <!-- End of table body -->
+                                </table>
+                                <!-- End of table -->
+                                </div>
+                            </div>
+                            <!-- End of column div for table -->
+                    </aura:if>
+                </aura:if>
+                <!-- End of div for table -->
+            </div>
+            <!-- End of scrollable div for table 22181 -->    
+              
+            <!--Tile approach SAL MOBILITY start YK-->
+            <aura:if isTrue="{!v.isSalMobilityFlow == true}">	<!--Sal mobility change YK-->
+                <div class="demo-only" style="margin-top:1%;">
+                    <aura:iteration items="{!v.ObjectList}" var="Object" indexVar="ObjectIndex">
+                        <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="padding-bottom:1%;margin-top:1%;">
+                            <article class="slds-tile slds-hint-parent" style="padding-left: 5px;">
+                                <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate" style="padding-top: 5px;">
+                                    <div class="slds-shrink-none">
+                                        <aura:if isTrue="{!v.ObjectName == 'DPLinsurance__c'}">
+                                            <!-- Start of changes - 22181 -->
+											<aura:if isTrue="{!v.flow != 'ELA'}">
+												<button class="slds-button slds-button--brand ButtonStyle" aura:id="add_member_btn" data-index="{!ObjectIndex}" onclick="{!c.addPolicyMembers}" title="Manage Members" disabled="{!Object.addMemBtnDisabled}"><lightning:icon iconName="utility:groups" size="x-small" variant="inverse"/></button>
+											</aura:if>
+											<!-- End of changes - 22181 -->
+                                            <button class="slds-button slds-button--brand ButtonStyle" aura:id="fdQuest_btn" data-index="{!ObjectIndex}" onclick="{!c.openFDQuestion}" title="Medical Questions" disabled=""><lightning:icon iconName="utility:work_order_type" size="x-small" variant="inverse"/></button>
+                                        </aura:if>
+                                        <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="view_btn" data-index="{!ObjectIndex}" onclick="{!c.viewRecord}" title="View" disabled="{!Object.viewBtnDisabled}"><lightning:icon iconName="utility:preview" size="x-small" variant="inverse"/></button>
+                                        <aura:if isTrue="{!v.isDisbDashboard}">
+                                            <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="edit_btn" data-index="{!ObjectIndex}" onclick="{!c.editRecord}" title="Edit" disabled="false"><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                                            <aura:set attribute="else">
+                                                <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="edit_btn" data-index="{!ObjectIndex}" onclick="{!c.editRecord}" title="Edit" disabled="{!Object.editBtnDisabled}"><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                                            </aura:set>
+                                        </aura:if>
+                                        <aura:if isTrue="{!v.ObjectName == 'Existing_Loan_Details__c'}">
+                                            <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="delete_btn" id="{!'oblig_delete_btn'+ObjectIndex}" data-index="{!ObjectIndex}" onclick="{!c.deleteRecord}" title="Delete" disabled="{!Object.deleteBtnDisabled}"><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                                        </aura:if>
+                                        <aura:if isTrue="{!v.ObjectName != 'Existing_Loan_Details__c'}">
+                                            <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="delete_btn" data-index="{!ObjectIndex}" onclick="{!c.deleteRecord}" title="Delete" disabled="{! if(v.isDisbDashboard==true,false, or(Object.deleteBtnDisabled, v.isReadOnlyPOSLA) )}"><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                                <aura:iteration items="{!Object.fields}" var="Field" indexVar="FieldIndex">
+                                    <aura:if isTrue="{!Field.FieldVisibleInTable}">
+                                        <div class="slds-tile__detail">
+                                            <dl class="slds-list_horizontal slds-wrap">
+                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" title="{!Field.FieldLabel}">{!Field.FieldLabel}:</dt>
+                                                <dd class="slds-item_detail slds-truncate" title="{!Field.FieldValue}">{!Field.FieldValue}</dd>
+                                            </dl>
+                                        </div>
+                                    </aura:if>
+                                </aura:iteration>
+                            </article>
+                        </div>
+                    </aura:iteration>
+                </div>
+            </aura:if>
+            <!--Tile approach end YK-->
+            
+            <!--Tile approach POS LA start YK-->
+            <aura:if isTrue="{!v.isPosLaFlow == true}">	<!--POS LA change YK-->
+                <div class="demo-only" style="margin-top:1%;">
+                    <aura:iteration items="{!v.ObjectList}" var="Object" indexVar="ObjectIndex">
+                        <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="padding-bottom:1%;margin-top:1%;">
+                            <article class="slds-tile slds-hint-parent" style="padding-left: 5px;">
+                                <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate" style="padding-top: 5px;">
+                                    <div class="slds-shrink-none">
+                                        <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="view_btn" data-index="{!ObjectIndex}" onclick="{!c.viewRecord}" title="View" disabled="{!Object.viewBtnDisabled}"><lightning:icon iconName="utility:preview" size="x-small" variant="inverse"/></button>
+                                        <button class="slds-button slds-button--brand" aria-haspopup="true" aura:id="edit_btn" data-index="{!ObjectIndex}" onclick="{!c.editRecord}" title="Edit" disabled="{!or(Object.editBtnDisabled, v.isReadOnlyPOSLA)}"><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                                    </div>
+                                </div>
+                                <aura:iteration items="{!Object.fields}" var="Field" indexVar="FieldIndex">
+                                    <aura:if isTrue="{!Field.FieldVisibleInTable}">
+                                        <div class="slds-tile__detail">
+                                            <dl class="slds-list_horizontal slds-wrap">
+                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" title="{!Field.FieldLabel}">{!Field.FieldLabel}:</dt>
+                                                <dd class="slds-item_detail slds-truncate" title="{!Field.FieldValue}">{!Field.FieldValue}</dd>
+                                            </dl>
+                                        </div>
+                                    </aura:if>
+                                </aura:iteration>
+                            </article>
+                        </div>
+                    </aura:iteration>
+                </div>
+            </aura:if>
+            <!--Tile approach end YK-->
+            
+            <!-- Start of changes - 22181 -->
+            <aura:if isTrue="{!and(v.isPosLaFlow != true, v.flow != 'ELA')}">
+                <div class="slds-button-group slds-align--absolute-center" style="margin-top: 10px;" role="group" aura:id="addBtnDiv">
+                    <button style="{!if(v.flow == 'ELA', 'height:30px !important;', '')}" class="{!'slds-button slds-button--brand ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="add_btn" onclick="{!c.addNewRecord}" title="Add New" disabled="{! if(v.isDisbDashboard==true,false, or(v.isDisabled, v.isReadOnlyPOSLA) )}">
+						<aura:if isTrue="{!v.flow != 'ELA'}">
+							<lightning:icon iconName="utility:add" size="small" variant="inverse"/>
+							<aura:set attribute="else">
+								Add Insurance
+							</aura:set>
+						</aura:if>
+					</button>
+                </div>
+            </aura:if>
+            <!-- End of changes - 22181 -->
+           </div>
+            </ui:scrollerWrapper>
+            </div>
+       
+        <!-- End of parent div for SLDS -->
+        
+        <!-- Start of modal condition -->
+        <aura:if isTrue="{!v.isOpen}">
+            <!-- Start of modal container div -->
+            <div class="{!if(or(v.isSalMobilityFlow, v.isPosLaFlow), 'noClass', if(v.flow == 'ELA', 'slds-page-header', 'container'))}" style="{!if(v.flow == 'ELA', 'cursor: pointer;', '')}"><!-- Added changes for - 22181 -->
+                <form class="slds-form--stacked">
+                    <!-- Start of modal dialog div -->
+                    <div role="dialog" tabindex="-1" aria-labelledby="header99" class="{!if(v.flow == 'ELA', 'slds-clearfix', 'slds-modal slds-modal_large slds-fade-in-open slds-align_absolute-center')}"> <!-- Added changes for - 22181 -->
+                        <div class="{!if(v.flow == 'ELA', '', 'slds-modal__container')}" style="{!if(v.flow == 'ELA', '', 'padding-bottom: 0px;')}"><!-- Added changes for - 22181 -->
+							<!-- Start of changes - 22181 -->
+							<aura:if isTrue="{!v.flow != 'ELA'}">
+								<div class="{!if(v.flow == 'mobility2','slds-modal__header mobHeader','slds-modal__header')}"> <!-- Bug 17138 -->
+									<!-- Start of close icon and button -->
+									<button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModalWindow}">
+										X<span class="slds-assistive-text">Close</span>
+									</button>
+									<!-- End of close icon and button -->
+									<!-- Start of modal header text and message -->
+									<h2 id="header99" class="slds-text-heading--medium">
+										<ui:outputText aura:id="modal_header" value="{!if(v.isNewRecord, 'Add Record', if(v.isViewRecord, 'View Record', 'Edit Record'))}" />
+										<aura:if isTrue="{! !empty(v.validationMsg)}">
+											<ui:message severity="warning" closable="false">
+												<lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+												<ui:outputText class="slds-text-heading--label" value="{!v.validationMsg}"/>
+											</ui:message>
+										</aura:if>
+									</h2>
+									<!-- End of modal header text and message -->
+								</div>
+								<aura:set attribute="else">
+									<div class="slds-m-left--large">
+										<aura:if isTrue="{! !empty(v.validationMsg)}">
+											<ui:message severity="warning" closable="false">
+												<lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+												<ui:outputText class="slds-text-heading--label" value="{!v.validationMsg}"/>
+											</ui:message>
+										</aura:if>
+									</div>
+								</aura:set>
+							</aura:if>
+                            <!-- End of changes - 22181 -->
+							
+                            <!-- Start of modal content div -->
+							<div class="{!if(v.flow == 'ELA', 'slds-p-around--small', 'slds-modal__content slds-p-around--small ')}" aura:id="modal-content-id-1"><!-- Added changes for - 22181 -->
+								<ui:scrollerWrapper class="wrapStyle">
+									<!-- Start of changes - 22181 -->
+									<aura:if isTrue="{!and(and(v.flow == 'ELA', v.ObjectName == 'DPLinsurance__c'), !v.isViewRecord)}">
+										<div class="slds-p-bottom_small">
+											<div class="slds-grid slds-wrap slds-grid--pull-padded">
+												<div class="slds-p-horizontal--small slds-size--12-of-12 slds-medium-size--12-of-12 slds-large-size--3-of-12 slds-p-top_large">
+													<center>
+														Loan % to be covered
+													</center>   
+												</div>
+												<div class="slds-p-horizontal--small slds-size--12-of-12 slds-medium-size--12-of-12 slds-large-size--6-of-12">
+													<c:SliderComponent aura:id="sumAssuredSlider" sliderParams="{!v.sliderParams}"/>
+												</div>
+												<div class="slds-p-horizontal--small slds-size--12-of-12 slds-medium-size--12-of-12 slds-large-size--3-of-12">
+													<center>
+														<lightning:button class="slds-button slds-button--brand slds-theme_alt-inverse" aura:id="slider_btn" onclick="{!c.sliderChange}" label="Confirm" disabled="true"/>
+													</center>	
+												</div>	
+											</div>
+										</div>
+										<br/>
+									</aura:if>
+									<!-- End of changes - 22181 -->
+									<div id="form_div" class="slds-grid slds-wrap slds-grid--pull-padded">
+										<!-- Start of fields to be displayed in modal -->
+										<aura:iteration items="{!v.ObjectVar.fields}" var="Field" indexVar="FieldIndex">
+											<aura:if isTrue="{!and(Field.FieldVisibleInModal, not(Field.FieldHide))}"> <!-- Added condition for 22181 -->
+												<!-- Start of field label -->
+												
+												<div class="slds-p-horizontal--small slds-size--12-of-12 slds-medium-size--6-of-12 slds-large-size--3-of-12 FieldStyle">	<!--{!Field.FieldHide}-->					                      
+													<ui:outputText value="{!Field.FieldLabel}" />
+													<!-- <ui:outputText value="{!Field.FieldReadOnly}" /> -->
+													
+												</div>
+												<!-- End of field label -->
+												<!-- Start of responsive div -->
+												<div class="slds-p-horizontal--small slds-size--12-of-12 slds-medium-size--6-of-12 slds-large-size--3-of-12 FieldStyle">                                 
+													<div class="slds-form-element slds-is-required">
+														<!-- Start of field value rendering as per field type -->
+														<div class="slds-form-element__control">
+															<aura:if isTrue="{!Field.FieldType == 'TEXT' || Field.FieldType == 'STRING'}">
+																<ui:inputText aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'TEXTAREA'}">
+																<ui:inputTextArea aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'BOOLEAN'}">
+																<ui:inputCheckbox aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-checkbox ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'DATE'}">
+																<ui:inputDate aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" displayDatePicker="true" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" blur="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>	
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'DATETIME'}">
+																<ui:inputDateTime aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" displayDatePicker="true" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" blur="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>                                                     	 
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'CURRENCY'}">
+																<ui:inputCurrency aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'EMAIL'}">
+																<ui:inputEmail aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'PHONE'}">
+																<ui:inputPhone aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'URL'}">
+																<ui:inputURL aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<aura:if isTrue="{!Field.FieldType == 'DOUBLE'}">
+																<ui:inputNumber aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-input ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" change="{!c.validateField}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/>
+															</aura:if>
+															<!-- Start of customLookup component for lookup fields -->
+															<aura:if isTrue="{!Field.FieldType == 'REFERENCE'}">
+																<div class="{!if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField ' + if(empty(Field.FieldValue), 'lookup_div_cls', ''), '')}" data-fieldname="{!Field.FieldName}" data-value="{!Field.FieldValue}" onchange="{!c.setLookupField}">
+																	<c:customLookup ObjectName="{!Field.ParentObjName}" ObjectLabel="{!Field.FieldLabel}" FieldName="Name" SearchKeyWord="{!Field.FieldValue}"/>
+																</div>
+																<aura:if isTrue="{!and(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), empty(Field.FieldValue))}">
+																	<ui:inputDefaultError aura:id="error_pnl"/>
+																</aura:if>
+															</aura:if>
+															<!-- End of customLookup component for lookup fields -->
+															<!-- Start of picklist fields (controlling / dependent / independent) -->
+															<aura:if isTrue="{!Field.FieldType == 'PICKLIST'}">
+																<aura:if isTrue="{!Field.CtrlFieldName == null}">
+																	<!-- Start of picklist fields (controlling / independent) -->
+																	<div data-fieldname="{!Field.FieldName}" data-value="{!Field.FieldValue}" onchange="{!c.setDependentPicklistMapping}">
+																		<ui:inputSelect aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-select ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!or(Field.FieldReadOnly, v.isViewRecord)}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}">                                                      
+																			<aura:iteration items="{!Field.PicklistProp}" var="PickObj">
+																				<ui:inputSelectOption text="{!PickObj.value}" label="{!PickObj.label}" disabled="{!PickObj.disabled}"/>   
+																			</aura:iteration>
+																		</ui:inputSelect>
+																	</div>
+																	<!-- End of picklist fields (controlling / independent) -->
+																	<aura:set attribute="else">
+																		<!-- Start of picklist fields (dependent) -->
+																	   
+																		<div data-fieldname="{!Field.FieldName}" data-value="{!Field.FieldValue}" onchange="{!c.setDependentPicklistMapping}">
+																		 
+																			<ui:inputSelect aura:id="field_inp" label="{!Field.FieldName}" class="{!'slds-select ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" value="{!Field.FieldValue}" required="{!Field.FieldRequired}" disabled="{!if((Field.PicklistProp.length == 1 || empty(Field.PicklistProp) || Field.FieldReadOnly || v.isViewRecord), true, false)}" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}">                                                       
+																				<aura:iteration items="{!Field.PicklistProp}" var="PickObj"> 
+																				  {!PickObj.value}:{!PickObj.label}
+																					<ui:inputSelectOption text="{!PickObj.value}" label="{!PickObj.label}" disabled="{!PickObj.disabled}"/>                                                              
+																				</aura:iteration>
+																			</ui:inputSelect>
+																		</div>
+																		<!-- End of picklist fields (dependent) -->
+																	</aura:set>   
+																</aura:if>
+															</aura:if>
+															<!-- End of picklist fields (controlling / dependent / independent) -->
+															<!-- Start of multi select picklist fields -->
+															<aura:if isTrue="{!Field.FieldType == 'MULTIPICKLIST'}">
+																<div class="{!'slds-select_container slds-dropdown--length-5' + ' ' + if(and(Field.FieldRequired, empty(Field.FieldValue)), 'lookup_div_cls', '')}" data-fieldname="{!Field.FieldName}" onchange="{!c.setMultiPicklistValues}">
+																	<select aura:id="field_inp" id="{!Field.FieldName + '_multi_pick'}" class="{!'slds-select ' + if(and(Field.FieldRequired, not(or(Field.FieldReadOnly, v.isViewRecord))), 'RequiredField', '')}" labelClass="hidden_label" multiple="true" size="3">
+																		<aura:iteration items="{!Field.PicklistProp}" var="PickObj"> 
+																			<option value="{!PickObj.value}" selected="{!PickObj.selected}">{!PickObj.value}</option>                                                              
+																		</aura:iteration>
+																	</select>
+																</div>
+																<aura:if isTrue="{!and(Field.FieldRequired, empty(Field.FieldValue))}">
+																	<ui:inputDefaultError aura:id="error_pnl"/>
+																</aura:if>
+															</aura:if>
+															<!-- End of multi select picklist fields -->
+															<aura:if isTrue="{!Field.FieldType == 'FORMULA'}">
+																<ui:inputText label="{!Field.FieldName}" class="slds-input" labelClass="hidden_label" disabled="true" value="{!Field.FieldValue}"/>
+															</aura:if>
+														</div>
+														<!-- End of field value rendering as per field type -->
+													</div>    
+												</div>
+												<!-- End of responsive div -->
+											</aura:if>   
+										</aura:iteration>
+										<!-- End of fields to be displayed in modal -->
+									</div>
+								</ui:scrollerWrapper>
+                            </div>
+                            <!-- End of modal content div -->
+                            <!-- Start of changes - 22181 -->
+							<aura:if isTrue="{!v.flow != 'ELA'}">
+								<div class="slds-modal__footer">
+									<!-- Start of CircularProgress component to display percentage of fields filled correctly -->
+									<aura:if isTrue="{!and(v.isProgressVisible, and(v.flow != 'ELA', v.flow != 'mobility2'))}"> <!--Bug 17138-->
+										<div class="slds-float_left">
+											<span class="slds-align_absolute-center">    
+												<c:CircularProgress actualProgress="{!v.filledFieldsCount}" totalProgress="{!v.enabledFieldsCount}" theme="{!if(v.percentFilled > 75, 'green', if(v.percentFilled > 25, 'orange', 'red'))}" size="small"/>
+												<ui:outputText class="slds-text-heading--label" value="Record completeness"/>&nbsp;
+											</span>
+										</div>
+									</aura:if>    
+									<!-- End of CircularProgress component to display percentage of fields filled correctly -->
+									<!-- Start of save and cancel button group -->
+									<div class="slds-float_right slds-align_absolute-center">
+										<button class="slds-button slds-button--neutral" aura:id="cancel_btn" onclick="{!c.closeModalWindow}" disabled="{!v.isDisabled}">Cancel</button>
+										<aura:if isTrue="{!!v.isViewRecord}">	
+											<button class="{!'slds-button slds-button--brand ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="save_btn" onclick="{!c.saveRecords}" disabled="{!v.isDisabled}">Save</button>
+										</aura:if>
+									</div>
+									<!-- End of save and cancel button group -->
+								</div>
+								<aura:set attribute="else">
+									<!-- Start of save and cancel button group -->
+									<div class="slds-float_right slds-align_absolute-center">
+										<button class="slds-button slds-button--neutral" aura:id="cancel_btn" onclick="{!c.closeModalWindow}" disabled="{!v.isDisabled}">Cancel</button>
+										<aura:if isTrue="{!!v.isViewRecord}">
+											<button class="{!'slds-button slds-button--brand ' + if(v.flow == 'ELA', 'slds-theme_alt-inverse', '')}" aura:id="save_btn" onclick="{!c.saveRecords}" disabled="{!v.isDisabled}">Save</button>
+										</aura:if>
+									</div>
+									<!-- End of save and cancel button group -->
+								</aura:set>
+                            </aura:if>
+							<!-- End of changes - 22181 -->
+                        </div>
+                    </div>
+                    <!-- End of modal dialog div -->
+					
+					<!-- Start of changes - 22181 -->
+					<aura:if isTrue="{!v.flow != 'ELA'}">
+						<div class="slds-backdrop slds-backdrop_open"></div>
+					</aura:if>
+					<!-- End of changes - 22181 -->
+					
+                </form>
+            </div>
+            <!-- End of modal container div --> 
+        </aura:if>
+        <!-- End of modal condition -->    
+        
+		<!-- Start of changes - 22181 -->
+		<aura:if isTrue="{!v.flow != 'ELA'}">
+			<!--SAL mobility toast starts YK-->
+			<div id="parentSuccessToast1" style="display:none; ">
+				<div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+					<div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+						<lightning:icon iconName="utility:success" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+						<lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentSuccessToast}" alternativeText="Close alert." />
+						<div class="slds-notify__content">
+							<h2 id ="parentSuccessMsg1"></h2>
+						</div>
+					</div>
+				</div>
+			</div> 
+			
+			<div id="parentErrorToast1" style="display:none;">
+				<div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+					<div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+						<lightning:icon iconName="utility:error" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+						<lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentErrorToast}" alternativeText="Close alert." />
+						<div class="slds-notify__content">
+							<h2 id ="parentErrorMsg1"></h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="parentInfoToast1" style="display:none;">
+				<div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+					<div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--info" role="alert" >
+						<lightning:icon iconName="utility:info" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+						<lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentInfoToast}" alternativeText="Close alert." />
+						<div class="slds-notify__content">
+							<h2 id ="parentInfoMsg1"></h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--SAL mobility toast ends YK-->
+		</aura:if>
+		<!-- End of changes - 22181 -->	
+    </div>
+
+</aura:component>

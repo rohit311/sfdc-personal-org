@@ -1,0 +1,7 @@
+<!-- Sal_Pricing_Event -->
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="EMI1stDate" type="String"/>
+    <aura:attribute name="EMILastDate" type="String"/>
+    <aura:attribute name="BPI" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+</aura:event>

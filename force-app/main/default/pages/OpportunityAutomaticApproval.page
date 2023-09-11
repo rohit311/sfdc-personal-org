@@ -1,0 +1,10 @@
+<apex:page controller="OAA_Controller">
+    <apex:form >
+
+      <apex:inputField value="{!opp.CloseDate}"/>
+      <apex:inputField value="{!opp.TotalOpportunityQuantity}"/>
+      <apex:inputField value="{!opp.Probability}"/>  
+        
+      <apex:commandButton action="{!submit}" title="submit"/>  
+    </apex:form>
+</apex:page>

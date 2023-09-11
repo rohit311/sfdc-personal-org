@@ -1,0 +1,137 @@
+<aura:component controller="InitiateECSController" access="global">
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="isSuccess" type="Boolean" />
+    <aura:attribute name="disabled" type="boolean" default="false" />
+    <aura:attribute name="isOpen" type="Boolean" default="true" />
+    <aura:registerEvent name="CloneButton" type="c:CloneEvent" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   	<aura:attribute name="ECSMap" type="Map"/>
+    {!v.body}
+	<div class="slds">
+        
+    </div>
+    <aura:if isTrue="{!v.isOpen}">
+    <div class="container">
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-modal_large slds-fade-in-open">
+            <div class="slds-modal__container modalStyle">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-button svg slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModalWindow}">
+                       &#10062; <span class="slds-assistive-text">&#10062;</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-link_faux slds-text-heading_large ">
+                             	 ECS Details {!v.ECSMap.Called}
+                    </h2>
+                </div> 
+				<div class="slds-modal__content slds-p-around--large">
+					<div id="form_div" class="slds-grid slds-wrap slds-grid--pull-padded">
+						<aura:if isTrue="{!!v.isSuccess}" >
+                        	{!v.errorMessage}
+                        </aura:if>
+						<aura:if isTrue="{!v.isSuccess}" >
+                        	<div class="slds" style="overflow:auto;">
+								<ui:scrollerWrapper class="scrollerSize">
+									<table border ="1" class="slds-table slds-table--bordered slds-table--cell-buffer">
+										<thead>
+                                                <tr class="slds-text-title--caps">
+                                                    <th>
+                                                        <span class="slds-truncate" title="ECS Bank A/C No">ECS Bank A/C No</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="MICR">MICR</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="IFSC">IFSC</span>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="Bank Name">Bank Name</div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="Bank Branch Name">Bank Branch Name</div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="A/C Type">A/C Type</div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="A/C Holder Name">A/C Holder Name</div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="ECS End Date">ECS End Date</div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="slds-truncate" title="Open ECS Balance Limit">Open ECS Balance Limit</div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    <tr>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.accNo}"/>
+                           									 </div>
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.micrCode}"/>
+                           									 </div>                                                        
+                                                        </td>
+                                                        <td scope="row">
+															 <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.ifscCode}"/>
+                           									 </div>                                                        
+                                                        </td>
+                                                        <td scope="row">
+                                                           	<div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.bankName}"/>
+                           									 </div> 
+                                                        </td>
+                                                        <td scope="row">
+                                                        	<div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.branchName}"/>
+                           									 </div> 
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.accTYPE}"/>
+                           									 </div> 
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.customerName}"/>
+                           									 </div> 
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.endDate}"/>
+                           									 </div> 
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                            	<ui:outputText value="{!v.ECSMap.balLimit}"/>
+                           									 </div> 
+                                                        </td>
+                                                    </tr>
+                                            </tbody>
+									</table>
+								</ui:scrollerWrapper>
+                            </div>
+						</aura:if>
+					</div>
+				</div>
+				<div class="slds-modal__footer">
+					<div class="slds-align_absolute-center">
+						<span class="slds-align_absolute-center"> 
+                           <div class=" slds-align_absolute-center">
+                                <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.cloneRepayDetails}" disabled="{!v.disabled}">Clone</button>
+							</div> 
+						</span>
+					</div>    					
+				</div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open">
+        
+        </div>
+	</div>
+   </aura:if>
+</aura:component>

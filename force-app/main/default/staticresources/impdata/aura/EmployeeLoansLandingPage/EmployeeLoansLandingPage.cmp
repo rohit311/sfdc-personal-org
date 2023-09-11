@@ -1,0 +1,177 @@
+<!--
+Page Name: EmployeeLoansLandingPage.cmp
+-->
+
+<aura:component access="global" controller="EmployeeLoanAutomationCtrl" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="hybridFullTenor"  type="String"/>   
+    <aura:attribute name="employeeLoanBackground" type="String" default=""/>
+    <aura:attribute name="EncryptedEmployeeId" type="string" default=""/>
+    <aura:attribute name="EmployeeId" type="string" default=""/>
+    <aura:attribute name="availedAmount" type="String"/>
+    <aura:attribute name="OppId" type="string" default=""/>
+    <aura:attribute name="POdetails" type="Product_Offerings__c"/>
+    <aura:attribute name="ApplicantObj" type="Applicant__c"/>
+    <aura:attribute name="selTabId" type="String"/>
+    <aura:attribute name="InitialAmount" type="String"/>
+    <aura:attribute name="performance_report" type="Performance_reports__c"  default="{'sobjectType': 'Performance_reports__c'}"/>
+    <aura:attribute name="modalHeader" type="String" default=""/>
+    <aura:attribute name="loanTenorList" type="String[]"/>
+    <aura:attribute name="loanType" type="String[]"/>
+    <aura:attribute name="loanTypeList" type="String[]"/>
+    <aura:attribute name="loanTenor" type="String"/>
+    <aura:attribute name="EMILabel" type="String"/>
+    <aura:attribute name="TenorLabel" type="String"/>
+    <aura:attribute name="Rate"  type="String"/>
+    <aura:attribute name="Fees"  type="String"/>
+    <aura:attribute name="loanTenorInitial" type="String"/>
+    <aura:attribute name="availedTenor" type="String" default="none"/>
+    <aura:attribute name="isExit" type="boolean" default="false"/> 
+    <aura:attribute name="dataLoaded" type="boolean" default="false"/> 
+    <aura:attribute name="isOfferAvailabel" type="boolean" default="true"/>
+    <aura:attribute name="isDetailsAvailable" type="boolean" default="true"/>
+    <aura:attribute name="isVASAvailable" type="boolean" default="true"/>
+    <aura:attribute name="noOfferAvailable" type="boolean" default="false"/>
+    <aura:attribute name="isKYCModified" type="boolean" default="false"/>
+    <aura:attribute name="currentStageIsMydetails" type="boolean" default="false"/>
+    <aura:attribute name="setTab" type="boolean" default="true"/> <!-- Added by Anurag for - 22181 -->
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:registerEvent name="reloadEmployeeLoanDisbSection" type="c:reloadEmployeeLoanDisbSection"/>
+    <!-- Added by Anurag for 22181 S -->
+    <aura:registerEvent name="passInsuranceListEvt" type="c:InsuranceCMPValidations"/>
+    <!-- Added by Anurag for 22181 E -->
+    <aura:handler name="DestroyTrackApplicationEvent" action="{!c.closeWindow}" event="c:DestroyTrackApplication" />
+    <aura:handler event="c:flowIdToLanding" action="{!c.getID}"/>
+    <c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <div aura:id="boxBorder" class="slds-box slds-box_x-small tabsetColors slds-theme_default slds-m-top_medium slds-theme_shade" > 
+        <aura:if isTrue="{!v.isExit}">
+            <div class="slds-text-heading_large Selector slds-align_absolute-center slds-p-vertical_xx-large"> Thank you for showing interest in Bajaj Finserv. </div>
+            
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.noOfferAvailable}">
+                    <div class="slds-text-heading_large Selector slds-align_absolute-center slds-p-vertical_xx-large">" Sorry! Currently you don't have a pre-approved  personal loan offer."</div>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!!v.isOfferAvailabel}">
+                            <div class="setcornerbuttons " style="">
+                                <c:Employeecard OppId="{!v.OppId}"/>
+                            </div>
+                        </aura:if>
+                        <div  style="float:right;" class=" borderColor ">
+                            <div  style="font: bold;  
+                                         color: orange ; font-size: 150%;" class="  " onmouseover="{!c.showInfoMessage}" onmouseleave="{!c.hideInfoMessage}" id="search"  >
+                                <lightning:button label="Help" iconName="utility:help_center" aura:id="help_center" class="slds-p_around-medium WrapText" value="uploader"></lightning:button>
+                                
+                            </div>  
+                        </div>
+                        
+                        <aura:if isTrue="{!and(!$Browser.isIPhone,!$Browser.isAndroid)}">
+                        <div aura:id="boxBorder " style="position: relative;">
+                            <div  style="float:right;" class=" borderColor ">
+                                <lightning:button label="Track Application" iconName="utility:overflow" aura:id="search" onclick="{!c.trackApplications}"  class="slds-p_around-medium WrapText" value="track"></lightning:button>
+                                <aura:if isTrue="{!!v.isOfferAvailabel}">
+                                    
+                                    <lightning:button label="Upload Documents" iconName="utility:upload" aura:id="upload" onclick="{!c.uploader}"  class="slds-p_around-medium WrapText" value="uploader"></lightning:button>
+                                </aura:if>
+                                
+                            </div>
+                        </div>
+                        </aura:if>
+                        
+                        <div  style="float:right;" class=" borderColor ">
+                            
+                            <div onmouseover="{!c.showInfoMessage}" onmouseleave="{!c.hideInfoMessage}" aura:id="info1" class="slds-align_absolute-center slds-hide slds-popover slds-popover_tooltip slds-nubbin_top-centre" role="tooltip" id="help" >
+                                <div class="slds-popover__body">Call us: 8975544402</div><br></br>
+                                <div><a style="  color: yellow;" href="www.google.com">Quick Guide  </a><br></br>
+                                </div>
+                            </div>
+                  
+                        </div>   
+                        <aura:if isTrue="{!v.dataLoaded}">
+                            <lightning:tabset class="slds-m-top--medium  tabsetColors" aura:id="tabSection" onselect="{!c.tabSelected}" selectedTabId="{!v.selTabId}">
+                                <!--  <aura:if isTrue="{!!v.performance_report.Offer_converted__c}">-->
+                                <lightning:tab class=" slds-border_right borderColor" label="Your Offer" aura:id="tab1" id="tab1" >
+                                    <c:EmployeeOfferPageClone OppId="{!v.OppId}" performance_report="{!v.performance_report}" EmployeeId="{!v.EmployeeId}"  selTabId="{!v.selTabId}" loanTenorList="{!v.loanTenorList}" loanType="{!v.loanType}" loanTypeList="{!v.loanTypeList}"  Fees="{!v.Fees}"
+                                                              loanTenor="{!v.loanTenor}" InitialTenor="{!v.loanTenorInitial}"  hybridFullTenor="{!v.hybridFullTenor}" availedAmount="{!v.availedAmount}" InitialAmount="{!v.InitialAmount}"
+                                                              isOfferAvailabel="{!v.isOfferAvailabel}" isExit="{!v.isExit}"  isDetailsAvailable="{!v.isDetailsAvailable}"
+                                                              EMILabel="{!v.EMILabel}" TenorLabel="{!v.TenorLabel}" availedTenor="{!v.availedTenor}"
+                                                              />       
+                                </lightning:tab>
+                                <!--  </aura:if>
+                    <aura:if isTrue="{!v.performance_report.Offer_converted__c}"> -->
+                                <aura:if isTrue="{!!v.isOfferAvailabel}">
+                                    <lightning:tab class=" slds-border_right borderColor" label="My Details"  id="tab2" >
+                                        <c:EmployeeLoandetailsPage oppId="{!v.OppId}" EmployeeId="{!v.EmployeeId}" Performance_report="{!v.performance_report}"  selTabId="{!v.selTabId}"
+                                                                   isDetailsAvailable="{!v.isDetailsAvailable}" isExit="{!v.isExit}" applicantObj="{!v.ApplicantObj}"
+                                                                   isKYCModified="{!v.isKYCModified}"
+                                                                   />
+                                    </lightning:tab>
+                                        
+                                        <lightning:tab  onactive="{!c.callDoinitMethodToRefrshVASPage}"  class=" slds-border_right borderColor" label="Value Added Services" aura:id="tab3" id="tab3" >
+                                            <c:EmployeeVASPage OppId="{!v.OppId}" selTabId="{!v.selTabId}" isInsuranceSectionVisible="true" currentStageIsMydetails="{!v.currentStageIsMydetails}" setTab = "{!v.setTab}"/>
+                                            </lightning:tab>
+                                        <lightning:tab onactive="{!c.callDoinitMethodToRefrsh}" class=" slds-border_right borderColor" label="Disbursement" aura:id="tab4" id="tab4"  >
+                                            <c:EmployeeLoanDisbursementScreen selTabId="{!v.selTabId}" isExit="{!v.isExit}" oppId="{!v.OppId}" currentStageIsMydetails="{!v.currentStageIsMydetails}" setTab = "{!v.setTab}"/>
+                                        </lightning:tab> 
+                                </aura:if>
+                                <!-- </aura:if>-->
+                                
+                                
+                            </lightning:tabset>
+                            
+                            <aura:if isTrue="{!or($Browser.isIPhone,$Browser.isAndroid)}">
+                            <div aura:id="boxBorder " style="position: relative;">
+                               <div  style="float:right;" class=" borderColor ">
+                                <lightning:button label="Track Application" iconName="utility:overflow" aura:id="search" onclick="{!c.trackApplications}"  class="slds-p_around-medium WrapText" value="track"></lightning:button>
+                                <aura:if isTrue="{!!v.isOfferAvailabel}">
+                                    
+                                    <lightning:button label="Upload Documents" iconName="utility:upload" aura:id="upload" onclick="{!c.uploader}"  class="slds-p_around-medium WrapText" value="uploader"></lightning:button>
+                                </aura:if>
+                                
+                            </div>
+                     </div>
+     				</aura:if>
+                        </aura:if>
+                        
+                        <div aura:id="overrideModalbox"  class="demo-only slds-hide slds-modal_large" style="height: 640px;" id="dummyId">
+                            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                                <div class="slds-modal__container">
+                                    <header class="slds-modal__header">
+                                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                                            
+                                            <span class="slds-assistive-text">Close</span>
+                                        </button>
+                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.modalHeader}</h2>
+                                    </header>
+                                    <aura:if isTrue="{!v.modalHeader == 'Track Applications'}">
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            <c:trackApplicationCmp selTabId="{!v.selTabId}" empId="{!v.EmployeeId}" isDetailsAvailable="{!v.isDetailsAvailable}" oppId="{!v.oppId}"
+                                                                   isOfferAvailabel="{!v.isOfferAvailabel}"/>
+                                        </div>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.modalHeader == 'Upload Documents'}">
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                          
+                                            <c:EmployeeDocumentUploader oppId="{!v.OppId}" applicantObj="{!v.ApplicantObj}"/> <!--DMS uploader by swapnil 24317-->
+                                        </div>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.modalHeader == 'Open application found'}">
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            You have loan application in progress. Please check Track Application section to resume.
+                                        </div>
+                                    </aura:if>
+                                    <footer class="slds-modal__footer">
+                                        <button class="slds-button slds-button_neutral" onclick="{!c.closeWindow}">ok</button>
+                                        
+                                    </footer>
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

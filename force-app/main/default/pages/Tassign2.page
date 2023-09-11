@@ -1,0 +1,37 @@
+<apex:page controller="Tassign2_Controller">
+    <apex:form id="myform">
+        <apex:pageBlock title="Expense List">
+        
+            <apex:pageBlockTable value="{!explist}" var="a">
+                <apex:column headerValue="Name">
+                 <apex:inputField value="{!a.Name}">
+                    <!-- <apex:inlineEditSupport event="ondblClick" /> -->
+                 </apex:inputField>
+               </apex:column>
+               <apex:column headerValue="Amount">
+                 <apex:inputField value="{!a.Amount__c}">
+                    <!-- <apex:inlineEditSupport event="ondblClick" /> -->
+                 </apex:inputField>
+               </apex:column>
+               <apex:column headerValue="Client">
+                 <apex:inputField value="{!a.Client__c}">
+                    <!-- <apex:inlineEditSupport event="ondblClick" /> -->
+                 </apex:inputField>
+               </apex:column>
+               <apex:column >
+                    <apex:inputCheckbox value="{!mapid[a]}" onchange="alert('{!mapid[a]}')">
+                        <apex:actionSupport event="onchange" action="{!uMap}">
+                              <apex:param value="{!a.id}" assignTo="{!mid}" />
+                        </apex:actionSupport>
+                   </apex:inputCheckbox>
+               </apex:column>
+           </apex:pageBlockTable>
+           <!-- <apex:actionFunction name="doUnlink" action="{!clickme}" rerender="refresh" status="myStatus"/>
+            <input type="button" value="saveall" onclick="doUnlink();" /> -->
+            <apex:commandButton action="{!myfunc}" value="Save all"/> 
+            <apex:pageMessages ></apex:pageMessages>
+      
+       </apex:pageBlock>
+     </apex:form>
+    
+</apex:page>

@@ -1,0 +1,9 @@
+.menu-container {
+  margin-bottom: 23px;
+  margin-left: 67px;
+}
+
+.svg-theme {
+  fill: currentColor;
+  pointer-events: none;
+}

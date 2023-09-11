@@ -1,0 +1,656 @@
+.changeBtnCls {
+	background:url(SDEFimages/grey_bg.gif) repeat-x scroll 0 0;
+	border-top: 1px solid #cccccc;
+	border-left: 1px solid #cccccc;
+	border-right: 1px solid #666666;
+	border-bottom: 1px solid #666666;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	font-weight: normal;
+	height: 22px;
+	cursor: pointer;
+	margin-left: 5px;
+	padding-bottom: 2px;
+	width: 74px;
+	padding-bottom: 4px;
+	padding-bottom /*\**/: 0px\9;
+}
+
+.changeBtnCls {
+	min-width: 115px;
+	width: auto;
+	padding-right: 10px;
+	padding-left: 10px; 
+	*padding-right: 0px; 
+	*padding-left: 0px;
+	font-color: #fbf9ed;
+	*width: 140px;
+	*margin-left: 5px;
+}
+
+.selectBtnCls {
+	background:url(SDEFimages/grey_bg.gif) repeat-x scroll 0 0;
+	border-color: #CCCCCC #666666 #666666 #CCCCCC;
+	border-style: solid;
+	border-width: 1px;
+	cursor: pointer;
+	font-family: Tahoma,MS Sans Serif;
+	font-size: 11px;
+	font-weight: normal;
+	height: 21px;
+	padding-bottom: 4px;
+	padding-bottom/*\**/: 0px\9;
+	padding-left:6px;
+	padding-left/*\**/: 10px\9;
+	padding-right:6px;
+	padding-right/*\**/: 10px\9;
+}
+
+.clsInputfixedLabelTD {
+	width: 90px; 
+	*width: 129px;
+	white-space: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	.clsInputfixedLabelTD {
+		width: 129px;
+		white-space: normal;
+	}
+	.Datepicker {
+		right: 1030px;
+	}
+}
+
+.clsInputTextFieldRel,.clsInputTextFieldRelDisabled {
+	padding-bottom: 0px;
+	vertical-align: top;
+	width: 461px;
+	*width: 460px !important;
+	height: 17px;
+	color: #000000;
+	border: 1px solid;
+	border-top-color: #6a7378;
+	border-left-color: #6a7378;
+	border-right-color: #bac3c8;
+	border-bottom-color: #bac3c8;
+	font-family: Tahoma, Ms Sans Serif;
+	font-size: 11px;
+	background-color: #FFFFFF;
+	padding-left: 5px;
+	overflow: auto;
+}
+
+.clsInputTextFieldRel1 {
+	padding-bottom: 0px;
+	vertical-align: top;
+	width: 95%;
+	*width: 100% !important;
+	height: 17px;
+	color: #000000;
+	border: 1px solid;
+	border-top-color: #6a7378;
+	border-left-color: #6a7378;
+	border-right-color: #bac3c8;
+	border-bottom-color: #bac3c8;
+	font-family: Tahoma, Ms Sans Serif;
+	font-size: 11px;
+	background-color: #FFFFFF;
+	padding-left: 5px;
+	overflow: auto;
+}
+.clsInputLabelTD {
+	padding-left: 12px !important;
+	padding-right: 5px !important;
+	padding-bottom: 5px !important;
+	width: 130px !important;
+	white-space: nowrap;
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+}
+
+.clsInputLabelTD1 {
+	padding-left: 20px !important;
+	padding-right: 5px !important;
+	padding-bottom: 5px !important;
+	width: 70px !important;
+	white-space: normal;
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+}	
+
+.clsInputTextBoxTD {
+	padding-bottom: 7px;
+	width: 466px;
+	width /*\**/: 466px\9; 
+	*width: 466px;
+	*padding-top: 7px;
+}
+
+.clsInputTextBoxTD1 {
+	padding-bottom: 7px;
+	width: 30%;
+	width /*\**/: 466px\9; 
+	*width: 466px;
+	*padding-top: 7px;
+}
+
+.clsInputTextBox {
+	width: 459px ! important;
+	*height: 13px;
+}
+
+.clsIdInputTextBox,.clsIdInputTextBoxReadOnly,.clsInputTextBoxReadOnly,.clsInputTextBox
+	{
+	width: 459px; 
+	*width: 459px !important;
+	*height: 13px;
+}
+
+.clsInputTextBox1 {
+	width: 195px ! important;
+	height: 17px;
+	*height: 16px;
+}
+
+.clsInputTextBox2 {
+	width: 96% ! important;
+	*height: 13px;
+}
+
+.TextboxPopupIcon1 {
+	background-image:url(SDEFbuttons/b_textbox_popup_on.gif) !important;
+	border: 0 none;
+	height: 19px;
+	margin-left: 2px;
+	padding-left: 0px;
+	vertical-align: top;
+	width: 19px;
+	position: relative;
+	left: 373px;
+	left /*\**/: 380px\9;
+}
+
+.TextboxPopupIconDiv {
+	height: 19px;
+	width: 19px;
+}
+
+.TextboxPopupIconTD {
+	padding-left: 2px;
+	padding-right: 3px;
+	*padding-right: 18px;
+	vertical-align: middle;
+	border: 1px solid #FFFFFF;
+}
+
+.lookUpIconDiv  {
+	padding-left: 5px;
+    padding-bottom: 6px;
+	*padding-bottom: 7px;
+	height: 19px;
+	width: 19px;
+}
+
+.clsRequestDefSelectList {
+	width: 102px;
+	*width: 102px;
+	height: 19px;
+	height /*\**/: 19px\9;
+	*height: 19px;
+	margin-right: 6px;
+	color: #000000;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	vertical-align: top;
+	border-top: solid 1px grey;
+	border-left: solid 1px grey;
+	border-right: solid 1px grey;
+	border-bottom: solid 1px grey;
+}
+
+.clsRequestDefSelectList1 {
+	width: 193px;
+	*width: 193px;
+	height: 19px;
+	height /*\**/: 19px\9;
+	*height: 19px;
+	margin-right: 10px;
+	color: #000000;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	vertical-align: top;
+	border-top: solid 1px grey;
+	border-left: solid 1px grey;
+	border-right: solid 1px grey;
+	border-bottom: solid 1px grey;
+}
+
+#ReqDef_GeneralInfo{
+	font-weight:bold;
+}
+.btnArrowUp {
+    background: url(SDEFbuttons/b_darrow_U_new.gif) !important;
+   /* background: url(SDEFbuttons/b_darrow_U.gif) !important;*/
+    width:20px !important;
+    height:20px !important;
+    
+}
+
+.btnArrowDown {
+    background: url(SDEFbuttons/b_darrow_D_new.gif) !important;
+    /*background: url(SDEFbuttons/b_darrow_D.gif) !important;*/
+    width:20px !important;
+    height:20px !important;
+    
+}
+.btnArrowUpDisable {
+    background: url(SDEFbuttons/b_darrow_U_new.gif) !important;
+    /*background: url(SDEFbuttons/b_darrow_U_disable_custom.gif) !important;*/
+    width:20px !important;
+    height:20px !important;
+    
+}
+
+.btnArrowDownDisable {
+    background: url(SDEFbuttons/b_darrow_D_new.gif) !important;
+    /*background: url(SDEFbuttons/b_darrow_D_disable_custom.gif) !important;*/
+    width:20px !important;
+    height:20px !important;
+    
+}
+.clsCapsule{
+	border: 1px solid #999999;
+	*height:100%;
+}
+
+.clsGeneralInfoTab{
+	height: 525px; 
+	height/*\**/: 525px\9 !important; 
+	padding-top: 0px; 
+	margin-left:10px; 
+	margin-right:10px; 
+	margin-bottom:10px;
+	border: 1px solid #999999; 
+	display: block;
+}
+
+.clsEntitlemenetTab{
+	height: 525px;
+	padding-top: 0px; 
+	margin-left:10px; 
+	margin-right:10px; 
+	margin-bottom:10px; 
+	border: 1px solid #999999; 
+	display: none;
+}
+
+.clsFulfillmentTab{
+	height: 900px; 
+	height/*\**/: 860px\9 !important; 
+	*height: 865px !important; 
+	padding: 0px 0px 0px 0px; 
+	margin: 0px 10px 10px 10px;
+	border: 1px solid #999999; 
+	display: none;
+	padding-bottom : 25px;
+}
+
+.clsOptionsTab{
+	height: 525px; 
+	height/*\**/: 517px\9 !important; 
+	*height: 513px !important; 
+	padding: 0px 0px 0px 0px; 
+	margin: 0px 10px 10px 10px;
+	border: 1px solid #999999; 
+	display: none;
+}
+.clsInputTab{
+	height: 525px; 
+	height/*\**/: 517px\9 !important; 
+	*height: 513px !important; 
+	padding: 0px 0px 0px 0px; 
+	margin: 0px 10px 10px 10px;
+	border: 1px solid #999999; 
+	display: none;
+}
+.clsInlineHelpTD{
+	width: 10%;  
+	padding-bottom:6px;
+}
+
+.clsCurrencyTD{
+	width: 9%;
+	padding-bottom: 9px;
+}
+
+.clsPrice1TD{
+	width: 21%; 
+	padding-left: 1px;
+	padding-bottom:6px;
+}
+
+.clsPrice2TD{
+	width: 60%;
+	padding-bottom:6px;
+}
+
+.clsLabelHistoryDays{
+	padding-bottom:5px; 
+	*padding-left: 4px ! important ;
+}
+
+.clsEntitlementTable{
+	table-layout:fixed; ! important; 
+	margin-left:10px; 
+	margin-top:10px;
+}
+
+.clsAvailableTableAccounts, .clsclsAvailableTableAccounts1{
+	table-layout:fixed; 	
+	margin-left:10px;
+}
+
+.clsclsAvailableTableAccounts1{
+	width: 360;
+	*width:390px !important; 
+}
+
+.clsTable2{
+	width: 360;
+	table-layout:fixed; 
+	*width:390px !important; 
+	margin-top:10px; 
+	margin-left:10px;
+}
+
+.clsRequestDefOnlineTD{
+	padding-left: 0;
+	padding-bottom: 5px;
+}
+
+.clsApprovalRequiredTD{
+	padding-bottom:10px;
+	white-space:nowrap;
+}
+
+.clsPadding5TD, .clsImageSrcTD{
+	padding-left: 5px;
+}
+.clsPaddingRight5TD{
+	padding-right: 5px;
+}
+.clsImage{
+	height:90px; 
+	width:111px;
+}
+.paddingBottom10{
+	padding-bottom:10px;
+}
+.paddingRight10{
+	padding-right:10px;
+}
+.configurationPanelcls{
+	background-color: #DEE0E0;
+	padding: 10px;
+}
+.checkLabel{
+	padding-left:10px;
+}
+
+.defaultBtn{
+	margin-left:0px;
+}
+.clsImageSrcTD{
+	padding-right:14px;
+}
+
+.clsMainTable{
+	border:none;
+}
+
+.clsLeftPadTD{
+	padding-left: 16px;
+}
+
+.clsLeftPadTD5px{
+	padding-left: 5px;
+}
+
+.clsBottomPadTD{
+	padding-bottom:5px;
+}
+
+.clsBottomPadTD3px{
+	padding-bottom:3px;
+}
+
+.clsMarginLeftTD{
+	margin-left:10px;
+}
+
+.clsMarginLeftTD1{
+	margin-left:13px;
+}
+
+.clsBottomPadTD1{
+	padding-bottom: 4px;
+	width: 75%;
+}
+
+.clsInputTextAreaTD1{
+	vertical-align:top;
+}
+.clsInputTextAreaTD2 {	
+	width: 30%;
+}
+/*
+    Fulfillment tab UI issues
+*/
+#newInputBtn, #editInputBtn, #delInputBtn, #delTemplateBtn, #newTemplateBtn, #exeOrderBtn, #delMappingBtn,#copyInputBtn, #btnUpId, #btnDownId {
+    font: 11px tahoma,verdana,helvetica;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #004376;
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+    border-style: none !important;
+    background: none !important;
+}
+
+.ux-vertical-tabs, .ux-vertical-tabs .x-tab-panel-bwrap, .ux-vertical-tabs .x-tab-panel-body {
+	height: 100%;
+} 
+.ux-vertical-tabs-left .x-tab-panel-body {
+   border: 1px solid #AEBAC1;
+}
+ /*syles for ie8*/
+#ReqDef_FulfillmentTab .x-tab-panel .x-tab-panel-bwrap{
+    width /*\**/: 84%\9;
+} 
+/*syles for ie7*/
+html* .x-tab-panel .x-tab-panel-bwrap{
+    width: 75%;
+}
+.x-tab-panel-body {
+	width /*\**/: 96%\9;
+	height: 95.8%!important;
+}
+.ext-ie .ux-vertical-tabs .x-tab-panel-bwrap{
+  position:static;  
+}
+
+.reqDefclsInputTextBox {
+	vertical-align: top;
+	color: #000000;
+	width: 61px;
+	*width: 59px;
+	height: 13px;
+	*height: 13px;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	border: 1px solid;
+	border-top-color: #6a7378;
+	border-left-color: #6a7378;
+	border-right-color: #bac3c8;
+	border-bottom-color: #bac3c8;
+	padding: 2px;
+	margin: 0px;
+	padding-left: 5px;
+}
+
+.reqDefclsInputLabelTD {
+    font-family: tahoma !important;
+    font-size: 11px !important;
+    padding-bottom: 5px !important;
+    padding-left: 10px !important;
+    padding-right: 3px !important;
+    white-space: normal;
+    
+}
+	
+.clsPanelInputCheckboxTDSA {
+    padding-left: 5px;
+}
+.clsPanelCheckBoxLabel {
+	*padding-left: 0px;
+}
+.datePicker {
+	*width: 17em;
+}
+.days-label-td {
+	line-height: 20px;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	padding-bottom: 5px;
+}
+
+.hours-label-td {
+	line-height: 20px;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	padding-left: 10px;
+	*padding-left: 7px !important; 
+	padding-bottom:5px;
+}
+
+.clsImageTD{
+	border-color: #6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	border-style: solid;
+	border-width: 1px;
+	color: #000000; 
+	height: 90px;
+	width: 111px;
+}
+
+#days-ct,#hours-ct {
+	width: 60px;
+	float: left;
+}
+
+#days-ct,#hours-ct,#cPrice-ct,#dPrice-ct {
+	width: 82px;
+	*width: 75px;
+	float: left;
+}
+
+.x-form-field{
+    font-family: Tahoma,MS Sans Serif;
+    font-size: 11px;
+}
+
+.x-panel-btns-left {
+    border-bottom-width: 0 !important;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    padding-top: 0 !important;
+}
+
+
+#windowId .x-window-header-text {
+    padding-left: 0px;
+    margin-left: 0px;
+}
+.windowBtnCls {
+    background: url("SDEFimages/btn_background_gray_01.gif") repeat-x scroll 0 0 transparent !important;
+    border-color: #CCCCCC #666666 #666666 #CCCCCC !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    color: #004376 !important;
+}
+
+.EnclosingDiv{
+	border:1px !important;
+	height:90px;
+	width:110px;
+}
+.mapInstrucntionCls {
+	font-family: Tahoma,MS Sans Serif;
+	font-size: 11px;
+}
+.hideLinkCls {
+	color: #004376;
+	padding-left:5px;
+}
+.quickLinkCls{
+	min-width: 180px;
+	padding-left: 10px;
+}
+.createNewCls
+{
+  background-image: url(SDEFbuttons/b_add.png) !important;
+  height: 19px;
+  width: 19px;
+  padding: 10px 19px 8px 0px;
+  background: white;
+  border: 0px;
+  margin-bottom: 5px;
+}
+ .x-item-disabled,.x-item-disabled * {
+		cursor: default !important;
+	}	
+#grid .x-grid3-scroller {
+	height: 349px !important;
+}
+#grid .x-grid3-body, #reqInputGrid .x-grid3-body, #mappingGrid .x-grid3-body {
+	overflow-x: hidden; 
+	width: auto !important;
+}
+#grid a.x-grid3-focus, #reqInputGrid a.x-grid3-focus, #mappingGrid a.x-grid3-focus {
+	left: 0px !important;
+}
+#reqInputGrid .x-grid3-scroller {
+	height: 170px !important;
+}
+#processGrid .x-grid3-scroller {
+	height: 125px !important;
+}
+.collapseRDInput{ background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -43px 0px; width: 9px; height: 31px; margin:0px auto;}
+.expandRDInput{ background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -43px -33px; width: 9px; height: 31px; margin:0px auto;}
+.collapseRDInput:hover { background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -11px 0px; width: 9px; height: 31px; margin:0px auto;}
+.expandRDInput:hover{ background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -11px -33px; width: 9px; height: 31px; margin:0px auto;}
+.collapsedTd{ border: 1px solid #999999; background-color: #eeeeee;}
+.expandedTd{ border: 0px; background-color: #eeeeee;}
+.collapsedTd:hover { border: 1px solid #999999; background-color: #cfeef8;}
+.expandedTd:hover{  border: 0px; background-color: #cfeef8;}
+.collapseRDInputhover { background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -11px 0px; width: 9px; height: 31px; margin:0px auto;}
+.expandRDInputhover{ background: url(SDEFbuttons/expand-collapse-side-icons.png) no-repeat -11px -33px; width: 9px; height: 31px; margin:0px auto;}
+.RDFullfilmentImg{vertical-align: middle;padding-left: 20px;}
+.RfMenuClass .x-menu-item-active
+{
+    border: 1px solid gray  !important; 
+    margin:0px 0px 0px 0px 	!important;
+}
+ .CriteriaTextClass{
+    margin-left: 3px;
+    padding: 8px 0px 2px 10px;
+    vertical-align: middle;
+    height: 25px;
+    width: 890px;
+}
+
+#processOptionsCombo .x-form-field-wrap {
+	width:180px !important;
+}

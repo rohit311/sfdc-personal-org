@@ -1,0 +1,92 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="GenericTableCtrl">
+    <aura:attribute name = "objNamesList" type="List" default=""/>
+    <aura:attribute name = "recordList" type="Object" default=""/>
+    <aura:attribute name = "Obj" type="String" default=""/>
+    <aura:attribute name = "queryStr" type="String" default=""/>
+    <aura:attribute name = "sortParams" type="List" default="[' ORDER BY ','','ASC','NULLS FIRST']"/>
+    <aura:attribute name = "Spinner" type="Boolean" default="false"/>
+    <aura:attribute name = "FieldsList" type="List" default=""/>
+    <aura:attribute name = "SelectedFieldsList" type="List" default=""/>
+    <aura:attribute name = "dataCol" type="List" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <div class="slds-m-around_xx-large">
+        <lightning:select aura:id="objSel" name="objList" label="Select Object:" required="true" class="slds-size_1-of-5" onchange="{!c.fetchFields}">
+            <option value="None" selected="true">choose one...</option>
+            <aura:iteration items="{!v.objNamesList}" var="obj">
+                <option value="{!obj}">{!obj}</option>    
+            </aura:iteration>
+        </lightning:select> 
+        <br/>
+        <br/>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_1-of-2">
+                <lightning:dualListbox aura:id="selectFields"
+                                       name="Fields"
+                                       label="Fields"
+                                       sourceLabel="Available Fields"
+                                       selectedLabel="Selected Fields"
+                                       options="{!v.FieldsList}"
+                                       value="{!v.SelectedFieldsList}"
+                                       onchange="{!c.handleFieldsChange}"/>
+                
+            </div>
+            
+            <div class="slds-size_1-of-2">
+                <br/>
+                <br/>
+                <br/>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_6-of-12">
+                        <lightning:select aura:id="sortfieldsList" name="objList" label="Sort results by:" value="{!v.sortParams[1]}" onchange="{!c.setqueryForSort}">
+                            <option value="None" selected="true"></option>
+                            <aura:if isTrue="{!v.SelectedFieldsList.length > 0}">
+                                <aura:iteration items="{!v.FieldsList}" var="field">
+                                    <option value="{!field.value}">{!field.label}</option>    
+                                </aura:iteration>
+                            </aura:if>
+                        </lightning:select>
+                    </div>
+                    <div class="slds-size_3-of-12">    
+                        <lightning:select aura:id="sortOrder" class="slds-size_3-of-5" name="sortOrder" label="" value="{!v.sortParams[2]}" onchange="{!c.setqueryForSort}">
+                            <option value="ASC" selected="true">A to Z</option>
+                            <option value="DESC" selected="true">Z to A</option>
+                        </lightning:select>
+                    </div>
+                    <div class="slds-size_3-of-12">    
+                        <lightning:select aura:id="nullOrder" class="slds-size_3-of-5" name="nullOrder" label="" value="{!v.sortParams[3]}" onchange="{!c.setqueryForSort}">
+                            <option value="NULLS FIRST" selected="true">NULLS FIRST</option>
+                            <option value="NULLS LAST" selected="true">NULLS LAST</option>
+                        </lightning:select>
+                    </div>
+                </div>
+            </div>    
+        </div>
+        <br/>
+        <br/>
+        <lightning:textarea aura:id="Query" label="Enter or modify a SOQL query below:" value="{!v.queryStr}"/>
+        <br/>
+        <lightning:button variant="brand" label="Query" onclick="{!c.fetchData}" />
+        <br/>
+        <br/>
+        <div aura:id="dataTableDiv">
+        
+        	<lightning:datatable data="{! v.recordList }" 
+                         columns="{! v.dataCol }" 
+                         keyField="id"
+                         hideCheckboxColumn="true"/>
+        </div>
+    </div>    
+</aura:component>

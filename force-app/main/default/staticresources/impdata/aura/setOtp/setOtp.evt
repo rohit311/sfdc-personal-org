@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event to set Otp attribute for target generateOtp component" >
+    <aura:attribute name="Otpvalue" type="String"/>
+    <aura:attribute name="poId" type="String"/>
+</aura:event>

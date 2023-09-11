@@ -1,0 +1,5 @@
+<apex:page standardController="Lead">
+  <apex:pageBlock rendered="NOT({!$ObjectType.Lead.accessible})">
+    <p>Accessible</p>
+  </apex:pageBlock>
+</apex:page>

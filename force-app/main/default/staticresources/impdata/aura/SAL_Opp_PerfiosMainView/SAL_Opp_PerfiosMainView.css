@@ -1,0 +1,17 @@
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS .blue-color{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+.THIS .slds-truncate {
+    white-space: normal;
+}
+.THIS .padRight
+{
+    
+    padding-right: 0px;
+
+}

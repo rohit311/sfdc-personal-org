@@ -1,0 +1,343 @@
+<aura:component controller="EmployeeLoanAutomationCtrl" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="showSubmit" type="Boolean" />
+    <aura:attribute name="showConfirm" type="Boolean" default="true" />
+    <aura:attribute name="showValidationMsgOnSubmit" type="Boolean" />
+    <aura:attribute name="oppId" type="String" default="" />
+    <aura:attribute name="emi" type="String" />
+    <aura:attribute name="processingFee" type="String" />
+    <aura:attribute name="netDisbursementAmount" type="String" />
+    <aura:attribute name="selTabId" type="String"/>
+    <aura:attribute name="ECSAmount" type="String" />
+    <aura:attribute name="tenor" type="String"/>
+    <aura:attribute name="displayReadOnly" type="Boolean" default="false"/>
+    <aura:attribute name="disableECSButton" type="Boolean" default="false"/>
+    <aura:attribute name="EcsCheck" type="Boolean" default="false"/>
+    <aura:attribute name="KycCheck" type="Boolean" default="false"/>
+    <aura:attribute name="isInsurancePresent" type="Boolean" default="false"/>
+    <aura:attribute name="insuranceList" type="DPLinsurance__c[]" />
+    <aura:attribute type="RePayment_mode_detail__c" name="repay"/>
+    <aura:attribute type="Applicant__c" name="primaryApplicant"/>
+    <aura:attribute type="CAM__c" name="cam"/>
+    <aura:attribute type="Opportunity" name="opp"/>
+    <aura:attribute type="Current_Disbursal_Details__c" name="disb"/>
+    <aura:attribute type="Bank_Account__c" name="bankAcc"/>
+    <aura:attribute type="Contact" name="con"/> 
+    <aura:attribute type="Date" name="LastDate"/>
+    <aura:attribute name="isExit" type="boolean" default="false"/>
+    <aura:attribute name="currentStageIsMydetails" type="boolean" />
+    <aura:attribute name="setTab" type="boolean"/> <!-- Added by Anurag for - 22181 -->
+    
+    
+    <aura:handler event="c:reloadEmployeeLoanDisbSection" action="{!c.doInit}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <!-- Added by Anurag for 22181 S -->
+    <aura:registerEvent name="passInsuranceListEvt" type="c:InsuranceCMPValidations"/>
+    <!-- Added by Anurag for 22181 E -->
+    <c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />         <div class="slds-box slds-box_x-small slds-theme_shade slds-size--1-of-1">
+    
+    <p class="slds-align_absolute-center">
+        <lightning:button aura:id="eMandateButton"  label="Online Mandate Registration"  class="slds-theme--alt-inverse"  variant="brand" 
+                          value="{!v.id}"  onclick="{! c.onInitiateOpenECS_Emandate }"  disabled="{!or(v.displayReadOnly,v.disableECSButton)}"/>
+        <a  style=" padding-left: 10px; font: bold;  
+                   color: orange ; font-size: 200%;" class="  " onclick="{!c.showMessage}" id="search" href="" >
+            ?
+        </a> </p>
+    
+    <c:E_Mandate id="{!v.oppId}" aura:id="emandate"  employeeLoanFlag="false" rObj="{!v.repay}"/>
+    
+    <div   >
+        
+        <div aura:id="info1" class="slds-align_absolute-center slds-hide slds-popover slds-popover_tooltip slds-nubbin_top-centre" role="tooltip" id="help" >
+            <div class="slds-popover__body">To register for electronic EMI payments, you will require to make a credit transaction of Rs. 5 towards Bajaj Finserv using your netbanking.</div>
+        </div>
+        
+        
+    </div>
+    <lightning:accordion>
+        
+        <lightning:accordionSection class="color1" name="Loan Details" label="Loan Details">
+            <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" >   
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="Product_type" name="Product_type" value="{!v.opp.Product__c}" label="Product type" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="Loan_type" name="Loan_type" value="{!v.opp.Loan_Type__c}" label="Loan type" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="Approved_loan_amount" name="Approved_loan_amount" value="{!v.opp.Loan_Amount_with_Premium__c}" label="Approved loan amount" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="roi" name="roi" value="{!v.opp.Approved_Rate__c}" label="Rate of interest (% per annum)" disabled="true"/>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.opp.Loan_Type__c == 'Term Loan'}">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="EMI_amount" name="EMI_amount" value="{!v.emi}" label="EMI Amount" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="Gross_tenure" name="Gross_tenure" value="{!v.tenor}" label="Gross tenure (Months)" disabled="true"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.opp.Loan_Type__c == 'Flexi Term Loan'}">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="EMI_amount" name="EMI_amount" value="{!v.primaryApplicant.Pure_Flexi_EMI__c}" label="Pure Flexi EMI" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="Gross_tenure" name="Gross_tenure" value="{!v.primaryApplicant.Pure_Flexi_Period__c}" label="Pure Flexi tenure (Months)" disabled="true"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.opp.Loan_Type__c == 'Hybrid Loan'}">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="EMI_amount" name="EMI_amount" value="{!v.primaryApplicant.Pure_Flexi_EMI__c}" label="Initial EMI Amount" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="Gross_tenure" name="Gross_tenure" value="{!v.primaryApplicant.Pure_Flexi_Period__c}" label="Initial tenure (Months)" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="EMI_amount" name="EMI_amount" value="{!v.opp.EMI_CAM__c}" label="Subsequent EMI Amount" disabled="true"/>
+                                    </div>
+                                </div>  
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="Gross_tenure" name="Gross_tenure" value="{!v.primaryApplicant.Drop_Line_Flexi_Period__c}" label="Subsequent tenure (Months)" disabled="true"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="firstEmi" name="firstEmi" value="{!v.opp.First_Due_Date__c}" label="First EMI date" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="LastEmi" name="LastEmi" value="{!v.LastDate}" label="Last EMI date" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="modeOfPayment" name="modeOfPayment" value="{!v.repay.Repayment_Mode__c}" label="Mode of Payment" disabled="true"/>
+                                </div>
+                            </div>
+                            
+                        </div>       
+                    </div>
+                </p>
+            </div>
+        </lightning:accordionSection>
+       
+        <lightning:accordionSection class="color1" name="Deductions" label="Deductions">
+            <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">              
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" >                   
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="processingFee" name="processingFee" value="{!v.processingFee}" label="Processing fees %(excluding taxes)" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="netDisbursementAmount" name="netDisbursementAmount" value="{!v.netDisbursementAmount}" label="Net disbursement Amount" disabled="true"/>
+                                </div></div>
+                            <div class="slds-hide slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="stampduty" name="stampduty" value="{!v.con.Stamp_Duty__c}" label="Stamp duty charges" disabled="true"/>
+                                </div>
+                            </div></div>
+                    </div></p>
+                
+                <c:EmployeeVASPage OppId="{!v.oppId}" showInDisbSectionFlag="true" isInsuranceSectionVisible="false"/>
+            </div>
+        </lightning:accordionSection>
+        <lightning:accordionSection class="color1" name="Loan Disbursement section" label="Loan Disbursement section">
+            <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" >                   
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="Bank_name" name="Bank_name" value="{!v.opp.Bank_Name__c}" label="Bank Name" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="typeOfAcc" name="typeOfAcc" value="{!v.opp.A_C_Type__c}" label="Type of Account" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="IFSC" name="ifsc" value="{!v.opp.IFSC_Code__c}" label="IFSC Code" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="acName" name="acName" value="{!v.opp.Favouring__c}" label="A/c holder name as per bank account" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="bankAccNo" name="bankAccNo" value="{!v.opp.Bank_A_c_No_of_Customer__c}" label="Bank Account No" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="cheq" name="cheq" value="{!v.opp.Favouring__c}" label="Cheque in favour of" disabled="true"/>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </p>
+            </div>
+        </lightning:accordionSection>
+        
+        <lightning:accordionSection class="color1" name="Details of ECS" label="Details of ECS">
+            <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" >                   
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="checkbox-id-01">Existing ECS</label>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-checkbox slds-checkbox_standalone">
+                                                <input type="checkbox" id="ecsCheckbox" name="label" value="option" checked="{!v.EcsCheck}" disabled="true"/>
+                                                <span class="slds-checkbox_faux"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="checkbox-id-01">Existing KYC Consent</label>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-checkbox slds-checkbox_standalone">
+                                                <input type="checkbox" id="kycCheckbox" name="label" value="option" checked="{!v.KycCheck}" disabled="true"/>
+                                                <span class="slds-checkbox_faux"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="repayBankname" name="repayBankname" value="{!v.opp.Bank_Name__c}" label="Repayment Bank Name" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="acNo" name="acNo" value="{!v.opp.Bank_A_c_No_of_Customer__c}" label="Repayment Bank Account Number" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="bankAccNo" name="bankAccNo" value="{!v.ECSAmount}" label="ECS Amount" disabled="true"/>
+                                </div>
+                            </div>
+                            
+                            
+                            
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </p>
+            </div>
+        </lightning:accordionSection>
+    </lightning:accordion> 
+    
+    <div class="slds-p-horizontal--small parentclass">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                <div class="slds-form-element__control">
+                    <aura:if isTrue="{!!v.showSubmit}">  
+                        <aura:if isTrue="{!v.showConfirm}">               	             
+                            <lightning:input type="checkbox" name="checkBoxId" checked="checked" label="I agree and acknowledge the loan details" aura:id="checkBoxId"/>
+                        </aura:if>
+                    </aura:if>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                <div class="slds-p-around--x-small" align="center">   
+                    <aura:if isTrue="{!!v.showSubmit}">   
+                        <aura:if isTrue="{!v.showConfirm}">               	             
+                            <lightning:button aura:id="ConfirmTC" variant="brand" iconName="action:approval" label="Confirm" class="slds-theme--alt-inverse " onclick="{!c.confirmTC}" disabled="{!v.displayReadOnly}"/>
+                        </aura:if> 
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.showSubmit}">               	             
+                        <lightning:button aura:id="submit" variant="brand" iconName="action:approval" label="Submit" class="slds-theme--alt-inverse"  onclick="{!c.clicksubmit}" disabled="{!v.displayReadOnly}" />               	
+                    </aura:if> 
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+    <div aura:id="overrideModalbox" class="slds-hide slds-align_absolute-center slds-p-around--medium borderColor" id="dummyId">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="{!$Browser.isIOS == true ? 'slds-modal slds-fade-in-open slds-modal_large slds-is-fixed slds-align_absolute-center slds-border_bottom slds-border_top slds-border_left slds-border_right align-dashboard borderColor':'slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center slds-border_top slds-border_left slds-border_right borderColor'    }" style="position: fixed;">
+            <div class="slds-modal__container borderColor">
+                <div style="position:relative">
+                    <div class="innerDivWrapper">  
+                        <div class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12 alignModal':' slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12'}" style="margin-bottom: 0px;margin-top: 0px; height: 150px; overflow-y: scroll;">
+                            <div class="slds-p-around--medium slds-m-top_large">
+                                <span class="WrapText">To register for electronic EMI payments, you will require to make a credit transaction of Rs. 5 towards Bajaj Finserv using your netbanking.<br/></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="{!$Browser.isIOS == true ? 'slds-modal__footer slds-size--8-of-12 slds-align_absolute-center alignModal':' slds-modal__footer slds-size--8-of-12 slds-align_absolute-center'}" style="margin-bottom: 0px;margin-top: 0px; height: 50px">
+                    
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeMessage}">Ok</button>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </div> 
+    
+    
+</aura:component>

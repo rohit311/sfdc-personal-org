@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event to set pincode on landing page if pincode will be changed on demographic" >
+    <aura:attribute name="pincode" type="String"/>
+    <aura:attribute name="arealocality" type="String"/>
+</aura:event>

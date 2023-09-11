@@ -1,0 +1,178 @@
+<aura:component controller="cloneBankDetails" access="global">
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="isOpen" type="Boolean" default="true" />
+    <aura:attribute name="bankAccNo" type="String"  />
+    <aura:attribute name="disbursement" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="repayment" type="RePayment_mode_detail__c[]"/>
+    <aura:attribute name="TotalDis" type="Integer" default="0"/>
+    <aura:attribute name="TotalRepay" type="Integer" default="0"/>
+    <aura:attribute name="selectedRecord" type="String" default="" />
+    <aura:attribute name="norecord" type="Boolean" default="false" />
+    <aura:attribute name="isSALMobilityV2" type="Boolean" default="false" />
+    <aura:registerEvent name="SetCloneBankRecord" type="c:SetCloneBankRecord"/>
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="demo-only" style="height: 640px;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="{!$Browser.isIOS == true ? 'slds-modal slds-modal_medium slds-fade-in-open alignModal' : 'slds-modal slds-modal_medium slds-fade-in-open'}">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <aura:if isTrue="{!v.isSALMobilityV2}">
+                        	<button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.closeModalWindow}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <aura:set attribute="else">
+                                <button class="slds-button slds-button svg slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModalWindow}">
+                                    &#10062; <span class="slds-assistive-text">&#10062;</span>
+                                </button>
+                            </aura:set>
+                        </aura:if>
+                        
+                        <h3 id="modal-heading-01" class="slds-text-link_faux">Clone Banking Details</h3>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--large slds-grid  slds-grid_align-space slds-grid_align-center" id="modal-content-id-1">
+                       <form class="slds-form--inline"> 
+                           <div class="slds-form-element">
+                        <lightning:input type="text" name="bankNumber" label="Bank Account Number" value="{!v.bankAccNo}"  /></div>
+                               
+                        <div class="slds-form-element">
+                            <button class="slds-button slds-button_brand slds-button_small slds-button__neutral" onclick="{!c.searchRec}" >Search</button>
+                        </div>
+                        </form>
+                        
+                    </div>
+                    <div class="slds-modal__content slds-p-around--large">
+                        <div class="slds" style="overflow:auto;">
+                            <aura:if isTrue="{!v.norecord}" >
+                               <div class="slds-truncate">
+                                    <ui:outputText value="No Records" />   
+                                </div>    
+                            </aura:if>
+                            <aura:if isTrue="{!v.TotalDis>0}" >
+                                 <!-- Priyanka added to display card in mobility V2 -start --> 
+                                 <aura:if isTrue="{!v.isSALMobilityV2}" >
+
+                                <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                                        <div class="applyColor">
+                                            <aura:iteration items="{!v.disbursement}" var="dis">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">
+                                                    
+                                                    <div class="slds-p-horizontal--small">
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <ui:inputRadio aura:id="r0" name="select" change="{!c.onGroup}"  text="{!dis.Id}" class="slds-col" /> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-col slds-form-element__label" > Loan Application Name</label><br/>
+                                                                    <strong>  <ui:outputText value="{!dis.Loan_Application__r.Name}" /></strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-col slds-form-element__label" >Bank Account Number</label><br/>
+                                                                    <strong>  <ui:outputText value="{!dis.Bank_Account__c}" /></strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--2-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-col slds-form-element__label ">IFSC Code</label><br/>
+                                                                    <strong>  <ui:outputText value="{!dis.IFSC_Code__c}"  /></strong>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-col slds-form-element__label">Bank Name</label><br/>
+                                                                    <strong>  <ui:outputText value="{!dis.Bank_Name__c}" /></strong>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                                <br/>
+                                            </aura:iteration>
+                                        </div>
+                                    </div>
+                                <aura:set attribute="else">
+                                        <!-- Priyanka added to display card in mobility V2 -end -->   
+                                        <table  class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                            <thead>
+                                                <tr class="slds-text-title--caps">
+                                                    <th>
+                                                        <span class="slds-truncate" title="Select">Select</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="Loan Application Name">Loan Application Name</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="Bank Account Number">Bank Account Number</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="IFSC Code">IFSC Code</span>
+                                                    </th>
+                                                    <th>
+                                                        <span class="slds-truncate" title="Bank Name">Bank Name</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                                <aura:iteration items="{!v.disbursement}" var="dis">
+                                                    <tr class="slds-text-title--caps">  
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                                <ui:inputRadio aura:id="r0" name="select" text="{!dis.Id}" change="{!c.onGroup}"  />
+                                                            </div>
+                                                        </td>
+                                                        <td scope="row" >
+                                                            <div class="slds-truncate">
+                                                                <ui:outputText value="{!dis.Loan_Application__r.Name}" />
+                                                            </div>
+                                                        </td>
+                                                        <td scope="row" >
+                                                            <div class="slds-truncate">
+                                                                <ui:outputText value="{!dis.Bank_Account__c}" />
+                                                            </div>
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                                <ui:outputText value="{!dis.IFSC_Code__c }" />
+                                                            </div>                                                        
+                                                        </td>
+                                                        <td scope="row">
+                                                            <div class="slds-truncate">
+                                                                <ui:outputText value="{!dis.Bank_Name__c }" />
+                                                            </div>                                                        
+                                                        </td>
+                                                    </tr>
+                                                </aura:iteration>
+                                                
+                                                
+                                            </tbody>
+                                        </table>
+                                        
+                                    </aura:set>
+                            </aura:if>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                         <div class="slds-align_absolute-center">
+                            <span class="slds-align_absolute-center"> 
+                                <div class=" slds-align_absolute-center">
+                                    <aura:if isTrue="{!v.TotalDis>0}" >
+                                        <button class="slds-button slds-button_brand slds-button_small slds-button__neutral"  onclick="{!c.cloneRec}">Clone</button>  
+                                    </aura:if> 
+                                </div> 
+                            </span>
+                        </div>    
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        
+    </aura:if>
+</aura:component>

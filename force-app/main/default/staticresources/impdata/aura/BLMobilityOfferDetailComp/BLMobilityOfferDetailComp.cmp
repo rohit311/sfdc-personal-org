@@ -1,0 +1,873 @@
+<aura:component controller="BLMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,force:lightningQuickAction" access="global">
+    <aura:attribute name="leadID" type="string" />
+     <!--22141 S-->
+    <aura:attribute name = "mobileValidResult" type = "String" default = ""/>
+    <!-- 22141 E -->
+    <aura:attribute name="selectedACM" type="string" />
+    <aura:attribute name="isCpv" type="Boolean" default="false"/>
+    <aura:attribute name="AllDocReceived" type="Boolean" default="false"/>
+    <aura:attribute name="ProductOffer" type="Product_Offerings__c" />
+    <aura:attribute name="LeadApplicants" type="Lead_Applicants__c[]" default="null"/>
+    <aura:attribute name="AddressChangeFlag" type="boolean" default="false"/>
+    <aura:attribute name="ACM" type="Boolean" default="false"/>
+    <aura:attribute name="isValidDispositionFields" type="Boolean" default="false"/>
+    <aura:attribute name="isAllowConvert" type="Boolean" default="false"/>
+    <aura:attribute name="isShowConvert" type="Boolean" default="false"/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="isDeletePop" type="Boolean" default="false"/>
+    <aura:attribute name="selectedDeleteFile" type="ContentVersion"/>
+    <aura:attribute name="loanId" type="string" />
+	<aura:attribute name="isConverted" type="Boolean" default="false"/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="AllCities" type="String[]" default="[]"/>
+    <aura:attribute name="filteredCities" type="String[]" default="[]"/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="schemeSearchKeyword" type="string" default=""/>
+    <aura:attribute name="schemeList" type="Scheme_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedScheme" type="Scheme_Master__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="searching" type="Boolean" default="false"/>
+    <aura:attribute name="KYCpickval" type="String"  default=""/>
+    <aura:attribute name="Addresspickval" type="String"  default=""/>
+    <aura:attribute name="Ownershippickval" type="String"  default=""/>
+    <aura:attribute name="CoKYCpickval" type="String"  default=""/>
+    <aura:attribute name="CoAddresspickval" type="String"  default=""/>
+    <aura:attribute name="KYCdropDown" type="String[]" default="['PAN card','Driving Licence','Passport','Voter ID card','Shop &amp; Establishment Certificate','Trade Licence certificate','Factory Registration Certificate','Sales Tax/Vat reg. Certificate','Excise Certificate','Aadhaar Card','All directors/ Partner ID Proof','Available in Customer Eye']"/>
+    <aura:attribute name="AddresspickdropDown" type="String[]" default="['Shop &amp; Establishment Certificate','Ration Card','Driving Licence','Passport','Bank Statements','Trade Licence certificate','factory registration Certificate','Telephone Bill','Sales Tax/Vat reg. Certificate','Sanction letter of OD CC limit','Excise Certificate','Latest bank Credit Card Statement','Alternate Bank A/c','Aadhaar Card','Electricity Bill','Registered Rent Agreement','Property Tax','Sales Deed','All Directors Partner Address Proof','Available in Customer Eye']"/>
+    <aura:attribute name="OwnershippickdropDown" type="String[]" default="['Electricity Bill','Sanction letter','Electricity Bill','Property Tax','Sales Deed']" />
+    <aura:attribute name="uploadedAttachments" type="ContentVersion[]"/>
+    <aura:attribute name="customerEKYC" type="eKYC__c" default="null"/>
+    <aura:attribute name="isEKYCcompleted" type="Boolean" default="false"/>
+    <aura:attribute name="DocTab" type="Boolean" default="false"/>
+    <aura:attribute name="isValidAmount" type="Boolean" default="true"/>
+    <aura:handler name="GridRefresh" event="c:SingleFileGridRefreshEvt" action="{!c.refreshDocList}"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.linktoPO}"/>
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:attribute name="isRetriggerCIBIL" type="Boolean" default="true"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="cibilTempId" type="String" default=""/>
+    <aura:registerEvent name="LoanConversionEvent" type="c:LoanConversionEvent"/>
+    <aura:attribute name="leadCibilId" type="string" />
+    <aura:attribute name="checkAllDocReceived" type="Boolean" default="false"/>
+    <aura:attribute name="loanNumber" type="string" default=""/>
+    <aura:attribute name="cibilScore" type="string" default=""/>
+    <aura:attribute name="isShowSubitToCredit" type="Boolean" default="false"/>
+    <aura:registerEvent name="BLMobilityPOCardEvent" type="c:BLMobilityPOCardEvent"/>
+    <aura:attribute name="coname" type="string" />
+      <aura:attribute name="autoAllocateduser" type="string"  default=""/><!-- Bug Id : 21804-->
+    <div class="slds">
+        <ui:scrollerWrapper class="outerScroller cBLMobilityOfferDetailComp" >
+                <div class="slds-tabs--scoped">
+                    <!-- 22141 S -->
+                        <c:POCard po="{!v.ProductOffer}" fewmoreFields="false" hidefewmoreFields="false" isStaticHeader="true" showLAN="{!v.isConverted}" leadCibilId="{!v.leadCibilId}" mobileResult = "{!v.mobileValidResult}" />
+                    <!--22141 E -->    
+                    <ul class="slds-tabs--scoped__nav slds-scrollable--x" role="tablist">
+                        
+                        <li aura:id="t1" class="slds-tabs--scoped__item slds-text-title--caps slds-active ActiveBar cBLMobilityOfferDetailComp" title="OFFER DETAILS" role="presentation" onclick="{!c.init}">
+                            <a class="slds-tabs--scoped__link" data-index="t1" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-scoped-1" id="tab-scoped-1__item" style="text-decoration:none;">
+                                OFFER DETAILS</a>
+                        </li>
+                        <li aura:id="t2" class="slds-tabs--scoped__item slds-text-title--caps" title="CUSTOMER DETAILS" role="presentation" onclick="{!c.getCustomerDetails}">
+                            <a class="slds-tabs--scoped__link" data-index="t2" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item" style="text-decoration:none;">
+                                CUSTOMER DETAILS</a>
+                        </li>
+                        <li aura:id="t3" class="slds-tabs--scoped__item slds-text-title--caps" title="DEMOGRAPHIC DETAILS" role="presentation" onclick= "{!c.getDemographicDetails}" >
+                            <a class="slds-tabs--scoped__link" data-index="t3" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-3" id="tab-scoped-3__item" style="text-decoration:none;">
+                                DEMOGRAPHIC DETAILS</a>
+                        </li>
+                        
+                        <li aura:id="t4" class="slds-tabs--scoped__item slds-text-title--caps" title="DOCUMENTS DETAILS" role="presentation" onclick="{!c.getDocumentDetails}">
+                            <a class="slds-tabs--scoped__link" data-index="t4" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-4" id="tab-scoped-4__item" style="text-decoration:none;">
+                                DOCUMENTS DETAILS</a>
+                        </li>
+                        
+                        <li aura:id="t5" class="slds-tabs--scoped__item slds-text-title--caps" title="CPV ELIMINATION" role="presentation"  onclick="{!c.showCPV}">
+                            <a class="slds-tabs--scoped__link" data-index="t5" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-5" id="tab-scoped-5__item" style="text-decoration:none;">
+                                CPV ELIMINATION</a>
+                        </li>
+                        
+                        <li aura:id="t6" class="slds-tabs--scoped__item slds-text-title--caps" title="DISPOSITION DETAILS" role="presentation" onclick="{!c.getDispositionDetails}">
+                            <a class="slds-tabs--scoped__link" data-index="t6" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-5" id="tab-scoped-5__item" style="text-decoration:none;">
+                                DISPOSITION DETAILS</a>
+                        </li>
+                    </ul>
+                    <div aura:id="t1detail" class="slds-tabs--scoped__content slds-show boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="POName">PO Name  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="POName" value="{!v.ProductOffer.Name}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="Tags">Tags :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="Tags" value="{!v.ProductOffer.Tags__c}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="Propensity">Propensity  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="Propensity" value="{!v.ProductOffer.Propensity__c}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="OfferAmount">Offer Amount :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputNumber aura:id="OfferAmount" value="{!v.ProductOffer.Offer_Amount__c}" format="#,##,##,#00.00#"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="ECSegment">Customer Segment  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="ECSegment" value="{!v.ProductOffer.Existing_Customer_Segmentation__c}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="ROI">Offer ROI  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="ROI" value="{!v.ProductOffer.Offer_ROI__c}" />
+                            </div>
+                            
+						    <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="OfferRate">Offer Rate  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="OfferRate" value="{!v.ProductOffer.Offer_Rate__c}" />
+                            </div>
+							
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="OfferPF">Offer PF  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="OfferPF" value="{!v.ProductOffer.Offer_PF__c}"/>
+                            </div>
+                            <!--Below Added by Rohan on 19-03-2018 for Biz Requirement.-->
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="OfferPF">UTM Campaign  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="OfferPF" value="{!v.ProductOffer.UTM_Campaign__c}"/>
+                            </div>
+                             <!--Above Added by Rohan on 19-03-2018 for Biz Requirement.-->
+                        </div>
+                        <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                            <lightning:button label="Next" value="t1" onclick="{!c.NextTab}" class="slds-button_brand"/>
+                        </div>
+                        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                    </div>
+                    
+                    
+                    <div aura:id="t2detail" class="slds-tabs--scoped__content slds-hide boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+                        
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="FirstName" >First Name :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="FirstName" value="{!v.ProductOffer.Lead__r.FirstName}"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="LastName">Last Name :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="LastName" value="{!v.ProductOffer.Lead__r.LastName}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="CustomerID">Customer ID :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="CustomerID" value="{!v.ProductOffer.Lead__r.Customer_ID__c}" />
+                            </div>
+                                
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="Email">Email :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate" >
+                                {!v.ProductOffer.Lead__r.Email}
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="DOB">DOB :</label><label style="color :red;">*</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <!--<ui:outputDate aura:id="DOB" value="{!v.ProductOffer.Lead__r.DOB__c}" format="DD/MM/yyyy"/>-->
+                                <!--<ui:inputDate aura:id="DOB" class="slds-input" value="{!v.ProductOffer.Lead__r.DOB__c}"/> -->
+                                <ui:inputDate aura:id="DOB" class="slds-input" value="{!v.ProductOffer.Lead__r.DOB__c}" displayDatePicker="true" change="{!c.validateDOB}"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="AlternateMobile">Alternate Mobile  :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputPhone aura:id="AlternateMobile" value="{!v.ProductOffer.Lead__r.Customer_Mobile__c}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="PAN">PAN :</label><label style="color :red;">*</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <!--<ui:outputText aura:id="PAN" value="{!v.ProductOffer.Lead__r.PAN__c}" />-->
+                                <!--<ui:inputText aura:id="PAN" class="slds-input" value="{!v.ProductOffer.Lead__r.PAN__c}"/>-->
+                                <ui:inputText aura:id="PAN" class="slds-input" updateOn="keyup" keyup="{!c.validatePAN}" value="{!v.ProductOffer.Lead__r.PAN__c}" placeholder="PAN" maxlength="10"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="EmploymentType">Employment Type :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:outputText aura:id="EmploymentType" value="{!v.ProductOffer.Lead__r.Employment_Type__c}" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="ProfessionType" >Profession :</label><label style="color :red;">*</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="ProfessionType" class="slds-input" value="{!v.ProductOffer.Lead__r.Profession_Type__c}" required="true" change="{!c.isValidProf}"/> 
+                            </div>  
+                        </div>
+                        <aura:if isTrue="{!!empty(v.LeadApplicants)}">
+                            
+                            <div class="slds-box slds-box--small slds-m-top--small">
+				                <strong>Co Applicant Details</strong>
+				                <div class="slds-p-around--medium ">
+				                    <div class="slds-grid slds-has-divider--top">
+				                        <div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">Name</div>
+				                        <div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">Customer Type</div>
+				                        <div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">Mobile</div>
+				                    </div>
+				                    <aura:iteration items="{!v.LeadApplicants}" var="coApplicant">
+				                        <div class="slds-grid slds-has-divider--top">
+				                        	<div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">{!coApplicant.Name}</div>
+				                            <div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">{!coApplicant.Customer_Type__c}</div>
+				                            <div class="slds-col slds-m-left--xx-small slds-size--4-of-12  slds-small-size--4-of-12 slds-medium-size--1-of-6 slds-hyphenate slds-border--left">
+				                            	<ui:outputPhone aura:id="Mobile" value="{!coApplicant.Mobile__c}" />
+				                            </div>
+				                        </div> 
+				                    </aura:iteration>
+				                </div>
+				            </div>
+                            
+                        </aura:if>
+                        <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                            <lightning:button aura:id="Savebtn" label="Save &amp; Next" value="t2" onclick="{!c.SaveNextCustomerDetails}" class="slds-button_brand"/>
+                        </div>
+                        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                    </div>
+                    <div aura:id="t3detail" class="slds-tabs--scoped__content slds-hide boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-3__item">
+                        
+                        <div class="slds-list_horizontal" style="padding: 3px;">
+                            &nbsp;&nbsp; <ui:inputCheckbox aura:id="EditAddress" name="AddressChangeFlag" value="{!v.AddressChangeFlag}" change="{!c.editAddress}" class="slds-checkbox"/> &nbsp; Edit Address 
+                        </div><br/>
+                        
+                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">Residence Address :</h3>
+                        
+                        <div class="slds-grid slds-wrap">
+                            
+                            <aura:if isTrue="{! !v.AddressChangeFlag}">
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_AddressLine1">Residence Address 1:</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_AddressLine1" value="{!v.ProductOffer.Address_Line_1__c}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_AddressLine2">Residence Address 2 :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_AddressLine2" value="{!v.ProductOffer.Address_Line_2__c}"/>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_AddressLine3">Residence Address 3 :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_AddressLine3" value="{!v.ProductOffer.Address_Line_3__c}"/>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_ResiCity">Residence City :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_ResiCity" value="{!v.ProductOffer.Resi_City__c}"  />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_ResiState">Residence State :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_ResiState" value="{!v.ProductOffer.Resi_State__c}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_ResiPinCode">PinCode  :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:outputText aura:id="D_ResiPinCode" value="{!v.ProductOffer.Pin_Code__c}"  />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_CustomerLandline">Customer Landline :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_CustomerLandline" value="{!v.ProductOffer.Customer_Landline__c}"  />
+                                </div>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{! v.AddressChangeFlag}">
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="AddressLine1">Residence Address 1:</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="AddressLine1" maxlength="35" updateOn="keyup" keyup="{!c.validateadd1}" value="{!v.ProductOffer.Address_Line_1__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="AddressLine2">Residence Address 2 :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="AddressLine2" maxlength="35" updateOn="keyup" keyup="{!c.validateadd2}" value="{!v.ProductOffer.Address_Line_2__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="AddressLine3">Residence Address 3 :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="AddressLine3" maxlength="35" updateOn="keyup" keyup="{!c.validateadd3}" value="{!v.ProductOffer.Address_Line_3__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="residenceCity">Residence City :</label><label style="color :red;">*</label>
+                                </div>
+                                <div aura:id="residenceCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <div class="slds-form-element__control">
+                                        <ui:inputText aura:id="residenceCity" class="slds-input" updateOn="keyup" keyup="{!c.residenceCityKeyPressController}" value="{!v.ProductOffer.Resi_City__c}" placeholder="Select Residence City"  disabled="{! !v.AddressChangeFlag}" />                               
+                                        <div class="slds-lookup__menu slds" id="residenceCityList">
+                                            <div aura:id="residenceCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.filteredCities}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectResidenceCity}">{!singleRec}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="ResiState">Residence State :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="ResiState" value="{!v.ProductOffer.Resi_State__c}" disabled="true" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="PinCode">PinCode  :</label><label style="color :red;">*</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="PinCode"  class="slds-input " maxlength="6" value="{!v.ProductOffer.Pin_Code__c}" placeholder="Enter Pin Code XXXXXX" updateOn="keyup" keyup="{!c.validatePIN}" disabled="{! !v.AddressChangeFlag}"/>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="CustomerLandline">Customer Landline :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputNumber aura:id="CustomerLandline" value="{!v.ProductOffer.Lead__r.Customer_Landline__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                            </aura:if>
+                        </div>
+                        <br/>
+                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">Office Address :</h3>
+                        <br/>
+                        <div class="slds-grid slds-wrap">
+                            
+                            <aura:if isTrue="{! !v.AddressChangeFlag}">
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_OfficeAddress1">Office Address1 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_OfficeAddress1" value="{!v.ProductOffer.Office_Address_1__c}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_OfficeAddress2">Office Address2 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_OfficeAddress2" value="{!v.ProductOffer.Office_Address_2__c}"/>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_OfficeAddress3">Office Address3 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_OfficeAddress3" value="{!v.ProductOffer.Office_Address_3__c}"  />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_OfficeCity">Office City :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_OfficeCity" value="{!v.ProductOffer.Office_City__c}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_OfficeState">Office State :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <ui:outputText aura:id="D_OfficeState" value="{!v.ProductOffer.Office_State__c}"/>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="D_Officepincode">Office PinCode :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:outputText aura:id="D_Officepincode" value="{!v.ProductOffer.Office_Pin_Code__c}" />
+                                </div>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{! v.AddressChangeFlag}">
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="OfficeAddress1">Office Address1 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="OfficeAddress1" maxlength="35" updateOn="keyup" keyup="{!c.offvalidateadd1}" value="{!v.ProductOffer.Office_Address_1__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="OfficeAddress2">Office Address2 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="OfficeAddress2" maxlength="35" updateOn="keyup" keyup="{!c.offvalidateadd2}" value="{!v.ProductOffer.Office_Address_2__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="OfficeAddress3">Office Address3 :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="OfficeAddress3" maxlength="35" updateOn="keyup" keyup="{!c.offvalidateadd3}" value="{!v.ProductOffer.Office_Address_3__c}" disabled="{! !v.AddressChangeFlag}" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="officeCity">Office City :</label>
+                                </div>
+                                <div aura:id="officeCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <div class="slds-form-element__control">
+                                        <ui:inputText aura:id="officeCity" class="slds-input" updateOn="keyup" keyup="{!c.officeCityKeyPressController}" value="{!v.ProductOffer.Office_City__c}" placeholder="Select office City"  disabled="{! !v.AddressChangeFlag}" />                               
+                                        <div class="slds-lookup__menu slds" id="officeCityList">
+                                            <div aura:id="officeCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.filteredCities}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectOfficeCity}">{!singleRec}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="OfficeState">Office State :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="OfficeState" value="{!v.ProductOffer.Office_State__c}" disabled="true" />
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <label class="slds-form-element__label" for="Officepincode">Office PinCode :</label>
+                                </div>
+                                <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <ui:inputText aura:id="Officepincode" class="slds-input" maxlength="6" value="{!v.ProductOffer.Office_Pin_Code__c}" placeholder="Enter Pin Code XXXXXX" updateOn="keyup" keyup="{!c.validateOfficePIN}" disabled="{! !v.AddressChangeFlag}"/>
+                                </div>
+                            </aura:if>
+                        </div>
+                        
+                        <br/> 
+                        <div class="slds-list_horizontal" style="padding: 3px;" >
+                            &nbsp;&nbsp; 
+                            <ui:inputCheckbox aura:id="IgnoreMCPResults" name="IgnoreMCPResults" value="true" disabled="true"
+                                              class="slds-checkbox"/> &nbsp; Ignore MCP Results
+                             &nbsp;&nbsp; 
+                            <aura:if isTrue="{! v.cibilScore}">
+                            	<lightning:button aura:id="InitiateCibil" label="Initiate CIBIL" value="v_InitiateCibil" onclick="{!c.initiateCIBIL}"  class="slds-button_success"/>
+                             </aura:if>
+                            <aura:if isTrue="{!! v.cibilScore}">
+                            	<lightning:button aura:id="InitiateCibil" label="Initiate CIBIL" value="v_InitiateCibil" onclick="{!c.initiateCIBIL}" class="slds-button_brand"/>
+                             </aura:if>
+                        </div>
+                        
+                        <aura:if isTrue="{! v.AddressChangeFlag}">
+                            <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                                <lightning:button aura:id="Savebtn" label="Save &amp; Next" value="t3" onclick="{!c.SaveNextDemographicDetails}" disabled="{!v.isConverted}" class="slds-button_brand"/>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{! !v.AddressChangeFlag}">
+                            <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                                <lightning:button label="Next" value="t3" onclick="{!c.NextTab}" class="slds-button_brand"/>
+                            </div>
+                        </aura:if>
+                        <br/><br/><br/>
+                    </div>
+                    <div aura:id="t4detail" class="slds-tabs--scoped__content slds-size--2-of-2 slds-small-size--4-of-4 slds-medium-size--8-of-8 slds-hide boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-4__item" >
+                         <div class="slds-box slds-box--small alert">
+               				 <strong>Please note:</strong> Maximum attachment size should be 5 MB per file.
+           				 </div>
+                        <div aura:id="uploadedDocs" class="slds-box slds-box--small slds-m-top--small slds-hide">
+			                <strong>Uploaded Documents</strong>
+			                <div  class="slds-p-around--medium ">
+			                    <div class="slds-grid slds-has-divider--top">
+			                        <aura:if isTrue="{! !v.isConverted}">
+                                    	<div class="slds-col slds-size--2-of-12 slds-text-align--center slds-text-heading_regular"><strong>Action</strong></div> 
+                                    </aura:if>
+                                    <div class="slds-col slds-size--6-of-12 slds-hyphenate slds-border--left slds-text-heading_regular"><strong>Name</strong></div>
+                                    <div class="slds-col  slds-size--4-of-12 slds-hyphenate slds-border--left slds-text-heading_regular"><strong>Created On</strong></div>
+			                    </div>
+			                    <aura:iteration items="{!v.uploadedAttachments}" var="obj">
+			                        <div class="slds-grid slds-has-divider--top">
+										<aura:if isTrue="{! !v.isConverted}">
+                                            <div class="slds-col slds-size--2-of-12 slds-text-align--center">
+                                                <lightning:buttonIcon class="del-btn" aura:id="del-btn" iconName="utility:delete" variant="bare" alternativeText="Delete Attachment." value="{!obj}" onclick="{!c.removeDoc}"/>
+                                            </div>
+                                        </aura:if>
+			                            <div class="slds-col slds-size--6-of-12 slds-hyphenate slds-border--left slds-text-title">{!obj.Title}</div>
+			                            <div class="slds-col  slds-size--4-of-12 slds-hyphenate slds-border--left slds-text-title"><ui:outputDateTime value="{!obj.CreatedDate}"  format="DD/MM/yyyy hh:mm:ss"/></div>
+			                        </div> 
+			                    </aura:iteration>
+			                </div>
+			            </div>
+                        
+                        
+                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">Applicant Details</h3>
+                        <div class="slds-box slds-box--small slds-m-top--small">
+                        	<c:AadharVerification />
+                        </div>
+                        
+                        <div class="slds-box slds-box--small slds-m-top--small">   
+	                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">KYC</h3>
+	                        	<div style="padding : 12px;">
+			                        Identity Proof :
+			                        <div class="slds-form-element">
+	                					<div class="slds-form-element__control">
+					                        <ui:inputSelect aura:id="appIdentityProof" value="{!v.KYCpickval}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+					                            <ui:inputSelectOption text="" label="-None-"/>
+					                            <aura:iteration items="{!v.KYCdropDown}" var="pic" >
+					                        		<ui:inputSelectOption text="{!pic}"/>
+					                        	</aura:iteration>
+					                        </ui:inputSelect>
+										</div>
+									</div>
+			                        <aura:renderIf isTrue="{!v.KYCpickval!=''}">
+			                        <c:SingleFileUploadComp aura:id="identityPf" instance="{!v.recordId + 'Identity'}" parentId="{!v.recordId}" filePrefix="{!'Identity_'+v.KYCpickval}"/>
+									</aura:renderIf>
+                                        <br/>
+			                        Address Proof :
+			                        <div class="slds-form-element">
+	                					<div class="slds-form-element__control">
+					                        <ui:inputSelect aura:id="appAddressProof" value="{!v.Addresspickval}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+					                        	<ui:inputSelectOption text="" label="-None-"/>
+					                        	<aura:iteration items="{!v.AddresspickdropDown}" var="pic" >
+					                        		<ui:inputSelectOption text="{!pic}"/>
+					                        	</aura:iteration>
+					                        </ui:inputSelect>
+										</div>
+									</div>
+									<aura:renderIf isTrue="{!v.Addresspickval!=''}">
+			                        <c:SingleFileUploadComp aura:id="addressPf" instance="{!v.recordId + 'Address'}" parentId="{!v.recordId}" filePrefix="{!'Address_'+v.Addresspickval}"/>
+                                    </aura:renderIf>
+		                        </div>
+						</div>
+                        <div class="slds-box slds-box--small slds-m-top--small"> 
+	                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">Ownership Proof of Residence/Office	</h3>
+	                        
+	                        <div style="padding : 12px;">
+	                        
+	                        	Ownership Proof :
+		                        <div class="slds-form-element">
+                					<div class="slds-form-element__control">
+				                        <ui:inputSelect aura:id="appOwnershipProof" value="{!v.Ownershippickval}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+				                        	<ui:inputSelectOption text="" label="-None-"/>
+				                        	<aura:iteration items="{!v.OwnershippickdropDown}" var="pic" >
+				                        		<ui:inputSelectOption text="{!pic}"/>
+				                        	</aura:iteration>
+				                        </ui:inputSelect>
+									</div>
+								</div>
+                                <aura:renderIf isTrue="{!v.Ownershippickval!=''}">
+	                        	<c:SingleFileUploadComp aura:id="OwnershipPf" instance="{!v.recordId + 'Ownership'}" parentId="{!v.recordId}" filePrefix="{!'Ownership_'+v.Ownershippickval}"/>
+                                </aura:renderIf>
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!!empty(v.LeadApplicants)}">
+                        	<div class="slds-box slds-box--small slds-m-top--small">
+		                        <h3 class="slds-section-title--divider title1 cBLMobilityOfferDetailComp">Co-Applicant Details</h3>
+		                        
+		                        <ui:inputSelect aura:id="caname" value="{!v.coname}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8" change="{!c.selectedCA}"> 
+		                        	<ui:inputSelectOption text="" label="-None-"/>
+                                   <aura:iteration items="{!v.LeadApplicants}" var="coApplicant"  indexVar="idx">
+		                        	<ui:inputSelectOption text="{!coApplicant.Name}" label="{!coApplicant.Name}"/>
+                                   </aura:iteration>
+                                </ui:inputSelect>
+		                        	<aura:renderIf isTrue="{!v.coname != ''}">
+		                        	<div style="padding : 12px;">
+			                        Identity proof :
+			                        <ui:inputSelect aura:id="coappIdenPic" value="{!v.CoKYCpickval}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+			                        	<ui:inputSelectOption text="" label="-None-"/>
+			                        	<aura:iteration items="{!v.KYCdropDown}" var="pic" >
+			                        		<ui:inputSelectOption text="{!pic}"/>
+			                        	</aura:iteration>
+			                        </ui:inputSelect>  
+			                        <aura:renderIf isTrue="{!v.CoKYCpickval!=''}">
+			                        	<c:SingleFileUploadComp aura:id="CoApplicant-Identity" instance="{!'CoAppl-iden'+v.recordId+v.coname}" parentId="{!v.recordId}" filePrefix="{!'CoAppl-Identity'+'-'+v.coname+'_'+v.CoKYCpickval}"/>
+			                        </aura:renderIf>
+			                        <br/>
+			                        Address proof :
+			                        <ui:inputSelect aura:id="coappAddrPic" value="{!v.CoAddresspickval}" class="slds-p-horizontal--small slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+			                        	<ui:inputSelectOption text="" label="-None-"/>
+			                        	<aura:iteration items="{!v.AddresspickdropDown}" var="pic" >
+			                        		<ui:inputSelectOption text="{!pic}"/>
+			                        	</aura:iteration>
+			                        </ui:inputSelect> 
+                                        <aura:renderIf isTrue="{!v.CoAddresspickval!=''}">
+			                        	<c:SingleFileUploadComp aura:id="CoApplicant-Address" instance="{!'CoAppl-adres'+v.recordId+v.coname}" parentId="{!v.recordId}" filePrefix="{!'CoAppl-Address'+'-'+v.coname+'_'+v.CoAddresspickval}"/>
+                                        </aura:renderIf>
+		                        	</div>
+                                        </aura:renderIf>
+							</div>    
+	                    </aura:if>
+	                    <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                            <lightning:button label="Next" value="t4" onclick="{!c.NextCPV}" class="slds-button_brand"/> 
+                        </div>
+                        <br/><br/><br/>
+                    </div>
+                    
+                    <div aura:id="t5detail" class="slds-tabs--scoped__content slds-hide boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-5__item">
+                        
+                        <aura:if isTrue="{! v.isCpv}">
+                        	<div class="SLDS">
+                                <div class="slds-box slds-box--small alert">
+                                     <strong>Please note:</strong> Maximum attachment size should be 5 MB per file.
+                                 </div>
+                                <c:CPVEliminationComp aura:id="cpvTab" leadID="{!v.leadID}" POid="{!v.recordId}" isConverted="{!v.isConverted}" />
+                        	</div>
+                        </aura:if>
+                        <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                            <lightning:button label="Next" value="t5" onclick="{!c.NextTab}" class="slds-button_brand"/>
+                        </div>
+                        <br/><br/><br/>
+                    </div>
+                    <div aura:id="t6detail" class="slds-tabs--scoped__content slds-hide boarderscustom cBLMobilityOfferDetailComp" role="tabpanel" aria-labelledby="tab-scoped-5__item">
+                        
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label  for="FieldDisposition1">Field Disposition 1 Status</label><label style="color :red;">*</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <div class="slds-form-element__control slds-is-required">
+                                    <ui:inputSelect aura:id="FieldDisposition1" class="slds-input" value="{!v.ProductOffer.Field_Disposition_1__c}" required="true" change="{!c.onDispo1Change}"/>
+                                </div>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label  for="FieldDisposition">Field Disposition Status</label><label style="color :red;">*</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="FieldDisposition" class="slds-input" value="{!v.ProductOffer.Field_Desposition_Status__c}" required="true" change="{!c.onDispoChange}" disabled="true"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="FieldCheckStatus">Field Check Status :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="FieldCheckStatus" class="slds-input" value="{!v.ProductOffer.Field_Check_Status__c}" required="true" change="{!c.onFieldCheckChange}" disabled="true" />
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="AvailedAmount">Applied Loan Amount :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputNumber aura:id="AvailedAmount" format="##,##,#00.00#" value="{!v.ProductOffer.Availed_Amount__c}"  change="{!c.CorrectAmount}"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="AvailedTenor">Applied Tenor :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputNumber aura:id="AvailedTenor" value="{!v.ProductOffer.Availed_Tenor__c}" change="{!c.onTenorChange}" placeholder="Enter Tenor"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="LoanType">Type of Loan :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="LoanType" class="slds-input" value="{!v.ProductOffer.Loan_Type__c}" required="true" change="{!c.onLoanTypeChange}"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="ProgramType">Program Type :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="ProgramType" class="slds-input" value="{!v.ProductOffer.Program_Type__c}" required="true" change="{!c.onProgramTypeChange}"/>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="schemeName">Scheme Name :</label>
+                            </div>
+                            <div aura:id="schemeSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <div class="slds-form-element__control">
+                                    <ui:inputText aura:id="schemeName" class="slds-input" updateOn="keyup" keyup="{!c.schemeKeyPressController}" value="{!v.schemeSearchKeyword}" placeholder="Enter scheme"/>                
+                                    <div class="slds-lookup__menu slds" id="schemeList">
+                                        <div aura:id="schemeMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.schemeList}" var="singleRec" indexVar="idx">
+                                                <li role="presentation">
+                                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectScheme}">{!singleRec.Name + ' - ' } </a></div>
+                                                            </div>
+                                                        </div>    
+                                                    </span>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="sourceName">Sourcing Channel :</label>
+                            </div>
+                            <div aura:id="sourceSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <div class="slds-form-element__control">
+                                    <ui:inputText aura:id="sourceName" class="slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel"/>                
+                                    <div class="slds-lookup__menu slds" id="sourceList">
+                                        <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+                                                <li role="presentation">
+                                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+                                                            </div>
+                                                        </div>    
+                                                    </span>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="poASM">Area sales Manager :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                <ui:outputText aura:id="poASM" value="{!v.ProductOffer.ASM__r.Name}" />
+                            </div>
+                                
+						<aura:if isTrue="{! v.ACM}">
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <label class="slds-form-element__label" for="asm">Area Credit Manager :</label>
+                            </div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <ui:inputSelect aura:id="acm" class="slds-input" value="{!v.selectedACM}" required="true" change="{!c.onACMChange}" />
+                            </div>
+						</aura:if>
+                            
+                        </div>
+                        
+                        <div align="center" class="slds-align--absolute-center"  style="padding: 10px;">
+                            <lightning:button aura:id="Savebtn" label="Save" value="t6" onclick="{!c.save}" class="slds-button_brand"/>
+                            <aura:if isTrue="{!v.isShowConvert}">
+                            	<lightning:button label="Convert to Loan"  onclick="{!c.convert2Loan}" disabled="{! !v.isShowConvert}" class="slds-button_brand"/>
+                            </aura:if>
+                            <aura:if isTrue="{!v.isShowSubitToCredit}">
+                          		<lightning:button label="Submit to Credit"  onclick="{!c.showACM}" disabled="{! !v.isConverted}" class="slds-button_brand"/>
+                            </aura:if>
+                         </div>
+                        <br/><br/><br/>
+                    </div>
+                </div>
+			
+                
+        </ui:scrollerWrapper>
+    </div>    
+	    
+    <aura:if isTrue="{!v.isOpen}">      
+
+	      <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+	        <div class="slds-modal__container">
+	          <div class="slds-modal__header">
+	            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+	            X
+	            <span class="slds-assistive-text">Close</span>
+	            </button>
+	            <h2 id="header99" class="slds-text-heading--medium"></h2>
+	          </div>
+	          <div class="slds-modal__content slds-p-around--medium">
+	            <p><b>Do you really want to Submit to Credit ? </b></p>
+	          </div>
+	          <div class="slds-modal__footer">
+	            <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+	            <button class="slds-button slds-button--brand" onclick="{!c.acceptedACM}">OK</button>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="slds-backdrop slds-backdrop--open"></div>
+	          
+	 </aura:if>
+	 
+	<aura:if isTrue="{!v.isDeletePop}">      
+	      <div role="dialog" tabindex="-1" aria-labelledby="headerDelete1" class="slds-modal slds-fade-in-open ">
+	        <div class="slds-modal__container">
+	          <div class="slds-modal__header">
+	            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.cancelDelete}">
+	            X
+	            <span class="slds-assistive-text">Close</span>
+	            </button>
+	            <h2 id="headerDelete1" class="slds-text-heading--medium">Confirm Delete ?</h2>
+	          </div>
+	          
+	          <div class="slds-modal__content slds-p-around--medium">
+	            <p><b>Would you like to delete the selected document ? </b></p>
+	          </div>
+	          
+	          <div class="slds-modal__footer">
+	            <button class="slds-button slds-button--neutral" onclick="{!c.cancelDelete}" >Cancel</button>
+	            <button class="slds-button slds-button--brand" onclick="{!c.confirmDelete}">Yes</button>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="slds-backdrop slds-backdrop--open"></div>
+	 </aura:if>
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+ 
+    <div aura:id="alertDialog" class="slds-hide"> 
+        <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+                    <h2 class="slds-text-heading--medium" id="prompt-heading-id">Alert</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <p><h2 class="slds-text-heading--medium" id="prompt-heading-id">CIBIL response not yet received.</h2></p>
+                </div>
+                <div class="slds-modal__footer slds-theme--default">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.wait}">Wait</button>
+                    <button class="slds-button slds-button--neutral" onclick="{!c.abort}">Abort</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>  
+    <div aura:id="waiting" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    
+</aura:component>

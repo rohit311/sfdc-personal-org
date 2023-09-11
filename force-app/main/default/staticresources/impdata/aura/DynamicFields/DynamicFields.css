@@ -1,0 +1,104 @@
+.THIS .wrapStyle {
+    height:50vh;
+    overflow-x:hidden;
+}
+.THIS.scrollerSize {
+    height: 50px;
+}
+.THIS.disabledPage{
+    pointer-events:none;
+    cursor: not-allowed;
+}
+.THIS .BFLStyle {
+    color: white !important; 
+    background-color: #0072bc !important;
+    text-align: center;
+}
+
+.THIS .RequiredField {
+    border-left:5px solid red !important;
+} 
+
+.THIS .hidden_label {
+    display: none;
+}
+
+.THIS .tdWrapper {
+    padding-left: 5px !important;
+}
+
+.THIS .ButtonStyle {  
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+}
+
+.THIS .CustomTooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.THIS .CustomTooltip .CustomTooltipText {
+    visibility: hidden;
+    width: auto;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.THIS .CustomTooltip .CustomTooltipText::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.THIS .CustomTooltip:hover .CustomTooltipText {
+    visibility: visible;
+    opacity: 1;
+}
+
+.THIS .FieldStyle{
+    margin: 5px 0px;
+}
+
+.THIS input.error, .THIS select.error {
+    background-color: rgb(255, 255, 255);
+    border-color: red !important;
+    background-clip: padding-box;
+}
+
+.THIS span.required{
+    color: #c23934;
+}
+
+.THIS.slds-spinner_container {
+  z-index: 10000;
+  position: fixed;
+}
+.THIS .leftpadding
+{
+    padding-left:10%;
+}
+.THIS .mobHeader{
+    height:2.5rem;
+}
+.THIS .disabledDiv {
+    pointer-events: none;
+    opacity: 0.4;
+}

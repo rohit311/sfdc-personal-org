@@ -1,0 +1,68 @@
+<aura:component controller="SALMobilityController" access="global" extends="forceCommunity:navigationMenuBase" implements="force:hasRecordId,force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:disableOppTabs" action="{!c.disableTabs}"/>
+    
+    <!--check component loading YK start-->
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <!--check component loading YK end-->
+    
+    <!--check component loading YK start-->
+    <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+        <div class="slds-align_absolute-center" style="height: 5rem;">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--check component loading YK end-->
+    
+    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+        <div class="slds-tabs--scoped">
+            <ul class="slds-tabs--scoped__nav" role="tablist">
+                <li aura:id="loanTab" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Loan Application" role="presentation">
+                    <a id="loanTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="0" aria-selected="true" aria-controls="loanTabContent">
+                        DSS
+                    </a>
+                </li>
+                
+                <li aura:id="documentTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Documents" role="presentation">
+                    <a id="documentTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-2" aria-selected="false" aria-controls="documentTabContent">
+                        Documents
+                    </a>
+                </li>
+                <li aura:id="ActionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Action" role="presentation">
+                    <a id="ActionTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-2" aria-selected="false" aria-controls="ActionTabContent">
+                        Action
+                    </a>
+                </li>
+            </ul>
+            <!--<ui:scrollerWrapper class="sWrapTest">-->
+            <div aura:id="loanTabContent" class="slds-tabs--scoped__content" role="tabpanel" aria-labelledby="LoanTab">
+                <aura:if isTrue="{!v.recordId != null}">
+                    <c:DSSPage oppId="{!v.recordId}"/> 
+                </aura:if>
+                <aura:if isTrue="{!v.recordId == null}">
+                    <c:DSSPage oppId="{!v.recordId}"/>
+                </aura:if>
+            </div>
+            
+            <div aura:id="documentTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="documentTab">
+                <aura:if isTrue="{!v.recordId != null}">
+                    <c:SALDocuments parentId="{!v.recordId}"/>
+                </aura:if>
+            </div>   
+            <div aura:id="ActionTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="ActionTab">
+                <aura:if isTrue="{!v.recordId != null}">
+                    <c:SAL_Opp_SubmitToUW parentId="{!v.recordId}"/>
+                </aura:if>
+            </div> 
+           <!-- </ui:scrollerWrapper>-->
+        </div>
+    </aura:if>
+  
+</aura:component>

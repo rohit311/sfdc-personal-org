@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to go to next tab" >
+    <aura:attribute name="tabId" type="String"/>
+</aura:event>

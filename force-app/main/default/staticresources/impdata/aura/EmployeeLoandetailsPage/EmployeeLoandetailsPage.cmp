@@ -1,0 +1,159 @@
+<!--EmployeeLoandetailsPage.cmp
+-->
+<aura:component controller="EmployeeLoanAutomationCtrl" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="EmployeeId" Type="String"/>
+    <aura:attribute name="isEdit" type="boolean" default="true"/>
+    <aura:attribute name="bttnModify" type="boolean" default="false"/>
+    <aura:attribute name="isEditBank" type="boolean" default="true"/> 
+    <aura:attribute name="isEditDemo" type="boolean" default="true"/>
+    <aura:attribute name="Performance_report" type="Performance_reports__c"  default="{'sobjectType': 'Performance_reports__c'}"/>
+    <aura:attribute name="currentAddress" Type="String"/>
+    <aura:attribute name="Message" Type="String"/>
+    <aura:attribute name="selTabId" type="String" default="tab2"/>
+    <aura:attribute name="goNext" type="boolean" default="false"/>
+    <aura:attribute name="callCharges" type ="boolean" default="false"/>
+    <aura:attribute name="isDetailsAvailable" type ="boolean" default="true"/>
+    <aura:attribute name="isExit" type="boolean" default="false"/> 
+    <aura:attribute name="areaSearchKeyword" type="String" default="false"/>
+    <aura:attribute name="ValidAreaLocality" type="boolean" default="false"/>
+    <aura:attribute name="availeLater" type="boolean" default="false"/>
+    <aura:attribute name="areaList" type="Area_Locality__c[]" default="[]"/>
+    <!---CKYC-->
+     <aura:attribute name="copyresiaddressflag" type="Boolean" default="false"/>
+    <aura:attribute name="isConfirm" type="boolean" default="true"/>
+    <aura:attribute name="loan" type="Opportunity" default="{}"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="accObj" type="Account" default="{}"/>
+    <aura:attribute name="oppObj" type="Opportunity" default="{}"/>
+    <aura:attribute name="conObj" type="Contact" default="{}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{}"/>
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{}"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c" default="{}"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="isUWCheck" type="boolean" default="false"/>
+    <aura:attribute name="isKYCModified" type="boolean" default="false"/>
+    <aura:handler  action="{!c.handlEvent}" event="c:invokeMyDetails" />
+    <!---CKYC-->
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}"/>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-size--1-of-1">
+        <!-- contact search -->
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+            <ui:scrollerWrapper class="scrollerSize">
+                <div class="innerDivWrapper">
+                    <lightning:accordion activeSectionName="">
+                        <lightning:accordionSection name="InsuranceDetails" label="BANKING DETAILS">
+                            <div class="slds-box" style="background: #f4f6f9;">
+                                <div class="innerDivWrapper">        
+                                    <div class="slds-p-horizontal--small">
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">    
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Bank Account No." name="BankaAccountNo" aura:id="BankaAccountNo" value="{!v.loan.Bank_A_c_No_of_Customer__c}" required="true" disabled="{!v.isEditBank}" pattern="[0-9]*" messageWhenPatternMismatch="Please Enter valid Bank Account Number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Bank Account Holder's Name" name="BankaAccountHolder" aura:id="BankaAccountHolder" value="{!v.loan.Repayment_Account_Holder_Name__c}" pattern="^[a-z A-Z]+$" required="true" disabled="{!v.isEditBank}" messageWhenPatternMismatch="Please Enter valid Bank Account Holder Name"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Bank Name" name="BankName" aura:id="BankName" value="{!v.loan.Repayment_Bank_Name__c}"  required="true"  disabled="{!v.isEditBank}" pattern="^[a-z A-Z]+$" messageWhenPatternMismatch="Please Enter valid Bank Name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><br/>  
+                            <div class="slds-p-top--x-small slds-align_absolute-center">
+                                <lightning:button variant="brand" label="Save Banking Details" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveBankingDetails}" disabled="{!v.isEditBank}"/>
+                            </div>
+                        </lightning:accordionSection>
+                        <lightning:accordionSection name="CrossSellCart" label="DEMOGRAPHIC DETAILS">
+                            <div class="slds-box" style="background: #f4f6f9;">
+                                <div class="innerDivWrapper">        
+                                    <div class="slds-p-horizontal--small">
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Current Address" name="currentAddress" aura:id="currentAddress" value="{!v.currentAddress}" required="true" disabled="{!v.isEditDemo}" messageWhenPatternMismatch="Please Enter valid Address"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="City" name="City" aura:id="City" value="{!v.conObj.Residence_City__c}" required="true"  pattern="^[a-z A-Z]+$" disabled="{!v.isEditDemo}" messageWhenPatternMismatch="Please Enter valid City"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+													<lightning:input label="State" name="State" aura:id="State" value="{!v.conObj.State__c}" required="true" disabled="{!v.isEditDemo}" pattern="^[a-z A-Z]+$" messageWhenPatternMismatch="Please Enter valid State"/>
+                                              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Pin code" name="pincode" aura:id="pincode"  maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pincode" pattern="[0-9]*" value="{!v.conObj.Pin_Code__c}" required="true" disabled="{!v.isEditDemo}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><br/>  
+                            <div class="slds-p-top--x-small slds-align_absolute-center">
+                                <lightning:button variant="brand" label="Save Dempgraphic Details" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveDemographicDetails}" disabled="{!v.isEditDemo}"/>
+                            </div>
+                        </lightning:accordionSection> 
+                        
+                        <lightning:accordionSection name="LoanDetails" label="CKYC DETAILS">
+                            <c:Generic_Ckyc tatMasterRecord="{!v.tatMasterRecord}" forprimeAPP="true" isUWCheck="{!v.isUWCheck}" oppId="{!v.oppId}" oppObj="{!v.loan}" 
+                                            accObj="{!v.accObj}" appObj="{!v.applicantObj}" contObj="{!v.conObj}" 
+                                            eKycObj="{!v.eKycObj}" poObj="{!v.poObj}" bankObj="{!v.bankObj}"
+                                            areaSearchKeyword="{!v.areaSearchKeyword}" isEmployeeLoan="true" isKYCModified="{!v.isKYCModified}"
+                                            page="pricing" aura:id="ckycCMP" isConfirm="{!v.isConfirm}" copyresiaddressflag="{!v.copyresiaddressflag}"/>
+                        </lightning:accordionSection> 
+                        
+                        
+                    </lightning:accordion>
+                   
+                    <aura:if isTrue="{! and(v.isDetailsAvailable, !v.availeLater)}">  
+                        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+                            <aura:if isTrue="{! and(v.isEdit,v.applicantObj.Employee_Modified__c == false?true:false)}">     
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:save" variant="brand" label="Confirm"  onclick="{!c.confirmLoanApplication}" />
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:edit_form" variant="brand" label="Modify"  onclick="{!c.modifyData}" />
+                                <aura:set attribute="else">
+                                    
+                                    <div class="slds-p-top--x-small slds-align_absolute-center">
+                                        <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:edit_form" variant="brand" label="Modify"  onclick="{!c.modifyData}" />
+                                        <lightning:button variant="brand" label="Next" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.nextPage}" disabled="false"/>
+                                    </div>
+                                </aura:set>
+                            </aura:if > 
+                        </lightning:card>
+                    </aura:if>
+                </div>
+            </ui:scrollerWrapper>
+        </lightning:card>
+    </div>
+    
+    <div aura:id="overrideModalbox" class="slds-hide slds-align_absolute-center slds-p-around--medium borderColor" id="dummyId">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="{!$Browser.isIOS == true ? 'slds-modal slds-fade-in-open slds-modal_large slds-is-fixed slds-align_absolute-center slds-border_bottom slds-border_top slds-border_left slds-border_right align-dashboard borderColor':'slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center slds-border_top slds-border_left slds-border_right borderColor'    }" style="position: fixed;">
+            <div class="slds-modal__container borderColor">
+                <div class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12 alignModal':' slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12'}" style="margin-bottom: 0px;margin-top: 0px; height: 150px">
+                    <div class="slds-p-around--medium">{!v.Message}</div>
+                </div>
+                <div class="{!$Browser.isIOS == true ? 'slds-modal__footer slds-size--8-of-12 slds-align_absolute-center alignModal':' slds-modal__footer slds-size--8-of-12 slds-align_absolute-center'}" style="margin-bottom: 0px;margin-top: 0px; height: 50px">
+                    
+                    <button class="slds-button slds-button--neutral" onclick="{!c.confirmModify}">Ok</button>
+                    <aura:if isTrue="{!v.bttnModify}">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.cancelModify}">Cancel</button>
+                    </aura:if>
+                    
+                </div>
+            </div>
+            
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    
+</aura:component>

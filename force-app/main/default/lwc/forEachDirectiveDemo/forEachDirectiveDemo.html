@@ -1,0 +1,13 @@
+<template>
+    <lightning-card title="For each demo" icon-name="custom:custom14">
+        <ul class="slds-m-around_medium">
+            <template for:each={cities} for:item="city">
+                <li key={city.Id}>
+                    <b style="color:cornflowerblue">{city.Name}</b>
+                </li>
+            </template>    
+        </ul>    
+    </lightning-card>
+    
+
+</template>

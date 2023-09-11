@@ -1,0 +1,10 @@
+<apex:page >
+ 
+ 
+ <apex:outputPanel rendered="{! $User.UIThemeDisplayed=='Theme4t'}">
+ 
+ {!$User.UITheme}
+ <br/>
+ {!$User.UIThemeDisplayed}
+ </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,21 @@
+<apex:page controller="EmployeeContr">
+  <apex:form >
+      <apex:pageblock >
+      <apex:outputText >
+         <h2>List of Employees</h2>
+         <br/>
+      </apex:outputText>
+         <apex:repeat value="{!emplist}" var="el">
+             <apex:outputLink value="/apex/EmployeeDetails">       
+                {!el.Name__c}
+                  <apex:param name="empid" value="{!el.id}"/>
+             </apex:outputLink>
+  
+            <br/>
+            <br/>         
+         </apex:repeat>
+      </apex:pageblock>
+  </apex:form>
+  
+  
+</apex:page>

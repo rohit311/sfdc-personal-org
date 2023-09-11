@@ -1,0 +1,54 @@
+.THIS .wrapStyle {
+    height:50vh;
+    overflow-x:hidden;
+}
+.THIS .RequiredField {
+   border-left:5px solid red !important;
+    border-style:inset;
+
+} 
+
+ .THIS .none{
+ display:none; }
+/*.THIS .slds-has-error .slds-input{
+    box-shadow : none;
+    border: 1px solid #d8dde6;
+    border-left-color: red;
+    border-left-width: 5px;
+}*/
+/*.THIS .slds-scope [role=combobox] input[readonly]{padding-left:.75rem;
+        border-right-color: #d8dde6;
+    border-bottom-color: #d8dde6;
+    border-left-color: red;   
+    border-top-color: #d8dde6;
+
+    background-color:rgb(255, 255, 255);font-size:inherit;font-weight:400;}
+*/
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+/*.THIS .slds-has-error .slds-select {
+    border-right-color: #d8dde6;
+    border-bottom-color: #d8dde6;
+    border-left-color: red;   
+    border-top-color: #d8dde6;
+    border-left-width: 5px;
+    box-shadow: none; 
+    background-clip: padding-box;
+}*/
+.THIS .mobHeader{
+    height:3rem;
+}
+.THIS .mobFooter{
+    height:4rem;
+}
+.THIS .align-dashboard{
+    height : 90vh !important;
+}

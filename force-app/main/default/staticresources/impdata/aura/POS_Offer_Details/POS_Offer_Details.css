@@ -1,0 +1,32 @@
+.THIS div.container {
+    margin: 0px 0px 0px 0px;
+}
+
+.THIS div.expandCollapse{
+    cursor : pointer;
+    /*width:20%;*/
+   	height: 40px;
+    float:right ;
+}
+.THIS div.show{
+    display:block;
+}
+.THIS div.hide{
+    display:none;
+}
+.THIS div.outputVal{
+    float:centre
+}
+.THIS .redFont{
+    background: #FF0000 !important;
+    color: white;
+}
+.THIS .greenFont{
+    background: #008000 !important;
+    color: white;
+}
+
+.THIS .slds-button_brand{
+    padding-left: 0.6rem!important;
+    padding-right: 0.6rem!important;
+}

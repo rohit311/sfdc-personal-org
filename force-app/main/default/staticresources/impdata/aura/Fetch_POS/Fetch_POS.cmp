@@ -1,0 +1,239 @@
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppObj" type="Opportunity"/>
+    <aura:attribute name="oppId" type="String" default=""/> 
+    <aura:attribute name="existingLAN" type="String"/><!--US_982-->
+    <aura:attribute name="endUseList" type="String[]"/> <!--US_982-->
+    <aura:attribute name="endUseFlag" type="boolean" default="true"/> <!--US_982-->
+    <aura:attribute name="loanTypeList" type="String[]"/> 
+    <aura:attribute name="programTypeList" type="String[]"/> <!--US_18345-->
+    <aura:attribute name="programType" type="String"/> <!--US_18345-->
+    <aura:attribute name="loanType" type="String"/> <!--US_18345-->
+    <aura:attribute name="proposedLoan" type="String[]"/> <!--22017-->
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="camObj" type="CAM__c"/>
+    <!--underwriter screen changes start-->
+    <aura:attribute name="loanVariantList" type="String[]"/>
+    <!--underwriter screen changes end-->
+    <aura:attribute name="disTypeList" type="String[]"/>
+    <aura:attribute name="topUpList" type="Set"/>
+    <aura:attribute name="BTList" type="Set"/>
+    <aura:attribute name="posListTU" type="TelePDQuestionMaster__c[]"/>
+    <aura:attribute name="posRecBT" type="TelePDQuestionMaster__c"/>
+    <aura:attribute name="topUpFlag" type="Boolean" default="false"/>
+    <aura:attribute name="BTFlag" type="Boolean" default="false"/>
+    <aura:attribute name="otherFlag" type="Boolean" default="false"/>
+    <aura:attribute type="String" name="theme" />
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <!--underwriter screen changes start-->
+    <aura:attribute name="isCredit" type="Boolean" default="false"/>
+    <aura:attribute name="schemeSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="schemeList" type="Scheme_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedScheme" type="Scheme_Master__c" default="{}"/>
+    <aura:attribute name="schemesearching" type="Boolean" default="false"/>
+    <aura:attribute name="oldSchemeKeyword" type="String" default=""/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="showRetrigger" type="Boolean" default="false"/>
+    <!--underwriter screen changes end-->
+    <div class="slds-p-horizontal--small">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element__control slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:select aura:id="purpose" label="Purpose of Loan" value="{!v.account.Purpose_of_Facility__c}">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.proposedLoan}" var="pro">
+                            <option value="{!pro}" text="{!pro}" selected="{!v.account.Purpose_of_Facility__c == pro}"></option>
+                        </aura:iteration>
+                    </lightning:select>                   
+                </div>
+            </div>
+               <!--US_18345 S-->
+         <div class="slds-form-element__control slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <lightning:select aura:id="programType" name="programType" label="Program" required="true" onchange="{!c.varientChange}" messageWhenValueMissing="Please Select Value" value="{!v.account.Program__c}">
+                <option value="" text="--None--" />
+                <aura:iteration items="{!v.programTypeList}" var="programType">
+                    <option value="{!programType}" text="{!programType}" selected="{!v.account.Program__c == programType}"></option>
+                </aura:iteration>
+            </lightning:select>  
+        </div>
+        <!--US_18345 E-->
+            <div class="slds-form-element__control slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <lightning:select aura:id="loanType" name="loanType" label="Loan Type" required="true" onchange="{!c.renderSec}" messageWhenValueMissing="Please Select Value" value="{!v.oppObj.Type_Of_Loan__c}">
+                    <option value="" text="--None--" />
+                    <aura:iteration items="{!v.loanTypeList}" var="loanType">
+                        <option value="{!loanType}" text="{!loanType}" selected="{!v.oppObj.Type_Of_Loan__c == loanType}"></option>
+                    </aura:iteration>
+                </lightning:select>  
+                
+            </div>
+            <!--US_982 S-->
+            <aura:if isTrue="{!v.endUseFlag}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-top : -8px">
+                    <div class="slds-form-element__control">
+                        <lightning:select aura:id="endUse" name="endUse" label="End Use"  value="{!v.oppObj.End_Use__c}">
+                            <option value="" text="--None--" />
+                            <aura:iteration items="{!v.endUseList}" var="endUseType">
+                                <option value="{!endUseType}" text="{!endUseType}" selected="{!v.oppObj.End_Use__c == endUseType}"></option>
+                            </aura:iteration>
+                        </lightning:select> 
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-top : -6px">
+                    <div class="slds-form-element__control">
+                        <lightning:input name="existingLAN" label="Existing LAN:" placeholder="Existing LAN " disable="false"  value="{!v.oppObj.If_Yes__c}" />
+                    </div>
+                </div>
+                
+            </aura:if>
+            <!--US_982 E-->
+            <!--underwriter screen changes start-->
+            <aura:if isTrue="{!v.isCredit == true}">
+                <div aura:id="schemeSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-top : -8px">
+                    <label class="slds-form-element__label" for="schemeName"><span class="requiredClass">*</span>Scheme</label>
+                    <ui:inputText aura:id="schemeName" required="true" class="slds-input" updateOn="keyup" keyup="{!c.schemeKeyPressController}" value="{!v.schemeSearchKeyword}" placeholder="Scheme"/>                
+                    <!--This part is for Display typehead lookup result List-->  
+                    <div class="slds-lookup__menu slds" id="schemeList">
+                        <div aura:id="areaMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                        <ul class="slds-lookup__list" role="listbox">
+                            <aura:iteration items="{!v.schemeList}" var="singleRec" indexVar="idx">
+                                <li role="presentation">
+                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                        <div class="slds-media__body">
+                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectScheme}">{!singleRec.Name} </a></div>
+                                            </div>
+                                        </div>    
+                                    </span>
+                                </li>
+                            </aura:iteration>
+                        </ul>
+                    </div> 
+                    
+                    
+                </div>
+              
+                <!-- 9465 -->
+ <div style="margin-left: 3%;margin-top: 3%;" class="slds-form-element__control">
+                            <a href="{!'/apex/CustomerEyeVF?id=' + v.oppObj.CUSTOMER__r.Id}" target="_blank" >View Customer</a>
+                        </div>
+                        <!-- 9465 -->
+                <!--US_18345 S-->
+                 <div class="slds-form-element__control slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-left: 23%">
+                <div class="slds-form-element__control">
+                   <!-- <lightning:input aura:id="variant" label="Loan Variant" value="{!v.oppObj.Loan_Variant__c}" name="variant"/> -->
+                    <lightning:select aura:id="loanVariant" name="loanVariant" label="Loan Variant" value="{!v.oppObj.Loan_Variant__c}" onchange="{!c.updateScheme}"><!--onchange="{!c.updateScheme}" added for US_18345-->
+                        <option value="" text="--None--" />
+                        <aura:iteration items="{!v.loanVariantList}" var="variant">
+                            <option value="{!variant}" text="{!variant}" selected="{!v.oppObj.Loan_Variant__c == variant}"></option>
+                        </aura:iteration>
+                    </lightning:select>  
+                </div>
+            </div>
+            <!--US_18345 E-->
+            </aura:if>
+          
+            <!--underwriter screen changes start-->
+        </div>
+
+        <aura:if isTrue="{!v.topUpFlag}">
+            <aura:iteration items="{!v.posListTU}" var="teleObj">
+                <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_small slds-theme_shade" >
+                    <lightning:card class="slds-box slds-box_x-small applyColor">
+                        
+                        <p class="slds-p-horizontal_small slds-theme_shade">
+                            <div class="slds-p-horizontal--small">                
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                    <div aura:id="allDivBtn" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-12')}">
+                                        <button value="{!teleObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"> <!-- CR 22307 --><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--2-of-8')}">
+                                        <div class="slds-form-element__control slds-form--inline slds-grid">
+                                            <label class="slds-size--2-of-6 slds-large-size--1-of-6 slds-col slds-form-element__label" for="exLAN"><span class="requiredClass">*</span>Existing LAN:</label>
+                                            
+                                            <lightning:input class="slds-col slds-size--4-of-6" aura:id="exLAN" label="" value="{!teleObj.ExistingLAN__c}" name="exLAN" placeholder="Enter Existing LAN"/></div>
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-8')}">
+                                        <div class="slds-form-element__control slds-grid ">
+                                            <label class="slds-size--2-of-6 slds-col slds-form-element__label" for="balAmt">Balance Amount (POS + Charges):</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--4-of-6 slds-col" aura:id="balAmt" value="{!teleObj.BalanceAmount__c}"/></strong></div>
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-8')}">
+                                        <div class="slds-form-element__control slds-grid ">
+                                            <label class="slds-size--2-of-6 slds-col slds-form-element__label" for="cusName">Customer Name:</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--4-of-6 slds-col slds-hyphenate" aura:id="cusName" value="{!teleObj.CustomerName__c}"/></strong></div>
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--2-of-8')}">
+                                        <div class="slds-form-element__control slds-form--inline slds-grid ">
+                                            <label class="slds-size--2-of-6 slds-col slds-form-element__label" for="disType">Disbursement Type:</label>
+                                            
+                                            <lightning:select class="slds-col slds-size--4-of-6" aura:id="disType" name="disType" label="" messageWhenValueMissing="Please Select Value" value="{!teleObj.DisbursementType__c}">
+                                                
+                                                <aura:iteration items="{!v.disTypeList}" var="disType">
+                                                    <option value="{!disType}" text="{!disType}" selected="{!teleObj.DisbursementType__c == disType}"></option>
+                                                </aura:iteration>
+                                            </lightning:select> 
+                                        </div>
+                                        
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2','slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--2-of-12')}">
+                                        <div class="slds-form-element__control slds-grid ">
+                                            <label class="slds-size--2-of-6 slds-col slds-form-element__label" for="apiRes">API Response:</label>
+                                            <strong><ui:outputText class="slds-size--3-of-6 slds-col" aura:id="apiRes" value="{!teleObj.ApiResponse__c}"/></strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </lightning:card>
+                </div>
+            </aura:iteration>
+            <div class="slds-m-top_x-small slds-align--absolute-center" role="">
+                <button class="slds-button slds-theme--alt-inverse slds-button--brand" aura:id="add_btn" onclick="{!c.addNewRecord}" title="Add New" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"> <!-- CR 22307 --> <lightning:icon iconName="utility:add" size="small" variant="inverse"/></button>
+                <lightning:button class="slds-m-left_x-small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Fetch POS" onclick="{! c.fetchPOS }" disabled="{!or (v.displayReadOnly ,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+                <lightning:button class="slds-m-left_x-small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Save" onclick="{! c.savePOSTU }"     disabled="{!or (v.displayReadOnly ,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+               <aura:if isTrue="{!and(v.showRetrigger,v.isCredit)}">
+                    <lightning:button aura:id="retriggerBRE" variant="brand" iconName="" label="Retrigger BRE" class="slds-theme--alt-inverse" onclick="{!c.retriggerBRE}" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/>
+                </aura:if> 
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.BTFlag}">
+            <div class="slds-box slds-box_x-small slds-theme_default  slds-m-top_small slds-theme_shade" >
+                <lightning:card class="slds-box slds-box_x-small applyColor">
+                    <p class="slds-p-horizontal_small slds-theme_shade">
+                        <div class="slds-p-horizontal--small">                
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-3 slds-large-size--3-of-12">
+                                    <div class="slds-form-element__control slds-form--inline slds-grid">
+                                        <lightning:input class="slds-col slds-size--5-of-5" aura:id="exLANBT" label="Existing LAN:" value="{!v.posRecBT.ExistingLAN__c}" name="exLAN" placeholder="Enter Existing LAN"/></div>
+                                </div>
+                                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-3 slds-large-size--3-of-12">
+                                    <div class="slds-form-element__control slds-form--inline slds-grid">
+                                        <lightning:input class="slds-col slds-size--5-of-5" aura:id="posVal" required="true" messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid Number" label="POS:" value="{!v.oppObj.POS__c}" name="posVal" placeholder="Enter POS"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </lightning:card>
+            </div>
+            <div class="slds-m-top_x-small slds-align--absolute-center" role="">
+                <lightning:button class="slds-m-left_x-small slds-theme--alt-inverse" title="Save 1" iconName="utility:save" variant="brand" label="Save" onclick="{! c.savePOSBT }" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+              <aura:if isTrue="{!and(v.showRetrigger,v.isCredit)}">
+                    <lightning:button aura:id="retriggerBRE" variant="brand" iconName="" label="Retrigger BRE" class="slds-theme--alt-inverse" onclick="{!c.retriggerBRE}" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/>
+                </aura:if> 
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.otherFlag}">
+            <div class="slds-m-top_x-small slds-align--absolute-center" role="">
+                <lightning:button class="slds-m-left_x-small slds-theme--alt-inverse" title="Save 2" iconName="utility:save" variant="brand" label="Save" onclick="{! c.savePOSOth }" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/> <!-- CR 22307 -->
+                <aura:if isTrue="{!and(v.showRetrigger,v.isCredit)}">
+                    <lightning:button aura:id="retriggerBRE" variant="brand" iconName="" label="Retrigger BRE" class="slds-theme--alt-inverse" onclick="{!c.retriggerBRE}" disabled="{!or(v.displayReadOnly,and(v.page == 'pricing',v.stageName != 'Post Approval Sales'))}"/>
+                </aura:if> 
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

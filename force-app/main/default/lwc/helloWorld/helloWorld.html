@@ -1,0 +1,35 @@
+<template>
+    <!--<lightning-card title="HelloWorld" icon-name="custom:custom14">
+        <div class="slds-m-around_medium">
+            <p>Hello, {greeting}!</p>
+            <lightning-input label="Name" value={greeting} onchange={changeHandler}></lightning-input>
+        </div>
+    </lightning-card>
+    <div onclick={handleClick} data-id="abc">
+      Sample Text
+      Sample Text
+    </div>
+    <lightning-layout vertical-align="stretch" multiple-rows="true" >
+      <lightning-layout-item class="slds-p-around_x-small targetcolor" size="12" large-device-size="3">
+        <strong>My Simple Label</strong>
+         </lightning-layout-item>
+         <lightning-layout-item class="slds-p-around_x-small targetcolor"  size="12" large-device-size="3">
+        <strong>{MySimpleValue}</strong>
+         </lightning-layout-item>
+    </lightning-layout>
+    <div class="slds-grid slds-wrap">
+      <template for:each={columns} for:item="col">
+        <div key={col.subHeading} class="slds-size_1-of-2">{col.subHeading}</div>
+      </template>
+    </div>-->
+
+    <div class="container">
+      <lightning-layout multiple-rows="true">
+        <template for:each={columns} for:item="col">
+          <lightning-layout-item key={col.subHeading} padding="horizontal-small">
+            <p>{col.subHeading}</p>
+          </lightning-layout-item>
+        </template>
+      </lightning-layout>
+  </div>
+</template>

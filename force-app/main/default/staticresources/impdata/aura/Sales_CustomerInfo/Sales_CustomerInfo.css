@@ -1,0 +1,15 @@
+.THIS {
+}
+
+.THIS .scrollerSize{
+    
+    height:50% !important;
+}
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}

@@ -1,0 +1,51 @@
+<apex:page standardController="Employee__c">
+<apex:form >
+   <apex:pageBlock >
+     <!--  <apex:pageBlockTable value="{!emplist}" var="e">
+          <apex:column >
+              <apex:inputField value="{!e.Country__c}"/>     
+          </apex:column>
+       <apex:column >
+              <apex:inputField value="{!e.Name__c}"/>     
+       </apex:column>
+        <apex:column >
+              <apex:inputField value="{!e.State__c}"/>     
+          </apex:column>
+
+       
+       </apex:pageBlockTable>  -->
+        <apex:outputLink value="/apex/day3_assign2"> Back
+       </apex:outputLink>
+
+       <br/>
+       <br/>
+       <br/>
+       <apex:outputText > Hello </apex:outputText>
+       <apex:outputField value="{!Employee__c.Name__c}"/>
+       <br/>
+       Name: <apex:inputField value="  {!Employee__c.Name__c}">
+       </apex:inputField>
+       <br/>
+       Country :<apex:inputField value="{!Employee__c.Country__c}" >
+             </apex:inputField>
+
+       <br/>
+       State: <apex:inputField value="{!Employee__c.State__c}">
+        </apex:inputField>
+
+       <br/>
+       Employee ID : <apex:inputField label="ID " value="{!Employee__c.Id__c}">
+       </apex:inputField>
+
+       <br/>
+       <br/> 
+         <apex:outputLink value="/apex/EmployeeDetails?id={!$CurrentPage.parameters.empid}"> Edit
+       </apex:outputLink>
+       <br/>
+       <br/>  
+       <apex:commandButton value="SAVE" action="{!save}">
+       </apex:commandButton>
+       
+   </apex:pageBlock>
+ </apex:form>
+</apex:page>

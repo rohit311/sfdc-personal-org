@@ -1,0 +1,29 @@
+.THIS .uiInputDate .datePicker-openIcon {
+   position: absolute;
+    left: 95%;
+    top: 30%;
+}
+
+.THIS .uiInputDefaultError li {
+  list-style: none;
+}
+
+.THIS .disp-container{
+    position:fixed;
+}
+
+.THIS .disp-wrapper{
+    height: 36vh;
+}
+
+.THIS .uiInputDateTime .datePicker-openIcon {
+   position: absolute;
+    left: 42%;
+    top: 55%;
+}
+
+.THIS .uiInputDateTime .timePicker-openIcon {
+   position: absolute;
+    left: 92%;
+    top: 55%;
+}

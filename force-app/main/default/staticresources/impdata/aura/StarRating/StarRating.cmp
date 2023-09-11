@@ -1,0 +1,10 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+	 <ltng:require styles="/resource/RatingPlugin/css/jquery.raty.css"
+                  scripts="/resource/RatingPlugin/js/jquery.js, /resource/RatingPlugin/js/jquery.raty.js"
+                  afterScriptsLoaded="{!c.doInit}"/>
+    <aura:attribute type="Integer" name="currentRating"/>
+
+          <div style="height:35px">
+                <div aura:id="starRating" class="star-rating"></div> Current Rating: {!v.currentRating}&nbsp;star
+        </div>
+</aura:component>

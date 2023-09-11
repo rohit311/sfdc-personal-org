@@ -1,0 +1,48 @@
+.THIS .offer-pg-cont1{
+    width: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+.THIS .offer-pg1 > .testing{
+    overflow-x: auto;
+    background-color:blue;
+    margin-left:10px;
+    float:left;
+}
+.THIS .offer-pg1{
+    
+    width: 1500px;
+}
+.THIS .offer-pg1-exp{
+    
+    width: 600px;
+}
+@media only screen and (max-width: 500px){
+   .THIS .offer-pg1{
+        
+        width: 300px;
+}
+
+.THIS .offer-pg-cont1{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+}
+@media only screen and (max-width: 680px) and (min-width: 400px){
+   .THIS .offer-pg1{
+        
+        width: 700px;
+}
+
+.THIS .offer-pg-cont1{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+    
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+}

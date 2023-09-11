@@ -1,0 +1,96 @@
+.THIS .green-color{
+    background-color: lightgreen;
+
+}
+
+.THIS .orange-color{
+    background-color: rgb(255,144,144);
+
+}
+.THIS .blue-color{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+
+
+.THIS .slds-badge+.slds-badge {
+    margin-left: 0px;
+}
+.THIS .WrapText
+{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+   -moz-hyphens: auto;
+}
+.THIS .font-size-14
+{
+   font-size: 10px;
+}
+
+.THIS .slds-truncate
+{
+padding-left: 0 }
+
+.THIS .slds-modal__container{
+    
+    overflow:auto !important;
+ }
+.THIS .dashboardModelId{
+    
+}
+
+.THIS .borderColor {
+    border-top: 1px solid rgb(187, 188, 189);
+   
+}
+.THIS .slds-scope {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS .slds-theme_alt-inverse {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+    top:0.5rem;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+}
+.THIS .card{
+    border-radius: 5px;
+        background-color: rgb(167, 48, 44);
+        background-color: rgb(103, 93, 93);
+    border-color: rgb(103, 93, 93);
+}
+.THIS .cardSuccess{
+    border-radius: 5px;
+        background-color: rgb(167, 48, 44);
+        background-color: rgb(103, 93, 93);
+    border-color: rgb(103, 93, 93);
+}
+
+.THIS .cardTitle{
+    background-color : #d80f0f;
+}
+.THIS .fontColor{
+        color: white;
+}
+.THIS .slds-icon-standard-contact{
+    background-color: rgb(103, 93, 93);
+}
+.THIS .align-dashboard{
+    margin-top : 10px;
+    height : 90vh !important;
+}
+
+.THIS dd {word-break: break-word;}

@@ -1,0 +1,207 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="secName" type="String"/> 
+    <aura:attribute name="validallquestions" type="Boolean" default="false"/>
+    <aura:attribute name="appId" type="String" />
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="telepdstatus" type="List" default="Yes,No"/>
+    <aura:attribute name="quesdetailslist" type="Object" />
+    <aura:attribute name="pdObj" type="Personal_Discussion__c" default="{'sobjectType':'Personal_Discussion__c'}"/>	
+    <aura:attribute name="pddone" type="String"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="telepdstatusdashboard" type="String" />
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <c:GenericBackCmp/>
+    <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        
+        <lightning:card class="applyMarginToCard  slds-box" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                        
+                        <table>
+                            
+                            <tbody>
+                                <aura:if isTrue="{!v.telepdstatusdashboard != ''}">
+                                    <aura:if isTrue="{!or(v.telepdstatusdashboard == 'Positive',v.telepdstatusdashboard == 'Waived')}" >
+                                        <tr class="green-color" style="height:30px;text-align :center"> 
+                                            <div style="padding-top:8px"> Tele PD :{!v.telepdstatusdashboard} </div> </tr>
+                                        
+                                        <aura:set attribute="else">
+                                            <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Tele PD :{!v.telepdstatusdashboard} </div> </tr>
+                                        </aura:set>
+                                    </aura:if> 
+                                    <aura:set attribute="else">
+                                        <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Tele PD :{!v.telepdstatusdashboard} </div> </tr>
+                                    </aura:set>
+                                </aura:if> 
+                                <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                    <lightning:card title="" class="applyColor">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input name="custid" label="Tele PD Applicability" value="{!v.pdObj.Tele_PD_Applicability__c}" disabled="true"/>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input name="custid" label="Discussion Remarks" value="{!v.pdObj.CO_comment__c}" disabled="false"/>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:select aura:id="telepddpne" class="optionClass" name="telepddpne" label="Tele PD Done" value="{!v.pddone}" required="false">
+                                                                <option value="">-- None --</option>
+                                                                <aura:iteration items="{!v.telepdstatus}" var="telepd">
+                                                                    <option value="{!telepd}" text="{!telepd}" selected="{!v.pddone == telepd}"></option>
+                                                                </aura:iteration>
+                                                            </lightning:select>
+                                                            
+                                                        </div>
+                                                    </div>  
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <label class="slds-form-element__label">Tele PD questionnaire</label>
+                                                            <div class="slds-list--vertical slds-has-block-links" style="padding-top: 2%">
+                                                                <a href="javascript:void(0)" onclick="{!c.showmodal}">
+                                                                    Click here to open questions
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                    
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </lightning:card>
+                                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+                                        <div class="slds-p-around--x-medium" align="center">
+                                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.savepdrecord}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                        </div>
+                                    </div>
+                                    <br/>
+                                </div></tbody>
+                            
+                        </table>
+                        
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        <div aura:id="dashboardModel" class=" slds-size--12-of-12 slds-hide" >
+            <div aura:id="deviceBasedDiv" id="deviceBasedDiv" role="dialog" tabindex="-1" aria-labelledby="header99" class=" slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container slds-size--12-of-12"  style="overflow:auto;">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.onCrossButton}">
+                            X
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="header99" class="slds-text-heading--medium"> Questions List </h2>
+                    </div>
+                    <div aura:id='MainPopUp' class="slds-modal__content slds-p-around--medium  slds-scrollable_y">
+                        
+                        
+                        
+                        
+                        <div class=" slds-scrollable_y " style="font-size: 14px;">
+                            <table id="mytable" style="overflow:auto;" class="slds-no-row-hover slds-hyphenate WrapText slds-scrollable_y slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                                <thead>
+                                    <tr class="slds-hyphenate slds-text-title_caps slds-col slds-size--12-of-12 ">
+                                        <th scope="col" class="slds-size--1-of-12 blue-color slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps  slds-hyphenate WrapText" title="Check List" style=" color: white;">Sr No</div>	
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--8-of-12 slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps slds-hyphenate WrapText" value="Remark" title="Remark" style=" color: white;">Questions</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Disposition" style=" color: white;">Answer</div>
+                                        </th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>                         
+                                    <aura:iteration items="{!v.quesdetailslist}" indexVar="index" var="quesdetails">  
+                                        <tr class="{!if(quesdetails.showQues,'slds-size--12-of-12','slds-hide slds-size--12-of-12')}" id="tableid">
+                                            
+                                            <th id="{!'srno'+quesdetails.index}" value="{!'srno'+index}" scope="row" data-label="" class=" slds-size--1-of-12  ">
+                                                <div  class=" WrapText slds-hyphenate"  >{!quesdetails.index} </div>
+                                            </th>
+                                            <th id="{!'question'+index}" value="{!quesdetails.title}" scope="row" data-label="" class=" slds-size--7-of-12  ">
+                                                <div  class=" WrapText slds-hyphenate" ><aura:if isTrue="{!quesdetails.mandatory== 'TRUE'}">*</aura:if>{!quesdetails.title} </div>
+                                            </th>
+                                            <td data-label=" "  class="slds-size--4-of-12">
+                                                <aura:if isTrue="{!quesdetails.type == 'picklist'}">
+                                                    <lightning:select onchange="{!c.checkChange}" aura:id="answer" name="{!index}" label="" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Select Value"  value="{!quesdetails.selectedvalue}" disabled="false">
+                                                        <option value="">-- None --</option>
+                                                        <aura:iteration  items="{!quesdetails.answer}" var="dis">
+                                                            <option class="font-size-14" value="{!dis}" text="{!dis}" selected="{!quesdetails.selectedvalue == dis}"></option>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!quesdetails.type == 'text'}">
+                                                            <lightning:input type="text" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                            <aura:set attribute="else">
+                                                                <aura:if isTrue="{!quesdetails.type == 'Date'}">
+                                                                    <lightning:input required="{!quesdetails.mandatory== 'TRUE'}"  type="date" name="{!index}" aura:id="answer" value="{!quesdetails.selectedvalue}" messageWhenValueMissing="Please Enter Value"/>  
+                                                                    <aura:set attribute="else">
+                                                                        <aura:if isTrue="{!quesdetails.type == 'Number'}">
+                                                                            <lightning:input type="text" pattern="[0-9]*" messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                                            <aura:set attribute="else">
+                                                                                <aura:if isTrue="{!quesdetails.type == 'Email'}">
+                                                                                    <lightning:input type="text" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$" messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                                                    <aura:set attribute="else">
+                                                                                        <aura:if isTrue="{!quesdetails.type == 'Text_plus_Number'}"> <!-- 22018-->
+                                                                                            <lightning:input type="text" messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                                                            
+                                                                                            <aura:set attribute="else">
+                                                                                                <lightning:input type="textarea"  messageWhenPatternMismatch="Please Enter Valid Value" required="{!quesdetails.mandatory== 'TRUE'}" messageWhenValueMissing="Please Enter Value"  aura:id="answer" name="{!index}" label="" value="{!quesdetails.selectedvalue}"/>
+                                                                                            </aura:set>
+                                                                                        </aura:if>
+                                                                                    </aura:set>
+                                                                                </aura:if>
+                                                                            </aura:set>
+                                                                        </aura:if>                                                                        
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </td>
+                                            
+                                        </tr>
+                                    </aura:iteration>
+                                    
+                                </tbody>
+                            </table>
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+                                <div class="slds-p-around--x-small" align="center">
+                                    <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.saverecords}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </div>
+</aura:component>

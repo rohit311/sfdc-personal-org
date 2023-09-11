@@ -1,0 +1,405 @@
+<aura:component controller="SALMobilityCntrl_V2">
+    
+    <aura:attribute name="isViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="LANnumber" type="String" default=""/>
+    <aura:attribute name="opp" type="Opportunity"/>
+	<aura:attribute name="account" type="Account" default=""/>
+	<aura:attribute name="conObj" type="Contact" default="{}"/>
+	<aura:attribute name="cam" type="CAM__c" default="{}"/>  
+    <aura:attribute name="srcamObj" type="SurrogateCAM__c" default="{}"/> 
+	<aura:attribute name="applicantPrimary" type="Applicant__c"/> 
+    <aura:attribute name="coappList" type="Applicant__c[]" default=""/> 
+    <aura:attribute name="bankObj" type="Bank_Account__c"/> 
+    <aura:attribute name="accPANNO" type="string"/>
+    <aura:attribute name="maxloanamount" type="string"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:accordion activeSectionName="A">
+        <lightning:accordionSection name="A" label="Demographic Details">
+            <div class="slds-box slds-box_x-small slds-theme_shade" >
+                <lightning:card title="" class="applyColor">
+                    <p class="slds-p-horizontal_small slds-theme_shade">  
+                        <div class="slds-p-horizontal--small">                
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input  aura:id="typeloan" label="Type of Loan" value="{!v.opp.Type_Of_Loan__c}" name="loantype" disabled="true" />        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Loan Variant" value="{!v.opp.Loan_Variant__c}" name="variant" disabled="true" />        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input  aura:id="FirstName" label="First Name" value="{!v.account.First_Name__c}" name="FName" disabled="true" />        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="MiddleName" label="Middle Name" value="{!v.account.Middle_Name__c}" name="MName" disabled="true" />        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input  aura:id="LastName" label="Last Name" value="{!v.account.Last_Name__c}" name="LName" disabled="true"/>        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input  aura:id="PanNO" label="Pan Number" value="{!v.accPANNO}" name="PanNo" disabled="true"/>        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="resAdd1" label="Res Add1" value="{!v.account.Current_Residence_Address1__c}" name="resAdd1" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="resAdd2" label="Res Add2" value="{!v.account.Current_Residence_Address2__c}" name="resAdd2" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="resAdd3" label="Res Add3" value="{!v.account.Current_Residence_Address3__c}"  name="resAdd3" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="respincode" label="Res Pin Code" value="{!v.account.Current_PinCode__c}"  name="respincode" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="rescity" label="Res City" value="{!v.account.Current_City__c}"  name="rescity" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Res State" value="{!v.account.Current_State__c}"  name="resstate" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Res Type" value="{!v.account.Residence_TypeAcc__c}"  name="restype" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Permanent City" value="{!v.account.Permanent_City__c}"  name="percity" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Permanent State" value="{!v.account.Permanent_State__c}"  name="perstate" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Permanent Pincode" value="{!v.account.Permanent_PinCode__c}"  name="perpincode" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Employer" value="{!v.account.Employer__r.Name}"  name="employer" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Designation" value="{!v.account.DesignationOTP__c}"  name="Designation" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Total Experience (YY)" value="{!v.account.Total_Work_Experience_Yrs__c}"  name="texpyy" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Total Experience (MM)" value="{!v.account.Total_Work_Experience_Months__c}"  name="texpmm" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Current Experience (YY)" value="{!v.account.Current_experiance_in_Years__c}"  name="cexpyy" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Current Experience (MM)" value="{!v.account.Current_experiance_in_Month__c}"  name="cexpmm" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Office Email Id" value="{!v.conObj.Office_Email_Id__c}"  name="ofcemail" disabled="true"/>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+							
+							<div class="slds-page-header" style="cursor: pointer;" onclick="{!c.sectionOne}">
+                                    <section class="slds-clearfix">
+                                        <div class="slds-float--left ">
+                                            <lightning:icon class="slds-show" aura:id="articleOne" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                                            <lightning:icon class="slds-hide" aura:id="articleOne" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                                        </div>
+                                        <div class="slds-m-left--large"> Coapplicant Details </div>
+                                    </section>
+                                </div> 
+                                <div class="slds-hide slds-p-around--medium" aura:id="articleOne">
+                                    <aura:iteration items="{!v.coappList}" var="coapp">
+									<lightning:card title="" iconName="" class="applyColor">
+                                        <p class="slds-p-horizontal_small">
+                                            
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="Customer" value="{!coapp.Contact_Name__r.Name}"  name="custName" disabled="true"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="DOB" value="{!coapp.Contact_Name__r.Date_of_Birth__c}"  name="dob" disabled="true"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input label="PAN" value="{!coapp.Contact_Name__r.PAN_Number__c}"  name="pan" disabled="true"/>
+                                                    </div>
+                                                </div>
+                                            
+                                        </p>
+                                    </lightning:card>
+									</aura:iteration>
+                                </div>
+							
+                        </div>
+                    </p>
+                </lightning:card>
+            </div>
+            <br/>
+        </lightning:accordionSection>
+        <lightning:accordionSection name="B" label="Financial Details">
+            <div class="slds-box slds-box_x-small slds-theme_shade" >
+                <lightning:card title="" class="applyColor">
+                    <p class="slds-p-horizontal_small slds-theme_shade">  
+                        <div class="slds-p-horizontal--small">                
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                
+                                
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Total Net Salary including Incentive" value="{!v.cam.Average_Monthly_Net_Income1__c}" name="reim" disabled="true"/>
+                                    </div>
+                                </div> 
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Total net salary including Reimbursement and Incentive" value="{!v.cam.Average_Monthly_Net_Income2__c}" name="incentive" disabled="true"/>
+                                    </div>
+                                </div> 
+                                
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Customer Segmentation"  value="{!v.applicantPrimary.Bureau_Segment__c}" name="segment" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Company Category"  value="{!v.account.Type_Of_Industry__c}" name="industry" disabled="true"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="End Use"  value="{!v.opp.End_Use__c}" name="enduse" disabled="true"/>
+                                    </div>
+                                </div>
+								<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Bank Account Name"  value="{!v.bankObj.Bank_Name__c}" name="bankname" disabled="true"/>
+                                    </div>
+                                </div>
+								<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Bank Account Number"  value="{!v.bankObj.Bank_Account_Number__c}" name="accountNo" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Total Monthly Obligation"  value="{!v.cam.Total_Mthly_Oblig__c}" name="obligation" disabled="true"/>
+                                    </div>
+                                    
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input label="Customer Type" value="{!v.cibil.Applicant__r.Applicant_Type__c}" name="custType" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="cIBILScoreId" label="Cibil Score" value="{!v.applicantPrimary.CIBIL_Score__c}" name="cIBILScoreName" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="dpd" label="DPD cluster segment" value="{!v.cibil.Cibil_Temp__r.DPD_cluster_Segment__c}" disabled="true"/>
+                                        
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <label class="slds-form-element__label" for="select-01"> View CIBIL- link </label> <br/>
+                                        <aura:if isTrue="{!v.cibil}">
+                                            <a onclick="{!c.redirectToViewCibilReport}">
+                                                View CIBIL Report
+                                            </a>
+                                            <aura:set attribute="else">
+                                                Link Not Available
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <label class="slds-form-element__label" for="select-01"> View CIBIL Report- link </label> <br/>
+                                        <aura:if isTrue="{!v.cibilExt1}">
+                                            <a onclick="{!c.redirectToOneViewCibilReport}">
+                                                One View CIBIL Report
+                                            </a>
+                                            <aura:set attribute="else">
+                                                Link Not Available
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </div> 
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="amount" label="Approved Loan Amount" value="{!v.opp.Approved_Loan_Amount__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="tenor" label="Approved Tenor" value="{!v.opp.	Approved_Tenor__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="rate" label="Approved Rate" value="{!v.opp.Approved_Rate__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="foir" label="Final FOIR" value="{!v.cam.Eligible_FOIR__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="rate" label="Approved Rate" value="{!v.opp.Approved_Rate__c}" disabled="true"/>
+                                    </div>
+                                </div> 
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="rate" label="Max loan amount as per Policy" value="{!v.maxloanamount}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="rate" label="Line Opted" value="{!v.srcamObj.Line_opted__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="lineeligibility" label="Line Eligibility" value="{!v.srcamObj.Line_assigned_basis_Credit_Assessment__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="date" name="rate" label="Line Expiry Date" value="{!v.srcamObj.Expiry_Date_without_BT__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </lightning:card>
+            </div>
+            <aura:if isTrue="{!v.isViewReportModalOpen}">
+                <!--Rohit added slds absolute center class for center alignment-->
+                <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="header99" class="slds-text-heading--medium"> View CIBIL Report </h2>
+                        </div>
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <aura:if isTrue="{!v.isCommunityUsr == true}">
+                                <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                    <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantPrimary.Id}" frameBorder="0"/>
+                                    <aura:set attribute="else">
+                                        <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantPrimary.Id}" width="100%" height="800" frameBorder="0"/>
+                                    </aura:set>
+                                </aura:if>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                        <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantPrimary.Id}" frameBorder="0"/>
+                                        <aura:set attribute="else">
+                                            <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantPrimary.Id}" width="100%" height="800" frameBorder="0"/>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.isOneViewReportModalOpen}">
+                <!--Rohit added slds absolute center class for center alignment-->
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModel}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                        </div>
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <aura:if isTrue="{!v.isCommunityUsr == true}">
+                                <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                    <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                    <aura:set attribute="else">
+                                        <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                    </aura:set>
+                                </aura:if>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                        <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                        <aura:set attribute="else">
+                                            <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+        </lightning:accordionSection>  
+    </lightning:accordion>
+</aura:component>

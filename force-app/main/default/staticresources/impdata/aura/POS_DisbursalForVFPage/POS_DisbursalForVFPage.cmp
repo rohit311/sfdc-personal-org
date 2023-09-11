@@ -1,0 +1,252 @@
+<aura:component controller="SFDCMobileLoanController">
+    
+    <aura:attribute name="oppId" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    
+    <!-- Generate Ops Attri -->
+    <aura:attribute name="isOpenOps" type="boolean" default="false"/>
+    <aura:attribute name="AddressChange" type="boolean" default="false"/>
+    <aura:attribute name="ekycops" type="boolean" default="false" />
+    <aura:attribute name="fileOpsCheck" type="String"/>
+    <aura:attribute name="GenOpsCDD" type="String"/>
+	<!--bugId 24528 s -->
+	<aura:attribute name="ccEligible" type="String" default = "false"/>
+    <!--bugId 24528 e -->
+     <!--Bug 24927 S -->
+    <aura:attribute name="isGCO" type="String" default = "false"/>
+    <aura:attribute name="isAddrchanged" type="String" default = "false"/>
+     <aura:attribute name="isGCODisFlag" type="String" default = "false"/>
+    <!--Bug 24927 E-->
+    <!--bugId 23801 s -->
+    <aura:attribute name="cddApproved" type="String"/>
+	<aura:attribute name="nsdlApproved" type="String" default = "false"/> 
+    <aura:attribute name="impsApproved" type="String" default = "false"/>
+    <aura:attribute name="creditCardApplied" type="String" default = "false"/>
+    <aura:attribute name="repaymentApproved" type="String" default = "false"/>
+    <!--bugId 23801 e -->
+     <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->
+	  <aura:attribute name="consentApp" type="String" default = "false"/>
+	    <aura:attribute name="consentAgree" type="String" default = "false"/>
+	<!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  end-->
+    <aura:if isTrue="{!v.isOpenOps}">
+      <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+        <div class="slds-modal__container">
+          <div class="slds-modal__header">
+            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOpsModel}">
+            X
+            <span class="slds-assistive-text">Close</span>
+            </button>
+            <h2 id="header99" class="slds-text-heading--medium"></h2>
+          </div>
+          <div class="slds-modal__content slds-p-around--medium">
+              
+          
+		<fieldset aura:id="commercialDetails" class="slds-form--stacked slds-p-bottom--medium">
+            <h3 class="slds-section-title--divider">OPS Checklist</h3>
+            
+          
+            <!--<p class="slds-p-horizontal_small">-->
+            <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">   
+              
+              <table border="1" style="background: rgb(243, 242, 242)">
+                   <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->
+                  <tr>
+                      <td> 
+                         Customer consent on Agreement and Commercials
+                      </td>
+                      
+                      <td>
+					  	<aura:if isTrue="{!v.consentAgree == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                                  
+                              </aura:set>
+                          </aura:if>
+                         
+                      </td>
+                  </tr>   
+				   <tr>
+                      <td> 
+                          Customer consent on Application Form
+                      </td>
+                      
+                      <td>
+					  	<aura:if isTrue="{!v.consentApp == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                                  
+                              </aura:set>
+                          </aura:if>
+                      </td>
+                  </tr>  
+                   <!--Bug 23676 - February 2019 - OTP Based acceptance of E-Application and E-Agreement  start-->  
+                  
+                  <tr>
+                      <td>
+                          Demographics captured through EKYC 
+                      </td>
+                      <td>
+                          <aura:if isTrue="{!and(v.ekycops == true , v.AddressChange == false)}" >
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                          </aura:if>
+                          <aura:if isTrue="{!and(v.ekycops == true, v.AddressChange == true)}" >
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>
+                          </aura:if>
+                          <aura:if isTrue="{!and(v.ekycops == false, v.AddressChange == false)}" >
+                              <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>
+                          </aura:if>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Degree Certificate
+                      </td>
+                      <td>
+                          <aura:if isTrue="{!v.fileOpsCheck}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>  
+                                  
+                              </aura:set>
+                          </aura:if>                    </td></tr>
+             	<tr>
+                      <td>
+                          Repayment Details
+                      </td>                    
+                    	<td>
+                           <aura:if isTrue="{!v.repaymentApproved == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>                 
+                  </tr>
+                  <tr>
+                      <td>
+                          Disbursement Details
+                      </td>
+                      <!-- Bug 23801 S changed to cddApproved-->
+                      <td>
+                            <aura:if isTrue="{!v.cddApproved == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                  <!-- Bug 23801 S-->
+                   <tr>
+                      <td>
+                          NSDL Rule and Pan Validation Corrections
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.nsdlApproved == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                   <tr>
+                      <td>
+                          IMPS Validation of Applicant
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.impsApproved == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                  				 <!--Bug 24528  S-->
+                   <tr>
+				   		<td>
+				    		 Eligible for Credit Card
+						</td>
+						<td>
+							<aura:if isTrue="{!v.ccEligible == 'true'}">
+								<lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+								<aura:set attribute="else">
+                        			<lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+							 	</aura:set>
+							</aura:if>                     
+						</td>
+					</tr>
+                <!--Bug 24528  E--> 
+                   <tr>
+                      <td>
+                          Applied for Credit Card
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.creditCardApplied == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                  <!-- Bug 23801 E -->
+                   <!-- Bug 24927 S -->
+                   <tr>
+                      <td>
+                          Application is processed through Green Channel Offer
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isGCO == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>
+                   <tr>
+                      <td>
+                          Residence Address Modifications Not Done
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isAddrchanged != 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td>
+                  </tr>                  
+                  <!-- Bug 24927 E-->
+                 <tr>
+                      <td>
+                          SPDC
+                      </td>
+                      <td>
+                           <aura:if isTrue="{!v.isGCODisFlag == 'true'}">
+                              <lightning:icon iconName="action:approval" size="XX-small" alternativeText="Indicates Approval"/>
+                              <aura:set attribute="else">
+                                  <lightning:icon iconName="action:close" size="XX-small" alternativeText="Indicates Rejection"/>                                   
+                              </aura:set>
+                          </aura:if>                     
+                      </td> 
+                  </tr>
+              </table>
+        </div>
+		</fieldset>     
+         
+          </div>
+          <div class="slds-modal__footer">
+            <button class="slds-button slds-button--neutral" onclick="{!c.closeOpsModel}" >Cancel</button>           
+          </div>
+        </div>
+      </div>
+      <div class="slds-backdrop slds-backdrop--open"></div>   
+ </aura:if>
+</aura:component>

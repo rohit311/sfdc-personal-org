@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to display Existing Offer panel">
+    <aura:attribute name="offer" type="Object"/>
+</aura:event>

@@ -1,0 +1,72 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" 
+                access="GLOBAL" controller="Sales_Compliance_Cntrl">
+    
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:registerEvent name="checklistInsertEvent" type="c:checklistInsertEvent"/>
+       <aura:registerEvent name="getAuditResultEvt" type="c:getAuditResult"/>
+    <aura:attribute name="verTypeList" type="List" default=""/>
+    <aura:attribute name="verRecordCount" type="Integer" default="0"/>
+    <aura:attribute name="verifType" type="String" default=""/>
+    <aura:attribute name="WeakAccn" type="Weak_Account__c" default=""/>
+	<aura:attribute name="geoCoordintes1" type="String" default="" />	
+    <aura:attribute name="fileNumber" type="String" default="" />
+    <aura:attribute name="geoCoordintes3" type="List" default="[]" />
+    <aura:attribute name="verificationObj" type="object[]"/>
+    <aura:attribute name="isGeoavailable" type="boolean" default="false"/>
+    <aura:attribute name="recidentialGeoLocation" type="String"/>  
+    <aura:attribute name="OfficelGeoLocation" type="String"/>
+    <aura:handler name="shareLatLong" event="c:shareLatLongEvt" action="{!c.fetchLatLong}"/>
+    <aura:attribute name="showUploadButton" type="Boolean" default="false"/>
+    <aura:attribute name="parentId" type="String" default="" />
+    <aura:attribute name="isOfficeGeoavailable" type="boolean" default=""/>
+    <aura:attribute name="isResiGeoavailable" type="boolean" default=""/>
+    <aura:attribute name="isApplicable" type="boolean" default="true"/>
+  <aura:attribute name="isSubmitTrue" type="boolean" default="true"/>
+     <aura:attribute name="fileName" type="String"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-scrollable_y" >
+        <lightning:card class="applyMarginToCard slds-section-title--divider applyColor "   title="Verfication Type">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small"> 
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <lightning:select aura:id="VeriType" label="" value="{!v.verifType}" messageWhenValueMissing="Please Select Value" onchange="{!c.setDocLoader}">
+                        	<option value="">-- None --</option>
+                            <aura:iteration items="{!v.verTypeList}" var="level">
+                                <option value="{!level}" text="{!level}" ></option>
+                            </aura:iteration>                              
+                        </lightning:select>
+                    </div>
+                  <aura:if isTrue='{!v.isApplicable}'>
+                  <aura:if isTrue="{!v.verRecordCount >=1}">
+                    <div style="padding-top: 30px; padding-left: 20px;">
+                        <c:DocumentUploader aura:id="file-upload_11" uploadType="feed" imageUpload="true" instance="11" parentId="{!v.parentId}" fileName="{!v.fileName}" uploadImageFilesOnly="true" showUploadButton="{!v.showUploadButton}" geoCoordintes="{!v.geoCoordintes1}" fileNumber='{!v.fileNumber}' uploaderName='ImageOne' flow ='Mobility2' salesCompliance='true' isSubmitTrue="{!v.isSubmitTrue}"/>
+                    </div> 
+                 
+                    <div style="padding-top: 30px; padding-left: 20px;">
+                        <c:DocumentUploader aura:id="file-upload_12" uploadType="feed" imageUpload="true"  instance="12" parentId="{!v.parentId}" fileName="{!v.fileName}" uploadImageFilesOnly="true" showUploadButton="{!v.showUploadButton}" geoCoordintes="{!v.geoCoordintes1}" fileNumber='{!v.fileNumber}' uploaderName='ImageTwo' flow ='Mobility2' salesCompliance='true' isSubmitTrue="{!v.isSubmitTrue}"/>
+                    </div>
+                  
+                    <div style="padding-top: 30px; padding-left: 20px;">
+                        <c:DocumentUploader aura:id="file-upload_13" uploadType="feed" imageUpload="true" instance="13" parentId="{!v.parentId}" fileName="{!v.fileName}" uploadImageFilesOnly="true" showUploadButton="{!v.showUploadButton}" geoCoordintes="{!v.geoCoordintes1}" fileNumber='{!v.fileNumber}' uploaderName='ImageThree' flow ='Mobility2' salesCompliance='true' isSubmitTrue="{!v.isSubmitTrue}"/>
+                    </div>
+                </aura:if>
+                      <aura:set attribute='else'>
+                        <div class="slds-align_absolute-center slds-text-heading_medium">
+               					 NOT APPLICABLE
+           				 </div>  
+                      </aura:set>
+                </aura:if>
+                </div>    
+            </p>
+              <aura:if isTrue="{! and(v.verRecordCount >=1,v.isSubmitTrue)}">
+            <div style="padding-top: 60px; padding-left: 20px;padding-bottom: 100px" class="slds-p-top--large">
+                <lightning:button aura:id="saveButtonId" variant="brand" label="Submit" onclick="{!c.save}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+            </aura:if>
+        
+        </lightning:card>    
+        
+    </div>    
+	
+</aura:component>

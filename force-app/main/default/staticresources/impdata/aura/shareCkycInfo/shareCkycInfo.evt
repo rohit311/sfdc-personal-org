@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" >
+	<aura:attribute name="infObj" type="Object"/>
+    <aura:attribute name="ckycsmsLst" type="Object"/>
+    <aura:attribute name="dSource" type="String"/><!-- US : 13265-->
+</aura:event>

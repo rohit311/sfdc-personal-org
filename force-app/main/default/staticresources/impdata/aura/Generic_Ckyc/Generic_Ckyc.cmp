@@ -1,0 +1,483 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SALMobilityCntrl_V2">
+    
+     <ltng:require scripts="{!$Resource.JS_CKYC_Field_Validation}"
+                  afterScriptsLoaded="{!c.afterScriptsLoaded_CKYCValidation}" /> <!-- Bug 23146 - CKYC POI/ POA validation -->
+
+    
+    <!--City CR s-->
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="finalCity" type="List"/>
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+	 <aura:attribute name="isSalMob" type="boolean" default="false"/><!-- 24675 -->
+    <!--City CR e-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="accObj" type="Account" default="{}"/>
+    <aura:attribute name="oppObj" type="Opportunity" default="{}"/>
+    <aura:attribute name="contObj" type="Contact" default="{}"/>
+    <aura:attribute name="appObj" type="Applicant__c" default="{}"/>
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{}"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c" default="{}"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="isOwnedTrue" type="boolean" default="true"/>
+    <aura:attribute name="maritalStatusList" type="List"/>
+    <aura:attribute name="fatherSpouseList" type="List"/>
+    <aura:attribute name="F_S_salutationlist" type="List"/>
+    <aura:attribute name="documentTypeList" type="List"/>
+    <aura:attribute name="employmentTypeList" type="List"/>
+    <aura:attribute name="genderList" type="List"/>
+    <aura:attribute name="residenceTypeList" type="List"/>
+        <aura:attribute name="pref_Language" type="List"/>
+    <aura:attribute name="OccupationList" type="List"/>
+    <aura:attribute name="permDocumentList" type="List"/>
+    <aura:attribute name="resDocumentList" type="List"/>
+    <aura:attribute name="paramAddress" type="String" default=""/>
+    <aura:attribute name="paramAddressbackup" type="String" default=""/>
+    <aura:attribute name="officeAddress" type="String" default=""/>
+    <aura:attribute name="resiAddress" type="String" default=""/>
+    <aura:attribute name="permpincodebackup" type="String" default=""/>
+    <aura:attribute name="copyresiaddressflag" type="Boolean" default="false"/>
+    <aura:attribute name="forprimeAPP" type="Boolean" default="true"/>
+    
+    <aura:attribute name="areasearching" type="Boolean" default="false"/>
+    <aura:attribute name="areaList" type="Area_Locality__c[]" default="[]"/>
+    <aura:attribute name="selectedArea" type="Area_Locality__c" default="{}"/>
+    <aura:attribute name="oldAreaKeyword" type="String" default=""/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    
+    <aura:attribute name="isUWCheck" type="Boolean" default="false"/>
+    <aura:attribute name="disableAadhaar" type="Boolean" default="false"/>
+    <aura:attribute name="disablePerfios" type="Boolean" default="false"/>
+    <aura:attribute name="disablePO" type="Boolean" default="false"/>
+    <aura:attribute name="addressMatchLst" type="String[]" default="['Yes','No']"/> 
+    <!--rohit added for months at residence S-->
+    <aura:attribute name="monthsAtResidence" type="List"/>
+    <!--rohit added for months at residence E-->
+    <aura:handler event="c:UpdateNewApplicant" action="{!c.updateNewApp}"/>
+    
+    <aura:handler event="c:firePanBreCheck" action="{!c.callPANBre}"/>
+    
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="destroyAddCoAppCmp" type="c:destroyAddCoAppCmp"/>
+      <!-- added by swapnil employee loan 20934 s-->
+          <aura:attribute name="isEmployeeLoan" type="Boolean" default="false"/>
+          <aura:attribute name="isEdit" type="Boolean" default="false"/>
+          <aura:attribute name="isKYCModified" type="Boolean" default="false"/><!--20934-->
+          <aura:attribute type="boolean" name="validateResult" default="false"/>
+         <aura:attribute type="boolean" name="isConfirm" default="false"/>
+    <aura:method name="validateCKYC" action="{!c.saveCKYCData}" access="PUBLIC"/>
+     <!-- added by swapnil employee loan 20934 e-->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+	<aura:attribute name="isFromCkycApi" type="Boolean" default="false"/> <!--23578 -->
+    <aura:attribute name="hideresidential" type="Boolean" default="false"/><!--22017-->
+    <aura:attribute name="hideSections" type="Boolean" default="false"/> <!--22017 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 / 20934 -->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 --> 
+    <aura:attribute name="isSME" type="Boolean"/>
+    <br/>
+    <aura:if isTrue="{!!v.hideSections}">
+    <div class="slds-box slds-box_x-small slds-theme_default slds-theme_shade" >
+        <lightning:card title="{!if(v.forprimeAPP == true,'CKYC Details','')}" class="slds-hyphenate applyColor">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="ckyc_no" maxlength="14" label="CKYC No" value="{!v.appObj.CKYC_No__c }" name="ckyc_no" placeholder="Ckyc Number" disabled="{!v.isUWCheck==true?true:false}"/>
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.forprimeAPP}">
+                             <aura:if isTrue="{!!v.hideresidential}">
+ 								 <aura:if isTrue = "{!!v.isEmployeeLoan}">
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input required="true" aura:id="personal_email" label="Personal Email ID" value="{!v.contObj.Email}" name="personal_email" disabled="{!v.isUWCheck==true?true:false}" messageWhenValueMissing="Please Enter Value"  messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                                </div>
+                            </div>
+   							</aura:if>
+                            </aura:if>
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="gender" name="gender" label="Gender" required="{!v.isEmployeeLoan==true?false:true}"  messageWhenValueMissing="Please Select Value"  value="{!v.accObj.Gender__c}" disabled="{!v.isUWCheck==true?true:false}">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.genderList}" var="gender">
+                                            <option value="{!gender}" text="{!gender}" selected="{!v.accObj.Gender__c == gender}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="marital_status" name="marital_status" label="Marital Status" required="{!v.isEmployeeLoan==true?false:true}" messageWhenValueMissing="Please Select Value"  value="{!v.contObj.Marital_Status__c}" disabled="{!v.isUWCheck==true?true:false}">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.maritalStatusList}" var="maritalstatus">
+                                            <option value="{!maritalstatus}" text="{!maritalstatus}" selected="{!v.contObj.Marital_Status__c == maritalstatus}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div> 
+                        </aura:if>
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="father_spouse" name="father_spouse" label="Father / Spouse" required="true" messageWhenValueMissing="Please Select Value"  value="{!v.contObj.Father_Spouse__c}" disabled="{!v.isUWCheck==true?true:false}">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.fatherSpouseList}" var="fatherspouse">
+                                        <option value="{!fatherspouse}" text="{!fatherspouse}" selected="{!v.contObj.Father_Spouse__c == fatherspouse}"></option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <div style="float:left;display:inline">
+                                    <lightning:select aura:id="F_S_salutation" name="F_S_salutation" label="Salutation" required="true" messageWhenValueMissing="Please Select Value" value="{!v.contObj.Father_Spouse_Salutation__c}" disabled="{!v.isUWCheck==true?true:false}">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.F_S_salutationlist}" var="salutation">
+                                            <option value="{!salutation}" text="{!salutation}" selected="{!v.contObj.Father_Spouse_Salutation__c == salutation}"></option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                                </div>
+                                <div style="float:left;display:inline">
+                                    <lightning:input required="true" aura:id="F_S_firstname" name="F_S_firstname" label="Father / Spouse First Name" value="{!v.contObj.Father_Spouse_First_Name__c }" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" disabled="{!v.isUWCheck==true?true:false}" placeholder="" messageWhenValueMissing="Please Enter Value"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="F_S_middlename" label="Father / Spouse Middle Name" value="{!v.contObj.Father_Spouse_Middle_Name__c }" disabled="{!v.isUWCheck==true?true:false}" name="F_S_middlename" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="F_S_lastname" required="true" label="Father / Spouse Last Name" value="{!v.contObj.Father_Spouse_Last_Name__c }" disabled="{!v.isUWCheck==true?true:false}" name="F_S_lastname" placeholder="" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" messageWhenValueMissing="Please Enter Value"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="m_firstname" name="m_firstname" required="true" label="Mother's First Name" value="{!v.contObj.Mother_First_Name__c}" disabled="{!v.isUWCheck==true?true:false}" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name"  placeholder="" messageWhenValueMissing="Please Enter Value"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="m_middlename" name="m_middlename" label="Mother's Middle Name" value="{!v.contObj.Mother_Middle_Name__c}" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" disabled="{!v.isUWCheck==true?true:false}"  placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="m_lastname" name="m_lastname" required="true" label="Mother's Last Name" value="{!v.contObj.Mother_Last_Name__c}" disabled="{!v.isUWCheck==true?true:false}"  placeholder="" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" messageWhenValueMissing="Please Enter Value"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="documet_type" name="documet_type" label="Primary Applicant ID Proof Submitted" required="{!v.isEmployeeLoan==true?false:true}"  messageWhenValueMissing="Please Select Value"  value="{!v.appObj.Proof_of_Identity__c}" disabled="{!v.isUWCheck==true?true:false}" onchange="{!c.validateCkycDetails_POI}"  >  <!-- Bug 23146 - CKYC POI/ POA validation : Added on change -->
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.documentTypeList}" var="documenttype">
+                                        <option value="{!documenttype}" text="{!documenttype}" selected="{!v.appObj.Proof_of_Identity__c == documenttype}"></option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="doc_number" name="doc_number" required="true" label="Applicants ID Proof Doc No" value="{!v.appObj.Identity_Document_No__c}" placeholder="" messageWhenValueMissing="Please Enter Value" disabled="{!v.isUWCheck==true?true:false}" onblur="{!c.validateCkycDetails_POI}" />  <!-- Bug 23146 - CKYC POI/ POA validation : Added on blur -->
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input required="{!if(v.appObj.Proof_of_Identity__c == 'Voters ID card' || v.appObj.Proof_of_Identity__c == 'PAN Card',false, true)}"  type="date" label="Identity Document Expiry Date" name="doc_expiry_date" aura:id="doc_expiry_date" value="{!v.appObj.Identity_Document_Expiry_Date__c}" messageWhenValueMissing="Please Enter Value" disabled="{!v.isUWCheck==true?true:false}" />  
+                            </div>
+                        </div> 
+ 						  <aura:if isTrue="{!!v.isEmployeeLoan}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="v_r_number" name="v_r_number" label=" Vehicle Registration Number" value="{!v.appObj.Vehicle_Registration_number__c}" placeholder="" disabled="{!v.isUWCheck==true?true:false}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input type="date" label="Vehicle Registration Date" name="v_r_date" aura:id="v_r_date" value="{!v.appObj.Vehicle_Registration_date__c}"  disabled="{!v.isUWCheck==true?true:false}"/>  
+                            </div>
+                        </div> 
+    </aura:if>
+                        <aura:if isTrue="{!!v.forprimeAPP}">
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="o_e_type" name="o_e_type" label="Occupation / Employment Type"  value="{!v.contObj.Occupation_CKYC__c}" disabled="{!v.isUWCheck==true?true:false}">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.employmentTypeList}" var="employmentType">
+                                            <option value="{!employmentType}" text="{!employmentType}" selected="{!v.contObj.Occupation_CKYC__c == employmentType}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                        </aura:if> 
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    </aura:if> 
+ <aura:if isTrue="{!and(or(and(v.forprimeAPP,!v.isUWCheck),v.isEmployeeLoan),!v.hideresidential)}"><!--added by swapnil 20934 -->
+           <div id="resSection" class="{!v.isEmployeeLoan==true?'slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade slds-hide':'slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade'}" >         
+   <lightning:card title="Residential Details" class="slds-hyphenate slds-m-top_medium applyColor">
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                              <aura:if isTrue="{!!v.isUWCheck}">
+							  <aura:if isTrue="{!!v.isSalMob}"><!--24675 added aura:if s-->
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                    <lightning:select aura:id="pref_lang"  label="Preferred Language" value="{!v.accObj.Preferred_language__c }" name="pref_lang">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.pref_Language}" var="pl">
+                                            <option value="{!pl}" text="{!pl}" selected="{!v.accObj.Preferred_language__c == pl}"></option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                                    </div>
+                                </div>
+								</aura:if><!--24675 added aura:if e-->
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="promo_code" label="Promo Code" value="{!v.appObj.Refferal_Identifier__c }" name="promo_code" placeholder=""/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.hideSections}">
+  <aura:if isTrue="{!!v.isEmployeeLoan}">
+                            	<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input required="true" aura:id="personal_email" label="Personal Email ID" value="{!v.contObj.Email}" name="personal_email" disabled="{!v.isUWCheck==true?true:false}" messageWhenValueMissing="Please Enter Value"  messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                                    </div>
+                                </div>
+   </aura:if>
+                            </aura:if>
+  
+                   
+                                <aura:if isTrue="{!and(v.isOwnedTrue,and(v.contObj.Residence_Type__c!='',v.contObj.Residence_Type__c!=null,v.contObj.Residence_Type__c!='Owned by Self/Spouse',v.contObj.Residence_Type__c!='Owned by Parent/Sibling'))}">
+
+                                <div class="slds-grid slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--4-of-12" style="padding:1%">
+                                    <label for="copyeresiaddress" class="slds-size--3-of-5 slds-form-element__label">Permanent Address same as Residence Address</label>
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="toggle" name="copyeresiaddress" label="" aura:id="copyeresiaddress" class="slds:input slds-size--2-of-5" onchange="{!c.copyRsiAddress}"  checked="{!v.copyresiaddressflag}" disabled="{!v.isUWCheck==true?true:false}"/>
+                                    </div>
+                                </div>
+                                </aura:if>
+ 
+                            
+                    <aura:if isTrue="{!or(v.isUWCheck,v.isEmployeeLoan)}"><!--added by swapnil employee loan 20934-->
+                                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                                  <!--  <div class="slds-form-element__control">
+                                       <lightning:input type="radio" label="Address match - EKYC" name="radioAddress" value="address" disabled="{!v.disableAadhaar}" onchange="{!c.changeAadhaaraddress}"/>
+                                        <lightning:input type="radio" label="Address match - Perfios" name="radioAddress" value="address" disabled="{!v.disablePerfios}" onchange="{!c.changePerfiosaddress}"/>
+                                        <lightning:input type="radio" label="Address match - PO" name="radioAddress" value="address" disabled="{!v.disablePO}" onchange="{!c.changePOaddress}"/> 
+                                    </div> 
+                                    <br/><br/> -->
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+									<div class="slds-form-element__control">
+										<lightning:input label="Name as per Aadhar" value="{!v.eKycObj.eKYC_First_Name__c+' '+v.eKycObj.eKYC_Last_Name__c}" name="aadharAdd" disabled="true"/>
+									</div>
+								</div>
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+									<div class="slds-form-element__control">
+										<lightning:input label="Name as per PAN" value="{!v.tatMasterRecord.Name__c}" name="aadharAdd" disabled="true"/>
+									</div>
+								</div>
+                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+									<div class="slds-form-element__control">
+										<lightning:input label="Name as per Bureau" value="{!v.cibilobj.Name}" name="aadharAdd" disabled="true"/>
+									</div>
+								</div>
+								<div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+									<div class="slds-form-element__control">
+										<lightning:input label="Address as per Aadhar" value="{!v.eKycObj.eKYC_Address_details__c}" name="aadharAdd" disabled="true"/>
+									</div>
+								</div>
+								<!--<div class="slds-form-element slds-p-top-x-small  slds-p-horizontal-small slds-size-1-of-1 slds-medium-size-3-of-6 slds-large-size-4-of-12">
+									<div class="slds-form-element__control">
+										<lightning:textarea label="Address as per Previous Address" value="{!v.poAddress}" name="poAdd" disabled="true"/>
+									</div>
+								</div> -->
+								<div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+									<div class="slds-form-element__control">
+										<!--<lightning:textarea label="Address as per Perfios" value="{!v.contObj.Perfios_Address__c }" name="perfiosAdd" disabled="true"/> -->
+										<label> Address as per Perfios</label>
+										<lightning:input type="toggle" name="perfiosAdd" label="" class="slds:input" checked="{!v.contObj.Perfios_Address__c == 'Yes' ? true :false}" disabled="true"/>
+									</div>
+								</div>
+								<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="addMatchPrevious" name="addMatchPrevious" required="{!v.isEmployeeLoan==true?false:true}" label="Address match - previous address" messageWhenValueMissing="Please Select Value"  value="{!v.contObj.Customer_Add_Matches_With_Previous_Add__c}" >
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.addressMatchLst}" var="prevAdd">
+                                                <option value="{!prevAdd}" text="{!prevAdd}" selected="{!v.contObj.Customer_Add_Matches_With_Previous_Add__c == prevAdd}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>  
+                                    </div>
+                                </div>
+								<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select disabled="" aura:id="addMatchekyc" name="addMatchekyc" required="{!v.isEmployeeLoan==true?false:true}" label="Address match - EKYC" messageWhenValueMissing="Please Select Value"  value="{!v.contObj.Customer_address_matches_with_eKYC__c}" >
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.addressMatchLst}" var="ekycAdd">
+                                                <option value="{!ekycAdd}" text="{!ekycAdd}" selected="{!v.contObj.Customer_address_matches_with_eKYC__c == ekycAdd}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>  
+                                    </div>
+                                </div>
+								
+								<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="addMatchPerfios" name="addMatchPerfios" required="{!v.isEmployeeLoan==true?false:true}" label="Address match - Perfios" messageWhenValueMissing="Please Select Value"  value="{!v.contObj.Customer_address_matches_with_perfios__c}"  disabled="{!and(v.isEmployeeLoan,v.isUWCheck==true?true:false)}">
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.addressMatchLst}" var="perfiosAdd">
+                                                <option value="{!perfiosAdd}" text="{!perfiosAdd}" selected="{!v.contObj.Customer_address_matches_with_perfios__c == perfiosAdd}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>  
+                                    </div>
+                                </div>
+                            </aura:if>
+                            
+                            
+                                
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    
+                                    <lightning:select aura:id="resi_documet_type" name="resi_documet_type" label="Proof of Residence Address Submitted" required="{!v.isEmployeeLoan==true?false:true}" messageWhenValueMissing="Please Select Value"  value="{!v.appObj.Proof_of_Residence_Address_Submitted__c}" >
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.resDocumentList}" var="resDocument">
+                                            <option value="{!resDocument}" text="{!resDocument}" selected="{!v.appObj.Proof_of_Residence_Address_Submitted__c == resDocument}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                                
+                           
+                            <!--24997 s-->
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="alt_no" label="Alternate Phone Number" value="{!v.contObj.Permanent_Mobile__c }" name="promo_code" placeholder=""/>
+                                </div>
+                            </div>
+                            <!--24997 e-->
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select messageWhenValueMissing="Please Select Value" required="true" aura:id="resi_type" label="Residential Type" value="{!v.contObj.Residence_Type__c}" disabled="{!and(v.isEmployeeLoan,v.isUWCheck==true?true:false)==true?true:false}" name="resi_type" onchange="{!c.onPicklistChange}">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.residenceTypeList}" var="residenceType">
+                                            <option value="{!residenceType}" text="{!residenceType}" selected="{!v.contObj.Residence_Type__c == residenceType}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div> 
+                            <aura:if isTrue="{!and(v.isOwnedTrue,and(v.contObj.Residence_Type__c!='',v.contObj.Residence_Type__c!=null,v.contObj.Residence_Type__c!='Owned by Self/Spouse',v.contObj.Residence_Type__c!='Owned by Parent/Sibling'))}">
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                 <!--  <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="month_at_resi" label="Month at Residence" value="{!v.contObj.Years_At_Residence__c}" name="month_at_resi" placeholder="Month at Residence" messageWhenPatternMismatch="Please Enter Digits only"  maxlength="2" pattern="[0-9]*"/>-->	
+                                    <lightning:select messageWhenValueMissing="Please Select Value" required="{!v.isEmployeeLoan==true?false:true}" aura:id="month_at_resi" label="Month at Residence" value="{!v.contObj.months_of_Residence__c}" disabled="{!and(v.isEmployeeLoan,v.isUWCheck==true?true:false)}" name="month_at_resi">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.monthsAtResidence}" var="monResi">
+                                            <option value="{!monResi}" text="{!monResi}" selected="{!v.contObj.months_of_Residence__c == monResi}"></option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                                </div>
+                            </div>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.isOwnedTrue,and(v.contObj.Residence_Type__c!='',v.contObj.Residence_Type__c!=null,v.contObj.Residence_Type__c!='Owned by Self/Spouse',v.contObj.Residence_Type__c!='Owned by Parent/Sibling'))}">
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="perm_documet_type" name="perm_documet_type" label="Proof of Address Submitted for Permanent" required="{!v.isEmployeeLoan==true?false:true}" messageWhenValueMissing="Please Select Value"  value="{!v.appObj.Proof_of_Address_Submitted_for_Permanent__c}" >
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.permDocumentList}" var="permDocument">
+                                                <option value="{!permDocument}" text="{!permDocument}" selected="{!v.appObj.Proof_of_Address_Submitted_for_Permanent__c == permDocument}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>  
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                        <lightning:input aura:id="perm_address" name="perm_address"  maxlength="35"  value="{!v.contObj.Permanant_Address_Line_1__c}" label="Permanent Address Line 1" required="true" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value" disabled="{!or(and(v.isEmployeeLoan,v.isUWCheck==true?true:false),v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->   
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                        <lightning:input aura:id="perm_address2" name="perm_address2"  maxlength="35"  value="{!v.contObj.Permanant_Address_Line_2__c}" label="Permanent Address Line 2" required="true" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value" disabled="{!or(and(v.isEmployeeLoan,v.isUWCheck==true?true:false),v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->   
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                        <lightning:input aura:id="perm_address3" name="perm_address3"  maxlength="35"  value="{!v.contObj.Permanant_Address_Line_3__c}" label="Permanent Address Line 3" required="true" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value" disabled="{!or(and(v.isEmployeeLoan,v.isUWCheck==true?true:false),v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->   
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="Permanent_PinCode" label="Permanent Pin code" value="{!v.contObj.Permanent_Pin_Code__c}" name="Permanent_PinCode" type="text" maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pincode" pattern="[0-9]*" messageWhenBadInput="Pin Code should contain only digits." disabled="{!or(and(v.isEmployeeLoan,v.isUWCheck==true?true:false),v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.isOwnedTrue,and(v.contObj.Residence_Type__c!='',v.contObj.Residence_Type__c!=null,v.contObj.Residence_Type__c!='Owned by Self/Spouse',v.contObj.Residence_Type__c!='Owned by Parent/Sibling'))}">
+   <!--Condition added by swapnil bug id 20934--> 
+                            <!--<aura:if isTrue="{!or(v.isUWCheck,v.isEmployeeLoan)}">                      -->
+                                <div aura:id="citySearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                        <label class="slds-form-element__label" for="cityField"><span class="requiredClass">*</span>Permanent City</label>
+                                        <ui:inputText aura:id="cityField" class="slds-input"  updateOn="keyup" keyup="{!c.cityKeyPressController}" value="{!v.citySearchKeyword}" placeholder="Enter City" disabled="{!if(v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->                
+                                        <!--This part is for Display typehead lookup result List-->  
+                                        <div class="slds-lookup__menu slds" id="referralList">
+                                            <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.finalCity}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCity}">{!singleRec.city} </a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="state" label="Permanent State" value="{!v.contObj.Permanent_State__c}" name="state" disabled="{!or(and(v.isEmployeeLoan,v.isUWCheck==true?true:false),v.appObj.Data_Source__c == 'Copy CKYC Data')}"/><!--changed condition for Edit CKYC for US 21328-->        
+                                    </div>
+                                </div>
+                                <!--City CR e -->    
+                            
+                            <!--</aura:if>-->
+                          
+       </aura:if>
+                        </div>
+                    </div>
+                </p>
+            </lightning:card>
+        </div>
+    </aura:if>
+    
+   
+    <div class="slds-p-top--x-small slds-align_absolute-center">
+    <!--Added by swapnil EmployeeLoan Automation s!-->
+      	<aura:if  isTrue="{!v.isEmployeeLoan}"> 
+             <lightning:button variant="brand" label="Save CKYC Details" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveCKYCData}" disabled="{!v.isUWCheck==true?true:false}" aura:id="saveCKYC"/> <!-- CR 22307 -->
+             <aura:set attribute="else">
+             	 <lightning:button variant="brand" label="Save Details" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveCKYCData}" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}" aura:id="saveCKYC1"/> <!-- CR 22307 --><!--added by swapnil employee loan 20934-->
+             </aura:set>
+    </aura:if>
+           <!--Added by swapnil EmployeeLoan Automation e!-->
+    </div>
+</aura:component>

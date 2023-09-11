@@ -1,0 +1,6 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="UtilityCls">
+	<aura:attribute name="objectName" type="String" default=""/>
+    <aura:attribute name="dataLst" type="Object" default=""/>
+    
+    
+</aura:component>

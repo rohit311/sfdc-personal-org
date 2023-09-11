@@ -1,0 +1,27 @@
+<aura:component >
+    
+    <aura:method name="showToast" action="{!c.onShowToast}" > 
+        <aura:attribute name="title" type="String"/>
+        <aura:attribute name="message" type="String"/>
+        <aura:attribute name="type" type="String"/>
+    </aura:method>
+
+	<div aura:id="customToast" class="slds-notify_container slds-hide" >
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">  
+                            <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+</aura:component>

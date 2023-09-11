@@ -1,0 +1,1 @@
+<aura:event type="APPLICATION" description="Enable submit button after files are uploaded successfully." />

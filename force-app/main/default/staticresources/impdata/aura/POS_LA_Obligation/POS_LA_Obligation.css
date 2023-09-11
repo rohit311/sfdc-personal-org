@@ -1,0 +1,15 @@
+.THIS .uiInputDate .datePicker-openIcon{
+    position: absolute;
+    left: 95%;
+    top: 30%;
+}
+
+
+.THIS .obligation-wrapper{
+    height: 52vh;
+    width: 100%;
+}
+
+.THIS .obligation-container{
+    position:fixed;
+}

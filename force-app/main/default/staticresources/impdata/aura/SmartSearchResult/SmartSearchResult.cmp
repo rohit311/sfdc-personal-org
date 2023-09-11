@@ -1,0 +1,38 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL" controller="SALMobilityCntrl_V2">
+    
+    
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="ValidSourceChannel" type="Boolean" default="false"/>
+    <aura:attribute name ="obj" type="Opportunity" />
+    <aura:attribute name="acsToUpdate" type="List" />
+    
+	<div aura:id="sourceSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2">
+		<div class="slds-form-element__control">
+			<label class="slds-form-element__label" for="sourceName"><span class="requiredClass"></span>Sourcing Channel:</label>
+			<ui:inputText aura:id="sourceName" required="true" class="slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="{!v.obj.Sourcing_Channel__r.Name}"/>                
+			<!--This part is for Display typehead lookup result List-->  
+			<div class="slds-lookup__menu slds" id="sourceList">
+				<div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+				<ul class="slds-lookup__list" role="listbox">
+					<aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+						<li role="presentation">
+							<span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+								<div class="slds-media__body">
+									<div class="slds-input-has-icon slds-input-has-icon--right">
+										<div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+									</div>
+								</div>    
+							</span>
+						</li>
+					</aura:iteration>
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+</aura:component>

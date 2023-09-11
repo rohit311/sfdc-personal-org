@@ -1,0 +1,140 @@
+<aura:component controller="SFDCMobilePOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="mobNo" type="String" default=""/> 
+    <aura:attribute name="offerproduct" type="String" default=""/> 
+    <aura:attribute name="poid" type="String" default=""/> 
+    <aura:attribute name="productvalue" type="String[]"/>
+    <aura:attribute name="isValidUser" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/> 
+    <aura:attribute name="allData" type="List"/>
+    <aura:attribute name="currentPageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <aura:attribute name="pageList" type="List"/>    
+    
+    <lightning:spinner aura:id="mySpinner" class="slds-hide" />
+    
+    <aura:if isTrue="{!v.isValidUser == 'true'}">
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="PO Search" class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small"> 
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="ponumber" aura:id="pono" label="PO ID" value="{!v.poid}" />
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="mobnumber" aura:id="mobval" label="Mobile Number" value="{!v.mobNo}" messageWhenPatternMismatch="Please Enter Valid Mobile Number" maxlength="10"  pattern="^([6789]\d{9})$" />
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select 
+                                                  label="Offer Product*" 
+                                                  name="offerproduct" 
+                                                  value="{!v.offerproduct}"> 
+                                    <aura:iteration items="{!v.productvalue}" var="op">
+                                    <option value="{!op}" text="{!op}"/>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div> 
+                        </div>
+                    </div>
+                    
+                    <br/>
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-align_absolute-center">
+                        <lightning:button variant="brand" label="Search" class="slds-button slds-button--brand" iconName="utility:search" iconPosition="left" onclick="{!c.searchData}" />
+                    </div>
+                    <aura:if isTrue="{!not(empty(v.allData))}">
+                    <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-m-top_small " >
+                        <thead>
+                            <tr>
+                                <th scope="col" ><div class="slds-truncate">Product Offering Name</div></th>
+                                <th scope="col" ><div class="slds-truncate">Owner</div></th>
+                                <th scope="col" ><div class="slds-truncate">TeleCalling Desposition Status</div> </th>
+                                <th scope="col" ><div class="slds-truncate">Field Disposition 1</div></th>
+                                <th scope="col" ><div class="slds-truncate">Field Disposition status</div></th>
+                                <th scope="col" ><div class="slds-truncate">First Field disposition status</div></th>
+                                <th scope="col" ><div class="slds-truncate">Field Remarks</div></th>
+                                <th scope="col" ><div class="slds-truncate">Converted date/time</div></th>
+                                
+                            </tr>   
+                        </thead>
+                         
+                        <tbody>
+                            <aura:iteration items="{! v.data }" var="po" >
+                                <tr>
+                                    <td scope="row" data-label="Product Offering Name"><div class="slds-truncate" >{!po.Name}</div></td>
+                                    <td scope="row" data-label="Owner"><div class="slds-truncate" >{!po.Owner.Name}</div></td>
+                                    <td scope="row" data-label="TeleCalling Desposition Status"><div class="slds-truncate" >{!po.TeleCalling_Desposition_Status__c}</div></td>
+                                    <td scope="row" data-label="Field Disposition 1"><div class="slds-truncate" >{!po.Field_Disposition_1__c}</div></td>
+                                    <td scope="row" data-label="Field Disposition status"><div class="slds-truncate" >{!po.Field_Desposition_Status__c}</div></td>
+                                    <td scope="row" data-label="First Field disposition status"><div class="slds-truncate" ><ui:outputDateTime aura:id="DateField" value="{!po.First_Field_Desposition_Status__c}" /></div></td>                                    
+                                    <td scope="row" data-label="Field Remarks"><div class="slds-truncate_container_25" > {!po.Field_Remarks__c} </div></td>
+                                    <td scope="row" data-label="Converted date/time"><div class="slds-truncate" ><ui:outputDateTime aura:id="DateField" value="{!po.Converted_Date_Time__c}" /></div></td>
+                                    <!--<ui:outputDate aura:id="EndDateField" value="{!po.Converted_Date_Time__c}" format="MM/dd/yyyy hh:mm aaa"/>-->
+                                </tr>
+                            </aura:iteration>
+                        </tbody>                        
+                    </table>
+                    </aura:if>
+                    <lightning:layout multipleRows="true" >
+                        <aura:if isTrue="{!not(empty(v.allData))}">
+                            <div aura:id="pagination" class="slds-align_absolute-center slds-show">
+                                <lightning:layoutItem class="slds-p-top_small" flexibility="auto">
+                                    <lightning:button class="slds-p-horizontal_x-small slds-button slds-button--brand" label="First" iconName="utility:left" iconPosition="left" onclick="{!c.onFirst}" disabled="{! v.currentPageNumber == 1}"/>
+                                    <lightning:button class="slds-p-horizontal_x-small slds-button slds-button--brand" iconName="utility:chevronleft" iconPosition="left" onclick="{!c.onPrev}" disabled="{! v.currentPageNumber == 1}"/>
+                                    
+                                    <span class="slds-p-horizontal_xx-small">
+                                        <a onclick="{!c.processMe}" name="1" class="{! (v.currentPageNumber == 1) ? 'selected' : ''}">1</a>
+                                    </span>
+                                    <span aura:id="showSpan1">
+                                        <a>...</a>
+                                    </span>
+                                    <aura:iteration items="{!v.pageList}" var="item">
+                                        <span class="slds-p-horizontal_xx-small">
+                                            <a onclick="{!c.processMe}" name="{!item}" class="{! (v.currentPageNumber == item) ? 'selected' : ''}">{!item}</a>
+                                        </span>
+                                    </aura:iteration>
+                                    <span aura:id="showSpan2">
+                                        <a>...</a>
+                                    </span>
+                                    <span class="slds-p-horizontal_xx-small">
+                                        <a onclick="{!c.processMe}" name="{!v.totalPages}" class="{! (v.currentPageNumber == v.totalPages) ? 'selected' : ''}">{!v.totalPages}</a>
+                                    </span> 
+                                    
+                                    <lightning:button class="slds-p-horizontal_x-small slds-button slds-button--brand" iconName="utility:chevronright" iconPosition="right" disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onNext}"/>
+                                    <lightning:button class="slds-p-horizontal_x-small slds-button slds-button--brand" label="Last" iconName="utility:right" iconPosition="right" disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onLast}"/>
+                                </lightning:layoutItem>
+                            </div>
+                        </aura:if>
+                    </lightning:layout>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    </aura:if>
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,247 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" 
+                access="global" controller="NSDL_PAN_CheckCntrl">
+
+    <aura:attribute name="LoanId" type="String" />
+    <aura:attribute name="productName" type="String" />
+
+    <aura:attribute name="wrapperList"  type="object"/>
+    <aura:attribute name="panChkStatusValues" type="String[]" />
+    <aura:attribute name="creditObvValues" type="String[]" default="[]"/>
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute name="applicantList" type="Applicant__c[]" />  
+    <aura:attribute name="tatList" type="TAT_Master__c[]" /> 
+    <aura:attribute name="isOpen" type="Boolean" default="false" access="private"/>
+    <aura:attribute name="isAccessible" type="Boolean" default="" />
+    <aura:attribute name="dateStr" type="Date" default="" />
+<!--     <aura:attribute name="spinner" type="Boolean" default="false"/> -->
+    <aura:attribute name="productNotFound" type="String" default=""/>
+    <aura:attribute name="tatReponseString" type="String[]" default=""/>
+    <aura:attribute name="CalculatedHeight" type="Integer" default="50" access="private" />
+    <aura:attribute name="isDoneRendering" type="Boolean" default="false"/>
+     <!-- start sales 2.0 by prashant-->
+     <aura:attribute name="isMobilityFlag" type="Boolean" default="false"/>
+     <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+     <!-- end sales 2.0 by prashant-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/> 
+    <aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+        <aura:if isTrue="{!v.productNotFound == 'success'}">
+
+         <!-- Start of modal container div -->
+         <div class="container slds-show" id="dataDiv" style="overflow:auto">
+             <form class="slds-form--stacked">
+                 <!-- Start of modal dialog div -->
+                 <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-modal_large slds-fade-in-open">
+                     <div class="slds-modal__container">
+
+                        <div aura:id="waiting" class="slds-hide">
+                            <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+                        </div>
+
+                         <!-- Start of modal header div -->
+                         <div class="slds-modal__header">
+                             <!-- Start of close icon and button -->
+                             <aura:if isTrue="{!v.isMobilityFlag}">
+                             <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModalWindow}">
+                                X
+                               <span class="slds-assistive-text">Close</span>
+                           </button>
+                            </aura:if>
+                              <div class="slds-align_absolute-center slds-text-heading--medium">PAN Validation Details</div>
+                             
+                             </div>
+                             <!-- End of close icon and button -->
+                             <!-- Start of modal content div -->
+
+                               <div class="{!v.isMobilityFlag? 'slds-modal__content slds-p-around--large scrollXY': 'slds-modal__content slds-p-around--large'}">
+                                <div id="form_div" class="slds-grid slds-wrap slds-grid--pull-padded">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer   ">
+<!--                                         <div class="slds-grid slds-wrap" style="height:50vh; overflow-y:scroll; overflow-x:hidden;"> -->
+                                        <div class="slds-grid slds-wrap" style="{!'height: ' + v.CalculatedHeight + 'px; overflow-y: scroll; overflow-x: hidden;'}">
+
+                                            <aura:iteration items="{!v.wrapperList}" var="App" >
+
+                                            <div class="slds-col slds-size_4-of-7 BFLStyle" style="height:25px;"><span>{!App.applicantName}</span></div>
+                                            <div class="slds-col slds-size_3-of-7 BFLStyle" style="height:25px;"><span>{!App.applicantType}</span></div>
+                                            <table  class="slds-table slds-table--bordered slds-table--cell-buffer  ">
+                                            <thead>
+                                                <tr class="slds-text-title--caps" >
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="PAN Number">PAN Number</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="PAN Source">PAN Source</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="PAN Check Status">PAN Check Status</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="PAN Check Details">PAN Check Details</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="Comments">Comments</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="Comments">Credit Observation</span>
+                                                    </th>
+                                                    <th class="bglightBlue">
+                                                        <span class="slds-truncate" title="Overrides flag">Overrides flag</span>
+                                                    </th>
+                                                    <aura:if isTrue="{!v.isMobilityFlag}">
+                                                            <th class="bglightBlue">
+                                                                <span class="slds-truncate" title="PAN Series Trigger">PAN Series Trigger</span>
+                                                            </th>
+                                                        </aura:if>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <aura:iteration items="{!App.tatMasterInstance}" var="ct" > 
+                                                <tr class="bgclr">  
+                                                    <td scope="row">
+                                                        <div class="slds-truncate">
+                                                            <ui:outputText value="{!ct.PAN_Number__c}" />
+                                                        </div>
+                                                    </td>
+                                                    <td scope="row" >
+                                                        <div class="slds-truncate">
+                                                            <ui:outputText value="{!ct.PAN_Source__c}" />
+                                                        </div>
+                                                    </td>
+                                                    <td scope="row" aura:id="pcsTd">
+                                                        <div class="slds-truncate" id="{!ct.Id}" aura:id="pcsDiv">
+                                                            <ui:inputSelect aura:Id="panCheckStatusId" class="slds-input" value="{!ct.PAN_Check_Status__c}" >
+                                                                <aura:iteration aura:Id="panCheckStatusOId" items="{!v.panChkStatusValues}" var="pan">
+                                                                    <aura:if isTrue="{!ct.PAN_Check_Status__c == pan}" >
+                                                                        <ui:inputSelectOption aura:Id="pan_SelectOption" text="{!pan}" label="{!pan}" value="true"/>
+                                                                        <aura:set attribute="else">
+                                                                            <ui:inputSelectOption aura:Id="pan_SelectOption" text="{!pan}" label="{!pan}"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </ui:inputSelect>
+                                                        </div>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <div class="slds-truncate">
+                                                            <div>Name : <ui:outputText value="{!ct.Name__c}" /></div>
+                                                            <div>Last Modified : <ui:outputText value="{!ct.Last_Modified_Date__c}" /></div> 
+                                                        </div>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <div class="slds-truncate">
+                                                            <ui:inputTextArea value="{!ct.Comment__c}" />
+                                                        </div>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <aura:if isTrue="{!ct.PAN_Source__c == 'Input'}">
+                                                        <div class="slds-truncate">
+                                                            <ui:inputSelect aura:Id="creditObservation" class="slds-input" value="{!ct.Credit_Observation__c}">
+                                                                <aura:iteration aura:Id="creditObservationOId" items="{!v.creditObvValues}" var="co">
+                                                                    <aura:if isTrue="{!ct.Credit_Observation__c == co}" >
+                                                                        <ui:inputSelectOption aura:Id="co_SelectOption" text="{!co}" label="{!co}" value="true"/>
+                                                                        <aura:set attribute="else">
+                                                                            <ui:inputSelectOption aura:Id="co_SelectOption" text="{!co}" label="{!co}"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </ui:inputSelect>
+                                                        </div>
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!ct.PAN_Source__c == 'Secondary Cibil'}">
+                                                        <div aura:Id="outerDiv">
+                                                            <ui:inputSelect aura:Id="creditObservation" class="slds-input requiredCss" value="{!ct.Credit_Observation__c}">
+                                                                <aura:iteration aura:Id="creditObservationOId" items="{!v.creditObvValues}" var="co">
+                                                                    <aura:if isTrue="{!ct.Credit_Observation__c == co}" >
+                                                                        <ui:inputSelectOption aura:Id="co_SelectOption" text="{!co}" label="{!co}" value="true"/>
+                                                                        <aura:set attribute="else">
+                                                                            <ui:inputSelectOption aura:Id="co_SelectOption" text="{!co}" label="{!co}"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </ui:inputSelect>
+                                                            <div id="{!ct.PAN_Number__c}" aura:Id="error-01" class="slds-required slds-hide slds-form-element__help">Please select value</div>
+                                                        </div>
+                                                        </aura:if>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <div class="slds-truncate">
+                                                            <ui:inputCheckbox value="{!ct.Override_Flag__c}" disabled="{!if(v.isAccessible,false,true)}"/>
+                                                        </div>
+                                                    </td>
+                                                     <aura:if isTrue="{!v.isMobilityFlag}">
+                                                                <aura:if isTrue="{!ct.PAN_Source__c == 'Input'}">
+                                                                    
+                                                                    <td scope="row">
+                                                                        <div class="slds-truncate">
+                                                                            <ui:outputText value="{!App.panseriestrigger}"/>
+                                                                        </div>
+                                                                    </td>
+                                                                    <aura:set attribute="else">
+                                                                        <td scope="row">
+                                                                            <div class="slds-truncate">
+                                                                                <ui:outputText value=""/>
+                                                                            </div>
+                                                                        </td>     
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </aura:if>  
+                                                </tr>
+                                            </aura:iteration>
+                                            </tbody>
+                                        </table>
+                                            </aura:iteration>
+
+                                    </div>
+                                    </table>
+                                </div>
+                                <hr />
+                            <div class="slds-align_absolute-center">
+                                <button class="slds-button slds-button--brand ButtonStyle" aura:Id="validatePan_btn" onclick="{!c.validatePanBtnClick}" title="Validate PAN" disabled="{!v.displayReadOnly}"> <!-- CR 22307 --> Validate PAN</button>
+                                <button class="slds-button slds-button--brand ButtonStyle" aura:Id="save_btn" onclick="{!c.saveBtnClick}" title="Save" disabled="{!v.displayReadOnly}"> <!-- CR 22307 -->Save</button>
+                                <button class="slds-button slds-button--brand ButtonStyle" aura:Id="destroy_btn" title="Close" onclick="{!c.closeModalWindow}" disabled="{!v.displayReadOnly}"> <!-- CR 22307 -->Close</button>
+                            </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </form>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.productNotFound == 'fail'}">
+        <div  class="container slds-show" id="noDataDiv">
+            <form class="slds-form--stacked">
+                <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal--large" aria-labelledby="header43">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header">
+                            <div class="slds-align_absolute-center slds-text-heading--medium">No records for PAN validation!!</div>
+                                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.closeModalWindow}">
+                                X<span class="slds-assistive-text">Close</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </form>
+        </div>
+    </aura:if>
+
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+</aura:component>

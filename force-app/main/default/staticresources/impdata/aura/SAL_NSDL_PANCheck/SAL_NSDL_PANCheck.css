@@ -1,0 +1,83 @@
+.THIS .requiredClass {
+    color: #c23934;
+    margin: 0 0.125rem;
+}
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+
+.THIS .alignmodal{   
+    left: 9% !important;
+    display: inline-block !important;
+}
+
+@media screen and (device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2) {
+ .THIS html {
+    position: fixed;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+  }
+  .THIS html body {
+    position: fixed;
+    overflow-x: scroll;
+    height: 100%;
+    width: 100%;
+  }
+}
+@media screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) {
+ .THIS html {
+    position: fixed;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+  }
+ .THIS html body {
+    position: fixed;
+    overflow-x: scroll;
+    height: 100%;
+    width: 100%;
+  }
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1) {
+  .THIS html {
+    position: fixed;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+  }
+  .THIS html body {
+    position: fixed;
+    overflow-x: scroll;
+    height: 100%;
+    width: 100%;
+  }
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+  .THIS html {
+    position: fixed;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+  }
+  .THIS html body {
+    position: fixed;
+    overflow-x: scroll;
+    height: 100%;
+    width: 100%;
+  }
+}
+@media only screen and (max-device-width: 640px), only screen and (max-device-width: 667px), only screen and (max-width: 480px) {
+ .THIS  html {
+    position: fixed;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+  }
+  .THIS html body {
+    position: fixed;
+    overflow-x: scroll;
+    height: 100%;
+    width: 100%;
+  }
+}

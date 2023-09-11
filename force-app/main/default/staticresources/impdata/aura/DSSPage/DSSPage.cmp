@@ -1,0 +1,407 @@
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes">
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="accObj" type="Account" default=""/>
+    <aura:attribute name="oppObj" type="Opportunity" default=""/>
+    <aura:attribute name="contObj" type="Contact" default="{'sobjectType': 'Contact'}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="camObj" type="CAM__c" default=""/>
+    <aura:attribute name="gender" type="List"/>
+    <aura:attribute name="typeOfIndustryList" type="List"/>
+    <aura:attribute name="productList" type="List" default="SAL,SPL"/>
+    <aura:attribute name="totalexpYr" type="List"/>
+    <aura:attribute name="totalexpMon" type="List"/>
+    <aura:attribute name="maritalStatusList" type="List"/>
+    <aura:attribute name="resTypeList" type="List"/>
+    <aura:attribute name="currentexpYr" type="List"/>
+    <aura:attribute name="currentexpMon" type="List"/>
+    <aura:attribute name="resiAddress" type="String" default=""/>
+    <aura:attribute name="permanentAddress" type="String"/>
+    <aura:attribute name="officeAddress" type="String"/>
+    <aura:attribute name="isOther" type="Boolean"/>
+    <aura:attribute name="employer" type="Id"/>
+    <aura:attribute name="applicationSource" type="List"/>
+    <aura:attribute type="Boolean" name="panFlag" default="false"/>
+    <aura:attribute type="Boolean" name="copyekycaddressflag" default="false"/>
+    <aura:attribute name="kyc" type="eKYC__c" default="{'sobjectType':'eKYC__c',Id:'',Applicant__c:'',eKYC_Address_details__c:''}"/>
+    <aura:method name="setResidenceAddress" action="{!c.setResidenceAddress}" access="PUBLIC"/> 
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="change" value="{!v.accObj.Employer__r.Name}" action="{!c.employerChange}"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    <aura:registerEvent name="disableTabs" type="c:disableOppTabs"/>
+    <aura:attribute name="activePath" type="String" default=""/><!--commented default AadharTab for bug id 21851-->
+    <aura:attribute name="pathList" type="String[]" default=""/><!--commented defalult ['AadharTab','McpTab','ObligationTab','EligibilityTab','McpOutputTab','CommunicationTab','PerfiosTab'] for bug id 21851-->
+    <aura:attribute name="disablePrev" type="boolean" default="" /><!--commented default true for bug id 21851-->
+    <aura:attribute name="disableNext" type="boolean" default="" /><!--commented default false for bug id 21851-->
+    <aura:attribute name="StageNum" type="Integer" default="1" />
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:attribute name="mcpSuccess" type="String" default="init"/>
+    <aura:handler name="change" value="{!v.disablepage}" action="{!c.disablepage}"/>
+    <aura:attribute name="disablepage" type="Boolean" default="false"/> 
+    <aura:attribute name="mobilenumber" type="String" default=""/>
+    <aura:attribute name="tempOppId" type="String"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:registerEvent name="appEkycEvent" type="c:Sal_Opp_EkycEvent"/>
+    <aura:registerEvent name="selectObligationTab" type="c:DisplayObligationTab"/>
+    <aura:handler event="c:DisplayObligationTab" action="{!c.DisplayObligationTab}"/>
+    <aura:attribute name="flow" type="Boolean" default="false"/>
+    <aura:attribute name="isMonthAtResiRequired" type="boolean"/>
+    <aura:attribute name="prevfirstName" type="string"/>
+    <aura:attribute name="prevlastName" type="string"/>
+    <aura:attribute name="prevDOB" type="date"/>
+    <aura:attribute name="prevGender" type="string"/>
+    <aura:attribute name="prevPincode" type="string"/>
+    <aura:attribute name="prevEmail" type="string"/>
+    <aura:attribute name="prevAddress" type="string"/>
+    <aura:attribute name="isSALMobilityFlow" type="boolean" default="true"/>
+    <aura:attribute name="isCommunityUsr" type="boolean" default="true"/>
+    <aura:attribute name="randomNum" type="String" /><!-- Bug 18669 -->
+    <aura:attribute name="aadharValueDss" type="String" default="Aadhaar OTP"/><!-- Bug 18669 --><!--changed default value for bug id 20884-->
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!-- added for bug id 21851-->
+    <div>
+        <div align="right">
+            <aura:if isTrue="{!v.oppObj.Loan_Application_Number__c != null}"><h1><b>Loan Application No.: {!v.oppObj.Loan_Application_Number__c}</b> </h1></aura:if>
+            <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><h1><b>Current Stage : {!v.StageNum} out of 7</b> </h1></aura:if><!--added if for bug id 21851  -->
+            <aura:if isTrue ="{!(v.hideAadhaarSection == true)}"><h1><b>Current Stage : {!v.StageNum} out of 6</b> </h1></aura:if><!--added if for bug id 21851  -->
+        </div>
+    </div>
+    <br/>
+    <div class="demo-only" style="position:static">
+        <div class="slds-path">
+            <div class="slds-grid slds-path__track slds-has-overflow">
+                <div class="slds-grid slds-path__scroller-container">
+                    
+                    <div class="slds-path__scroller offer-pg-cont " role="application" id="PathId">
+                        <div class="slds-path__scroller_inner offer-pg" aura:id="offer-pg">
+                            
+                            <ul class="slds-path__nav" role="tablist">
+                               <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+                                <li aura:id="AadharTab" class="slds-path__item slds-is-current slds-is-active stage_item" role="presentation">
+                                    <a title="Aadhaar section" id="AadharTab"  aria-controls="AadharTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="AadharTab">Aadhaar section</span>
+                                    </a>
+                                </li>
+                                </aura:if>  
+                                <li aura:id="McpTab" class="slds-path__item slds-is-incomplete stage_item" role="presentation">
+                                    <a title="MCP Parameter" id="McpTab" aria-controls="McpTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        <span class="slds-path__title" id="McpTab">MCP Parameter</span>
+                                    </a>
+                                </li>
+                                
+                                <aura:if isTrue="{!and(v.oppId != null,v.oppObj.StageName != 'MCP Reject')}">
+                                    <li aura:id="ObligationTab" class="slds-path__item  slds-is-incomplete stage_item" role="presentation">
+                                        <a title="Obligation" id="ObligationTab" aria-expanded="true" aria-controls="ObligationTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                            <span class="slds-path__title" id="ObligationTab">Obligation</span>
+                                        </a>
+                                    </li>
+                                    <li aura:id="EligibilityTab" class="slds-path__item  slds-is-incomplete stage_item" role="presentation">
+                                        <a title="Eligibility" id="EligibilityTab" aria-controls="EligibilityTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                            <span class="slds-path__title" id="EligibilityTab">Eligibility</span>
+                                        </a>
+                                    </li> 
+                                    <li aura:id="McpOutputTab" class="slds-path__item  slds-is-incomplete stage_item" role="presentation">
+                                        <a title="MCP Output" id="McpOutputTab" aria-expanded="true" aria-controls="McpOutputTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                            <span class="slds-path__title" id="McpOutputTab">MCP Output</span>
+                                        </a>
+                                    </li>
+                                    <li aura:id="CommunicationTab" class="slds-path__item  slds-is-incomplete stage_item" role="presentation">
+                                        <a title="Communication Details" id="CommunicationTab" aria-expanded="true" aria-controls="CommunicationTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                            <span class="slds-path__title" id="CommunicationTab">Communication Details</span>
+                                        </a>
+                                    </li>
+                                    <li aura:id="PerfiosTab" class="slds-path__item  slds-is-incomplete stage_item" role="presentation">
+                                        <a title="Perfios Section" id="PerfiosTab" aria-expanded="true" aria-controls="PerfiosTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                            <span class="slds-path__title" id="PerfiosTab">Perfios Section<span style="visibility: hidden;">  sadsfsdfgsdfgdfgc testing Perfios section sadsfsdfgsdfgdfgc testing Perfios section sadsfsdfgsdfgdfgc testing Perfios section </span></span>
+                                        </a>
+                                    </li>
+                                </aura:if>
+                                <aura:if isTrue="{!v.theme == Theme4t}">
+                                    <div style="visibility:hidden" class="applywidth"> fdtyfdsdshsgdfhgdsfghdsfghsdfdhsgf </div>
+                                </aura:if>
+                            </ul>
+                            
+                        </div>
+                        
+                        <div class="slds-path__scroll-controls">
+                            <lightning:button variant="brand" label="" iconName="utility:left" iconPosition="left" onclick="{!c.prevStage}" disabled="{!v.disablePrev}"/>
+                            <lightning:button variant="brand" label="" iconName="utility:right" iconPosition="left" onclick="{!c.nextStage}" disabled="{!v.disableNext}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+          <div aria-labelledby="AadharTab" class="slds-path__content" aura:id="AadharTabContent" role="tabpanel">
+                <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+             	 <aura:if isTrue="{!!v.applicantObj.eKYC_Processing__c}">
+                  <!--Rohit added parentObj & parentId for linking-->
+                    <c:AadharVerification isDSS="true" parentId="{!v.applicantObj.Id}" isMobility="true" parentObj="Applicant" randomNum="{!v.randomNum}" aadharValue="{!v.aadharValueDss}" isCommunityUsr="{!v.isCommunityUsr}" flowis="OpenMarketMobility" oppId="{!v.oppId}" /> <!-- added Parameters flowis="OpenMarketMobility" oppId="{!v.oppId}" for Bug 18669/ 19912  --><!--commented flowis="OpenMarketMobility" oppId="{!v.oppId}"-->
+                    
+                              <aura:set attribute="else">
+                       <div id="aadharDone" style="margin-top:20px"> Aadhaar details have been received successfully! </div>
+                    </aura:set>
+                </aura:if>
+              </aura:if>
+            </div>
+            
+            <div aria-labelledby="McpTab" class="slds-path__content slds-hide" aura:id="McpTabContent" role="tabpanel">    
+                <ul class="slds-accordion">
+                    <li class="slds-accordion__list-item">
+                        <section class="slds-accordion__section slds-is-open">
+                            <div class="slds-accordion__summary">
+                                <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                                    <div aria-controls="subsection1Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection1">
+                                        <b><span id="subicon1" class="slds-m-horizontal--x-small slds-text-heading--small">[-]</span></b>
+                                        <span id="subname1" class="slds-truncate" title="Accordion summary">MCP Section 1</span>
+                                    </div>
+                                </h3>
+                            </div>
+                            <div aria-hidden="false" aura:id="subsection1Content">
+                                <div class="slds-p-horizontal--small">
+                                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                         <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+                                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding-top:1%;">
+                                            <div class="slds-form-element__control">
+                                                <!--Rohit changed label -->
+                                                <lightning:input type="checkbox" name="copyekycaddress" label="Copy Ekyc Details" aura:id="copyekycaddress" class="slds:input" onchange="{!c.copyekycaddress}" checked="{!v.copyekycaddressflag}"/>
+                                            </div>
+                                        </div>
+                                        </aura:if>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="mcpForm" label="First Name" name="firstName" value="{!v.accObj.First_Name__c}" placeholder="First Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter First Name" messageWhenPatternMismatch="Please Enter valid First Name"/> 
+                                            </div>
+                                        </div> 
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="mcpForm" name="lastName" value="{!v.accObj.Last_Name__c}" label="Last Name" placeholder="Last Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Last Name" messageWhenPatternMismatch="Please Enter valid Last Name"/>
+                                            </div>
+                                        </div> 
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <aura:if isTrue="{!or(v.oppId == null , v.oppObj.StageName == 'MCP Reject')}">
+                                                    <lightning:input aura:id="mcpForm" type="text" name="mobile" value="{!v.accObj.Mobile__c}" label="Mobile" placeholder="Mobile Number" maxlength="10" required="true" pattern="^[6-9]\d{9}" messageWhenValueMissing="Please Enter Mobile Number" messageWhenPatternMismatch="Please Enter valid Mobile Number"/>
+                                                    <aura:set attribute="else">
+                                                        <label class="slds-form-element__label" for="mobileNumber">Mobile Number</label>
+                                                        <div class="slds-list--vertical slds-has-block-links">
+                                                            <a href="{!v.mobilenumber}" target="_blank" style="color:black;">{!v.accObj.Mobile__c}</a>
+                                                        </div>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input label="PAN" value="{!v.accObj.PANNumber__c}" name="PAN" aura:id="mcpForm" placeholder="PAN" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="please enter valid PAN" required="true" messageWhenValueMissing="Please Enter PAN Number"  disabled="{!or(or(v.oppObj.StageName == 'MCP Reject', v.oppId == null) , v.panFlag) ? false : true}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input required="true"  type="date" label="DOB" name="dateOfBirth" aura:id="mcpForm" value="{!v.accObj.Date_of_Birth__c}"  disabled="{!or(v.oppId == null , v.oppObj.StageName == 'MCP Reject') ? false : true}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:select aura:id="mcpForm" name="product" label="Product" required="true" messageWhenValueMissing="Please Select Product" value="{!v.oppObj.Product__c}" >
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration items="{!v.productList}" var="product">
+                                                        <option value="{!product}" text="{!product}" selected="{!v.oppObj.Product__c == product}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select> 
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="mcpForm" name="address1" value="{!v.resiAddress}" label="Address" placeholder="Residence Address" required="true" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9-/][A-Za-z0-9-/ _]*$" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter Address"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:select aura:id="mcpForm" name="gender" label="Gender" required="true" messageWhenValueMissing="Please Select Gender" value="{!v.accObj.Gender__c}">
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration items="{!v.gender}" var="gen">
+                                                        <option value="{!gen}" text="{!gen}" selected="{!v.accObj.Gender__c == gen}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </div> 
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="mcpForm" label="Pin code" value="{!v.accObj.Current_PinCode__c}" name="pincode" placeholder="Pin code" type="text" maxlength="6" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Pin code can only accept digits." pattern="[0-9]*"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input type="text" aura:id="mcpForm" label="Personal email ID" placeholder="Personal Email" name="personalemail" value="{!v.contObj.Email}" required="true" messageWhenValueMissing="Please Enter Email ID" messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input type="text" aura:id="mcpForm" label="Official email ID" placeholder="Office Email" name="officeemail" value="{!v.contObj.Office_Email_Id__c}" messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </li> 
+                    <li class="slds-accordion__list-item">
+                        <section class="slds-accordion__section">
+                            <div class="slds-accordion__summary">
+                                <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                                    <div aria-controls="subsection2Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection2">
+                                        <b><span id="subicon2" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                        <span id="subname2" class="slds-truncate" title="Accordion summary">MCP Section 2</span>
+                                    </div>
+                                </h3>
+                                
+                            </div>
+                            <div aria-hidden="true" class="slds-hide" aura:id="subsection2Content">
+                                <div class="slds-p-horizontal--small">
+                                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label" >Employer</label> 
+                                                <c:customLookup isSALMobilityFlow="true" ObjectName="Segment_Master__c" ObjectLabel="Segment Master" FieldName="Name" SearchKeyWord="{!v.accObj.Employer__r.Name}" selectedRecord="{!v.accObj.Employer__r.Name}" />
+                                            </div>
+                                        </div>
+                                        <aura:if isTrue="{!v.isOther}">
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input aura:id="mcpForm" name="EmpNameIFOthers" value="{!v.accObj.Name_of_the_Company_Employer__c}" label="Employer Name(If Others)" required="true"/>
+                                                </div>
+                                            </div> 
+                                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="padding-top:1%;padding-bottom:1%">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-form-element__label" for="profile">Special Profile</label>
+                                                    <lightning:input type="checkbox" aura:id="profile" name="profile" checked="{!v.contObj.Special_Profile_Employer__c }" label=""/>
+                                                </div>
+                                            </div>
+                                        </aura:if>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="companycategory" name="companycategory" value="{!v.accObj.Type_Of_Industry__c}" label="Company Category" disabled="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label" >Sourcing Channel</label>
+                                                <c:customLookup isSALMobilityFlow="true" ObjectName="Sourcing_Channel__c" ObjectLabel="Sourcing Channel" FieldName="Name" SearchKeyWord="{!v.oppObj.Sourcing_Channel__r.Name}" selectedRecord="{!v.oppObj.Sourcing_Channel__r.Name}" />
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label" >Referral</label>
+                                                <c:customLookup isSALMobilityFlow="true" ObjectName="Referral__c" ObjectLabel="Referral" FieldName="Name" SearchKeyWord="{!v.oppObj.Referral__r.Name}" selectedRecord="{!v.oppObj.Referral__r.Name}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control"> 
+                                                <lightning:select aura:id="mcpForm" name="appSource" label="Application Source" required="true" messageWhenValueMissing="Please Select Application Source" value="{!v.oppObj.Application_Source__c}">
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration items="{!v.applicationSource}" var="application">
+                                                        <option value="{!application}" text="{!application}" selected="{!v.oppObj.Application_Source__c == application}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select> 
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input aura:id="mcpForm" label="Avg 3 month net salary" value="{!v.accObj.Gross_Salary_Turn_Over__c}" name="avg3monthsalary" placeholder="Avg 3 month net salary" type="text" maxlength="10" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Avg 3 month net salary can only accept digits." pattern="[0-9]*"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </li>
+                </ul>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+                    <div class="slds-p-around--x-small slds-align_absolute-center">
+                        <lightning:button aura:id="saveButtonId" variant="brand" label="MCP and Dedupe" onclick="{!c.submitDetails}" />
+                    </div>
+                </div>  
+                
+            </div>
+            <aura:if isTrue="{!and(v.oppId != null,v.oppObj.StageName != 'MCP Reject')}">
+                <div aria-labelledby="ObligationTab" class="slds-path__content slds-hide" aura:id="ObligationTabContent" role="tabpanel">
+                    <aura:if isTrue="{!v.camObj.Id != null}">
+                        <c:ObligationRecordDetailsCmp loanAppID="{!v.oppId}"/>
+                    </aura:if>
+                </div>
+                
+                <div aria-labelledby="EligibilityTab" class="slds-path__content slds-hide" aura:id="EligibilityTabContent" role="tabpanel">
+                    <aura:if isTrue="{!v.camObj.Id != null}">
+                        <c:Sal_Opp_Eligibility aura:id="EligibilityTabCmp" oppId="{!v.oppId}" recordId="{!v.camObj.Id}" camObj="{!v.camObj}" disablepage="{!v.disablepage}" theme="{!v.theme}"/>
+                    </aura:if>
+                </div>
+                
+                <div aria-labelledby="McpOutputTab" class="slds-path__content slds-hide" aura:id="McpOutputTabContent" role="tabpanel">
+                    <c:Sal_Opp_MCPOutputCmp oppId="{!v.oppId}"/>
+                </div>
+                <div aria-labelledby="CommunicationTab" class="slds-path__content slds-hide" aura:id="CommunicationTabContent" role="tabpanel">
+                  
+                        <c:Sal_Opp_CommunicationCmp oppId="{!v.oppId}" contact="{!v.contObj}" account="{!v.accObj}" applicantObject="{!v.applicantObj}"
+                                                    totalexpYr="{!v.totalexpYr}" totalexpMon="{!v.totalexpMon}" 
+                                                    maritalStatusList="{!v.maritalStatusList}" resTypeList="{!v.resTypeList}"
+                                                    currentexpYr="{!v.currentexpYr}" currentexpMon="{!v.currentexpMon}" disablepage="{!v.disablepage}"
+                                                    permanentAddress="{!v.permanentAddress}"
+                                                    officeAddress="{!v.officeAddress}" theme="{!v.theme}"
+                                                    isMonthAtResiRequired="{!v.isMonthAtResiRequired}"/> 
+                        
+                </div>
+                <div aria-labelledby="PerfiosTab" class="slds-path__content slds-hide" aura:id="PerfiosTabContent" role="tabpanel">
+                    <c:SAL_Opp_Mobility_Perfios oppId="{!v.oppId}" applicantObj="{!v.applicantObj}" disablepage="{!v.disablepage}" theme="{!v.theme}"/>
+                </div>
+            </aura:if>
+        </div>
+    </div>
+    <div id="SuccessToast1" style="display:none; ">
+        <div id="SuccessToast" class="slds-notify_container" style="padding : 10px 10px 10px 10px ">
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsg1"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="ErrorToast1" style="display:none;">
+        <div id="ErrorToast" class="slds-notify_container" style="padding : 10px 20px 10px 20px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="errormsg1"></h2>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="overrideModalbox" class="slds-modal">
+        <div class="slds-modal__container">
+            <div class="slds-modal__content slds-p-around--medium">
+               <!-- <aura:if isTrue="{!v.oppId == null}">
+                    Loan Application Created Successfully! Loan Application Number:{!v.oppObj.Loan_Application_Number__c}
+                    <aura:set attribute="else">
+                        MCP Done Successfully!
+                    </aura:set>
+                </aura:if>-->
+                Loan Application Created Successfully! Loan Application Number:{!v.oppObj.Loan_Application_Number__c}
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Cancel</button>
+                <button class="slds-button slds-button--neutral" onclick="{!c.continueMCP}">Continue</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    
+</aura:component>

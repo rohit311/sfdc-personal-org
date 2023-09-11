@@ -1,0 +1,3 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+	<aura:handler event="c:Update_identifier" action="{!c.updateidentifier}"/>
+</aura:component>

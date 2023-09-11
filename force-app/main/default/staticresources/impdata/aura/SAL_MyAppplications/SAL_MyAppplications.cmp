@@ -1,0 +1,154 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="theme" type="String"/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+    <aura:attribute name="loanAppList" type="Opportunity[]" />
+    <aura:attribute name="rejList" type="Opportunity[]" />
+    <aura:attribute name="dasaPsfList" type="Opportunity[]" />
+    <aura:attribute name="postApprList" type="Opportunity[]" />
+    <aura:attribute name="creditList" type="Opportunity[]" />
+    <aura:attribute name="opsList" type="Opportunity[]" />
+    <aura:attribute name="finnList" type="Opportunity[]" />
+    <aura:registerEvent name="navigateToComponent" type="c:navigateToParent"/>
+    <aura:handler event="c:navigateToOpp" action="{!c.navigateToLA}"/>
+    <div  id="appView">
+    <lightning:button class="slds-theme--alt-inverse  " iconName='utility:back' aura:id="BackButtonId" variant="brand" label="Back" onclick="{!c.sendback}" />
+    
+    <ul class="slds-accordion">
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection1Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection1">
+							<b><span id="subicon1" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname1" class="slds-truncate" title="Accordion summary">Total Applications</span>
+                            
+                                
+                                
+                            	<span class="slds-truncate" title="">{!' -'+v.loanAppList.length+''}</span>
+                            
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection1Content">
+                    <c:SAL_myAppsListView oppList="{!v.loanAppList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection2Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection2">
+                            <b><span id="subicon2" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname2" class="slds-truncate" title="Accordion summary">DSA/PSF Login</span>
+                                <span id="" class="slds-truncate" title="">{!' -'+v.dasaPsfList.length}</span>
+                                
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection2Content">
+                    <c:SAL_myAppsListView oppList="{!v.dasaPsfList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection3">
+                            <b><span id="subicon3" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname3" class="slds-truncate" title="Accordion summary">Post Approval</span>
+                                <span id="" class="slds-truncate" title="">{!' -'+v.postApprList.length}</span>
+                                
+                            
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection3Content">
+                    <c:SAL_myAppsListView oppList="{!v.postApprList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection4">
+                            <b><span id="subicon4" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname4" class="slds-truncate" title="Accordion summary">In Credit's Queue</span>
+                            <span id="" class="slds-truncate" title="">{!' -'+v.creditList.length}</span>
+                               
+                           
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection4Content">
+                    <c:SAL_myAppsListView oppList="{!v.creditList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection5">
+                            <b><span id="subicon5" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname5" class="slds-truncate" title="Accordion summary">Rejected</span>
+                            <span id="" class="slds-truncate" title="">{!' -'+v.rejList.length}</span>
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection5Content">
+                    <c:SAL_myAppsListView oppList="{!v.rejList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection6">
+                             <b><span id="subicon6" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname6" class="slds-truncate" title="Accordion summary">Branch Ops</span>
+                            <span id="" class="slds-truncate" title="">{!' -'+v.opsList.length}</span>
+                               
+                           
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection6Content">
+                    <c:SAL_myAppsListView oppList="{!v.opsList}" />
+                </div>
+            </section>
+        </li>
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="subsection7Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection7">
+                            <b><span id="subicon7" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="subname7" class="slds-truncate" title="Accordion summary">Moved to Finnone</span>
+                            <span id="" class="slds-truncate" title="">{!' -'+v.finnList.length}</span>
+                                
+                            
+                        </div>
+                    </h3>
+                    
+                </div>
+                <div aria-hidden="true" class="slds-hide" aura:id="subsection7Content">
+                    <c:SAL_myAppsListView oppList="{!v.finnList}" />
+                </div>
+            </section>
+        </li>
+        
+    </ul>
+        </div>
+    <div aura:id = "childCmpbody"> {!v.body} </div>  
+</aura:component>

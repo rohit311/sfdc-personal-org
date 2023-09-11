@@ -1,0 +1,148 @@
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="DocSelected" type="String" default=""/>
+    <aura:attribute name="parentId" type="string" />
+    <aura:attribute name="uploadedAttachments" type="SObject[]"/>
+    <aura:registerEvent name="showCustomToast" type="c:ShowCustomToast" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="primaryApp" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="activePath" type="String" default="ChecklistTab"/>
+    <aura:attribute name="pathList" type="String[]" default="['ChecklistTab','docUploderTab','docUplodedTab']"/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:attribute name="disablePrev" type="boolean" default="true" />
+    <aura:attribute name="disableNext" type="boolean" default="false" />
+    <aura:attribute name="StageNum" type="Integer" default="1" />
+    <aura:attribute name="disablepage" type="Boolean" default="false"/>   
+    <aura:handler name="change" value="{!v.disablepage}" action="{!c.disablepage}"/>
+    <aura:attribute name="documentToast" type="String" default="" />
+    <aura:handler name="change" value="{!v.documentToast}" action="{!c.showDocumentToast}"/>
+    <aura:handler event="c:Sal_Opp_Perfios" action="{!c.handlePerfiosAttr}"/>
+    <aura:attribute name="isPerfiosFlag" type="Boolean"/>   
+    <aura:handler event="c:Sal_Opp_EkycEvent" action="{!c.handleEkycAttr}"/>
+    <aura:attribute name="isEKycFlag" type="Boolean"/>   
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+    <div>
+        <div align="right">
+            <h1><b>Current Stage : {!v.StageNum} out of 3</b> </h1>
+        </div>
+    </div>
+    <br/>
+    <div class="demo-only" style="position:static">
+        <div class="slds-path">
+            <div class="slds-grid slds-path__track slds-has-overflow">
+                <div class="slds-grid slds-path__scroller-container">
+                    
+                    <div class="slds-path__scroller offer-pg-cont1" role="application">
+                        <div class="slds-path__scroller_inner offer-pg1" aura:id="offer-pg1">
+                            
+                            <ul class="slds-path__nav" role="tablist">
+                                <li aura:id="ChecklistTab" class="slds-path__item slds-is-current slds-is-active testing" role="presentation">
+                                    <a title="Document Checklist" id="ChecklistTab"  aria-controls="ChecklistTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.stageItemClick}">
+                                        
+                                        <span class="slds-path__title" id="ChecklistTab">Document Checklist</span>
+                                    </a>
+                                </li>
+                                <li aura:id="docUploderTab" class="slds-path__item  slds-is-incomplete testing" role="presentation">
+                                    <a title="Document Upload Functionality" id="docUploderTab"  aria-controls="docUploderTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.stageItemClick}">
+                                        
+                                        <span class="slds-path__title" id="docUploderTab">Document Upload Functionality</span>
+                                    </a>
+                                </li>
+                                <li aura:id="docUplodedTab" class="slds-path__item  slds-is-incomplete testing" role="presentation">
+                                    <a title="Uploaded Document" id="docUplodedTab" aria-controls="docUplodedTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.stageItemClick}">
+                                        
+                                        <span class="slds-path__title" id="docUplodedTab">Uploaded Document
+                                            <span style="visibility: hidden;"> Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded Document Uploaded DocumentUploaded Document Uploaded Document  
+                                            </span>
+                                        </span>
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            
+                        </div>
+                        
+                        <div class="slds-path__scroll-controls">
+                            <lightning:button variant="brand" label="" iconName="utility:left" iconPosition="left" onclick="{!c.prevStage}" disabled="{!v.disablePrev}"/>
+                            <lightning:button variant="brand" label="" iconName="utility:right" iconPosition="left" onclick="{!c.nextStage}" disabled="{!v.disableNext}"/>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div> 
+            <div aria-labelledby="ChecklistTab" class="slds-path__content" aura:id="ChecklistTabContent" role="tabpanel">
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="padding-top:2%;">
+                            <!--<label class="slds-form-element__label"> Perfios Response </label>-->
+                            <div class="slds-form-element__control">
+                                <lightning:input name="perResName" type="checkbox" label="Perfios Response" checked="{!v.isPerfiosFlag}" aura:id="perResId" disabled="true"/>
+                            </div>
+                        </div>
+                        <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="padding-top:2%;">
+                            <!--<label class="slds-form-element__label"> Ekyc Received - Flag </label>-->
+                            <div class="slds-form-element__control">
+                                <lightning:input name="eKycName" type="checkbox" label=" Ekyc Received - Flag" checked="{!v.isEKycFlag || v.primaryApp.eKYC__r}" aura:id="eKycId" disabled="true"/>
+                            </div>
+                        </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+            <div aria-labelledby="docUploderTab" class="slds-path__content slds-hide" aura:id="docUploderTabContent" role="tabpanel">
+                <br/>
+                <lightning:select aura:id="selectedDoc" name="Document" required="true" messageWhenValueMissing="Please select Document Type" label="Select Document Type" value="{!v.DocSelected}">
+                    <option value=""> --None-- </option>
+                    <option value="Application_form"> Application form </option>
+                    <option value="ID_Proof"> ID Proof </option>
+                    <option value="Address_Proof"> Address Proof </option>
+                    <option value="Salary_Slip"> Salary Slip </option>
+                    <option value="Banking_statement"> Banking statement </option>
+                    <option value="CPV_Photo"> Geotagging </option>
+                    <option value="Cheque"> Cheque </option>
+                    <option value="Other_Docs"> Other Docs </option>      
+                </lightning:select>
+                <br/>
+                <c:DocumentUploader aura:id="file-uploader-1" parentId="{!v.parentId}" disablepage="{!v.disablepage}" isMobilityDocument="true" salMobilityDocument="Mobility" documentToast="{!v.documentToast}" instance="1" fileName="{!v.DocSelected}" displayButtons="true" uploadType="{! v.DocSelected == 'CPV_Photo' ? 'feed' : 'Attachment'}"/>                       
+            </div>
+            <div aria-labelledby="docUplodedTab" class="slds-path__content slds-hide" aura:id="docUplodedTabContent" role="tabpanel">
+                <c:DocumentsList parentId="{!v.parentId}" documentToast="{!v.documentToast}"/>
+            </div>
+        </div>
+    </div> 
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    <div id="parentErrorToast" style="display:none;">
+        <div id="ErrorToastelg" class="slds-notify_container">
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentErrorToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="parentErrorMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="parentSuccessToast" style="display:none; ">
+        <div id="SuccessToastelg" class="slds-notify_container">
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentSuccessToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="parentSuccessMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+</aura:component>

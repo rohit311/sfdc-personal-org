@@ -1,0 +1,24 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToParent"/>
+    <aura:registerEvent name="DestroyChild1" type="c:DestroyChild"/>
+     <div class="innerDivWrapper slds-size--1-of-1" style="margin-bottom: 0px; padding-bottom:0px; "> 
+         <c:LoaderForMobility />
+     <!--   <c:Custom_Toast_Mobility /> -->
+    <p style="margin-bottom: 15px">
+        <lightning:button class="slds-theme--alt-inverse  " iconName='utility:back' aura:id="BackButtonId" variant="brand" label="Back" onclick="{!c.sendback}" /> 
+    </p>
+    <lightning:tabset aura:id="tabset" class=""> 
+        
+        <lightning:tab class="slds-border_right borderColor" label="Refer" aura:id="tab1" id="tab1">
+            <c:referralMain></c:referralMain>     
+        </lightning:tab>
+        
+        <lightning:tab   class="slds-border_right borderColor" label="Dashboard" aura:id="tab2" id="tab2">
+            <c:referralDashboard></c:referralDashboard>
+        </lightning:tab>
+        
+    </lightning:tabset>	
+    
+    <div aura:id = "childCmpbody"> {!v.body} </div> 
+         </div>
+</aura:component>

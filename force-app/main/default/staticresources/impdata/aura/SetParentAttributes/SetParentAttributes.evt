@@ -1,0 +1,19 @@
+<aura:event type="APPLICATION" description="Event template">
+   <aura:attribute name="dedupeList" type="De_Dupe__c[]"/>
+    <aura:attribute name="SecName" type="string"/>
+    <aura:attribute name="panDetailsList" type="Object" />
+    <aura:attribute name="panDashboardData" type="Object" />
+    <aura:attribute name="officeverification" type="Verification__c" default=""/>
+    <aura:attribute name="bankverification" type="Verification__c" default=""/>
+    <aura:attribute name="resPerverification" type="Verification__c" default=""/>
+    <aura:attribute name="resCurverification" type="Verification__c" default=""/>
+    <aura:attribute name="pdObj" type="Personal_Discussion__c" default="{'sobjectType':'Personal_Discussion__c'}"/>
+    <aura:attribute name="pddone" type="String" default="No"/>
+    <aura:attribute name="telepdstatusdashboard" type="String" />
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/>
+    <aura:attribute name="discrepancyList" type="Discrepancy__c[]"/>
+    <aura:attribute name="quesdetailslist" type="Object" />
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="bankVerifyDone" type="string" default=""/> 
+    <aura:attribute name="verStatus" type="boolean" default=""/>
+</aura:event>

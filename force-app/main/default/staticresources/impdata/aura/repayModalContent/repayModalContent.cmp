@@ -1,0 +1,186 @@
+<aura:component controller="SAL_PricingCtrlV2" implements="forceCommunity:availableForAllPageTypes" >
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute type="String" name="header"/>
+    <aura:attribute type="RePayment_mode_detail__c" name="repay"/>
+    <aura:attribute type="String" name="ifscObj"/> 
+    <aura:attribute type="String" name="micrObj"/> 
+    <aura:attribute type="String" name="repayId"/>
+  	<aura:attribute type="Id" name="loanId"/>
+    <aura:attribute type="Boolean" name="disableECSFields"/>
+    <aura:attribute type="Boolean" name="disableSIFields"/>
+    <aura:attribute type="Boolean" name="disableChq" default="true"/>
+    <aura:attribute type="Boolean" name="mandatoryECSBarcode"/>
+    <aura:attribute type="Opportunity" name="loan"/>
+    <!--added by swapnil-->
+    <aura:attribute type="String" name="Ex_customer_id"/> 
+    
+    <aura:handler action="{!c.doInit}" value="{!this}" name="init"/>
+    <aura:registerEvent name="updateRepayEvent" type="c:updateRepayList"/>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large slds-fade-in-open">
+        <div class="slds-modal__container" >
+            <header class="slds-modal__header mobHeader">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <a onclick="{!c.goBack}" href="" style="text-decoration: none;">
+                        <lightning:icon iconName="utility:close" variant="inverse"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </a>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.header}</h2>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1" >
+                <ui:scrollerWrapper class="wrapStyle">
+                    <lightning:recordEditForm aura:id="edit" recordId="{!v.repay.Id}" objectApiName="RePayment_mode_detail__c" onload="{!c.handleOnLoad}"  onsubmit="{!c.beforeSave}" onsuccess="{!c.handleSuccess}" recordTypeId="0125D0000004vdO">
+                        <div class="slds-p-horizontal--small">
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Repayment_Mode__c" aura:id="repay_mode" value="" class="slds-has-error slds-scope [role=combobox] input[readonly] " onchange="{!c.selectRepay}" id="test111" />
+                                        <div id="repayError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                       
+                                        <lightning:inputField fieldName="ECS_Barcode_No__c" aura:id="ecs_barcode" class="slds-has-error" disabled="{!v.disableSIFields}" onfocusout = "{!c.checkDuplicateBarcode}"/>
+                                        <div id="ECSBarError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control" id="ifsc_codeId">
+                                        <lightning:inputField fieldName="IFSC_Code__c" aura:id="ifsc_code" onfocusout = "{!c.ifscOnBlur}"  class="slds-has-error" />
+                                        <div id="ifscError"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField   fieldName="MICR_Code__c" aura:id="micr_code" onfocusout = "{!c.micrOnBlur}" class="slds-has-error"/>
+                                        <div id="micrError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Account_Holder_Name__c" aura:id="acc_holder" class="slds-has-error"/>
+                                        <div id="accHolderError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="A_C_NO__c" aura:id="acc_no" class="slds-has-error"/>
+                                        <div id="acNoError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="A_C_Type__c" aura:id="ac_type" value="" class="slds-has-error slds-scope [role=combobox] input[readonly]"/>
+                                        <div id="acTypeError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <!--  //Added by swapnil -->
+                                        <!-- For new ECS default value added as value="Yes" -->
+                                        <lightning:inputField fieldName="Open_ECS_Facility__c"  aura:id="ecs_facility" value="Yes" onchange="{!c.HandleChangeECSFacility}" class="slds-has-error slds-scope [role=combobox] input[readonly]"/>
+                                        <div id="openECSError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <!--Added by swapnil value="{!v.Ex_customer_id}"-->
+                                        <lightning:inputField fieldName="Open_ECS_Ex_Customer_Id__c" value="{!v.Ex_customer_id}" aura:id="ecs_ex_cust"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Open_Valid_till__c" disabled="{!v.disableECSFields}" aura:id="open_valid"/>
+                                        <div id="openValidError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Open_ECS_Max_Limit__c" aura:id="ECS_maxLimit" disabled="{!v.disableECSFields}" />
+                                        <div id="maxLimitError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="ECS_Start_Date__c" aura:id="ECS_startDate" disabled="{!v.disableECSFields}" />
+                                        <div id="startDateError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="ECS_End_Date__c" aura:id="ECS_endDate" disabled="{!v.disableECSFields}" />
+                                        <div id="ecsEndError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="ECS_Amount__c" aura:id="ECS_amount" disabled="{!v.disableECSFields}"/>
+                                        <div id="ecsAmtError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Bank_Name__c" aura:id="bank_name"  class="slds-has-error" disabled=""/>
+                                        <div id="bankNameError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Bank_Branch__c" aura:id="bank_branch" disabled=""/>
+                                        <div id="bankBranchError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="PDC_By_Name__c" aura:id="pdcname" class="slds-has-error" />
+                                        <div id="pdcNameError"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Cheque_Amount__c"  aura:id="cheque_amt" disabled="{!v.disableSIFields}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="UMRN__c"  aura:id="umrn" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Cheque_Number_From__c" aura:id="chq_frm" disabled="{!v.disableChq}" />
+                                        <div id="chqFrom"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Cheque_Number_to__c"  aura:id="chq_to" disabled="{!v.disableChq}"/>
+                                    	<div id="chqTo"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Number_of_cheques__c"  aura:id="no_chq" disabled="{!v.disableChq}"/>
+                                    	<div id="noChq"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning:recordEditForm>
+                </ui:scrollerWrapper>
+            </div>
+            <footer class="slds-modal__footer mobFooter">
+                <div class="slds-align_absolute-center">
+                    <lightning:button class="slds-m-top_small  slds-theme--alt-inverse" iconName="utility:clear" variant="brand" label="Cancel" onclick="{! c.goBack }" />
+                    <lightning:button aura:id="saveButton" disabled="" class="slds-m-top_small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Save" onclick="{! c.saveRepay }" />
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+   
+</aura:component>

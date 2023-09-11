@@ -1,0 +1,51 @@
+.THIS .borderColor {
+    border-right: 1px solid rgb(187, 188, 189);
+     
+}
+.THIS .iconCss{
+     margin-top: 20px;
+}
+.THIS .slds-modal__container
+{
+}
+.THIS .setcornerbuttons{
+    position: relative;
+}
+.THIS .sizeOfDiv{
+        height: 98px;
+    width: 218px;
+}
+.THIS .button11 {
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #99CCFF;
+  background-color: #99CCFF;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.THIS .button:hover {}
+
+.THIS .button:active {
+  background-color: #99CCFF;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.THIS .tabsetColors
+{
+      color: #99CCFF;
+  background-color: #99CCFF;
+}
+.THIS .topright {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+.THIS .ex1 {
+  padding-top: 25px;
+}

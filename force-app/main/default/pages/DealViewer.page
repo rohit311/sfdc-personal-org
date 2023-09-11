@@ -1,0 +1,87 @@
+<apex:page controller="DealViewer_controller" > 
+<apex:form id="frm">
+
+
+    <h2> {!c.FirstName} </h2>
+    <h2>   {!c.LastName}</h2> 
+     <br/>
+     <h1> {!c_id}</h1>
+    <br/>
+    <br/>
+     deal id:<h1> {!deal_id} </h1>
+     <br/>
+    <apex:commandButton value="Done"  action="{!done_action}" disabled="false"/>  <!-- use disabled attribute for disabling button-->
+    <br/>
+    <br/>
+    <apex:pageBlock title="Total Deal Summary">
+      <apex:pageBlockSection >     
+        <apex:outputField value="{!c.Acceptance_rate__c}" id="ca"/>
+       <apex:outputField value="{!c.Deals_Accepted__c}" id="da"/>
+       <apex:outputField value="{!c.Deals_Rejected__c}" id="dr"/>
+      </apex:pageBlockSection>
+    </apex:pageBlock> 
+
+
+    <br/>
+   <apex:actionFunction action="{!Accept_Action}" name="methodOneInJavascript"  reRender="pb,ca,da,dr,stmap">
+        <apex:param name="firstParam" assignTo="{!deal_id}" value="" id="pr" />
+    </apex:actionFunction> 
+
+<apex:actionFunction action="{!Reject_Action}" name="methodUsing2" reRender="pb,ca,da,dr,stmap">
+        <apex:param name="firstparam" assignTo="{!deal_id}" value=""/>
+        <apex:param name="secondparam" assignTo="{!deal_name}" value=""/>
+        </apex:actionFunction>
+
+
+        <apex:pageBlock title="Deals" id="pb">
+                 <apex:pageBlockTable value="{!dealsList}" var="deal">
+           <apex:column >
+           <apex:facet name="header">Action</apex:facet>
+            
+ <apex:commandButton value="Accept"  onclick="methodOneInJavascript('{!deal.id}');return false;" disabled="{!IF(statusMap[deal.name]!='Available',true,false)}" />
+          <!--   <apex:outputPanel onclick="methodOneInJavascript('{!deal.id}')" styleClass="btn"> 
+             Accept
+                                 </apex:outputPanel>    -->       
+     <apex:commandButton value="Reject" onclick="methodUsing2('{!deal.id}');return false;" disabled="{!IF(statusMap[deal.name]!='Available',true,false)}"/>  
+        <!--  <apex:outputPanel onclick="methodOneInJavascript('{!deal.id}')" styleClass="btn"> 
+             Reject
+          </apex:outputPanel>  -->
+           </apex:column>
+           
+            <apex:column id="stmap">
+            <apex:facet name="header">status</apex:facet>
+              <!-- status-->
+              <apex:outputText value="{!statusMap[deal.name]}"/>
+                         </apex:column>
+
+            <apex:column >
+                       <apex:facet name="header">Icon</apex:facet>
+               <!-- icon -->
+               <apex:image url="{!amap[deal.id]}" alt="image" height="30" width="30"/>
+            </apex:column>
+             
+            <apex:column >
+            <apex:facet name="header">Deal Name</apex:facet>
+              <!-- deal name-->
+              <apex:commandLink title="{!deal.Deal_Name__c}"/>
+              <apex:outputField value="{!deal.Deal_Name__c}"/>
+            </apex:column>
+ 
+            <apex:column >
+            <apex:facet name="header">Valid Through</apex:facet>
+              <!-- Valid Through -->
+              <apex:outputField value="{!deal.Valid_Through__c}"/>
+            </apex:column>
+
+            <apex:column >
+              <!-- Available Deals-->
+              <apex:facet name="header">Available Deals</apex:facet>
+              <apex:outputField value="{!deal.Available_Deals__c}"/>
+            </apex:column>
+    
+        </apex:pageBlockTable>
+               <apex:commandButton action="{!next}" value="next"/>
+        <apex:commandButton action="{!previous}" value="previous"/>
+         </apex:pageBlock>
+</apex:form> 
+ </apex:page>

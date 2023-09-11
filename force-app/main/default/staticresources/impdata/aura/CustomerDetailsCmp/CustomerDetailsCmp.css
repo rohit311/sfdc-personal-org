@@ -1,0 +1,14 @@
+.THIS {
+}
+
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+.THIS
+ select option { color: black; background-color: white;}
+
+.THIS select option:first-child{
+  background-color: white;
+}

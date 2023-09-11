@@ -1,0 +1,12 @@
+.THIS {
+}
+.THIS .topright {
+  position: absolute;
+  top: 6px;
+  right: 16px;
+  font-size: 10px;
+}
+.THIS .sizeOfDiv1{
+        height: 78px;
+    width: 238px;
+}

@@ -1,0 +1,21 @@
+<apex:page docType="html-5.0" controller="day3_a3_controller">
+  <apex:form >
+    <apex:pageBlock >
+        <apex:input value="{!q}">
+            Quatity:
+        </apex:input>
+        <br/>
+        <br/>
+        <apex:input label="Price" value="{!p}">
+        Price:
+        </apex:input>
+        <br/>
+        <br/>
+         <apex:commandButton value="CALCULATE" action="{!calculate}"/>
+         <br/>
+         <br/>
+        <apex:outputText value="{!res}" >Total Price:</apex:outputText>
+           </apex:pageBlock>
+  </apex:form>
+
+  </apex:page>

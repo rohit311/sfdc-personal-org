@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="This event is responsible for handling dashboard component's container body.Use this to navigate components on the dashboard.">
+    <aura:attribute type="String"  access="global"  name="SAL20_Dashboard_Component"  description="Navigate dashboard components depends on this param." />
+    <aura:attribute type="String"  access="global"  name="navigationURL"  description="This will helps us to store the URL " /> <!-- addy -->
+</aura:event>

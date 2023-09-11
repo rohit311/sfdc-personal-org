@@ -1,0 +1,205 @@
+<!--cmp Name : DigitalSamplingDocuments-->
+<aura:component access="global" controller="DigitalSampling_AC" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" >
+    <aura:attribute name='loanID'  type='Id' default='' />
+    <aura:attribute name='disableSubmitButton' type='boolean' default='false' />
+    <aura:attribute name='DocTypeSelect'  type='String' />
+    <aura:attribute name='DocNameSelect'  type='String'  />
+    <aura:attribute name='DocTypeValues'  type='String[]' />
+    <aura:attribute name='DocNameValues'  type='String[]'  />
+    <aura:attribute name ='sampledataList' type='DigitalSampling_AC.SampleData[]'/>
+    <aura:attribute name ='uploadedDataMap' type='Map' />
+    <aura:attribute name ='uploadedDataMapKey' type='List' />
+    <aura:attribute name ='uploadedDataMapValue' type='ContentVersion[]' />
+    <aura:attribute name ='submitButtonMap' type='Map' />
+    <aura:attribute name ='ShowVendorPDF' type='boolean' default='false' />
+    <aura:attribute name ='VendorPDFId' type='String' default='' />
+    <aura:attribute name ='submitButtonMapKey' type='List' />
+    <aura:attribute name='DocNameValuesMap'  type='Map' />
+    <aura:attribute name='cv'  type='ContentVersion' default='{}'/>
+    <aura:attribute name='Appids'  type='Id[]' />
+    <aura:attribute name= 'uploadedDocs' type="List" default="[]" />
+    <aura:attribute name='digitalSamplingStatus' type='String' />
+    <aura:attribute name='showDGStatus' type='boolean' />
+    <aura:attribute name="isMobility" type="Boolean" default="false"/><!--added  for 24316-->
+    <aura:attribute name='DocTypeValuesMob'  type='String[]' /><!--added  for 24316-->
+    <aura:attribute name="docNameValueMapMob" type="Map" default="{}"/><!--added  for 24316-->
+    <aura:attribute name='loanIDStr'  type='String' default='' /><!--24316-->
+    <aura:attribute name="standardChecklist" type="LightningDocumentWrapper[]"/><!--24316-->
+     <aura:attribute name='DocNameValuesMob'  type='String[]' /><!--24316-->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    
+    <!-- <aura:registerEvent name="LoaderClose" type="c:LoaderClose"/> -->
+    <aura:handler name='init' action='{!c.doInit}' value='{!this}' />
+    <aura:handler name="LGDocSubmitEvent" event="c:LGDocSubmit" action="{!c.handleComponentEvent}"/>
+    <c:Custom_Toast_Mobility />
+    <c:LoaderForMobility />
+     <aura:if isTrue="{!!v.isMobility}"><!--added if for bug id 24316-->
+    <div class="form-group" style = "margin-top:20px;margin-bottom:20px;">
+        <img src="{!$Resource.SOL_images + '/images/bfs-logo-mod.png'}" height="49" alt="logo"/>
+    </div>
+    </aura:if>
+    <lightning:tabset >
+        
+        <lightning:tab label="Document Upload" class="slds-border_right borderColor "><!--added onactive="{!c.fetchEkycDetails}" for bug id 18669-->
+            <div class="slds-scrollable_y padding-around_small" style="font-size: 14px;overflow:auto;">
+                <table id="DigitalSamplingDocUpload" style="overflow:auto;" bordercolor="#0000CC" class="slds-table_bordered slds-box slds-no-row-hover slds-hyphenate WrapText slds-scrollable_y slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                    <thead class="slds-grid slds-hyphenate" >
+                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12" >
+                            <th scope="col" class="slds-col slds-size_6-of-12 slds-hyphenate">
+                                Applicant Name	
+                            </th>
+                            
+                            <th scope="col" class="slds-size--3-of-12 blue-color slds-cell-wrap slds-hyphenate WrapText">
+                                Applicant Type	
+                            </th>
+                            
+                            <th scope="col" class="slds-size--3-of-12 blue-color slds-cell-wrap slds-hyphenate WrapText">
+                                LG Registration No.	
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items='{!v.sampledataList}' var='dataobj' indexVar="index">
+                            
+                            <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                <td class="floatLeft WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    <a onclick="{!c.toggleAssVersion}" id="{!dataobj.appli.Id}">
+                                        <aura:if isTrue="{!v.class =='hideCls'}">
+                                            
+                                            <span class=" important-message" id="{!dataobj.appli.Id}">+ </span>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.myid == dataobj.appli.Id}">
+                                                    <span class=" slds-p-right_x-small important-message" id="{!dataobj.appli.Id}">-</span> 
+                                                    
+                                                    <aura:set attribute="else"  >
+                                                        <span class=" important-message">+
+                                                        </span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </a>	
+                                    {!dataobj.appli.Contact_Name__r.Name} 
+                                </td>    
+                                <td class="floatLeft WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">{!dataobj.appli.Applicant_Type__c}</td>   
+                                <td class="floatLeft WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">{!dataobj.appli.Loan_Guard_Reg_Number__c}</td>  
+                            </tr>
+                            <aura:if isTrue="{!equals(v.myid, dataobj.appli.Id)}" >
+                                <aura:if isTrue="{!v.class == 'showCls'}">
+                                    <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                        <div style="width:100%;">
+                                            <div class="slds-form-element__row slds-m-top--x-small ">
+                                                
+                                                <lightning:card class=" slds-size--12-of-12" >
+                                                    <header class="slds-hide"></header>
+                                                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--12-of-12 slds-align_absolute-center ">                   
+                                                        <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                            <div class="slds-form-element__control slds-float_left ">
+                                                                Document Type:
+                                                                
+                                                                <lightning:select aura:id="DocTypeSelect" name="{!index}"  messageWhenValueMissing="Please Select Value"  required="true" value="{!dataobj.DocTypeSelect}" onchange="{!c.changeValues}" >
+                                                                    <option text="--Select--" label="--Select--" ></option>
+                                                                    <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+                                                                    <aura:iteration items='{!v.DocTypeValues}' var='docType'>
+                                                                        <option value="{!docType}" text="{!docType}" selected="{!dataobj.DocTypeSelect== docType}"></option>
+                                                                    </aura:iteration>
+                                                                    <aura:set attribute="else">
+                                                                           <aura:iteration items='{!v.DocTypeValuesMob}' var='docType'>
+                                                                        <option value="{!docType}" text="{!docType}" selected="{!dataobj.DocTypeSelect== docType}"></option>
+                                                                    </aura:iteration><!--24316-->
+                                                                    </aura:set>
+                                                                    </aura:if>
+                                                                </lightning:select>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                            <div class="slds-form-element__control slds-float_left floatLeft">
+                                                                Document Name:
+                                                                
+                                                                <lightning:select aura:id="DocNameSelect" name="docname"  required="true" messageWhenValueMissing="Please Select Value"   value="{!dataobj.DocNameSelect}" >
+                                                                    <option text="--Select--" label="--Select--" ></option>
+                                                                    <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+                                                                    <aura:iteration items='{!v.DocNameValues}' var='docName'>
+                                                                        <option value="{!docName}" text="{!docName}" selected="{!dataobj.DocNameSelect== docName}"></option>
+                                                                    </aura:iteration>
+                                                                    <aura:set attribute="else">
+                                                                           <aura:iteration items='{!v.DocNameValuesMob}' var='docName'>
+                                                                        <option value="{!docName}" text="{!docName}" selected="{!dataobj.DocTypeSelect== docName}"></option>
+                                                                    </aura:iteration><!--24316-->
+                                                                    </aura:set>
+                                                                    </aura:if>
+                                                                </lightning:select>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                            <div class="slds-form-element__control slds-float_left ">
+                                                                Select Document: 
+                                                                <aura:if isTrue = "{!v.isMobility}">
+                                                                 <c:DocumentUploader AppIDs="{!v.Appids}" DocType="{!dataobj.DocTypeSelect}" DocName="{!dataobj.DocNameSelect}" IsDigitalSampling="Digital Sampling" aura:id="file-uploader-{!dataobj.DocNameSelect}" instance="{!index}" parentId="{!dataobj.appli.Id}" fileName="{!dataobj.DocTypeSelect+';'+dataobj.DocNameSelect}" uploadImageFilesOnly="false" showUploadButton="true" flow='Mobility2'/>
+
+                                                                    <aura:set attribute = "else">
+                                                                    <c:DocumentUploader AppIDs="{!v.Appids}" DocType="{!dataobj.DocTypeSelect}" DocName="{!dataobj.DocNameSelect}" IsDigitalSampling="Digital Sampling" aura:id="file-uploader-{!dataobj.DocNameSelect}" instance="{!index}" parentId="{!dataobj.appli.Id}" fileName="{!dataobj.DocTypeSelect+';'+dataobj.DocNameSelect}" uploadImageFilesOnly="false" showUploadButton="true" />
+                                                                 </aura:set>
+                                                                </aura:if>
+                                                                
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </lightning:card>
+                                            </div>
+                                        </div>
+                                    </tr>
+                                </aura:if>
+                               
+                            </aura:if>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            
+            <br/>
+        </lightning:tab>
+        <lightning:tab label="Uploaded Documents" class="slds-border_right borderColor" onactive="{!c.doInit}">
+            <aura:iteration items="{!v.uploadedDataMapKey}" var="key" >
+                <c:UploadedDocuments aura:id="uploadDocs" uploadedDataMap="{!v.uploadedDataMap}" uploadedDataMapKey="{!key}" submitButtonMap="{!v.submitButtonMap}" disableSubmitButton="{!v.disableSubmitButton}" isMobility="{!v.isMobility}"/><!--24316-->
+            </aura:iteration>
+              <!--<aura:iteration items="{!v.standardChecklist}" var="key" >
+                <c:UploadedDocuments aura:id="uploadDocs" uploadedDataMap="{!v.uploadedDataMap}" uploadedDataMapKey="{!key}" submitButtonMap="{!v.submitButtonMap}" disableSubmitButton="{!v.disableSubmitButton}"/>
+            </aura:iteration>-->	
+            <aura:if isTrue="{!v.showDGStatus}">
+                <div class="slds-text-title_bold slds-align_absolute-center">Digital Sampling Status : <ui:outputText value="{!v.digitalSamplingStatus}"/></div><br />
+            	</aura:if>
+                <aura:if isTrue="{!v.ShowVendorPDF}">
+                    <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+                    <lightning:button class="slds-button slds-button_brand slds-align_absolute-center" variant="brand"  onclick="{!c.vendorPDFDownload}">Vendor PDF</lightning:button><br />
+                	<aura:set attribute="else">
+                    <lightning:button class="slds-button slds-button_brand slds-align_absolute-center slds-theme--alt-inverse" variant="brand"  onclick="{!c.vendorPDFDownload}">Vendor PDF</lightning:button><br />
+                     </aura:set>
+                  </aura:if>
+                    </aura:if>
+              <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+                <lightning:button class="slds-button slds-button_brand slds-align_absolute-center" variant="brand"  onclick="{!c.markApplicationComplete}">Mark Complete</lightning:button><br />
+             <aura:set attribute="else">
+                  <lightning:button class="slds-button slds-button_brand slds-align_absolute-center slds-theme--alt-inverse" variant="brand"  onclick="{!c.markApplicationComplete}">Mark Complete</lightning:button><br /><!--24316-->
+                  </aura:set>
+            </aura:if>
+            </lightning:tab>
+        
+    </lightning:tabset>
+    
+    
+    
+    
+    
+</aura:component>

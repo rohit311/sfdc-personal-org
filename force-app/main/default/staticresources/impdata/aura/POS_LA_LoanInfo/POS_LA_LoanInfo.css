@@ -1,0 +1,9 @@
+.THIS .loanInfoScroller{
+    height: 52vh;
+    width: 100%;
+  
+}
+
+.THIS .loanIfo-container{
+    position:fixed;
+}

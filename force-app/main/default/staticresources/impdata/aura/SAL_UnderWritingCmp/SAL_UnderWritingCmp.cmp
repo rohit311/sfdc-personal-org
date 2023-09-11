@@ -1,0 +1,251 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" controller="SALMobilityCntrl_V2">
+    
+    
+    <aura:attribute name="preLangList" type="List"/>
+    <aura:attribute name="loanVariantList" type="String[]"/><!-- US 1652 -->
+    <aura:attribute type="Boolean" name="isCriticalChange" default="false"/> <!-- US 524 -->
+    <aura:attribute name="sourCateg" type="string" default=""/><!--CR 23820/22018-->
+    <aura:attribute name="isValidIM_Products" type="Boolean" default="false"/> <!-- 22018 RSL Mobility -->
+    <!--City CR s -->
+    
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <!--City CR e -->
+      <!-- US 983 rohit start -->
+    <aura:attribute name="isdoInitCalled" type="Boolean" default="false"/><!-- Added for Ext prod issue Rohit-->
+    <aura:attribute name="obligLst" type="List"/>
+    <aura:attribute name="oblType" type="List"/>
+    <aura:attribute name="statusLst" type="List"/>
+    <aura:attribute name="finLst" type="List"/>
+    <aura:attribute name="loanTypeLst" type="List"/>
+    <aura:attribute name="allApps" type="List"/>
+    <!-- US 983 rohit end -->
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToDashboard"/>
+    <aura:attribute name="datevariation" type="string" default=""/>
+    <aura:attribute name="amountvariation" type="string" default=""/>
+    <aura:attribute name="averageSal" type="string" default=""/> 
+    <aura:attribute name="abbvalue" type="string" default=""/>
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="isOther" type="Boolean" default="false"/>
+    <aura:attribute name="loan" type="Opportunity" default="{}"/>
+    <aura:attribute name="accObj" type="Account" default="{}"/>
+    <aura:attribute name="conObj" type="Contact" default="{}"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/> 
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{}"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c" default="{}"/>
+    <aura:attribute name="cibilExt" type="CIBIL_Extension__c" default="{}"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c" default="{}"/>
+    <aura:attribute name="eKycAddress1" type="String"/>
+    <aura:attribute name="eKycAddress2" type="String"/>
+    <aura:attribute name="eKycAddress3" type="String"/>
+    <aura:attribute name="solpolicyList" type="SOL_Policy__c[]"/>
+    <aura:attribute name="isSpecialProfile" type="Boolean"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="specialPro" type="Boolean" />
+    <aura:attribute name="mobileNumber" type="String"/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="applicantObj" type="Applicant__c"/>
+    <aura:attribute name="stageCompletion" type="String"/> 
+    <aura:attribute name="isPreapproved" type="Boolean" default="false"/>
+    <aura:attribute name="custId" type="String" default=""/>
+    <aura:attribute type="Boolean" name="isEkycDone" default="false"/>
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="rejectOption" type="List"/>
+    <aura:attribute name="rejectOption1" type="List"/>
+	<aura:attribute name="sendbackoption" type="List"/><!--User Story 985-->
+    <aura:attribute type="Boolean" name="isdiablebutton" default="true"/>
+    <aura:attribute type="Boolean" name="isdisablePricingbutton" default="true"/>
+    <aura:attribute name="nameTheme" type="String" default=""/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <aura:attribute name="officeAddress" type="String" default=""/>
+    <aura:attribute name="accordian_name" type="String" default=""/>
+    <aura:registerEvent name="fireDynOffer" type="c:fireDynOffer"/>
+    <aura:registerEvent name="firePanBreCheck" type="c:firePanBreCheck"/>
+    <aura:handler name="change" value="{!v.accordian_name}" action="{!c.callaccordianmethod}"/>
+    <aura:registerEvent name="loadCreditDashboard" type="c:loadCreditDashboard"/>
+    <aura:attribute type="boolean" name="epfoShow" default="false"/>
+    <aura:attribute name="EmployerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="creditofficerList" type="SALMobilityCntrl_V2.SelectOption"/>
+    <aura:attribute type="Boolean" name="isdiablesendback" default="true"/>
+    <aura:attribute name="TatTime" type="String"/>
+    <aura:attribute name="dsaUser" type="Boolean" default="false"/>
+	<aura:attribute name="hideBiometricOption" type="Boolean" default="true"/><!--18669-->
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:registerEvent name="DestroyChild1" type="c:DestroyDashboardChild"/>
+	<aura:attribute name="veriList" type="Verification__c[]" default=""/><!--24316-->
+	<aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--  added for bug id 22047-->
+     <!-- sal 2.0 new CR s-->
+     <aura:attribute name="eKycAddress" type="String" default=""/> 
+    <aura:attribute name="poAddress" type="String" default=""/>
+    <aura:attribute name="inputAddress" type="String" default=""/>
+   <!-- sal 2.0 new CR e-->
+    <aura:handler event="c:UpdateConAcc" action="{!c.setConAcc}"/><!-- prod issue 23466-->
+    <aura:attribute name="oldOfficeemail" type="String" default=""/><!-- prod new CR-->
+    <aura:attribute type="Boolean" name="showfinaloffer" default="false"/><!-- prod CR -->
+	<!--User Story 9465-->
+    <aura:attribute name="downSizeList" type="List"/>
+    <aura:attribute name="srcamObj" type="SurrogateCAM__c" />
+    <!--User Story 9465-->
+    	<!-- 24315 start -->
+    <aura:attribute name="disbObj" type="Current_Disbursal_Details__c"/>
+    <aura:attribute name="repayObj" type="RePayment_mode_detail__c"/>
+	<aura:attribute name="appTypeLst" type="List" default="['Primary']"/><!--24668 -->
+      <!-- 24315 stop -->
+	<aura:attribute type="Personal_Discussion__c" name="rules" default=""/> <!--11806 s -->
+    
+     <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <div style="position:relative"  aura:id="maindiv" class="disablediv">
+        <c:Custom_Toast_Mobility />       
+        <c:IdentifierForMobility /><!-- user story 978-->
+        <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+            <div class="slds-align_absolute-center" style="height: 5rem;">
+                <div class="slds-page-header">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <ui:scrollerWrapper class="scrollerSize">
+            <div style="position:relative">
+                <div class="innerDivWrapper">
+                  
+                    <c:LoaderForMobility />
+                    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+                        <div aura:id="boxBorder">
+                            <c:LACard oppObj="{!v.loan}" stageCompletion="{!v.stageCompletion}" isCredit="true" TATtime="{!v.TatTime}"/>
+                        </div>
+                        <div  aura:id="newtag">
+                            {!v.body}
+                        </div>
+                        
+                        
+                        <lightning:tabset >
+                            <lightning:tab onactive="{!c.loadDashboard}" label="Activity Dashboard" class="slds-border_right borderColor">
+<!-- 24315 added first 3 attribute -->
+                                <!-- US 524 added isCriticalChange parameter -->
+                                <c:CreditDashboardPOC appTypeLst="{!v.appTypeLst}"  repayObj="{!v.repayObj}" disbObj="{!v.disbObj}" bankObj="{!v.bankObj}"  isCriticalChange="{!v.isCriticalChange}" sendbackoption="{!v.sendbackoption}" sourCateg="{!v.sourCateg}" isValidIM_Products="{!v.isValidIM_Products}"  salesprofilecheck = "{!v.salesprofilecheck}" stageName="{!v.stageName}" profileName="{!v.profileName}" oppId="{!v.oppId}" creditofficerList ="{!v.creditofficerList}"
+                                                      isdisablePricingbutton ="{!v.isdisablePricingbutton}" iscommunityUser="{!v.iscommunityUser}" 
+                                                      isdiablebutton="{!v.isdiablebutton}" rejectOption="{!v.rejectOption}" rejectOption1="{!v.rejectOption1}" nameTheme="{!v.nameTheme}"
+                                                      loan="{!v.loan}" applicantObj="{!v.applicantObj}" isdiablesendback="{!v.isdiablesendback}" camObj="{!v.camObj}" conObj="{!v.conObj}" account="{!v.accObj}" allVeriList="{!v.veriList}" obligLst="{!v.obligLst}" rules="{!v.rules}"/><!--added rules and obligLst for 11806--><!--Added salesprofilecheck for Bug 23064,User Story 985 sendbackoption,24316 added allverilist-->
+                            </lightning:tab><!--22018 added isValidIM -->
+                            <lightning:tab onactive="{!c.doinit}" label="Credit View Details" class="slds-border_right borderColor ">
+                                <div aura:id="enhance" class=" slds-box slds-box_x-small slds-theme_shade slds-theme_default slds-m-top_medium" >
+                                    <lightning:card title="" class="applyColor" >
+                                        <lightning:accordion aura:id="accordion" activeSectionName="">
+                                            <aura:if isTrue="{!v.isPreapproved}">
+                                                <lightning:accordionSection name="OfferDetails" label="Offer Details">
+                                                    <c:SAL_UWOfferdetails oppId="{!v.oppId}" isOther="{!v.isOther}" loan="{!v.loan}" accObj="{!v.accObj}" applicantObj="{!v.applicantObj}" conObj="{!v.conObj}"/>
+                                                </lightning:accordionSection>
+                                            </aura:if>
+                                            <lightning:accordionSection name="PersonalDetails" label="Personal Details">
+                                                <c:SAL_UWLandingPage preLangList="{!v.preLangList}" cibilTemp="{!v.cibilTemp}" oldOfficeemail="{!v.oldOfficeemail}" salesprofilecheck = "{!v.salesprofilecheck}" isOther="{!v.isOther}" citySearchKeyword="{!v.citySearchKeyword}" stageName="{!v.stageName}" tatMasterRecord="{!v.tatMasterRecord}" loanId="{!v.oppId}" oppObj="{!v.loan}" accObj="{!v.accObj}" applicantObj="{!v.applicantObj}" 
+                                                                     conObj="{!v.conObj}" isSpecialProfile="{!v.isSpecialProfile}" specialPro="{!v.specialPro}" mobileNumber="{!v.mobileNumber}"
+                                                                     cibilobj="{!v.cibilobj}" EmployerSearchKeyword="{!v.EmployerSearchKeyword}" oldemployername="{!v.EmployerSearchKeyword}" cibilExt1="{!v.cibilExt1}" epfoShow="{!v.epfoShow}" cibilExt="{!v.cibilExt}" nameTheme="{!v.nameTheme}"/><!--Added salesprofilecheck for Bug 23064-->
+                                            </lightning:accordionSection>
+                                            <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 22047-->
+                                            <lightning:accordionSection name="Kyc" label="EKyc Details">
+                                                <c:EkycComponent page="Credit2" stageName="{!v.stageName}" custId="{!v.custId}" appNew="{!v.applicantObj}" kyc="{!v.eKycObj}" isEkycDone="{!v.isEkycDone}" isPreapproved="{!v.isPreapproved}" hideBiometricOption = "true"/> 
+                                            </lightning:accordionSection>
+                                            </aura:if>
+                                            <lightning:accordionSection name="DemographicDetails" label="Demographic Details" >
+                                                <c:SAL_UWDemographic salesprofilecheck = "{!v.salesprofilecheck}" cityList="{!v.cityList}" stageName="{!v.stageName}" oppObj="{!v.loan}" account="{!v.accObj}" priAppObj="{!v.applicantObj}" 
+                                                                     contact="{!v.conObj}" oppId="{!v.oppId}" isPreapproved="{!v.isPreapproved}" eKycObj="{!v.eKycObj}" poObj="{!v.poObj}"
+                                                                     eKycAddress1="{!v.eKycAddress1}" eKycAddress2="{!v.eKycAddress2}" eKycAddress3="{!v.eKycAddress3}"/><!--Added salesprofilecheck for Bug 23064-->
+                                            </lightning:accordionSection> 
+                                          <!--  <lightning:accordionSection name="ResidentialDetails" label="CKYC Details" >
+                                                <c:Generic_Ckyc hideSections="true" cityList="{!v.cityList}" stageName="{!v.stageName}" tatMasterRecord="{!v.tatMasterRecord}" forprimeAPP="true" isUWCheck="true" oppId="{!v.oppId}" oppObj="{!v.loan}" 
+                                                                accObj="{!v.accObj}" appObj="{!v.applicantObj}" contObj="{!v.conObj}" 
+                                                                eKycObj="{!v.eKycObj}" poObj="{!v.poObj}" bankObj="{!v.bankObj}"
+                                                                areaSearchKeyword="{!v.areaSearchKeyword}"/>
+                                            </lightning:accordionSection> -->
+                                            <!--22017 added hideSections attribute-->
+                                            <lightning:accordionSection name="resiDetails" label="Residential Details" >
+                                                <c:SAL_UWOtherDetails poAddress="{!v.poAddress}" inputAddress="{!v.inputAddress}" eKycAddress ="{!v.eKycAddress}" bankObj="{!v.bankObj}" salesprofilecheck = "{!v.salesprofilecheck}" hideSections="true" cityList="{!v.cityList}" stageName="{!v.stageName}" oppObj="{!v.loan}" cibilobj="{!v.cibilobj}" accObj="{!v.accObj}" appObj="{!v.applicantObj}" tatMasterRecord="{!v.tatMasterRecord}" oppId="{!v.oppId}" 
+                                                                      contObj="{!v.conObj}" eKycObj="{!v.eKycObj}"/><!--Added salesprofilecheck for Bug 23064-->
+                                            </lightning:accordionSection> 
+                                            <lightning:accordionSection name="Employment" label="Employment" >
+                                                <c:SALOpportunityEmployment_Page salesprofilecheck = "{!v.salesprofilecheck}" cityList="{!v.cityList}" stageName="{!v.stageName}" aura:id="empDetails" officeAddress ="{!v.officeAddress}" areaSearchKeyword="{!v.areaSearchKeyword}" isUWCheck="true" empAccount="{!v.accObj}" empOpp="{!v.loan}" empContact="{!v.conObj}" priAppObj="{!v.applicantObj}"/><!--Added salesprofilecheck for Bug 23064-->
+                                            </lightning:accordionSection> 
+                                            <lightning:accordionSection name="Final_Offer" label="Offer">
+                                                <aura:if isTrue="{!v.showfinaloffer}"><!--1652 profileName attribute added for 16270-->
+                                                    <c:Final_Offer_Details   profileName="{!v.profileName}" loanVariantList="{!v.loanVariantList}"  finLst="{!v.finLst}" statusLst="{!v.statusLst}" allApps="{!v.allApps}" loanTypeLst="{!v.loanTypeLst}" obligLst="{!v.obligLst}" cibilobj="{!v.cibilobj}" cibilExt1="{!v.cibilExt1}" bankAccount="{!v.bankObj}" salesprofilecheck = "{!v.salesprofilecheck}" cityList="{!v.cityList}" stageName="{!v.stageName}" nameTheme="{!v.nameTheme}" isPreapproved="{!v.isPreapproved}" oppId="{!v.oppId}" loan="{!v.loan}" account="{!v.accObj}" contact="{!v.conObj}" applicant="{!v.applicantObj}" isCredit="true" iscommunityUser="{!v.iscommunityUser}" stageCompletion="{!v.stageCompletion}" dsaUser="{!v.dsaUser}" downSizeList="{!v.downSizeList}"  camObj="{!v.camObj}" srcamObj="{!v.srcamObj}"/> <!--Added salesprofilecheck for Bug 23064--><!--added  camObj,srcamObj,downSizeList for us 9465-->
+                                                </aura:if>
+                                            </lightning:accordionSection>
+                                            <!--<lightning:accordionSection name="Banking_Summary" label="Banking Summary" >
+                    <c:BankingSummary datevariation="{!v.datevariation}" amountvariation="{!v.amountvariation}" averageSal="{!v.averageSal}" abbvalue="{!v.abbvalue}" accObj="{!v.accObj}" oppId="{!v.oppId}" bankObj="{!v.bankObj}" camObj="{!v.camObj}"/>
+                    </lightning:accordionSection>-->
+                                            
+                                        </lightning:accordion>
+                                    </lightning:card>
+                                </div>
+                                
+                            </lightning:tab>
+                            
+                            <!-- Aman Porwal - S -->
+                            <!-- <lightning:tab label="Landing Page" class="slds-border_right borderColor">
+                    <c:SAL_UWLandingPage loanId="{!v.oppId}" oppObj="{!v.loan}" accObj="{!v.accObj}" applicantObj="{!v.applicantObj}" 
+                                         conObj="{!v.conObj}" isSpecialProfile="{!v.isSpecialProfile}" specialPro="{!v.specialPro}" mobileNumber="{!v.mobileNumber}"
+                                         cibilobj="{!v.cibilobj}" cibilExt1="{!v.cibilExt1}"  cibilExt="{!v.cibilExt}" nameTheme="{!v.nameTheme}"/>
+                </lightning:tab>-->
+                            <!-- Aman Porwal - E -->
+                            <!--Rohit commented and added ekyc component-->
+                            <!--  <lightning:tab label="KYC" class="slds-border_right borderColor">
+                    <c:EkycComponent custId="{!v.custId}" appNew="{!v.applicantObj}" kyc="{!v.eKycObj}" isEkycDone="{!v.isEkycDone}" isPreapproved="{!v.isPreapproved}"/> 
+                </lightning:tab>-->
+                            
+                            <!-- Aman Porwal - S -->
+                            <!--  <lightning:tab label="Demographic Details" class="slds-border_right borderColor">
+                    <c:SAL_UWDemographic oppId="{!v.oppId}" isPreapproved="{!v.isPreapproved}" eKycObj="{!v.eKycObj}" poObj="{!v.poObj}"
+                                         eKycAddress1="{!v.eKycAddress1}" eKycAddress2="{!v.eKycAddress2}" eKycAddress3="{!v.eKycAddress3}"/>
+                </lightning:tab>-->
+                            <!-- Aman Porwal - E -->
+                            
+                            <!-- Aman Porwal - S -->
+                            <!-- <lightning:tab label="Employment" class="slds-border_right borderColor">
+                    <c:SALOpportunityEmployment_Page aura:id="empDetails" officeAddress ="{!v.officeAddress}" areaSearchKeyword="{!v.areaSearchKeyword}" isUWCheck="true" empAccount="{!v.accObj}" empOpp="{!v.loan}" empContact="{!v.conObj}"/>
+                </lightning:tab>-->
+                            <!-- Aman Porwal - E -->
+                            
+                            <!-- Aman Porwal - S -->
+                            <!-- <lightning:tab label="Other Details" class="slds-border_right borderColor">
+                    <c:Generic_Ckyc forprimeAPP="true" isUWCheck="true" oppId="{!v.oppId}" oppObj="{!v.loan}" 
+                                    accObj="{!v.accObj}" appObj="{!v.applicantObj}" contObj="{!v.conObj}" 
+                                    eKycObj="{!v.eKycObj}" poObj="{!v.poObj}" bankObj="{!v.bankObj}"
+                                    areaSearchKeyword="{!v.areaSearchKeyword}"/>
+                </lightning:tab>-->
+                            <!-- Aman Porwal - E -->
+                            
+                            <!-- <lightning:tab onactive="{!c.fireFinalOff}" label="Final Offer" class="slds-border_right borderColor">
+                    <c:Final_Offer_Details nameTheme="{!v.nameTheme}" isPreapproved="{!v.isPreapproved}" oppId="{!v.oppId}" loan="{!v.loan}" account="{!v.accObj}" contact="{!v.conObj}" applicant="{!v.applicantObj}" isCredit="true"/>
+                </lightning:tab> -->
+                            <!-- <lightning:tab label="Banking Summary" class="slds-border_right borderColor">
+                    <c:BankingSummary accObj="{!v.accObj}" oppId="{!v.oppId}" bankObj="{!v.bankObj}" camObj="{!v.camObj}"/>
+                </lightning:tab>-->
+                            <!-- <lightning:tab label="Banking Details" class="slds-border_right borderColor slds-hide">
+                    <c:Disbursement_Details oppId="{!v.oppId}" />
+                    <c:Repayment_Details oppId="{!v.oppId}" />
+                </lightning:tab>-->
+                            
+                            
+                            
+                        </lightning:tabset>
+                    </aura:if>
+                </div>
+            </div>
+        </ui:scrollerWrapper>
+    </div>
+</aura:component>

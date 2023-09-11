@@ -1,0 +1,171 @@
+<!-- component Name : EmployeeVASPage -->
+<aura:component controller="EmployeeLoanAutomationCtrl" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="oppObj" type="Opportunity" default=""/>
+    <aura:attribute name="FeesList" type="List" default=""/>
+    <aura:attribute name="OppId" type="String" default=""></aura:attribute>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="showInDisbSectionFlag" type="Boolean" default="false"/>
+    <aura:attribute name="selTabId" type="String" default="tab3"/>
+    <aura:attribute name="FeesListRecieved" type="boolean" default = "false"/>
+    <aura:attribute name="displayReadOnly" type="boolean" default = "false"/>
+    <aura:attribute name="showNext" type="boolean" default="false"/>
+    <aura:attribute name="HelpText" type="String" default=""/>
+    <aura:attribute name="currentStageIsMydetails" type="boolean"/>
+    <aura:attribute name="isInsuranceSectionVisible" type="boolean" default="false"/> <!-- Added for - 22181 -->
+    <aura:attribute name="isValInsDisabled" type="boolean" default="false"/> <!-- Added for - 22181 -->
+    <aura:attribute name="setTab" type="boolean"/> <!-- Added by Anurag for - 22181 -->
+    <aura:handler event="c:PassInsuranceListEvent" action="{!c.hideValIns}"/> <!-- Added for - 22181 23390 -->
+    <aura:handler event="c:InsuranceCMPValidations" action="{!c.insValidationOnDsbrsmntScrn}"/> <!-- Added for - 22181 -->
+    <!-- <aura:handler event="aura:locationChange" action="{!c.destoryCmp}"/> --> <!-- Added for - 22181 -->
+    <aura:handler event="c:reloadVASPage" action="{!c.doInit}"/>
+    
+    <!-- <c:DynamicFields/> --> <!-- Added by Anurag for 22181 23390 -->
+    <div class=" slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade">
+        
+        <aura:if isTrue="{!v.FeesListRecieved}">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade slds-grid slds-wrap slds-grid--pull-padded" >   
+                        <aura:if isTrue="{!!v.showInDisbSectionFlag}">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--3-of-12">
+                                <div class="slds-form-element__control slds-align_absolute-center">
+                                    
+                                    Product
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--3-of-12">
+                                <div class="slds-float_right slds-form-element__control slds-align_absolute-center">
+                                    
+                                    Amount                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--6-of-12">
+                                <div class="slds-form-element__control slds-align_absolute-center">
+                                    
+                                    Yes/No                               </div>
+                            </div>
+                        </aura:if>
+                        <aura:iteration items="{!v.FeesList}" var="Fees">   
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--3-of-12">
+                                <div class="slds-m-left_xx-large slds-form-element__control WrapText slds-size--2-of-4 " style="font-weight: bold; margin-left: 83px;">     
+                                    {!Fees.FeesObj.Charge_Desc__c}
+                                    <aura:if isTrue="{!!v.showInDisbSectionFlag}">
+                                        <aura:if isTrue="{!(Fees.FeesObj.Finnone_ChargeId__c == 500735 || Fees.FeesObj.Finnone_ChargeId__c == 600928 || Fees.FeesObj.Finnone_ChargeId__c == 28025)}">
+                                            
+                                            <a id="{!Fees.FeesObj.Finnone_ChargeId__c}" onclick="{!c.showMessage}" href="" style="padding-left: 10px;text-decoration: none; font: bold; font-size: 100%">
+                                                ?
+                                            </a>
+                                            
+                                        </aura:if>
+                                    </aura:if>
+                                </div>    
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--3-of-12">
+                                <div class="slds-form-element__control slds-float_right">
+                                    
+                                    {!Fees.FeesObj.Change_Amount__c}
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-3 slds-medium-size--3-of-9 slds-large-size--6-of-12">
+                                <aura:if isTrue="{!!v.showInDisbSectionFlag}">            
+                                    <div class="slds-form-element__control slds-align_absolute-center">               
+                                        <lightning:input name="toggle"
+                                                         type="toggle"
+                                                         checked="{!Fees.checked}"
+                                                         messageToggleActive="Yes"
+                                                         messageToggleInactive="No"
+                                                         aura:id="{!Fees.Key+'Fees'}"
+                                                         disabled = "{!v.displayReadOnly}"
+                                                         >
+                                        </lightning:input>
+                                    </div>
+                                </aura:if>
+                                
+                            </div>
+                        </aura:iteration>
+                    </div>
+                </div>
+            </p>
+            <!-- Start of changes - 22181 -->
+            <aura:if isTrue="{!v.isInsuranceSectionVisible}">
+                <div class=" slds-m-top_medium slds-box slds-box_x-small slds-theme_shade slds-size-1-of-1">
+                    <lightning:card title="INSURANCE DETAILS">
+                        <div id="InsuranceSectionDiv" class="innerDivWrapper">
+                            <c:GenericRecordDetails displayReadOnly="{!v.displayReadOnly}" loanAppID="{!v.OppId}" isSalMobilityFlow="false" flow="ELA"/>
+                        </div>
+                    </lightning:card>
+                    <lightning:card>
+                        <center>
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="validateInsuranceBtn" variant="brand" label="Validate Insurance" onclick="{!c.validateInsurance}" disabled = "{!v.isValInsDisabled}"/>
+                        </center>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- End of changes - 22181 -->
+            <aura:if isTrue="{!!v.showInDisbSectionFlag}">
+                <div class=" slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre">
+                    <div class="slds-p-around--x-small" align="center">
+                        <lightning:button class="slds-theme_alt-inverse" aura:id="Save"  variant="brand" label="Save" onclick="{!c.saveFees}" disabled="{!v.displayReadOnly}"/>
+                    </div>
+                    <aura:if isTrue="{!v.showNext}">
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="Next"  variant="brand" label="Next" onclick="{!c.NavigateToNext}" disabled="{!v.displayReadOnly}"/>
+                        </div>
+                    </aura:if>
+                </div>
+            </aura:if>
+            <aura:set attribute="else">
+                <!-- Start of changes - 22181 -->
+                <aura:if isTrue="{!v.isInsuranceSectionVisible}">
+                    <div class="slds-m-top_medium slds-box slds-box_x-small slds-theme_shade slds-size-1-of-1">
+                        <lightning:card title="INSURANCE DETAILS">
+                            <div id="InsuranceSectionDiv" class="innerDivWrapper">
+                                
+                                <c:GenericRecordDetails displayReadOnly="{!v.displayReadOnly}" loanAppID="{!v.OppId}" isSalMobilityFlow="false" flow="ELA"/>
+                            </div>
+                        </lightning:card>
+                        <lightning:card>
+                            <center>
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="validateInsuranceBtn" variant="brand" label="Validate Insurance" onclick="{!c.validateInsurance}" />
+                            </center>
+                        </lightning:card>
+                    </div>
+                </aura:if>
+                <!-- End of changes - 22181 -->
+                <aura:if isTrue="{!!v.showInDisbSectionFlag}">
+                    <div class="slds-text-heading_large Selector slds-align_absolute-center"> No Fees And Charges to display ! </div>
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-p-top--large slds-grid_align-center" align="center" style="float:centre">
+                        <div class="slds-p-around--x-large" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="Next"  variant="brand" label="Next" onclick="{!c.NavigateToNext}" disabled="{!v.displayReadOnly}" />
+                        </div>
+                    </div>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </div>
+    
+    <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+    <div aura:id="overrideModalbox" class="slds-hide slds-align_absolute-center slds-p-around--medium borderColor" id="dummyId">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="{!$Browser.isIOS == true ? 'slds-modal slds-fade-in-open slds-modal_large slds-is-fixed slds-align_absolute-center slds-border_bottom slds-border_top slds-border_left slds-border_right align-dashboard borderColor':'slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center slds-border_top slds-border_left slds-border_right borderColor'    }" style="position: fixed;">
+            <div class="slds-modal__container borderColor">
+                <div style="position:relative">
+                    <div class="innerDivWrapper">  
+                        <div class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12 alignModal':' slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12'}" style="margin-bottom: 0px;margin-top: 0px; height: 150px; overflow-y: scroll;">
+                            <div class="slds-p-around--medium slds-m-top_large helpText WrapText">
+                                {!v.HelpText}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="{!$Browser.isIOS == true ? 'slds-modal__footer slds-size--8-of-12 slds-align_absolute-center alignModal':' slds-modal__footer slds-size--8-of-12 slds-align_absolute-center'}" style="margin-bottom: 0px;margin-top: 0px; height: 50px">
+                    
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeMessage}">Ok</button>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</aura:component>

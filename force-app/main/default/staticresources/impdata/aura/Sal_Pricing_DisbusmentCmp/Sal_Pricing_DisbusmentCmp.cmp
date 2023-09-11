@@ -1,0 +1,118 @@
+<aura:component controller="SALMobilityController" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pricingId" type="String" default=""/>
+    <aura:attribute name="loanApplication" type="Opportunity" default="{'sobjectType': 'Opportunity'}"/>
+    <aura:attribute name="disbusment" type="Current_Disbursal_Details__c" default="{'sobjectType': 'Current_Disbursal_Details__c'}"/>
+    <aura:attribute name="loanTypeList" type="List"/>
+    <aura:attribute name="EMI1stDate" type="String"/>
+    <aura:attribute name="EMILastDate" type="String"/>
+    <aura:attribute name="BPI" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/> 
+    <aura:registerEvent name="appEvent" type="c:Sal_Pricing_Event"/>
+    
+    <ui:scrollerWrapper class="OppWrapScroller"> 
+        <div class="slds-p-horizontal--small">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:select aura:id="loanTypeId" class="optionClass" name="conMaritalStatusName" label="Loan Type" required="true" messageWhenValueMissing="Please Select Loan Type" value="{!v.loanApplication.Type_Of_Loan__c}">
+                            <option value=""> -- None -- </option>
+                            <option value="Flexi term loan"> Flexi term loan </option>
+                            <option value="Normal term loan"> Normal term loan </option>
+                            <option value="Step-Up Loan"> Step-Up Loan </option>
+                            <option value="Emi Holiday"> Emi Holiday </option>
+                            <option value="Flexi Interest-only Loan"> Flexi Interest-only Loan </option>
+                            <option value="Flexi Hybrid Loan"> Flexi Hybrid Loan</option>
+                            <option value="Flexi Assigned Limit"> Flexi Assigned Limit </option>
+                            <option value="Step-Down Loan"> Step-Down Loan </option>
+                        </lightning:select>                   
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input value="{!v.EMI1stDate}" type="date" label="1st EMI Date" name="name1EmiDate" />
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                    	<lightning:input aura:id="bpiId" label="BPI" value="{!v.BPI}" name="nameBPI" placeholder="BPI" type="text" maxlength="15" messageWhenPatternMismatch="BPI can only accept digits." pattern="[0-9]*" />
+                    </div>                        
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input value="{!v.EMILastDate}" type="date" label="Last EMI Date" name="nameLastEmiDate" aura:id="emiLastId"/>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="emiId" label="EMI" value="{!v.EMI}" name="nameEMI" placeholder="EMI" type="text" maxlength="15" messageWhenPatternMismatch="EMI can only accept digits." pattern="[0-9]*" />
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="favouringId" label="Favouring" value="{!v.disbusment.Favouring__c}" name="nameFavouring" messageWhenValueMissing="Please Enter Value" required="true" disabled="{!v.disbusment.isTopUp__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="bankAccountId" label="Bank Account" value="{!v.disbusment.Bank_Account__c}" name="nameBankAccount" placeholder="Bank Account" type="text" maxlength="25" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Bank Account can only accept digits." pattern="[0-9]*" disabled="{!v.disbusment.isTopUp__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="IFSCId" label="IFSC Code" value="{!v.disbusment.IFSC_Code__c}" name="nameIFSC" placeholder="IFSC Code" type="text" maxlength="30" messageWhenValueMissing="Please Enter Value" required="true" disabled="{!v.disbusment.isTopUp__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="bankNumberId" label="Bank Name" value="{!v.disbusment.Bank_Name__c}" name="nameBankName" messageWhenValueMissing="Please Enter Value" required="true" disabled="{!v.disbusment.isTopUp__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="disAmountId" label="Disbursement Amount" value="{!v.disbusment.Disbursement_Amount__c}" name="nameDisAmount" placeholder="Disbursement Amount" type="text" maxlength="17" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please enter valid Disbursement Amount." pattern="((\d{1,14})((\.\d{1,2})?))$" disabled="{!v.disbusment.isTopUp__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </ui:scrollerWrapper>
+    
+    <div class="slds-p-top--x-small">
+        <lightning:button class="slds-align_absolute-center" name="buttonName" variant="brand" label="Save Disbursement Record" iconName="utility:save" iconPosition="left" onclick="{!c.saveDisbursment}"/>
+        <div id="SuccessToastdis" style="display:none; ">
+            <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+                <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success" role="alert" >
+                    <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                    <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                    <div class="slds-notify__content">
+                        <h2 id ="successmsgdis"></h2>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <div id="ErrorToastdis" style="display:none;">
+            <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+                <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error" role="alert" >
+                    <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                    <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                    <div class="slds-notify__content">
+                        <h2 id ="errormsgdis"><b>Fail!</b>, Failed To Save</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

@@ -1,0 +1,74 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" controller="SAL20_EliteCardSectionController">
+    <!-- +-+-+-+-+-+-+-+- START : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="optionsMembershipCharges" type="list"/>
+    <aura:attribute name="membershipCharge" type="Decimal" default="0"/>
+    <aura:attribute name="ECselected" type="Boolean" default="false"/>
+    <aura:attribute name="isProcessing" type="Boolean"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+       
+    <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+		<h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Ellite Card Offer</h3>
+		</div>
+    <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+		<thead>
+			<tr class="slds-text-title_caps">
+                <th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Card Selection">
+						Tick for Elite Card Selection
+					</div>
+				</th>
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Membership Charges">
+						Membership Charges
+					</div>
+				</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td>
+                <div style="margin-left:30%;">
+                <ui:inputCheckbox label=" " value="{!v.ECselected}"/>
+                </div>
+            </td>
+            <td>
+                <lightning:select name="selectMembershipCharges" label="EMI Type" value="{! v.membershipCharge}" >
+                    	<aura:iteration items="{!v.optionsMembershipCharges}" var="oMembership">
+                        	<option value = "{!oMembership.value}" 
+                            	label = "{!oMembership.label}" 
+                                selected = "{! oMembership.value ==  v.membershipCharge}"/>
+                        </aura:iteration>
+                </lightning:select>
+            </td>
+        </tbody>
+    </table>
+    <div style="margin-left:50%; margin-top:1%;margin-bottom:1%;" >
+    	<lightning:button variant="brand" label="Save" title="Save" onclick="{!c.onSave}" disabled="{! v.isProcessing}"/>
+    </div>
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div aura:id="customToast" class="slds-notify_container slds-hide" >
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">  
+                            <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

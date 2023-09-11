@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="event to pass insurance records list in POS LA flow to Parent component" >
+    <aura:attribute name="insuranceList" type="Object[]" default="[]"/>
+</aura:event>

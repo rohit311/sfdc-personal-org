@@ -1,0 +1,4 @@
+<!-- Sal_Opp_EkycEvent -->
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="eKycObj" type="SObject[]"/>
+</aura:event>

@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to run validation rules for Insurance component. Fired in EmployeeDisbursementScreen. Handled in EmployeeVASPage">
+    <aura:attribute name="insuranceList" type="Object[]"/>
+</aura:event>

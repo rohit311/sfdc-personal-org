@@ -1,0 +1,23 @@
+<!-- SAL_UWDemographic -->
+<aura:component controller="SALMobilityCntrl_V2" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->    
+<aura:attribute name="cityList" type="List"/> <!--City CR -->
+    <aura:attribute name="oppObj" type="Opportunity" default="{}"/>
+    <aura:attribute name="account" type="Account" default="{}"/>
+    <aura:attribute name="contact" type="Contact" default="{}"/>
+    <aura:attribute name="priAppObj" type="Applicant__c"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="eKycObj" type="eKYC__c"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c"/>
+    <aura:attribute name="eKycAddress1" type="String"/>
+    <aura:attribute name="eKycAddress2" type="String"/>
+    <aura:attribute name="eKycAddress3" type="String"/>
+    <aura:attribute name="isPreapproved" type="Boolean" default="false"/>
+    <aura:handler event="c:firePanBreCheck" action="{!c.callPANBre}"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <div class="slds-m-top_small">
+    <c:SAL_Opp_Demographic salesprofilecheck= "{!v.salesprofilecheck}" isUnderwriter="true" cityList="{!v.cityList}" stageName="{!v.stageName}" isUnderwitercmp="true" oppId="{!v.oppId}" priAppObj="{!v.priAppObj}" oppObj="{!v.oppObj}" accObj="{!v.account}" conobj="{!v.contact}"/>
+	</div>         
+</aura:component>

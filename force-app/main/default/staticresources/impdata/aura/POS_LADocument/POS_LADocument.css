@@ -1,0 +1,14 @@
+.THIS .alert {
+    background-color: #d9edf2;
+    border-color: #bfe8e9;
+    color: #2d839a;
+}
+
+.THIS .doc-container{
+    position:fixed;
+}
+
+.THIS .doc-wrapper{
+    height: 70vh;
+    width: 100%;
+}

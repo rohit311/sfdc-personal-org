@@ -1,0 +1,74 @@
+<aura:component controller="SFDCMobileLoanController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes">
+	
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    <aura:registerEvent name="calculateDisburseAmount" type="c:CalculateDisburseAmountEvent"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:DisableFormEvent" action="{!c.disableFeesAndChargesForm}"/>
+    
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="oppoObject" type="Opportunity" access="global" />
+    <aura:attribute name="DueDate" type="String" access="global" default=""/>
+    <aura:attribute name="rmdObj" type="RePayment_mode_detail__c" default="{}"/>
+    
+    
+                    
+    <aura:attribute name="feesNChargesList" type="Fees_and_Charge__c[]" access="global"/>
+    <aura:attribute name="shouldBeDisable" type="Boolean" />
+    <div class="fees-container">
+        <ui:scrollerWrapper class="fees-wrapper">
+            
+            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="bankName">First Due Date<span style="color:red">*</span></label>
+                    <div class="slds-size--1-of-1 dateFieldContainer">
+                        <ui:inputDate aura:id="firstDueDate" format="dd-MM-yyyy" value="{!v.DueDate}" class="slds-input" displayDatePicker="true" disabled = "{!(v.oppoObject.StageName != 'Post Approval Sales') ? 'true':'false'}"/>
+                    </div>
+                </div>
+            </div>  
+            
+    <div class="slds-p-top--x-small">
+        <lightning:button aura:id="fetchChargesId" label="Fetch Charges" class="slds-align_absolute-center slds-button slds-button_neutral" onclick="{!c.fetchCharges}"/>
+    </div>
+   
+    <div style="margin-top:1%;">
+        <aura:iteration items="{!v.feesNChargesList}" var="feesNChargesObj" >
+            <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="padding-bottom:1%;margin-top:1%;background: rgb(243, 242, 242);">
+                <article class="slds-tile slds-hint-parent" style="padding-left: 5px;">
+                    <div class="slds-tile__detail">
+                        <dl class="slds-list_horizontal slds-wrap">
+                        	<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="bankAccountNumber">Charge Description :</label>
+                                    <ui:outputText aura:id="chargeAmount" class="slds-input" value="{!feesNChargesObj.Charge_Desc__c}" />
+                                </div>         
+                       	 	</div>    
+                        </dl>
+                        <dl class="slds-list_horizontal slds-wrap">                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="bankAccountNumber">Stamped Amount (Rs) :</label>
+                                    <ui:inputText aura:id="StampAmount" class="slds-input" value="{!feesNChargesObj.Change_Amount__c}" disabled = "{!(v.oppoObject.StageName == 'Branch Ops' || v.oppoObject.StageName == 'Moved To Finnone' ) ? 'true':'false'}"/>
+                                </div>         
+                       	 	</div>
+                        </dl>
+                    </div>
+                </article>
+            </div>
+        </aura:iteration>
+    </div>
+    
+    <div class="slds-p-top--x-small">
+         <div class="slds-p-horizontal_medium">
+        <lightning:button aura:id="saveId" variant="brand"  disabled="true" label="Save Details" class="" onclick="{!c.saveCharges}"/>
+        </div>
+    </div>
+	
+        </ui:scrollerWrapper>
+    </div>
+    
+    <!-- commented by Sachin -->
+    <!--<div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>-->
+</aura:component>

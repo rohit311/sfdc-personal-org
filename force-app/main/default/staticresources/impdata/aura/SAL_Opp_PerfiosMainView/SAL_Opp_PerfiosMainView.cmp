@@ -1,0 +1,388 @@
+<!-- SAL_Opp_PerfiosMainView -->
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="isCredit" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="AddRowEvt" event="c:SAL_Opp_PerfiosEvent" action="{!c.addNewRow}"/> 
+    <aura:attribute name="bankAccountList" type="Bank_Account__c[]"/>
+    <aura:attribute name="callChilddoinit" type="boolean" default="false"/>
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/>
+    <aura:attribute name="nameTheme" type="String"/>
+    <aura:attribute name="bankNameList" type="Bank_Account__c[]"/>
+    <aura:attribute name="averageSal" type="string" default=""/> 
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute name="applicantNameList" type="List" default="{}"/>
+    <aura:attribute name="perfiosTrans" type="List" default="{}"/>
+    <aura:attribute name="month1List" type="List" default="{}"/>
+    <aura:attribute name="month2List" type="List" default="{}"/>
+    <aura:attribute name="month3List" type="List" default="{}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="applicantList" type="Applicant__c[]"/>
+    <!--Rohit added for MCP start-->
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="contact" type="Contact"/>
+    <aura:attribute name="loan" type="Opportunity" default="{}"/>
+    <!--Rohit added for MCP stop --> 
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/>
+    <aura:attribute name="HVTPick" type="String[]" default="Manual,Perfios"/>
+    <aura:attribute name="selectedOption" type="String" default=""/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isToDisabled" type="boolean" default="false"/>
+    <aura:attribute name="isFinancialApplicant" type="boolean" default="false"/>
+    <aura:attribute name="finApplCon" type="Contact"/><!--Bug 24668 983-->
+    <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 -->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    
+    <!--<div class="slds-page-header">
+        <h1 class="slds-page-header__title"> Perfios Section </h1>
+    </div>-->
+    <aura:if isTrue="{!v.callChilddoinit}">
+    <aura:iteration items="{!v.bankAccountList}" var="bankAccount" indexVar="index">
+        <c:SAL_Opp_PerfiosTableView displayReadOnly="{!v.displayReadOnly}" iscommunityUser="{!v.iscommunityUser}" nameTheme="{!v.nameTheme}" aura:id="bankListCmp" loan = "{!v.loan}" bankAccount="{!bankAccount}" bankNameList="{!v.bankNameList}"
+                                    applicantList="{!v.applicantList}" 
+                                    bankAccountList="{!v.bankAccountList}" rowIndex="{!index}" isFinancialApplicant="{!v.isFinancialApplicant}"/>
+    </aura:iteration>
+    </aura:if>
+    <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center"> <!-- added or condition in disabled CR 22307 -->
+        <lightning:button disabled="{!or(v.isCredit,and(v.displayReadOnly,v.isCredit == false))}" variant="brand" label="Add Record" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{! c.addNewRow }"/>
+        <lightning:button disabled="{!or(v.isCredit,and(v.displayReadOnly,v.isCredit == false))}" variant="brand" label="Initiate Perfios" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{! c.initiatePerfiosForAppandCoApp }"/>
+    </div>
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="Salary Details" class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="HVTpick" label="Salary Mode"  name="HVTSelect" value="{!v.account.Type_of_Salary__c}" required="true" onchange="{!c.SelectPerfios}"  messageWhenValueMissing="Please Select Value">
+                                    <option text="--None--" value=""></option>
+                                    <aura:iteration items="{!v.HVTPick}" var="opt">
+                                        <option value="{!opt}" text="{!opt}" selected="{!v.account.Type_of_Salary__c== opt}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                            
+                        </div> 
+                        
+                        
+                        <div class="slds-p-top_large slds-p-top_small slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control slds-p-top_xx-small">
+                                <lightning:button variant="brand" label="Select" class="slds-theme--alt-inverse" iconName="" iconPosition="left" onclick="{!c.SelectNetSalary}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        <lightning:card title="Salary Details - Primary Applicant" class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled}">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="NetSalary1d" label="Net Salary 1" value="{!v.camObj.Average_incentive_for_Q1__c}" name="NetSalary1" placeholder="" disabled="true"/>        
+                                    <aura:set attribute="else">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" required="true"  aura:id="NetSalary1" label="Net Salary 1" value="{!v.camObj.Average_incentive_for_Q1__c}" name="NetSalary1" placeholder=""/> 
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled}">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="NetSalary2d" label="Net Salary 2" value="{!v.camObj.Average_incentive_for_Q2__c}" name="NetSalary2" placeholder="" disabled="true"/>        
+                                    <aura:set attribute="else">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" required="true"  aura:id="NetSalary2" label="Net Salary 2" value="{!v.camObj.Average_incentive_for_Q2__c}" name="NetSalary2" placeholder=""/>        
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled}">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="NetSalary3d" label="Net Salary 3" value="{!v.camObj.Average_incentive_for_Q3__c}" name="NetSalary3" placeholder="" disabled="true"/>        
+                                    <aura:set attribute="else">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" required="true"  aura:id="NetSalary3" label="Net Salary 3" value="{!v.camObj.Average_incentive_for_Q3__c}" name="NetSalary3" placeholder=""/>        
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!v.bankAccount != null}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled || v.bankAccount == null}">
+                                    <div class="slds-form-element__control slds-grid">
+                                        <strong><label class="slds-size--1-of-1 slds-col slds-form-element__label" for="SalaryDate1">Salary Date 1:</label></strong>
+                                        
+                                        <ui:outputText aura:id="SalaryDate1" value="{!v.bankAccount.Salary_Credit_Date1__c}" />       
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <lightning:input type="date" messageWhenValueMissing="Please Enter Value" messageWhenPatternMismatch="Please enter valid date" required="true"  aura:id="SalaryDate1" label="Salary Date 1" value="{!v.bankAccount.Salary_Credit_Date1__c}" name="salDate1" placeholder=""/> 
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled || v.bankAccount == null}">
+                                    <div class="slds-form-element__control slds-grid">
+                                        <strong><label class="slds-size--1-of-1 slds-col slds-form-element__label" for="SalaryDate2">Salary Date 2:</label></strong>
+                                        
+                                        <ui:outputText aura:id="SalaryDate2" value="{!v.bankAccount.Salary_Credit_Date2__c}" />       
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <lightning:input type="date" messageWhenValueMissing="Please Enter Value" messageWhenPatternMismatch="Please enter valid date" required="true"  aura:id="SalaryDate2" label="Salary Date 2" value="{!v.bankAccount.Salary_Credit_Date2__c}" name="salDate2" placeholder=""/> 
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isToDisabled || v.bankAccount == null}">
+                                    <div class="slds-form-element__control slds-grid">
+                                        <strong><label class="slds-size--1-of-1 slds-col slds-form-element__label" for="SalaryDate3">Salary Date 3:</label></strong>
+                                        
+                                        <ui:outputText aura:id="SalaryDate3" value="{!v.bankAccount.Salary_Credit_Date3__c}" />       
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <lightning:input type="date" messageWhenValueMissing="Please Enter Value" messageWhenPatternMismatch="Please enter valid date" required="true"  aura:id="SalaryDate3" label="Salary Date 3" value="{!v.bankAccount.Salary_Credit_Date3__c}" name="salDate3" placeholder=""/> 
+                                    </aura:set>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                        </aura:if>
+                        <!--24997 s -->
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" type="text" name="grossSal1" aura:id="grossSal1" value="{!v.camObj.Gross_Salary_Month1__c}" label="Gross Salary Month1" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" type="text" name="grossSal2" aura:id="grossSal2" value="{!v.camObj.Gross_Salary_Month2__c}" label="Gross Salary Month2" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" type="text" name="grossSal3" aura:id="grossSal3" value="{!v.camObj.Gross_Salary_Month3__c}" label="Gross Salary Month3" />
+                            </div>
+                        </div>
+                        <!--24997 e -->
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="netsal" value="{!v.averageSal}" label="Average Net salary" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" type="text" name="inwardChqBounces" aura:id="inwardChqBounces" value="{!v.bankAccount.Perfios_inwardChqBounces__c}" label="Inward Cheque Return" disabled="{!if((v.isToDisabled || v.bankAccount == null ), true , false)}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" type="text" name="InwardECSBounce" aura:id="InwardECSBounce" value="{!v.bankAccount.Perfios_inwardECSBounces__c}" label="Inward ECS Bounce" disabled="{!if((v.isToDisabled || v.bankAccount == null ), true , false)}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        <aura:if isTrue="{!v.isFinancialApplicant}">
+            <lightning:card title="Salary Details -Financial Co-Applicant" class="applyColor" >
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    
+                                    <lightning:input aura:id="NetSalary11" label="Net Salary 1" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" value="{!v.camObj.Receips4_Doc__c}" name="NetSalary1" placeholder=""/> 
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    
+                                    <lightning:input aura:id="NetSalary22" label="Net Salary 2" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" value="{!v.camObj.Receips5_Doc__c}" name="NetSalary2" placeholder=""/>        
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="NetSalary33" label="Net Salary 3" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" value="{!v.camObj.Receips6_Doc__c}" name="NetSalary3" placeholder=""/>        
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </p>
+            </lightning:card>
+        </aura:if>
+        
+    </div>
+    <div class="slds-p-top--x-small slds-align_absolute-center">
+        <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="" iconPosition="left" onclick="{!c.SaveSalaryDetails}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+    </div>
+    <aura:if isTrue="{!v.isOpen}">
+        
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header padRight">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium">Transaction Details</h2>
+                </div>
+                <div class="slds-modal__content padRight slds-p-around--medium">
+                    <div class=" slds-scrollable_y " style="font-size: 14px;">
+                        <aura:if isTrue = "{!v.month1List.length > 0}">
+                            <table style="overflow:auto;" class="slds-table slds-table_bordered slds-table_cell-buffer slds-hyphenate WrapText slds-scrollable_x slds-scrollable_y slds-table_col-bordered slds-size--12-of-12">
+                                <thead>
+                                    <tr class="slds-hyphenate slds-text-title_caps slds-col slds-size--12-of-12 ">
+                                        <th scope="col" class="slds-size--1-of-12 blue-color slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps  slds-hyphenate WrapText" title="" style=" color: white;">Select</div>	
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps slds-hyphenate WrapText" value="Amount" style=" color: white;">Amount</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Month" style=" color: white;">Month</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--5-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Narration" style=" color: white;">Narration</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>        
+                                    <aura:iteration items="{!v.month1List}" var="item">
+                                        <tr>
+                                            <td scope="col" class="slds-size--1-of-12 slds-hyphenate WrapText">
+                                                <input type="radio" id="" name="{!item.month}" value="{!item.amount+','+item.dateSal+','+item.narration}" />    
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.amount} 
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.year}
+                                            </td>
+                                             <td scope="col" class="slds-size--5-of-12 slds-wrap slds-hyphenate WrapText">
+                                                {!item.narration}
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            
+                        </aura:if>
+                        <br />
+                        <aura:if isTrue = "{!v.month2List.length > 0}">
+                            <table style="overflow:auto;" class="slds-table slds-table_bordered slds-table_cell-buffer slds-hyphenate WrapText slds-scrollable_x slds-scrollable_y slds-table_col-bordered slds-size--12-of-12">
+                                <thead>
+                                    <tr class="slds-hyphenate slds-text-title_caps slds-col slds-size--12-of-12 ">
+                                        <th scope="col" class="slds-size--1-of-12 blue-color slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps  slds-hyphenate WrapText" title="" style=" color: white;">Select</div>	
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps slds-hyphenate WrapText" title="Amount" style=" color: white;">Amount</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Month" style=" color: white;">Month</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--5-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Narration" style=" color: white;">Narration</div>
+                                        </th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>        
+                                    <aura:iteration items="{!v.month2List}" var="item">
+                                        <tr>
+                                            <td scope="col" class="slds-size--1-of-12 slds-hyphenate WrapText">
+                                                <input type="radio" id="" name="{!item.month}" value="{!item.amount+','+item.dateSal+','+item.narration}" />    
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.amount} 
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.year}
+                                            </td>
+                                            <td scope="col" class="slds-size--5-of-12 slds-wrap slds-hyphenate WrapText">
+                                                {!item.narration}
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </aura:if>
+                        <br />
+                        <aura:if isTrue = "{!v.month3List.length > 0}">
+                            <table style="overflow:auto;" class="slds-table slds-table_bordered slds-table_cell-buffer slds-hyphenate WrapText slds-scrollable_x slds-scrollable_y slds-table_col-bordered slds-size--12-of-12">
+                                <thead>
+                                    <tr class="slds-hyphenate slds-text-title_caps slds-col slds-size--12-of-12 ">
+                                        <th scope="col" class="slds-size--1-of-12 blue-color slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps  slds-hyphenate WrapText" title="" style=" color: white;">Select</div>	
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class="slds-text-title_caps slds-hyphenate WrapText" value="Remark" title="Amount" style=" color: white;">Amount</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--3-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Month" style=" color: white;">Month</div>
+                                        </th>
+                                        <th scope="col" class=" slds-col blue-color slds-size--5-of-12 slds-hyphenate WrapText">
+                                            <div class=" slds-text-title_caps slds-hyphenate WrapText" title="Narration" style=" color: white;">Narration</div>
+                                        </th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>        
+                                    <aura:iteration items="{!v.month3List}" var="item">
+                                        <tr>
+                                            <td scope="col" class="slds-size--1-of-12 slds-hyphenate WrapText">
+                                                <input type="radio" id="" name="{!item.month}" value="{!item.amount+','+item.dateSal+','+item.narration}" />    
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.amount} 
+                                            </td>
+                                            <td scope="col" class="slds-size--3-of-12 slds-hyphenate WrapText">
+                                                {!item.year}
+                                            </td>
+                                             <td scope="col" class="slds-size--5-of-12 slds-wrap slds-hyphenate WrapText">
+                                                {!item.narration}
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </aura:if>
+                    </div>
+                </div>
+                <div class="slds-modal__footer padRight">
+                    <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="" iconPosition="left" onclick="{!c.SaveHVTDetails}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --> 
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        
+    </aura:if>
+</aura:component>

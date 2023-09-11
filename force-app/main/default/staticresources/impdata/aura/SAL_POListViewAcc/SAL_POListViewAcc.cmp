@@ -1,0 +1,33 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+	<aura:attribute name="POMap" type="List" />
+    <ltng:require styles="/resource/SLDS/assets/styles/lightning-design-system-ltng.css'}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="countAccordian" type="Integer"/><!-- 981 countAccordian-->
+    <ul class="slds-accordion">
+        
+    <aura:iteration items="{!v.POMap}" var="po" indexVar="key">
+    	
+        <li class="slds-accordion__list-item">
+            <section class="slds-accordion__section">
+                <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                        <div aria-controls="{!'subsection'+key+'Content'}" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="{!'subsection'+key}">
+							<b><span id="{!'subicon'+key}" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                            <span id="{!'subname'+key}" class="slds-truncate" title="Accordion summary">{!po.key}</span>
+                            	<span class="slds-truncate" title="">{!' -'+po.value.length+''}</span>
+                                
+                        </div>
+                    </h3>
+                    
+                </div>
+                
+                <div aria-hidden="true" class="" style="display:none" id="{!'subsection'+key+'Content'}">
+                  
+                    <c:SAL_POListViewTable lstPo = "{!po.value}" />
+                </div>
+            </section>
+        </li>    
+    </aura:iteration>
+        
+    </ul>
+</aura:component>

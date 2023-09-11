@@ -1,0 +1,312 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" controller="SAL20_OtherLoanPropositionController">
+    <!-- +-+-+-+-+-+-+-+- START : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="grouptype" type="String" default=""/>
+    <aura:attribute name="loanTargetRecord" type="Object"/>
+    <aura:attribute name="loanRecord" type="Opportunity"/>
+    <aura:attribute name="loanRecordError" type="String"/>
+    <aura:attribute name="optionsEMItype" type="List"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name="applicantRecords" type="Applicant__c[]"/>
+    <aura:attribute name="primaryApplicant" type="Applicant__c"/>
+    <aura:attribute name="isEliteCardProduct" type="Boolean" default="false"/>
+    <aura:attribute name="isDisabledFFR" type="Boolean" default="true"/>
+    <aura:attribute name="blindDataFlag" type="Boolean"/>
+    <aura:attribute name="camObj" type="CAM__c"/>
+    <aura:attribute name="disabl" type="Boolean" default="false"/>
+    <aura:attribute name="reinitiateCredit" type="boolean" default="false"/>
+    <aura:attribute name="optionsCycleDate" type="List"/>
+    <aura:attribute name="optionsHolidayMonths" type="List"/>
+    <aura:attribute name="holidayOptions" type="List" default="[]"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <force:recordData aura:id="loanRecordHandler"
+                      recordId="{!v.oppId}"
+                      fields = "EMI_Type__c,StageName,Product__c,Disbursal_Date__c,Loan_amt_with_premium__c,Scheme_Master__c,Scheme_Master__r.Name"                
+                      layoutType="FULL"
+                      targetRecord="{!v.loanTargetRecord}"
+                      targetFields="{!v.loanRecord}"
+                      targetError="{!v.loanRecordError}"
+                      mode="EDIT"
+                      />
+    
+    <!-- +-+-+-+-+-+-+ START: Body +-+-+-+-+-+-+  -->
+    <article class="slds-card slds-m-around_xx-small">
+        <aura:if isTrue="{! and(v.grouptype!='professional',v.primaryApplicant.EMI_Holiday_Opted__c != true)}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Step-Up Step-Down</h3>
+                </div>
+                <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                    <tr class="slds-text-title_caps">
+                        <td>
+                            <div style="margin-left:40%;" >
+                                <lightning:select name="selectEMItype" label="EMI Type" value="{! v.loanRecord.EMI_Type__c}" >
+                                    <aura:iteration items="{!v.optionsEMItype}" var="oEMI">
+                                        <option value = "{!oEMI.value}" 
+                                                label = "{!oEMI.label}" 
+                                                selected = "{! oEMI.value ==  v.loanRecord.EMI_Type__c}"/>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="margin-left:5%; margin-top:3%;" >
+                                <lightning:button variant="brand" label="Calculate EMI" title="CalculateEMI" onclick="{!c.onCalculateEMIType}" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{! (v.grouptype=='salaried' || v.grouptype=='professional')}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Financial Fitness Report</h3>
+                </div>
+                <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" class="slds-cell-shrink">
+                                <div class="slds-truncate" title="Applicant Name">
+                                    Applicant Name
+                                </div>
+                            </th>
+                            <th scope="col" class="slds-cell-shrink">
+                                <div class="slds-truncate" title="Sent to FinnOne">
+                                    Applicant Type
+                                </div>
+                            </th>
+                            <th scope="col" class="slds-cell-shrink">
+                                <div class="slds-truncate" title="SFDC LAN">
+                                    Financial health check guide
+                                </div>
+                            </th>
+                            <th scope="col" class="slds-cell-shrink">
+                                <div class="slds-truncate" title="SFDC LAN">
+                                    Subscribed to credit vidya
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.applicantRecords }" var="appList">
+                            <aura:if isTrue="{! appList.Applicant_Type__c=='Primary'}">
+                                <tr>
+                                    <td>
+                                        <lightning:input label=" " value="{!appList.Contact_Name__r.Name}" disabled="true"/>
+                                    </td>
+                                    <td>
+                                        <lightning:input label=" " value="{!appList.Applicant_Type__c}" disabled="true"/>
+                                    </td>
+                                    <td>
+                                        <div style="margin-top:5%;margin-left:30%;">
+                                            <ui:inputCheckbox label=" " value="{!appList.Financial_Health_Check_Guide__c}" disabled="{!if(((and(v.loanRecord.StageName=='Approved',appList.Applicant_Type__c=='Primary')) || (and(v.isDisabledFFR == false,appList.Applicant_Type__c=='Primary'))),true,false)}" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="margin-top:5%;margin-left:30%;">
+                                            <ui:inputCheckbox label=" " value="{!appList.Subscribed_to_Credit_Vidya__c}" disabled="{! if(and(v.isDisabledFFR == false,appList.Applicant_Type__c=='Primary'),true,false) }"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </aura:if>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <div style="padding-left:40%;padding-top:1%;padding-bottom:1%;" >
+                    <lightning:button variant="brand" label="Subscribe to FFR" title="subscribe" onclick="{!c.onsubscribeToFFR}" disabled="{! (!v.isDisabledFFR || v.isProcessing)}"/>
+                </div>
+            </div>
+        </aura:if>
+        <div class="slds-box">
+            <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Credit Vidya Section</h3>
+            </div>
+            <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col" class="slds-cell-shrink">
+                            <div class="slds-truncate" title="Applicant Name">
+                                Applicant Name
+                            </div>
+                        </th>
+                        <th scope="col" class="slds-cell-shrink">
+                            <div class="slds-truncate" title="Applicant Type">
+                                Applicant Type
+                            </div>
+                        </th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.applicantRecords }" var="appList">    
+                        <tr>
+                            <td>
+                                <lightning:input label=" " value="{!appList.Contact_Name__r.Name}" disabled="true"/>
+                            </td>
+                            <td>
+                                <lightning:input label=" " value="{!appList.Applicant_Type__c}" disabled="true"/>
+                            </td>
+                            <td>
+                                <aura:if isTrue="{! and(and(appList.CIBIL_Score__c!='00000',appList.CIBIL_Score__c!='000-1'),and(appList.CIBIL_Score__c!='0',appList.CIBIL_Score__c!=null))}">
+                                    <div style="margin-left:15em;margin-top:2%;" >
+                                        <lightning:button variant="brand" label="Initiate Insight" title="initiateInsight" onclick="{!c.onsendToCreditVidya1}" name="{!appList.Id}" aura:id ="appList.Id" disabled="{! v.isProcessing}"/>
+                                    </div>
+                                </aura:if>
+                            </td>
+                            <td>
+                                <div style="margin-top:2%;" >
+                                    <lightning:button variant="brand" label="View Insight" title="viewInsight" onclick="{!c.oncreditVidyaURLForDisplay}" name="{!appList.Id}" aura:id="appList.Id" disabled="{! (v.disabl || v.isProcessing)}" value="{!appList.Id}"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+            <!--- Section for Reinitiate insight ***Start*** -->
+            <aura:if isTrue="{!v.reinitiateCredit}">
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Do you want to reinitiate?</p>
+                    <br/>
+                    <lightning:button variant="neutral" label="Yes" title="Yes" onclick="{! c.onReinitiateCreditVidya}"/>
+                    <lightning:button variant="brand" label="No" title="No" onclick="{! c.onCancelReinitiate }"/>
+                    <br/>
+                </div>
+            </aura:if>
+            <!--- Section for Reinitiate insight ***End*** -->
+        </div>
+        <aura:if isTrue="{! (v.grouptype=='selfemployed')}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Credit Vidya Section</h3>
+                </div>
+                <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                    <tbody>
+                        <tr>
+                            <td>Financial health check guide</td>
+                            <td>
+                                <ui:inputCheckbox label=" " value="{!v.primaryApplicant.Financial_Health_Check_Guide__c}" disabled ="{!if(and(v.loanRecord.StageName=='Approved',v.isDisabledFFR==true),true,false)}"/>
+                            </td>
+                            <td>
+                                <lightning:button variant="brand" label="Save" title="saveFinancialHealth" disabled="{!(!isDisabledFFR || v.isProcessing)}" onclick="{!c.onsaveFinancialHealth}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{! and(v.loanRecord.EMI_Type__c!='Step-Up',v.loanRecord.EMI_Type__c!='Step-Down')}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">EMI Holiday</h3>
+                </div>
+                <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                    <tbody>
+                        <tr>
+                            <td>No of Holidays</td>
+                            <td>
+                                <lightning:input label=" " value="{!v.primaryApplicant.Months_per_year__c}" disabled ="{!if(v.loanRecord.StageName=='Approved',true,false)}"/>
+                            </td>
+                            <td>Cycle Date</td>
+                            <td>
+                                <!--lightning:input label=" " value="{!v.primaryApplicant.Cycle_Day_Date__c}" disabled ="{!if(v.loanRecord.StageName=='Approved',true,false)}"/-->
+                                <lightning:select name="selectCycleDate" label=" " value="{!v.primaryApplicant.Cycle_Day_Date__c}"  disabled ="{!if(v.loanRecord.StageName=='Approved',true,false)}" >
+                                    <aura:iteration items="{!v.optionsCycleDate}" var="ocDate">
+                                        <option value = "{!ocDate.value}" 
+                                                label = "{!ocDate.label}" 
+                                                selected = "{! ocDate.value ==  v.primaryApplicant.Cycle_Day_Date__c}"/>
+                                    </aura:iteration>
+                                </lightning:select>                   
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Months</td>
+                            <td>
+                                <!--lightning:input label=" " value="{!v.primaryApplicant.EMI_Holiday_Months__c}" disabled ="{!if(v.loanRecord.StageName=='Approved',true,false)}"/-->
+                                <lightning:dualListbox aura:id="selectMonth"
+                                                       name="Months"
+                                                       label=" "
+                                                       sourceLabel="Available Months"
+                                                       selectedLabel="Selected Months"
+                                                       options="{!v.optionsHolidayMonths }"
+                                                       value="{! v.holidayOptions }"
+                                                       onchange="{!c.handleMonthChange}"
+                                                       required = "true"
+                                                       />
+                            </td>
+                            <td>Due Date</td>
+                            <td>
+                                <lightning:input label=" " type="date" value="{!v.primaryApplicant.EMI_Due_Date__c}" disabled="true"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-left: 40%;margin-top:1%;margin-bottom:1%">
+                    <lightning:button variant="brand" label="Subscribe to EMI Holiday" title="Subscribe" onclick="{!c.onsubscribeToEMIH}"/> <!-- button fucntionality pending -->
+                </div>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{! and(v.loanRecord.EMI_Type__c =='Step-Up',v.loanRecord.EMI_Type__c =='Step-Down')}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">EMI Holiday</h3>
+                    <p>You cant opt for step-Up / step-Down and EMI Holiday services simultaneously.</p>
+                </div>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{! and(v.primaryApplicant.EMI_Holiday_Opted__c, v.loanRecord.StageName!='Approved')}">
+            <div class="slds-box">
+                <div class="slds-grid slds-section-header"  style="background: rgb(211,211,211);color:black;padding-left:1%;padding-top:.5%;padding-bottom:.5%;">
+                    <h3 class="slds-page-section__title slds-text-heading_medium font-size-heading-medium slds-align-middle">Disable EMI Holiday</h3>
+                </div>
+                <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                    <tbody>
+                        <tr>
+                            <td>Emi Holiday Opted</td>
+                            <td>
+                                <ui:inputCheckbox label=" " value="{!v.primaryApplicant.EMI_Holiday_Opted__c}"/>
+                            </td>
+                            <td>
+                                <lightning:button variant="brand" disabled="{!v.isProcessing}" label="Disable EMI Holiday" title="disableEMIHoliday" onclick="{!c.ondisableEMIHoliday}" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{! and(v.loanRecord.StageName!='DSA/PSF Login', v.loanRecord.StageName!='Underwriting',v.loanRecord.StageName!='Approved',v.isEliteCardProduct == true)}">
+            <div class="slds-box">
+                <c:SAL20_EliteCardSection oppId="{!v.oppId}"/>
+            </div>
+        </aura:if>
+    </article>
+    <!-- +-+-+-+-+-+-+ END : Body +-+-+-+-+-+-+  -->
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <div aura:id="customToast" class="slds-notify_container slds-hide" >
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">  
+                        <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

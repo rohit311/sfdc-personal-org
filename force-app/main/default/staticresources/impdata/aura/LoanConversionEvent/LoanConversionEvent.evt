@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event to notify loan conversion" >
+    <aura:attribute name="loanId" type="String"/>
+    <aura:attribute name="loanNumber" type="String"/>
+</aura:event>

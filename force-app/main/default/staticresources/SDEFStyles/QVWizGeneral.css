@@ -1,0 +1,270 @@
+.wcmessage1{
+    color:#0000FF;
+    font: 2em Tahoma, MS Sans Serif;
+}
+.wcmessage2{
+    color:#000000;
+    font: 1em Tahoma, MS Sans Serif;
+}
+.wcmessage3{
+    color:#000000;
+    font: 2em Tahoma, MS Sans Serif;
+}
+.clsInputLabelTD {
+    color:#000000;
+	font-family:Tahoma,MS Sans Serif;
+	font-size:11px;
+	white-space:nowrap;
+	padding-left:0;
+}
+        .BRInfoTitle{
+            height: 25px; 
+            background: url(SDEFimages/blue_bg.gif) repeat;
+            color: #FFFFFF;
+            font: bold 11px Tahoma, MS Sans Serif;
+            padding-left: 10px;
+            margin:0px;
+            border: solid 1px grey;
+            border-bottom:none;
+            vertical-align: middle;
+            valign: middle;
+        }
+        .clsMainTableBR{
+            background-color: #EFF3F5;
+            /*height:100%;*/
+            width: 100%;
+            border: solid 1px grey;
+            border-top:none;
+            align:center;
+           
+            margin-right:15px;
+          
+        }
+        .clsBrTable{
+            border: solid 1px grey;
+            border-top: none;
+            height:auto;
+            width:100%;
+            border: solid 1px grey;
+            background-color: white;
+        }
+        #stageBar tr td
+        {
+            background:#EFF3F5;
+        }
+    #stageBar tr td.l
+    {
+        background:url('JIcons/status_curveL.gif');
+        width:7px;height:25px;
+    }
+    #stageBar tr td.r
+    {
+        background:url('JIcons/status_curveR.gif');
+        width:7px;height:25px;
+    }
+    #stageBar tr td img
+    {
+        vertical-align:middle;
+    }
+    #progressBar{
+        float: right;
+        clear: 
+    }
+    
+    .topAlignTD{
+        vertical-align: top;
+    }
+    .clsButtonStyle {
+        height:20px; 
+        padding-right:5px;
+    }
+    
+    .informationBar {
+        background-color:#dee0e0; 
+        border-style:solid; 
+        border-width:1px;
+        padding-left:10px;
+        padding-top:5px;
+        margin-left:15px;
+        margin-right:15px;
+        margin-bottom:3px;
+        margin-top:15px;
+        height:25px;
+        font-family:Tahoma,MS Sans Serif;
+	font-size:11px;
+    }
+    .QVStage
+    {
+         background:url('JIcons/hr_grey.gif') repeat-x;
+         background-position:center;
+         vertical-align:middle;
+     }
+     .statusTxt, .currentStatusTxt
+     {
+         color:#004376;
+         font-family: Tahoma, MS Sans Serif;
+         font-size: 11px;
+         font-weight: bold;
+     }
+
+     .currentStatusTxt
+     {
+          color:#0069a5;
+     }
+     .clsBrProgressBar{
+           height: 50px;
+           text-align: center;
+           margin:0px;
+           border: 0px;.
+           background:#EFF3F5;
+     }
+
+     img
+     {
+            display:block;
+            margin: 0px 0px;
+            hspace: 0px;
+            vspace: 0px;
+     }
+/*Added By Avadhut K.*/
+.qvTd {
+    background-color:#FFFFFF; 
+    padding-left:0px;
+    margin-left:13px;
+    margin-right:13px;
+    margin-bottom:0px;
+    margin-top:10px;
+}
+
+.x-grid3-hd-row td .x-grid3-check-col-td {
+    font-family: Tahoma, MS Sans Serif;
+    font-weight: bold;
+    font-size: 11px;
+    color: #000000;
+    border-bottom :solid 1px  #013B66;
+    border-right:solid 1px #013B66;
+    border-bottom :solid 1px #7CC0EA;
+    border-right:solid 1px #7CC0EA;     
+}
+.x-grid3-hd-inner  {
+    background-color: #2E7DB3;
+  
+   font: bold 11px Tahoma, MS Sans Serif;
+    font-weight: bold;
+    
+    color: #FFFFFF;
+    border-bottom: solid 1px  #013B66;
+    border-right: solid 1px #013B66;
+    border-bottom: solid 1px #7CC0EA;
+    border-right: solid 1px #7CC0EA;     
+}
+td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-asc .x-grid3-hd-inner, td.x-grid3-hd-menu-open .x-grid3-hd-inner {
+    background-color: #2E7DB3;
+    background-image: none;        
+}
+
+.x-grid3-row-selected {
+    background-color: #E0EE70 !important;
+    background-image: none;
+    border-color: #a3bae9;
+}
+.x-grid3-col .x-grid3-col-dd {
+    border: solid 1px  #dee0e0;
+    padding:0;
+    background:transparent;
+}
+.x-grid3-cell-text{
+    white-space: normal;
+}
+.x-grid3-cell{  
+    white-space: normal;
+    width: 100%;
+}
+/*End addition by Avadhut K.*/
+.clstrbtns{
+    height:35px; 
+    background-color: #dee0e0;
+    margin-left: 15px;
+    margin-bottom: 15px;
+    margin-top: 0px;
+    margin-right: 15px;
+}
+.clstr{
+    padding:0;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 0px;
+    margin-bottom: 0px;/   
+}
+.clsfirsttd{
+margin-left: 0px;    
+}
+.clsfirsttd{
+margin-right: 0px;
+}
+.grid-checkbox {
+    width:100%;
+    height:18px;
+    background-position:2px 2px;
+    background-repeat:no-repeat;
+    background-color: #fffff transparent;
+    background-image:url(../extjs/resources/images/default/grid/row-check-sprite.gif);    
+}
+.clsInputTextBoxqv {
+    vertical-align: top;
+    color: #000000;
+    width: 350px;
+    height: 13px;
+    font-family: Tahoma, MS Sans Serif;
+    font-size: 11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding: 2px;
+    margin: 0px;
+    padding-left: 5px;
+}
+.clsInputTextAreaqv {
+    padding-bottom: 0px;
+    vertical-align: top;
+    width: 500px;
+    height: 70px;
+    overflow: auto;
+    color: #000000;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    font-family: Tahoma, Ms Sans Serif;
+    font-size: 11px;
+    padding-left:5px;
+}
+.hdrtxt{
+    font: bold 11px Tahoma, MS Sans Serif; 
+    color: #004376;
+}
+.normaltxt{
+    font: 11px Tahoma, MS Sans Serif; 
+    color: #000000;
+}
+.bgBtnGrey {
+            -moz-background-clip:border;
+            -moz-background-inline-policy:continuous;
+            -moz-background-origin:padding;
+            background:transparent  url(SDEFimages/grey_bg.gif) repeat;
+            border-top:1px solid #cccccc;
+            border-left:1px solid #cccccc;
+            border-right:1px solid #666666;
+            border-bottom:1px solid #666666;
+            margin-top:0px;
+            margin-left:0px;
+            color:black;
+            font:11px Tahoma, MS Sans Serif;
+            font-weight:normal;
+            width:auto;
+            height:auto;
+            
+ }

@@ -1,0 +1,29 @@
+.THIS POS-card{
+    background: rgb(243, 242, 242)
+}
+
+.THIS .uiInputDate .datePicker-openIcon {
+    position: absolute;
+    left: 95%;
+    top: 30%;
+}
+
+
+.THIS .disbursal-wrapper{
+        height: 53vh;
+    width: 100%;
+}
+
+.THIS .disbursal-container{
+    position:fixed;
+}
+
+.THIS.outerScroller{
+    height:100% 
+}
+
+@media (min-width: 768px) {
+  .THIS .widthcss {
+   width:90%;
+  }
+}

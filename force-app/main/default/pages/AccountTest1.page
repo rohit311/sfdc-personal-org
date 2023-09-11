@@ -1,0 +1,24 @@
+<apex:page Controller="AccountTestController" docType="HTML- 5.0">
+     <apex:form >
+           <apex:pageBlock title="Edit account for {!$User.FirstName}">
+                <apex:pagemessages />
+               <!-- <apex:pageBlockButtons >
+                      <apex:commandButton value="Save" action="{!save}"/>
+                </apex:pageBlockButtons>  -->
+                <apex:pageBlockSection >
+                      <apex:input type="text" value="{!accountId}"/>
+                </apex:pageBlockSection>
+           </apex:pageBlock>
+           <apex:pageBlock >
+            <apex:commandButton value="Save" action="{!relatedContacts}" reRender="cList"/>
+            <apex:outputPanel >
+                 <apex:pageBlockTable value="{!conList}" var="con" id="cList">
+                       <apex:column value="{!con.name}"/>
+                 </apex:pageBlockTable>
+            </apex:outputPanel>      
+           </apex:pageBlock>
+          
+     </apex:form>
+     
+          
+</apex:page>

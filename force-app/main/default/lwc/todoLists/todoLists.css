@@ -1,0 +1,28 @@
+.listItem{
+    display: inline;
+}
+
+.itemRemove{
+    margin-left: 5%;
+    cursor: context-menu;
+}
+
+.headerCls{
+    margin: auto;
+    text-align: center;
+}
+
+.mainCls{
+    background-color: azure;
+}
+
+.inputCls{
+    padding-left: 3%;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+.buttonCls{
+    margin-top: 5%;
+}

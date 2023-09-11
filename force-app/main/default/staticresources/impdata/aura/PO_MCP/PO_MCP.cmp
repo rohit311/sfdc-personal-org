@@ -1,0 +1,164 @@
+<aura:component controller="SALMobilityController" access="global">
+    <aura:attribute name="kyc" type="eKYC__c" default=""/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    <aura:attribute name="residenceAddress" type="String" default=""/> 
+    <aura:attribute name="resCopyAddress" type="String" default=""/> 
+    <aura:attribute name="copyLeadDOB" type="Date" default=""/> 
+    <aura:attribute name="copyLeadGender" type="Date" default=""/> 
+    <aura:attribute name="copyLeadPincode" type="Date" default=""/> 
+    <aura:attribute name="copyLeadEmail" type="Date" default=""/> 
+    <aura:attribute name="copyLeadMobile" type="Date" default=""/> 
+    
+    <aura:attribute name="companyCategory" type="String" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    
+    <aura:attribute name="po" type="Product_Offerings__c" default="{}"/>  
+    <aura:attribute name="employerList" type="Segment_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedEmployer" type="Segment_Master__c" default="{}"/>
+    <aura:attribute name="employerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="lead" type="Lead" default="{}"/>
+    <aura:attribute name="searching" type="Boolean" default="false"/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{'sobjectType':'SurrogateCAM__c',Id:'',Special_Profile_Employer__c:''}"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute type="Boolean" name="copyekycaddressflag" default="false"/>
+    <aura:attribute name="experienceyears" type="List" default="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,28,30"/>
+    <aura:attribute name="productList" type="List"/>
+    <aura:attribute name="genderList" type="List"/>
+    <aura:attribute name="empList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="ifOther" type="Boolean" default="false"/>
+    
+    <!--<aura:handler event="aura:doneRendering" action="{!c.getDisablecheckbox}"/> -->
+    
+    <aura:handler name="SelectedRecordEvent" event="c:SelectedRecordEvent" action="{!c.updateLookup}" description="This event is fired when a record is selected from lookup records list"/>
+    
+    <aura:method name="validateMCP" action="{!c.validateMCP}" access="PUBLIC"/> 
+    <aura:method name="setResidenceAddress" action="{!c.setResidenceAddress}" access="PUBLIC"/> 
+    <aura:method name="disableChildForm" action="{!c.disableChildForm}" access="PUBLIC"/>
+    <aura:method name="displayEmpData" action="{!c.displayEmpData}" access="PUBLIC">
+        <aura:attribute name="empname" type="String" default=""/> 
+        <aura:attribute name="category" type="String" default=""/> 
+        <aura:attribute name="pannumber" type="String" default=""/>
+        <aura:attribute name="isPoConverted" type="Boolean" default=""/>
+    </aura:method>
+    <aura:method name="disablePAN" action="{!c.disablePAN}" access="PUBLIC"> 
+        <aura:attribute name="pannumber" type="String" default=""/>
+    </aura:method>
+    <div class="slds-p-horizontal--small" id="mcpId">
+        
+        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding:1%">
+            <div class="slds-form-element__control">
+                <lightning:input type="checkbox" name="copyekycaddress" label="Copy EKYC Address" aura:id="copyekycaddress" class="slds:input" onchange="{!c.copyekycaddress}"  checked="{!v.copyekycaddressflag}"/>
+            </div>
+        </div>
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <!--<label class="slds-form-element__label" for="pannumber">PAN</label>-->
+                    <lightning:input label="PAN" value="{!v.lead.PAN__c }" name="PAN" aura:id="pannumber" placeholder="PAN" maxlength="10" pattern="[A-Za-z]{5}\d{4}[A-Za-z]{1}" messageWhenPatternMismatch="please enter valid PAN" required="true" messageWhenValueMissing="Please Enter PAN Number"/>
+                    <!--<ui:inputText aura:id="pannumber" class="slds-input" updateOn="keyup" keyup="{!c.validatePAN}" value="{!v.lead.PAN__c }" placeholder="PAN" maxlength="10"/>-->
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <!--<label class="slds-form-element__label" for="dateOfBirth">DOB</label>
+                    <ui:inputDate aura:id="dateOfBirth" value="{!v.lead.DOB__c}" displayDatePicker="true" format="MM/dd/yyyy"/> -->
+                    <lightning:input required="true"  type="date" label="DOB" name="dateOfBirth" aura:id="dateOfBirth" value="{!v.lead.DOB__c}" />
+                    
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input label="Address" name="address" aura:id="address" value="{!v.residenceAddress}" required="true" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9-/][A-Za-z0-9-/ _]*$" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter Address"/>
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:select aura:id="gender" name="gender" label="Gender" required="true" messageWhenValueMissing="Please Select Gender" value="{!v.lead.Gender__c}">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.genderList}" var="gen">
+                            <option value="{!gen}" text="{!gen}" selected="{!v.lead.Gender__c == gen}"></option>
+                        </aura:iteration>
+                    </lightning:select>                   
+                    
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                  <!--  <lightning:input aura:id="pincode" maxlength="6" name="pincode" value="{!v.lead.Resi_Pin_Code__c}" label="Pin code" required="true" pattern="^[1-9]\d{5}$" messageWhenValueMissing="Please Enter Pin Code" messageWhenBadInput="Please Enter valid Pin Code" messageWhenPatternMismatch="Please Enter valid Pin Code"/>
+                	--><lightning:input aura:id="pincode" type="number" min="100000" max="999999" name="pincode" value="{!v.lead.Resi_Pin_Code__c}" label="Pin code" required="true" messageWhenValueMissing="Please Enter Pin Code" messageWhenRangeOverflow="Pin Code must be 6 digits long." messageWhenRangeUnderflow="Pin Code must be 6 digits long."/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input type="number" aura:id="avg3monthsalary" name="avg3monthsalary" value="{!v.po.Net_Salary_Per_Month__c}" label="Avg 3 month net salary" required="true" messageWhenValueMissing="Please Enter Salary" />
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:select aura:id="offerproduct" name="offerproduct" label="Offer Product" required="true" messageWhenValueMissing="Please Select Offer Product" value="{!v.po.Products__c}" disabled="true">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.productList}" var="product">
+                            <option value="{!product}" text="{!product}" selected="{!v.po.Products__c == product}"></option>
+                        </aura:iteration>
+                    </lightning:select>                   
+                </div>
+            </div>
+            <div aura:id="employerSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input aura:id="employerName" label="Employer Name" class="slds-lookup__search-input" onchange="{!c.employerKeyPressController}" value="{!v.employerSearchKeyword}" placeholder="Enter Employer Name" required="true" messageWhenValueMissing="Please Enter Employer Name" />        
+                   
+                    <!--This part is for Display typehead lookup result List-->  
+                    <div class="slds-lookup__menu slds" id="sourceList">
+                        <div aura:id="employerMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                           <ul class="slds-lookup__list" role="listbox">
+                            <aura:iteration items="{!v.employerList}" var="singleRec" indexVar="idx">
+                                <li role="presentation">
+                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                        <div class="slds-media__body">
+                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectEmployer}">{!singleRec.Name}</a></div>
+                                            </div>
+                                        </div>    
+                                    </span>
+                                </li>
+                            </aura:iteration>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input aura:id="companycategory" name="companycategory" value="{!v.companyCategory}" label="Company Category" disabled="true"/>
+                    <!-- value="{!v.lead.Employer__r.Company_Category__c}"  -->
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                   <lightning:input type="email" aura:id="personalemail" label="Personal email ID" name="personalemail" value="{!v.lead.Email}" required="true" messageWhenValueMissing="Please Enter Email ID" messageWhenPatternMismatch="Please Enter Valid Email Id"/>
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input type="email" aura:id="officeemail" label="Official email ID" name="officeemail" value="{!v.lead.Office_Email_ID__c}" messageWhenPatternMismatch="Please Enter Valid Email Id"/>
+                </div>
+            </div>
+            <aura:if isTrue="{!v.ifOther}">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input aura:id="EmpNameIFOthers" name="EmpNameIFOthers" value="{!v.lead.Employer_Name__c}" label="Employer Name(If Others)" required="true" />
+                    </div>
+                </div> 
+                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="padding-top:1%;padding-bottom:1%">
+                    <div class="slds-form-element__control">
+                        <label class="slds-form-element__label" for="profile">Special Profile</label>
+                        <lightning:input type="checkbox" aura:id="profile" name="profile" checked="{!v.scam.Special_Profile_Employer__c}" label=""/>
+                    </div>
+                </div>
+            </aura:if>
+           
+        </div>
+    </div>
+</aura:component>

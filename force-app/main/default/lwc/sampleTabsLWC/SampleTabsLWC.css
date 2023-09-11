@@ -1,0 +1,7 @@
+:host {
+    --sds-c-tabs-list-color-border: black;
+    --sds-c-tabs-item-color-border-active: red;
+    --sds-c-tabs-item-color-border-hover: green;
+    --sds-c-tabs-item-text-color: black;
+    --sds-c-tabs-item-text-color-active: green;
+  }

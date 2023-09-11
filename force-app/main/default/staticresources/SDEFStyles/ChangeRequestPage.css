@@ -1,0 +1,445 @@
+.changeBtnCls{
+	background:url(SDEFimages/grey_bg.gif) repeat-x scroll 0 0;
+	border-top:1px solid #cccccc;
+	border-left:1px solid #cccccc;
+	border-right:1px solid #666666;
+	border-bottom:1px solid #666666;
+	font-family: Tahoma, MS Sans Serif;
+	font-size:11px;
+	font-weight:normal;
+	height:22px;
+	cursor:pointer;
+	margin-left:5px;
+	padding-bottom:2px;
+	width:74px;
+	padding-bottom:4px;
+	padding-bottom/*\**/: 0px\9;
+}
+.clsInputTextFieldRel , .clsInputTextFieldRelDisabled {
+    padding-bottom: 0px;
+    vertical-align: top;
+    width: 100%;
+    height:17px;
+    *height:19px;
+    color: #000000;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    font-family: Tahoma, Ms Sans Serif;
+    font-size: 11px;
+    background-color: #FFFFFF;
+    padding-left:5px;
+	margin-right/*\**/: 70px\9;
+    *margin-right: 0px;
+	overflow: auto;
+}
+.clsInputPickList {
+	width: 137px;
+	*width: 130px;
+   	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	height:19px;
+	border: 1px solid;
+	border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+}
+.clsInputPickListTD {
+	border:none;
+	font-family:Tahoma,MS Sans Serif;
+	font-size:11px;
+	color:#000000;
+	padding-left:25px;
+	padding-bottom:5px;
+}
+.clsReadOnlyPanelTextForPermission {
+	border: none;
+	color:#000000;
+	font-family:Tahoma,MS Sans Serif;
+	font-size:11px;
+	padding-left:25px;
+	padding-bottom:5px;
+}
+.clsPanelReadOnlyInputTextbox {
+     border: 1px solid grey;
+    vertical-align: top;
+    width: 130px;
+	height: 18px;
+    *height: 19px;
+    color: #000000;
+    font-family: Tahoma, MS Sans Serif;
+    font-size: 11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding-left: 5px;
+	margin-left: 16px;
+    background-color: #D4D0C8;
+    vertical-align:middle;
+    
+}
+.TDheight5px{
+ height:5px;
+ *height:0px;
+}
+.clsReadOnlyTextForPermission {
+	border: 1px solid grey;
+    vertical-align: top;
+    height: 19px;
+	color:#000000;
+	font-family:Tahoma,MS Sans Serif;
+	font-size:11px;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    padding-left: 5px;
+    padding-left: 5px;
+    background-color: #D4D0C8;
+    vertical-align:middle;
+}
+.AddNoteButton{
+    background:url(SDEFimages/grey_bg.gif) repeat-x scroll 0 0;
+    border-top:1px solid #cccccc;
+    border-left:1px solid #cccccc;
+    border-right:1px solid #666666;
+    border-bottom:1px solid #666666;
+    font-family: Tahoma, MS Sans Serif;
+    font-size:11px;
+    font-weight:normal;
+    height:19px;
+    width:50px;
+    margin-top:3px;
+    cursor:pointer;
+    padding-bottom:3px;
+    padding-bottom/*\**/: 0px\9;
+    
+}
+.AddBtnDivCls{
+     background:#DEE0E0;
+     border:1px solid;
+     border-color:#DEE0E0 #BAC3C8 #BAC3C8 #DEE0E0;
+     height:25px;
+     padding-right:10px;
+     margin-right:2px;
+	 margin-right/*\**/: 0px\9;
+	 *margin-right:4px;
+}
+.DurationDivCls {
+   background:#DEE0E0;
+   border:1px solid;
+   height:25px;
+   border-color:#DEE0E0 #DEE0E0 #BAC3C8 #BAC3C8;
+   margin-left:9px;
+
+}
+ .clsInputTextBoxTDRelative{
+    padding-bottom: 5px;
+}
+.TextboxPopupIcon{
+    background-image: url(SDEFbuttons/b_textbox_popup_on.gif) !important;
+    border:0 none;
+    height:19px;    
+    margin-left:2px;
+    padding-left:0px;
+    vertical-align:top;
+    width:19px;
+ }
+ .clsInputTextFieldTDRel {
+    width: 100%;
+	padding-right:5px;
+	*padding-right:0px;
+}
+.clsInputTextAreaChange , .clsInputTextAreaChangeDisabled {
+    padding: 3px 0px 0px 4px;
+    vertical-align: top;
+    width: 100%;
+    height: 45px;
+	height /*\**/:35px\9;
+    *height: 35px;
+	overflow: auto;
+    color: #000000;
+    border: 1px solid;
+    border-top-color: #6a7378;
+    border-left-color: #6a7378;
+    border-right-color: #bac3c8;
+    border-bottom-color: #bac3c8;
+    font-family: Tahoma, Ms Sans Serif;
+    font-size: 11px;
+    background-color: #FFFFFF;
+    margin:0px;
+}
+.clsPanelAutocompleteDiv{
+	visibility:hidden;
+	position:absolute;
+	z-index:1;
+	margin-right:18px;
+    *margin-right:0px;
+    *margin-left:25px;
+	right: 20px;
+	
+}
+.clsPanelSelectOption{
+	width:137px;
+	*width:130px;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	*border-right:1px solid black; 
+	*border-bottom:1px solid black; 
+}
+.clsAutocompleteDiv{
+	visibility:hidden;
+	position:absolute;
+	*top: 140px !important; 
+	*left: 132px !important; 
+	z-index:1;
+}
+.clsAutocompleteSelectOption{
+	width:204px;
+	font-family: Tahoma, MS Sans Serif;
+	font-size: 11px;
+	*border-right:1px solid black; 
+	*border-bottom:1px solid black; 
+}
+.panelCapsule {
+	border-bottom: 1px solid #aebac1;
+	width: 100%;
+	background-color: #FFFFFF;
+	height:100%;
+}
+.dr-pnlbar {
+	border: solid 0px #adb9c0;
+	border-left: solid 1px #adb9c0;
+	border-bottom: 1px solid #aebac1;
+	padding: 0px;
+	background: url(SDEFimages/blue_bg.gif) repeat;
+}
+
+
+
+.clsDurationLabel{
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+	margin-left:11px;
+}
+    
+.clsDurationTextBoxDisable, .clsInputTextAreaDisabledNote{
+	background-color:#D4D0C8;
+}
+    
+.clsDurationTextBox, .clsDurationTextBoxDisable{
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+	color:#000000;
+	width:45px;
+	height:14px;    
+	margin-left:11px;
+	border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	border-style:solid;
+	border-width:1px;
+	padding-left: 4px;
+}
+		
+.clsInputTextAreaNote {
+	border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	border-style:solid;
+	border-width:1px;
+	color:#000000;
+	font-family:Tahoma,Ms Sans Serif;
+	font-size:11px;
+}
+
+.clsInputTextAreaNote, .clsInputTextAreaDisabledNote {
+	border-color:#6A7378 #BAC3C8 #BAC3C8 #6A7378;
+	border-style:solid;
+	border-width:1px;
+	color:#000000;
+	font-family:Tahoma,Ms Sans Serif;
+	font-size:11px;
+	height:45px;
+	height /*\**/:35px\9;
+    *height: 35px;
+	margin:0;
+	overflow:auto;
+	padding-bottom:0;
+	vertical-align:top;
+	width:100%;
+	padding: 3px 0px 0px 4px;
+}
+
+.clsTimeLabel{
+	font-family:Tahoma,Ms Sans Serif;
+	font-size:11px;
+	color:#000000;	
+	margin-left:5px;
+}		
+.AddButtonOff{
+	background:url(SDEFimages/grey_bg.gif) repeat-x scroll 0 0;
+    border:1px solid ;
+    border-color:#B5B5B5 #B5B5B5 #7F7F7F;
+    color:grey;
+    font-family: Tahoma, MS Sans Serif;
+    font-size:11px;
+    font-weight:normal;
+    height:19px;
+    width:50px;
+    margin-top:3px;
+    cursor:pointer;
+	padding-bottom:3px;
+    padding-bottom/*\**/: 0px\9;
+    	
+}
+div#capsule{
+		display:none;
+}
+#configureSITD{
+	font-size: 11px !important;
+}
+#getSIUrl{
+	font-size: 11px !important;
+	*padding-left: 5px;  	   
+}
+.fieldInfoTD{
+	padding-bottom:5px;
+	padding-left:5px;
+}
+/* custom fields styles */
+#changerequestcustomfields .clsInputTextBox{
+	width:130px ! important;
+}   
+
+#changerequestcustomfields .single-line-textarea{
+	width:135px ! important;
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+}  
+
+#changerequestcustomfields .clsComboStyle{
+	width:140px !important;
+}
+
+.customMultiselect{
+	height: 53px !important;
+	width: 140px !important;
+	font-family: tahoma ! important;
+	font-size: 11px ! important;
+} 
+
+#changerequestcustomfields .clsInputLabelTD{
+	padding-left: 7px !important;
+	padding-right: 3px !important;
+	padding-bottom: 5px !important;
+	width: 110px !important;
+	white-space: normal;
+	font-family: tahoma ! important;
+	font-size: 11px ! important;        
+}
+
+#changerequestcustomfields .clsInputCheckBox{
+	padding-left: 0px !important;
+}
+
+#CustomFieldsOutputPanel{
+	 height: 310px;
+     height /*\**/:286px\9;
+     *height: 270px;
+}
+/* End of custom fields styles */
+
+.TextboxPopupIconDiv{
+	height: 19px;
+	width: 19px;
+}
+.TextboxPopupIconTD{
+  
+	padding-left: 5px;
+	padding-right: 15px;
+	vertical-align: top;
+}
+
+/* Put SAFARI specific Styles here */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+
+   .TextboxPopupIconDiv{
+       padding-left:4px;
+
+  }
+  
+ .TextboxPopupIconTD{
+    padding-left: 0px;
+	padding-right:3px;
+	vertical-align: top;
+    border:1px solid #FFFFFF;
+    
+  }
+  .clsRightPadTD{
+     padding-right: 4px !important;
+  } 
+   .panelContent {
+		height: 325px;  
+	}	  
+
+}
+
+ /*added by Usha Juge for Defect 57212*/
+.publishercontainer{
+	padding-top:0px;
+}
+.panelContent {
+	height: 310px;
+	height /*\**/: 286px\9;
+	*height: 270px;
+}
+
+.clsPanelInputTextbox{ 	
+ 	padding-bottom: 2px ;
+ 	padding-bottom:/*\**/0px\9;
+ 	padding-top: 0px;
+ 	padding-top:/*\**/2px\9;
+}
+.clsPanelInputLabelTD{
+ 	padding-top: 4px !important;	 	
+ 	padding-top /*\**/:2px\9 !important;
+}
+.clsPanelInputTextboxReadOnly{
+ 	padding-bottom: 1px !important;
+ 	padding-top /*\**/:1px\9 !important;
+}
+.clsInputPickList{
+	padding-left: 3px;
+}
+
+#btnToolbar,
+#btnToolbar .x-panel,
+#btnToolbar .x-panel .x-panel-bwrap{
+	*height: 37px; 
+}
+
+.clsRightPadTD{
+	padding-right: 4px;
+	padding-right/*\**/: 2px\9 !important;
+    *padding-right: 0px !important;
+}
+
+ .clsRightPadTDForChange{
+       padding-right:4px;
+       *padding-right:0px;
+}
+
+/*For IE-7*/
+.XcheckBoxTD {
+	*padding-top: 5px !important;
+	padding-top/*\**/: 6px\9 !important;
+}
+
+#AccordionDiv {
+	background: none repeat scroll 0 0 #FFFFFF;
+	height: 340px;
+	width: 275px;
+}

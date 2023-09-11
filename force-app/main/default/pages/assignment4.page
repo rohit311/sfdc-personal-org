@@ -1,0 +1,13 @@
+<apex:page standardController="Employee__c">
+ <apex:form >
+     <apex:pageBlock >
+     <apex:pageBlockSection title="Employee info">
+         <apex:inputField value="{!Employee__c.Name__c}"/>
+         <apex:inputField value="{!Employee__c.Id__c}"/>
+         <apex:inputField value="{!Employee__c.Country__c}"/>
+         <apex:inputfield value="{!Employee__c.State__c}"/>
+     </apex:pageBlockSection>
+     <apex:commandButton action="{!save}" value="save"/>
+     </apex:pageBlock>
+ </apex:form>
+</apex:page>

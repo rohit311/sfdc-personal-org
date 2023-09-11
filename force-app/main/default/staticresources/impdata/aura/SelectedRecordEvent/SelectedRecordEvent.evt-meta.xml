@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>40.0</apiVersion>
+    <description>The event is fired from customLookupCmp. 
+Once the user selects the parent lookup record, reference to the parent record is stored in this event which is then available to child component.</description>
+</AuraDefinitionBundle>

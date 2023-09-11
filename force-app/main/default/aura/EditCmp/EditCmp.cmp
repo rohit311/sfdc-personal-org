@@ -1,0 +1,5 @@
+<aura:component  implements="flexipage:availableForAllPageTypes,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	 <aura:attribute name="recordId" type="String" default="0010I000021a6HB" />
+    
+     <lightning:button label="Edit Record" onclick="{!c.edit}"/>
+</aura:component>

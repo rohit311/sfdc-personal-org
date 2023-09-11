@@ -1,0 +1,31 @@
+<apex:page controller="assign3_2_controller">
+ <apex:form >
+        <apex:pageBlock >
+    <apex:selectList value="{!l}" size="1">
+   <apex:actionFunction action="{!disp}" name="plot"/>
+    
+    <apex:selectoptions value="{!options}" />
+    </apex:selectList>
+ <br/>
+ <br/>
+ <br/>
+ 
+      <apex:selectList value="{!a}" size="1" >
+    <!--  <apex:actionFunction action="{!disp}" name="display"/> -->
+           <apex:selectoptions value="{!animals}" />
+    </apex:selectList>
+<br/>
+<br/>
+{!a}
+</apex:pageBlock>
+
+</apex:form>
+
+<script>
+fuction plot2(){
+plot();
+}
+</script>
+ 
+  
+</apex:page>

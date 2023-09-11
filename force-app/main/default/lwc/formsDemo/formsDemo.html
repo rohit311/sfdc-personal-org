@@ -1,0 +1,164 @@
+<template>
+  <lightning-button variant="base" label="Base" title="Looks like a link" onclick={handleEdit} class="slds-m-left_x-small"></lightning-button>
+  <template if:false={editTable}>
+    <template for:each={contactList} for:item="mr">
+      <div key={mr.Id} class="">
+        <lightning-record-view-form
+                                  record-id={mr.Id}
+                                  object-api-name="Contact">
+          <div class="slds-grid slds-wrap slds-grid_vertical-stretch slds-border_bottom slds-size_12-of-12">
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-output-field
+                    variant="label-hidden"
+                    field-name="Name">
+                </lightning-output-field>
+              </div>
+            </div>
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-output-field
+                    variant="label-hidden"
+                    field-name="Budget__c">
+                </lightning-output-field>
+              </div>
+            </div>
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                  <lightning-output-field
+                      variant="label-hidden"
+                      field-name="Deals_Accepted__c">
+                  </lightning-output-field>
+              </div>
+          </div>
+          </div>
+        </lightning-record-view-form>
+      </div>
+    </template>
+  </template>
+    <template for:each={contactList} for:item="mr" for:index="index">
+      <div key={mr.Id} class="">
+        <lightning-record-edit-form
+                            record-id={mr.Id}
+                            object-api-name="Contact">
+          <div class="slds-grid slds-wrap slds-grid_vertical-stretch slds-border_bottom slds-size_12-of-12">
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-input-field
+                  variant="label-hidden"
+                  class="inp-cls"
+                  name="Budget__c"
+                  onchange={handleChange}
+                  data-id={index}
+                  field-name="Budget__c"
+                  value={mr.Budget__c}>
+                </lightning-input-field>
+              </div>
+            </div>
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-input-field
+                  variant="label-hidden"
+                  name="Deals_Accepted__c"
+                  required="true"
+                  onchange={handleChange}
+                  data-id={index}
+                  field-name="Deals_Accepted__c"
+                  value={mr.Deals_Accepted__c}>
+              </lightning-input-field>
+              </div>
+            </div>
+          </div>
+        </lightning-record-edit-form>
+      </div>
+    </template>
+
+    <lightning-record-edit-form
+                            record-id={contactRec.Id}
+                            object-api-name="Contact">
+          <div class="slds-grid slds-wrap slds-grid_vertical-stretch slds-border_bottom slds-size_12-of-12">
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-input-field
+                  variant="label-hidden"
+                  class="inp-cls"
+                  name="Budget__c"
+                  onchange={handleChange}
+                  data-id={index}
+                  field-name="Budget__c"
+                  value={contactRec.Budget__c}>
+                </lightning-input-field>
+              </div>
+            </div>
+            <div class="slds-size_2-of-12 slds-border_right">
+              <div class="slds-m-left_xx-small slds-m-right_small slds-m-top_x-small slds-m-bottom_xxx-small">
+                <lightning-input-field
+                  variant="label-hidden"
+                  name="Deals_Accepted__c"
+                  required="true"
+                  onchange={handleChange}
+                  data-id={index}
+                  field-name="Deals_Accepted__c"
+                  value={contactRec.Deals_Accepted__c}>
+              </lightning-input-field>
+              </div>
+            </div>
+          </div>
+        </lightning-record-edit-form>
+  <div class="slds-size_12-of-12 slds-align_absolute-center">
+    <lightning-button class="slds-m-bottom_small slds-m-top_x-small"
+                        variant="neutral"
+                        type="cancel"
+                        label="Cancel"
+                        onclick={handleCancel}>
+    </lightning-button>
+    <lightning-button class="slds-m-left_xx-small slds-m-bottom_small slds-m-top_x-small"
+                        variant="brand"
+                        type="submit"
+                        label={saveBtnLabel}
+                        disabled={disableBtn}
+                        onclick={handleSaveAll}>
+    </lightning-button>
+</div>
+
+Fixed width issue :
+<lightning-button class="slds-m-left_xx-small slds-m-bottom_small slds-m-top_x-small"
+                        variant="brand"
+                        label="Esclate"
+                        onclick={handleEsclation}>
+    </lightning-button>
+<template if:true={showIsEscalated}>
+  <div class="escalated-checkbox">
+    <input type="checkbox" data-id="escalated" name="escalated" onchange={handleCheckbox} value={isEscalatedValue}/>
+    <label for="escalated" class="checkbox-label"
+        >Technical Escalation to an expert
+    </label>
+  </div>
+</template>
+<!--<div class="slds-p-around_medium lgc-bg">
+  <lightning-input class="inp-cls" type="text" label="Enter some text" placeholder="type here..." disabled></lightning-input>
+</div>-->
+
+<!--<div class="slds-grid">
+  <div class="slds-has-flexi-truncate">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+  </div>
+  <div class="slds-has-flexi-truncate">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+  </div>
+  <div class="slds-has-flexi-truncate">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+  </div>
+  <div class="slds-has-flexi-truncate">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+  </div>
+  <div class="slds-has-flexi-truncate">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+  </div>
+</div> -->
+
+</template>

@@ -1,0 +1,27 @@
+<apex:page standardController="Account">
+
+<apex:form >
+    <apex:pageBlock >
+        <apex:pageBlockSection title="Account Details">
+            <apex:outputField label="Name" value="{!account.type}"/><br/>    
+        </apex:pageBlockSection>
+        <apex:pageBlockTable value="{!account.contacts}" var="con">
+           <apex:column >
+               <apex:commandLink reRender="ContactDetails">
+               {!con.name}
+                 <apex:param name="cid" value="{!con.id}"/>
+                </apex:commandLink>
+           </apex:column> 
+        </apex:pageBlockTable>
+        <apex:pageBlockButtons location="top">
+            <apex:commandButton value="save" action="{!save}"/>
+        </apex:pageBlockButtons>
+        
+    </apex:pageBlock>
+    <apex:outputPanel id="ContactDetails">
+    <apex:detail subject="{!$CurrentPage.parameters.cid}" relatedList="false" title="false"/>
+    
+    </apex:outputPanel>
+</apex:form>
+  
+</apex:page>

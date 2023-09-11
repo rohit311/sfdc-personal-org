@@ -1,0 +1,137 @@
+<aura:component controller="StartPageCtrl" 
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    <aura:attribute name="cloneLAid" type="String"/>
+    <aura:attribute name="counter" type="Integer" default="0"/>
+    <aura:attribute name="offset" type="Integer" default="0"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer" default="0"/>
+    <aura:attribute name="pageSize" type="Integer" default ="5"/>
+    <aura:attribute name="PaginationList" type="Opportunity[]"/>
+    <aura:attribute name="selectedcriteria" type="String"/>
+    <aura:attribute name="enteredValue" type="String"/>
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="LAlist" type="list" />
+    <aura:attribute name="ErrorMessage" type="Boolean" default="false" />
+    <aura:attribute name="cloneFlag" type="Boolean" default="true"/>
+    <aura:attribute name="FromCloneFlag" type="Boolean" default="true"/>
+    <aura:attribute name="Spinner" type="Boolean" default="false"/>
+    <aura:attribute name="filterlist" type="String[]" default="PAN Number,SFDC Number,LAN Number,Mobile Number"/>
+    
+    <aura:registerEvent name="navigateToComponent" type="c:navigateToParent"/>
+    <!--<aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/> -->   
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.cloneFlag}">
+    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div class="slds-form-element__control">
+            <lightning:button aura:id="BackButtonId" iconName="utility:back" class="slds-theme_alt-inverse" variant="brand" label="Back" onclick="{!c.sendback}" />
+        </div>
+    </div>
+    <br/>
+        
+    <lightning:card title="" class="applyMarginToCard slds-section-title--divider " >
+            <div class="slds-text-heading_small">Cloning Details</div>
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        
+                        <div class="slds-form-element slds-p-top_small slds-m-bottom_small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12"> 
+                            <lightning:select aura:id="myForm" label="Filter Criteria" name="FilterCriteria" value="{!v.selectedcriteria}" required="true" messageWhenValueMissing="Please select criteria">
+                                <aura:iteration items="{!v.filterlist}" var="criteria">
+                                    <option value="{!criteria}" text="{!criteria}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top_small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--3-of-12">     
+                            <aura:if isTrue="{!v.selectedcriteria == 'PAN Number'}">
+                                <lightning:input label="Enter Value" aura:id="enteredvaluePAN" type = "text" value ="{!v.enteredValue}" required="true" messageWhenValueMissing="Please enter value"  maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please Enter valid PAN Number"/>
+                        	</aura:if>
+                            <aura:if isTrue="{!v.selectedcriteria == 'Mobile Number'}">
+                                <lightning:input label="Enter Value" aura:id="enteredvalueMob" type = "text" value ="{!v.enteredValue}" required="true" messageWhenValueMissing="Please enter value" maxlength="10" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile Number"/>
+                        		
+                            </aura:if>
+                            <aura:if isTrue="{!or(v.selectedcriteria == 'LAN Number',v.selectedcriteria == 'SFDC Number')}">
+                            	<lightning:input label="Enter Value" aura:id="enteredvalueOth" type = "text" value ="{!v.enteredValue}" required="true" messageWhenValueMissing="Please enter value"/>
+                            </aura:if>
+                        </div>
+                        
+                        <div class="slds-form-element slds-m-top--large slds-is-required slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                            <lightning:button class="slds-m-right--small slds-theme_alt-inverse slds-m-around_x-small slds-size--1-of-1 slds-medium-size--4-of-12 slds-large-size--3-of-12" aura:id="search" iconName="utility:search" variant="brand" label="Search" onclick="{!c.searchLA}" />
+                             <lightning:button class="slds-m-left--small slds-theme_alt-inverse slds-m-around_x-small slds-size--1-of-1 slds-medium-size--8-of-12 slds-large-size--4-of-12" aura:id="create"  variant="brand" label="New Loan Application" onclick="{!c.newLoanApplicationForm}" />
+                          </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        
+        
+        <aura:if isTrue="{!v.PaginationList.length>0}">
+            <lightning:card title="" class="applyMarginToCard slds-section-title--divider " > 
+                
+                <table class="slds-table slds-table_bordered slds-table_col-bordered slds-size--12-of-12">
+                    <thead >
+                        <tr class ="slds-grid slds-size--12-of-12 ">
+                            <th class="slds-cell-wrap slds-col slds-size_5-of-12" > 
+                                Loan Application Number 
+                            </th>
+                            <th class="slds-cell-wrap slds-col slds-size_4-of-12 ">
+                                Name
+                            </th>
+                            <th class="slds-cell-wrap slds-col slds-size_3-of-12">
+                                Action                    
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <aura:iteration items="{!v.PaginationList}" var="LAlst">
+                            <tr class="slds-grid slds-wrap">
+                                <td class="slds-col slds-size_5-of-12 slds-cell-wrap cellHeight">
+                                    {!LAlst.Loan_Application_Number__c}
+                                </td> 
+                                <td class="slds-cell-wrap slds-col slds-size_4-of-12 cellHeight">
+                                    {!LAlst.Name}
+                                </td>
+                                
+                                <td class=" slds-col slds-size_3-of-12 cellHeight"  >
+                                    <button type="button" onclick="{!c.cloneLA}" id="{!LAlst.Id}" class="slds-button slds-button_brand slds-theme_alt-inverse">Clone</button> 
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                
+                <br/>
+                <lightning:buttonGroup class="slds-align_absolute-center">
+                    <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.currentPage == 0}"  
+                                      onclick="{!c.previous}" variant="brand"
+                                      iconName='utility:back'/>
+                    &nbsp; &nbsp; &nbsp;
+                    <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.currentPage+1 >= v.totalPages}" 
+                                      onclick="{!c.next}" variant="brand"
+                                      iconName='utility:forward' iconPosition='right'/>
+                </lightning:buttonGroup>
+                <div class="slds-align_absolute-center slds-text-body_regular">
+                    Page {!v.currentPage+1 } of {!v.totalPages}
+                </div>
+            </lightning:card>
+            
+            <aura:set attribute="else">
+                <aura:if isTrue ="{!v.ErrorMessage}">
+                    <div class="slds-align_absolute-center slds-text-heading_medium">
+                        No Records Found
+                    </div>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </aura:if>
+    {!v.body}
+</aura:component>

@@ -1,0 +1,106 @@
+.THIS {
+}
+
+.THIS .discrepancy-table{
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.THIS .discrepancy-table tr td {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+}
+
+.THIS .discrepancy-table tr td input, .THIS .discrepancy-table tr td select, .THIS .discrepancy-table tr td textarea{   
+    /**max-width: 95px !important; */
+    min-width: 95px !important;
+}
+
+.THIS .discrepancy-table .slds-input{
+    padding: 0px !important;
+}
+
+.THIS .discrepancy-table .discrepancy-table-header {
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: rgb(250, 250, 249);
+}
+
+.THIS .discrepancy-table .discrepancy-table-title {
+    padding-top: 3px;
+    padding-bottom: 3px;
+} 
+
+.THIS .discrepancy-table .discrepancy-table-title td{
+    border: none !important;
+}
+
+.THIS .discrepancy-table tr td .slds-input-has-icon svg{
+    color: #E0E0E0 !important;
+}
+
+.THIS .discrepancy-table .slds-form-element .slds-form-element__label {
+    display: none !important;
+    height: 0px !important;
+}
+
+.THIS .discrepancy-table tr td {
+    max-width: 100px;
+    
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+}
+
+
+.THIS .discrepancy-table tr td { /*:not(:first-child):not(:last-child)*/
+    box-sizing: border-box;
+    border: dotted 1px #E0E0E0;
+}
+
+.THIS .spinner-overlay{
+    background-color:black;
+    opacity: 0.20;
+    filter: alpha(opacity = 20);
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9998;
+}
+
+.THIS .discrepancy-table tr td textarea:disabled{
+    cursor: default !important;
+}
+
+.THIS header.slds-card__header.slds-grid{
+    padding-top:0px;
+    margin: 0px !important;
+}
+
+.THIS .slds-card__body{
+    margin-bottom: 0px !important;
+}
+
+.THIS .slds-form-element__row{
+    border-bottom: dotted 1px lightgray;
+}
+
+.THIS .customCard{
+    border: solid 1px gray !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    margin-left: 5px !important;
+    margin-right: 5px !important;
+}
+
+.THIS .customCard .slds-form-element__row>.slds-size_2-of-12{
+    width: 16.6666666667% !important;
+}

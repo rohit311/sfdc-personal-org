@@ -1,0 +1,71 @@
+.THIS .WrapText
+{
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    -ms-hyphens: auto !important;
+   -moz-hyphens: auto !important;
+}
+
+.THIS .alignModal{
+    margin-top : -50px !important;
+}
+
+.THIS .xcs-fix-max-height{
+    height : 50vh !important
+}
+
+.THIS .borderColor {
+    border-right: 1px solid rgb(187, 188, 189);
+}
+
+.THIS .slds-modal__container
+{
+    margin-left: 0px;
+    margin-top: 0px;
+    margin-right: 0px;
+    padding-top: 10px;
+    width: 100%;
+}
+
+.THIS .slds-modal__content
+{
+    padding-left: 0px; 
+    /*Width change for Bug 18661*/
+    /*padding-bottom : 5rem;*/
+    
+}
+@media screen and (max-width: 658px) {
+    .THIS .dashboardContent{
+        margin-bottom: 3rem;
+    }
+
+}
+.THIS .slds-modal__close
+{
+top: 10px;
+    right: 10px;
+    color: rgb(22, 50, 92);
+}
+
+.THIS .slds-modal--large 
+{
+    width: 100%;
+    height: 100%;
+
+}
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS .allig {
+  float: left;
+}
+
+.THIS .disabledDiv {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.THIS .helpText {
+    white-space : pre-line !important;
+}

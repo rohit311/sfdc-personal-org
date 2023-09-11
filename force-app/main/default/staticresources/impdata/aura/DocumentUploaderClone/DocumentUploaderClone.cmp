@@ -1,0 +1,126 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="SFDCMobilePOController">
+    
+     <ltng:require scripts="{!$Resource.PO_APP_EXIF}"/> 
+    <!--17138 s-->
+    <aura:handler event="c:checklistInsertEvent" action="{!c.setCheckId}"/> <!--Bug 17138 -->
+    <aura:attribute name="flow" type="string"/>
+    <aura:attribute name="forPricingDashboard" type="string"/> 
+    <!--17138 e-->
+    <!-- bug 17556 s --><aura:attribute name="isDeleteInsert" type="Boolean" default="false" /><!-- bug 17556 e -->
+    <!-- bug 17556 s --><aura:attribute name="stage" type="String" default="" /><!-- bug 17556 e -->
+    <aura:attribute name="parentId" type="Id"/> 
+    <aura:attribute name="poId" type="Id"/> 
+    <aura:attribute name="isFromCPV" type="Boolean" default="false" />
+    <aura:attribute name="imageUpload" type="Boolean" default="false"/>
+    <aura:attribute name="instance" type="Integer"/>
+    <aura:attribute name="fileName" type="String"/>
+    <aura:attribute name="uploadType" type="String"/>
+    <aura:attribute name="documentToast" type="String" default="" />
+    <aura:attribute name="salMobilityDocument" type="String" default="" />
+    <aura:attribute name="longitude" type="Double"/>
+    <aura:attribute name="latitude" type="Double"/>
+    <aura:attribute name="forPOSDocument" type="String"/>
+    <!--YK Attributes added for CPV enhancement-->
+    <aura:attribute name="displayUpload" type="Boolean" default="true"/>
+    <aura:attribute name="refreshPage" type="Boolean" default="false"/>
+    <aura:attribute name="uploadImageFilesOnly" type="Boolean" default="true"/>
+    <!--YK Attributes added for CPV enhancement-->
+    <aura:attribute name="showUploadButton" type="Boolean" default="true"/><!-- Bug 15855 - Hemant Keni-->
+    <aura:attribute name="isMobilityDocument" type="Boolean" default="true"/>
+	<aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    
+    <aura:registerEvent name="documentUpload" type="c:DocumentUploadEvent"/>
+    <aura:attribute name="displayButtons" type="Boolean" default="true" />	<!-- SAL Mobility - Hemant -->
+    
+    
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.disableForm}"/> 
+    <aura:handler event="c:LoanConversionEvent" action="{!c.disableForm1}"/>
+  
+    <aura:attribute name="disablepage" type="Boolean" default="false"/> 
+    <!--	YK event listener to set parentId on verification record insert	-->
+    <aura:handler event="c:VerificationInsertEvent" action="{!c.setVerificationId}"/>
+    <aura:registerEvent name="FileBrowseEvent" type="c:FileBrowseEvent"/>
+    <aura:attribute name="selectFileErrorFlag" type="Boolean" default="true"/>
+    <!-- YK reload after upload -->
+    <aura:registerEvent name="reloadImage" type="c:reloadImage" />
+    <!-- YK reload after upload -->
+    <!-- Enable submit button after files are uploaded sucessfully...-->
+    <aura:registerEvent name="enableSubmitButtonEvent" type="c:EnableSubmitButtonEvent"/>
+    
+    
+    <aura:method name="callSave" action="{!c.setVerificationId}"/>
+    
+       <!--23555 Neha Changes -->
+    <aura:attribute name="isDisbDashboard" type="boolean" default="false"/>
+    <!-- 23555 end -->
+	<!-- SAL Mobility - Hemant Keni -->
+    <aura:method name="uploadDoc" action="{!c.save}" description="This method is used to upload the document" /> 
+    <aura:method name="resetDoc" action="{!c.reset}" description="This method is used to reset the selected document" /> 
+    <!-- SAL Mobility - Hemant Keni-->
+    <div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">                  
+                <div class="slds-file-selector slds-file-selector--files">
+                    <div class="slds-file-selector__dropzone">
+                        <input type="file"  aura:id="file-upload-input" id="{!'file-upload_'+v.instance}" class="slds-file-selector__input slds-assistive-text" aria-describedby="file-selector-id" onchange="{!c.fileSelected}"/>
+                        <label class="slds-file-selector__body" for="{!'file-upload_'+v.instance}" >
+                            <span class="slds-file-selector__button slds-button slds-button--neutral inputSelector" >
+                                <lightning:icon iconName="utility:upload" size="xx-small" alternativeText="Upload File" class="slds-p-right--small uploader"/>
+                                Choose File
+                            </span>
+                            <ui:outputText aura:id="file-name" class="{!if(v.flow == 'Mobility2','slds-truncate WrapText','slds-file-selector__tex slds-truncate docNameLong')}" value="No file chosen"/>
+                        </label>
+                    </div>
+                </div>
+				<aura:if isTrue="{!v.displayButtons}">
+                <div class="slds-p-top--small">
+                    <aura:if isTrue="{!v.showUploadButton}">
+                        <!--Bug 17138 added class -->
+                       <lightning:button class="{!if(v.flow == 'Mobility2','slds-theme--alt-inverse','')}" aura:id="saveButtonId" variant="brand" label="Upload" onclick="{!c.save}" />
+                    </aura:if>
+                    <lightning:button class="{!if(v.flow == 'Mobility2','slds-theme--alt-inverse','')}" aura:id="cancelButtonId" variant="brand" label="Cancel" onclick="{!c.reset}" />
+                </div>
+				</aura:if>
+            </div>
+            <aura:if isTrue="{!v.displayButtons}">
+            <p/>
+            </aura:if>
+            
+           <!--<div class="{!if(v.isMobilityDocument == true,'slds-show','slds-hide')}">-->
+            <ui:outputText aura:id="latitude" class="slds-file-selector__text" value=""/>
+            <ui:outputText aura:id="longitude" class="slds-file-selector__text" value=""/>
+            <ui:inputText aura:id="Declattitude" class="slds-hide"/>
+            <ui:inputText aura:id="Declongitude" class="slds-hide"/>
+            <ui:inputText aura:id="Binarystring" class="slds-hide"/>
+           <!--</div> -->
+            
+            
+            <div aura:id="previewBlock">
+             <div >
+                 <!--17138 added class attribute -->
+            	<img class="{!if(v.forPricingDashboard=='yes','slds-hide','image slds-p-top--medium')}" id="{!v.poId+'_'+v.instance}" aura:id="imagePreview" src="" /></div>
+             </div>   
+        </div>    
+         <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+        
+        <div aura:id="customToast" class="slds-notify_container slds-hide">
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

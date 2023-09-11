@@ -1,0 +1,17 @@
+<apex:page standardController="Account"  contentType="application/msword#sample1.doc" cache="true">
+
+<html xmlns:w="urn:schemas-microsoft-com:office:word">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<body>
+<apex:outputText title="Welcome to word" value="{!$User.FirstName}"/>
+<br/>
+<br/>
+<apex:pageBlock >
+<div style="text-align:left" >
+<b>Account Name :</b><apex:outputText value="{!account.name}"/><br/>
+<b>Account Number: </b><apex:outputText value="{!account.AccountNumber}"/><br/>
+</div>            
+</apex:pageBlock>
+</body>
+</html>
+</apex:page>

@@ -1,0 +1,7 @@
+<apex:page controller="MyFirstController">
+  <apex:form >
+    
+       {!account}
+       
+  </apex:form>
+</apex:page>

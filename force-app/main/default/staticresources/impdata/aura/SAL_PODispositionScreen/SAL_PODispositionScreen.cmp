@@ -1,0 +1,257 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SALMobilityCntrl_V2">
+    
+    <aura:method name="getPO" action="{!c.doInit}" />
+    <aura:attribute name="loanId" type="String" default=""/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:attribute name="productOffering" type="Product_Offerings__c"/>
+    <aura:attribute name="productOfferingId" type="Id"/>
+    <aura:attribute name="teleCallingList" type="String[]"/>
+    <aura:attribute name="teleCallingSubList" type="String[]"/>
+    <aura:attribute name="leadSourceList" type="String[]"/>
+    <aura:attribute name="fieldDispositionList" type="String[]"/>
+    <aura:attribute name="fieldSubDispositionList" type="String[]"/>
+    <aura:attribute name="qualityDespositionList" type="String[]"/>
+    <aura:attribute name="isTeleCaller" type="Boolean"/>
+    <!-- bug 5881 s added by kishore -->  
+	<aura:attribute name="objLead" type="Lead" default="{'sobjectType': 'Lead'}"/>
+    <!-- bug 5881 e added by kishore -->
+	<aura:attribute name="isFieldAgent" type="Boolean"/>
+    <aura:attribute name="enableFollowUp" type="Boolean" default="false"/>
+    <aura:attribute name="iscommunityUser" type="string"/>
+    <aura:attribute name="isPOconverted" type="Boolean"/>
+    <aura:attribute name="leadSrcSel" type="Boolean" default="false"/>
+    <aura:attribute name="srcChSel" type="Boolean" default="false"/>
+    <aura:attribute name="refSel" type="Boolean" default="false"/>
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    
+    <aura:attribute name="referralList" type="Referral__c[]" default="[]"/>
+    <aura:attribute name="selectedReferral" type="Referral__c" default="{}"/>
+    <aura:attribute name="referralSearchKeyword" type="string" default=""/>
+    <aura:attribute name="sourcesearching" type="Boolean" default="false"/>
+    <aura:attribute name="isSourcingRequired" type="Boolean" default="false"/>
+    <aura:attribute name="referralsearching" type="Boolean" default="false"/>
+    <aura:attribute name="oldReferralSearchKeyword" type="String" default=""/>
+    
+    <aura:attribute name="smartLeadSource" type="String" default=""/>
+    <aura:attribute name="smartleadSourceList" type="String[]" default=""/>
+    <aura:attribute name="disableConvert" type="boolean" default="true" />
+    
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyChild" action="{!c.DestroyChildCmp}"/>
+    <!--<c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />-->
+
+    <lightning:card title="Disposition Section" class="applyMarginToCard slds-section-title--divider">
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-horizontal--small">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                    <aura:if isTrue="{!v.isTeleCaller}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select class="applyText" aura:id="teleCallingId" name="teleCalling" label="Tele Calling Disposition" required="true" messageWhenValueMissing="Please Select Value"  value="{!v.productOffering.TeleCalling_Desposition_Status__c}" onchange="{!c.enableFollowUpdate}" disabled="{!or(v.iscommunityUser,v.isPOconverted)}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.teleCallingList}" var="teleCalling">
+                                        <option value="{!teleCalling.value}" text="{!teleCalling.label}" selected="{!v.productOffering.TeleCalling_Desposition_Status__c == teleCalling.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select class="applyText" aura:id="teleCallingSubId" label="Tele Calling Sub Disposition" required="true" value="{!v.productOffering.Tele_Calling_Sub_disposition__c}" name="teleCallingSubName" disabled="{!v.isPOconverted}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.teleCallingSubList}" var="teleCallingSub">
+                                        <option value="{!teleCallingSub.value}" text="{!teleCallingSub.label}" selected="{!v.productOffering.Tele_Calling_Sub_disposition__c == teleCallingSub.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        <div aura:id="smartLeadSearchResult" class="slds-hide slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="sourceName">Lead Source</label>
+                                <ui:inputText aura:id="smartLeadSourceName" class="applyText slds-input" updateOn="keyup" keyup="{!c.smartLeadSourcePressController}" value="{!v.smartLeadSource}" placeholder="Enter Lead Source" disabled="{!v.isPOconverted}"/>                
+                                <div class="slds-lookup__menu slds" id="sourceList">
+                                    <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.smartleadSourceList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectLeadSource}">{!singleRec} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.isFieldAgent}">
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select class="applyText" aura:id="fieldDispositionId" required="true" label="Field Disposition" value="{!v.productOffering.Field_Disposition_1__c}" name="leadSourceName" onchange="{!c.enableFollowUpdate}" disabled="{!v.isPOconverted}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.fieldDispositionList}" var="fieldDisposition">
+                                        <option value="{!fieldDisposition.value}" text="{!fieldDisposition.label}" selected="{!v.productOffering.Field_Disposition_1__c == fieldDisposition.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select class="applyText" aura:id="fieldSubDispositionId" required="true" label="Field Sub Disposition" value="{!v.productOffering.Field_Desposition_Status__c}" name="leadSourceName" disabled="{!v.isPOconverted}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.fieldSubDispositionList}" var="fieldSubDisposition">
+                                        <option value="{!fieldSubDisposition.value}" text="{!fieldSubDisposition.label}" selected="{!v.productOffering.Field_Desposition_Status__c == fieldSubDisposition.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.isTeleCaller}">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:textarea class="applyText" required="true" messageWhenValueMissing="Please Enter Value" aura:id="teleCallerId" name="teleCallerName" value="{!v.productOffering.Tele_Caller_Remarks__c}" label="Tele Caller Remarks" disabled="{!v.isPOconverted}"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-hide slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select class="applyText" aura:id="qualityDisId" label="Quality Disposition" value="{!v.productOffering.Quality_Desposition_Status__c}" name="qualityDisName" disabled="{!v.isPOconverted}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.qualityDespositionList}" var="qualityDesposition">
+                                        <option value="{!qualityDesposition}" text="{!qualityDesposition}" selected="{!v.productOffering.Quality_Desposition_Status__c == qualityDesposition}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.enableFollowUp}">
+                            <div class="slds-form-element slds-is-required  slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control"  >
+                                    <label id ="followUpLbl" class="slds-form-element__label" for="followUpDate"><span class="requiredClass">*</span>Follow up Date/Time.</label>
+                                    <ui:inputDateTime  class="applyText" aura:id="followUpDate" value="{!v.productOffering.Follow_Up_Date__c}" displayDatePicker="true"  blur="{!c.validateFollowupDate}" disabled="{!v.isPOconverted}"/>
+                                    <div aura:id="followupdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please Select Follow Up Date</div> 
+                                </div> 
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.isFieldAgent}">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:textarea class="applyText" aura:id="fieldRemarksId" name="fieldRemarksName" value="{!v.productOffering.Field_Remarks__c}" label="Field Remarks" disabled="{!v.isPOconverted}"/>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <div aura:id="sourceSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <aura:if isTrue="{!v.isSourcingRequired}">
+                            <label class="slds-form-element__label" for="sourceName"><!-- bug 19606 S Priyanka --><span class="requiredClass">*</span><!-- bug 19606 E Priyanka-->Sourcing Channel</label>
+                            </aura:if>
+                            <aura:if isTrue="{!!v.isSourcingRequired}">
+                            <label class="slds-form-element__label" for="sourceName">Sourcing Channel</label>
+                            
+                            </aura:if>
+                                <ui:inputText aura:id="sourceName" class="applyText slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel" disabled="{!v.isPOconverted}"  blur="{!c.validateSourcingChannel}" />                
+                            <!--This part is for Display typehead lookup result List-->  
+                            <div class="slds-lookup__menu slds" id="sourceList">
+                                <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                <ul class="slds-lookup__list" role="listbox">
+                                    <aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+                                        <li role="presentation">
+                                            <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                <div class="slds-media__body">
+                                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                        <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+                                                    </div>
+                                                </div>    
+                                            </span>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div aura:id="referralSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="referralName">Referral</label>
+                            <ui:inputText aura:id="referralName" class="applyText slds-input" disabled="{!v.isPOconverted}" updateOn="keyup" keyup="{!c.referralKeyPressController}" value="{!v.referralSearchKeyword}" placeholder="Enter Referral"/>                
+                            <!--This part is for Display typehead lookup result List-->  
+                            <div class="slds-lookup__menu slds" id="referralList">
+                                <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                <ul class="slds-lookup__list" role="listbox">
+                                    <aura:iteration items="{!v.referralList}" var="singleRec" indexVar="idx">
+                                        <li role="presentation">
+                                            <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                <div class="slds-media__body">
+                                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                        <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectReferral}">{!singleRec.Branch_Master__r.Name + ' - '+singleRec.Name} </a></div>
+                                                    </div>
+                                                </div>    
+                                            </span>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!v.isFieldAgent}">
+                    	<aura:if isTrue="{!v.enableFollowUp}">
+                        <div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        </div>
+                            <div class="slds-form-element slds-is-required  slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control" >
+                                    <label id ="followUpLbl" class="slds-form-element__label" for="followUpDate"><span class="requiredClass">*</span>Follow up Date/Time</label>
+                                    <ui:inputDateTime aura:id="followUpDate" class="applyText uiDatePicker--default" value="{!v.productOffering.Follow_Up_Date__c}" displayDatePicker="true"  blur="{!c.validateFollowupDate}" disabled="{!v.isPOconverted}"/>
+                                    <div aura:id="followupdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please Select Follow Up Date</div> 
+                                </div> 
+                            </div>
+                        </aura:if>
+                    </aura:if>
+
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    
+    <div class="slds-p-top--x-small slds-align_absolute-center">
+        <lightning:button variant="brand" label="Save Disposition" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveDispositionRecord}" disabled="{!v.isPOconverted}"/>
+        <lightning:button variant="brand" label="Convert To Loan Application" iconName="utility:replace" class="slds-theme--alt-inverse" onclick="{!c.convertPO}" disabled="{!or(v.disableConvert,v.isPOconverted)}"/>
+    </div>
+    <div id="SuccessToast1" style="display:none; ">
+	<!-- added upper 2 divs for Bug 17795 -->
+        <div class="slds-grid slds-wrap">
+        	<div class="slds-col slds-size_12-of-12" style="width: 20rem;">
+                <div class="slds-notify_container " >
+                    <div aura:id="alert" class="slds-notify slds-notify--toast slds-theme--success " style="min-width: 20.5rem !important;padding-right: 0rem !important;padding-left: 0rem !important;font-size: 11.5px !important;margin-top:0.5rem !important;" role="alert" ><!-- added style tag for Bug 17795 -->
+                        <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                        <div class="slds-notify__content slds-size--10-of-12">
+                            <h2 id ="successmsg1" ></h2>
+                          <ui:outputURL aura:id="toastURL"  value="" click="{!c.navigateToOppComponent}"/> <!-- disabled="{!v.isdisableURL}" -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</aura:component>

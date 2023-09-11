@@ -1,0 +1,209 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2" 
+                implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="loanid" type="ID" /> 
+    <aura:attribute name="cam" type="CAM__c" /> 
+    <aura:attribute name="applicant" type="Applicant__c"/>
+    <aura:attribute name="Month1_Doc__c" type="List"/>
+    <aura:attribute name="typeOfIncentiveList" type="List"/>
+    <aura:attribute name="freqList" type="List"/>
+    
+    <aura:attribute name="Month2_Doc__c" type="List"/>
+    
+    <aura:attribute name="Month3_Doc__c" type="List"/>
+    <aura:attribute name="LTA_Frequency__c" type="List"/>
+    
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    
+    <aura:attribute name="average" type="String"/> 
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+        <lightning:card title="Incentive Details" class="applyColor">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">    
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-size_4-of-12 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="typeOfIncentive" name="typeOfIncentive" label="Type of Incentive" value="{!v.cam.Incentive_Monthly_or_Quarterly__c}" onchange="{!c.changeIncentiveType}">
+                                    <option value="" text="--None--" />
+                                    <aura:iteration items="{!v.typeOfIncentiveList}" var="type">
+                                        <option value="{!type}" text="{!type}" selected="{!v.cam.Incentive_Monthly_or_Quarterly__c == type}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded" aura:id="monthly">
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-large-size_4-of-12 slds-medium-size_4-of-12 slds-small-size_1-of-1">
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:select label="Month 1" value="{!v.cam.Month1_Doc__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.Month1_Doc__c}" var="level">
+                                            <option text="{!level}" value="{!level}" selected="{!v.cam.Month1_Doc__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                    
+                                </div>          
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number"  aura:id="inc1" label="Amount" value="{!v.cam.LAP_pmt__c}"   name="leadFNname"/>                            
+                                </div>        
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-large-size_4-of-12 slds-medium-size_4-of-12 slds-small-size_1-of-1">
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:select label="Month 2" value="{!v.cam.Month2_Doc__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.Month2_Doc__c}" var="level">
+                                            <option text="{!level}" value="{!level}" selected="{!v.cam.Month2_Doc__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>                
+                                </div>          
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" aura:id="inc2" label="Amount" value="{!v.cam.Avg_monthly_incentive2__c}"   name="leadFNname"/>                            
+                                </div>        
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-large-size_4-of-12 slds-medium-size_4-of-12 slds-small-size_1-of-1">
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:select label="Month 3" value="{!v.cam.Month3_Doc__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.Month3_Doc__c}" var="level">
+                                            <option text="{!level}" value	="{!level}" selected="{!v.cam.Month3_Doc__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>          
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number"  aura:id="inc3" label="Amount" value="{!v.cam.Avg_monthly_incentive3__c}"   name="leadFNname"/>                            
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded" aura:id="quarterly">
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-medium-size_6-of-12 slds-large-size_6-of-12 slds-small-size_1-of-1">
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:select label="Month 1" value="{!v.cam.Month1_Doc__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.Month1_Doc__c}" var="level">
+                                            <option text="{!level}" value="{!level}" selected="{!v.cam.Month1_Doc__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>          
+                            </div>
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" aura:id="incq1" label="Amount" value="{!v.cam.Avg_monthly_incentive1__c}"   name="leadFNname"/>                            
+                                </div>        
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-col slds-medium-size_6-of-12 slds-large-size_6-of-12 slds-small-size_1-of-1">
+                            <div class="slds-col slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:select label="Month 2" value="{!v.cam.Month2_Doc__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.Month2_Doc__c}" var="level">
+                                            <option text="{!level}" value="{!level}" selected="{!v.cam.Month2_Doc__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>                </div>          
+                            </div>
+                            <div class="slds-size_1-of-1">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" aura:id="lapPMT" label="Amount" value="{!v.cam.LAP_pmt__c}"   name="leadFNname"/>                            
+                                </div>        
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                     <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-col slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input disabled="true" label="Average" value="{!v.cam.Avg_mthly_incntve_3mts__c}"  />
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+        <lightning:card title="Income Details" class="applyColor">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number"  aura:id="monReimb" label="Monthly Reimbursement " value="{!v.cam.Monthly_Reimbursement__c}" name="leadFLNname"/>
+                            </div>
+                        </div>   
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value"   aura:id="renInc" label="Rental Income " pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" value="{!v.cam.Rental_Income__c}"    name="leadFLNname"/>
+                            </div>
+                        </div>   
+                        
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                
+                                <div style="float:left;display:inline">
+                                    
+                                    <lightning:select value="{!v.applicant.LTA_Frequency__c}" label="Type of Incentive">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.freqList}" var="level">
+                                            <option text="{!level}" value="{!level}" selected="{!v.applicant.LTA_Frequency__c == level}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                    
+                                </div>
+                                
+                                <div style="float:left;display:inline">
+                                    
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number"  aura:id="lta" label=" LTA Medical"  value="{!v.applicant.LTA_Medical__c}"    name="leadFLNname"/>
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid number" aura:id="hlSal" label=" Additional Net Salary Due to Under Construction HL " value="{!v.cam.Existing_HL_EMI__c}" name="leadCibil"/>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-grid_align-center" align="center" style="float:centre">
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:save" variant="brand" label="Save" onclick="{!c.saveIncomeDetailsButton}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

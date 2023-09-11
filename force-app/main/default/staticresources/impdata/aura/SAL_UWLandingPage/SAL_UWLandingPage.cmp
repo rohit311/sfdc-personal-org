@@ -1,0 +1,142 @@
+<!-- SAL_UWLandingPage -->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SALMobilityCntrl_V2">
+    <!--City CR s -->
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="isOther" type="Boolean"/>
+    <!--City CR e -->
+    <aura:attribute name="preLangList" type="List"/>
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="loanId" type="String"/>
+    <aura:attribute name="oppObj" type="Opportunity"/>
+    <aura:attribute name="accObj" type="Account"/>
+    <aura:attribute name="conObj" type="Contact"/>
+    <aura:attribute name="applicantObj" type="Applicant__c"/>
+    <aura:attribute name="isSpecialProfile" type="Boolean"/>
+    <aura:attribute name="mobileNumber" type="String"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibilExt" type="CIBIL_Extension__c"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c"/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="nameTheme" type="String" default=""/>
+    <aura:attribute name="specialPro" type="Boolean" />
+    <aura:attribute name="EmployerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="oldemployername" type="string" default=""/>
+    <aura:attribute type="boolean" name="epfoShow" default="false"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+     <aura:attribute name="oldOfficeemail" type="String" default=""/><!-- prod new CR-->
+    
+	<div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="Sourcing Details" class="applyColor">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="sourcingChannelId" label="Sourcing Channel" value="{!v.oppObj.Sourcing_Channel__r.Name}" name="sourcingChannelName" disabled="true" required="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="productTypeId" label="Product Type" value="{!v.oppObj.Product__c}" name="productTypeName" disabled="true" required="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="customerTypeId" label="Customer Type" value="{!v.oppObj.Customer_Type__c}" name="customerTypeName" disabled="true" required="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="applicationSourceId" label="Application Source" value="{!v.oppObj.Application_Source__c}" name="applicationSourceName" disabled="true" required="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="referralId" label="Referral" value="{!v.oppObj.Referral__r.Name}" name="referralName" disabled="true"/>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    <br/>
+    
+    <c:SAL_NSDL_PANCheck preLangList="{!v.preLangList}" cibilTemp="{!v.cibilTemp}" salesprofilecheck = "{!v.salesprofilecheck}" isOther="{!v.isOther}" citySearchKeyword="{!v.citySearchKeyword}" displayReadOnly="{!v.displayReadOnly}" stageName="{!v.stageName}" tatMasterRecord="{!v.tatMasterRecord}" isUnderwriter="true" mobileNumber="{!v.mobileNumber}" cibilExt1="{!v.cibilExt1}" cibil="{!v.cibilobj}" 
+                         EmployerSearchKeyword="{!v.accObj.Employer__r.Name}"  applicantObj="{!v.applicantObj}" contObj="{!v.conObj}" 
+                         account="{!v.accObj}" OppID="{!v.loanId}" epfoShow="{!v.epfoShow}" aura:id="pancheck" specialPro="{!v.specialPro}" isSpecialProfile="{!v.isSpecialProfile}" loan="{!v.oppObj}"/> <!--Added salesprofilecheck for Bug 23064-->
+    <br/>
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="Sales Reject" class="applyColor">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:textarea aura:id="salesRejectReasonId" label="Sales Reject Reason" value="{!v.oppObj.Reject_Reason__c}" name="salesRejectReasonName" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    
+    
+    <aura:if isTrue="{!v.nameTheme!='Theme4t'}">
+        <div class=" slds-align_absolute-center">
+            <div class="slds-p-top--x-small slds-p-bottom--x-small">
+               <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveDispositionRecord}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+            <div class="slds-p-top--x-small slds-p-bottom--x-small slds-p-left_small">
+                <lightning:button variant="brand" label="Re-Trigger Dedupe" class="slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerDedupe}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+            <div class="slds-p-top--x-small slds-p-bottom--x-small slds-p-left_small">
+                <lightning:button variant="brand" label="Re-Trigger CIBIL" class=" slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerCIBIL}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-grid slds-wrap slds-grid_align-center slds-p-top--x-small slds-p-bottom--x-small ">
+                <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_2-of-12 slds-large-size_2-of-12">
+                    <span>   
+                        <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveDispositionRecord}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                    </span>
+                </div>
+              
+                <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_2-of-12 slds-large-size_2-of-12 ">
+                    <span>   
+                        <lightning:button variant="brand" label="Re-Trigger Dedupe" class="slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerDedupe}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                    </span>
+                </div>
+                <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_2-of-12 slds-large-size_2-of-12 ">
+                    <span>   
+                        <lightning:button variant="brand" label="Re-Trigger CIBIL" class="slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerCIBIL}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                    </span>
+                </div>
+                
+            </div>
+        </aura:set>
+    </aura:if>
+    
+    <br/>
+    <div id="SuccessToast1" style="display:none; ">
+        <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--toast slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsg1"></h2>
+                    <ui:outputURL aura:id="toastURL"  value="" click="{!c.navigateToOppComponent}" disabled="{!v.isdisableURL}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

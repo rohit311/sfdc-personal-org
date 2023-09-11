@@ -1,0 +1,168 @@
+<aura:component >
+    <aura:attribute name="isStaticHeader" type="Boolean" default="false" />
+    <aura:attribute name="fewmoreFields" type="Boolean" default="TRUE" />
+    <aura:attribute name="hidefewmoreFields" type="Boolean" default="false" />
+	<aura:attribute name="showLAN" type="Boolean" default="false" />
+    <aura:attribute name="leadCibilId" type="string"/>
+    <aura:attribute name="cibilScore" type="string"/>
+    <aura:attribute name="loanNumber" type="string"/>
+    <!--22141 S -->
+    <aura:attribute name = "mobileResult" type = "string"/>
+    <!--22141 E -->
+    <aura:handler event="c:BLMobilityPOCardEvent" action="{!c.showOfferData}"/>
+    <aura:attribute name="po" type="Product_Offerings__c" access="public" default="{ 'sobjectType': 'Product_Offerings__c',
+                    'id':'',
+                    'Name': '',
+                    'Lead__r.Customer_Name__c': '',                   
+                    'Report_Branch__c':'',
+                    'Offer_Amount__c': '',
+                    'Lead__r.MobilePhone': '',
+                    'Existing_Customer_Segmentation__c': '',
+                    'Offer_ROI__c':'',
+					'Offer_Rate__c':'',
+                    'Opportunity__r.Loan_Application_Number__c':'',
+                    'Lead__r.Cibil_Score__c': '',
+                    'Lead__c': '' }" />
+	<aura:if isTrue="{!v.isStaticHeader}">
+		<div class="slds-grid">
+	    	<div align="left" class="slds-float--left positonTop cPOCard">
+	        <a onclick="{!c.navigateToHome}" href="javascript:void(0);" title="Go to Home Page">
+	            <lightning:icon iconName="utility:home" size="x-small" alternativeText="Home Page" variant="error"/> HOME 
+	        </a>
+	        </div>
+            <br/>
+	    </div>
+    </aura:if>
+    
+    <div class="slds-card">
+        <section class="slds-card__body slds-p-around--xx-small">
+            <ul class="slds-has-dividers_around-space">
+                <li class="slds-tile slds-tile_board">
+                    <div class="slds-grid slds-wrap">
+                        <br/><div />
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <label class="slds-form-element__label"  for="POName">PO Name :</label>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                            <a onclick="{!c.navigateToMyComponent}" href="javascript:void(0);">
+								<ui:outputText aura:id="POName" value="{!v.po.Name}" />
+							</a>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <label class="slds-form-element__label" for="CustomerName">Customer Name :</label>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                            <a onclick="{!c.navigateToMyComponent}" href="javascript:void(0);">
+								<ui:outputText aura:id="CustomerName" value="{!v.po.Lead__r.Customer_Name__c}" />
+							</a>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <label class="slds-form-element__label" for="ReportBranch">Report Branch :</label>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <ui:outputText aura:id="ReportBranch" value="{!v.po.Report_Branch__c}" />
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <label class="slds-form-element__label" for="OfferAmount">Offer Amount :</label>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <ui:outputNumber aura:id="OfferAmount" format="##,##,##,#00.00#" value="{!v.po.Offer_Amount__c}" />
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <label class="slds-form-element__label" for="CustomerMobile">Mobile :</label>
+                        </div>
+                        <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                            <ui:outputPhone aura:id="CustomerMobile" value="{!v.po.Lead__r.MobilePhone}" />
+                        </div>
+                        <aura:if isTrue="{!and(v.cibilScore!='',v.cibilScore!=null)}">
+							<div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+								<label class="slds-form-element__label" for="CibilScore">CIBIL Score :</label>
+							</div>
+                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+                                    <a onclick="{!c.gotoURL}" href="javascript:void(0);" > 
+								<ui:outputText aura:id="CibilScore" value="{!v.cibilScore}" />
+							</a>
+                       		</div>
+						</aura:if>
+                        <!--22141 S -->
+                          <aura:if isTrue="{!and(v.mobileResult!='',v.mobileResult!=null)}">
+                        	<div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+								<label class="slds-form-element__label" for="Validation">Fraud Check :</label>
+							</div>
+                             <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8 slds-hyphenate">
+								<aura:if isTrue="{!v.mobileResult == 'MATCH'}">
+                    				<div class="slds-form-element__help" style="color:#04844b">Matched with CIBIL</div>                  
+                				</aura:if>
+                    			<aura:if isTrue="{!v.mobileResult == 'NO-MATCH'}">
+                    					<div class="slds-form-element__help" style="color:#ffb75d">Not Matched with CIBIL</div>                  
+                    			</aura:if>
+                       		</div>
+                        </aura:if>
+                        <!-- 22141 E -->
+						<aura:if isTrue="{!v.showLAN}">
+							<div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+								<label class="slds-form-element__label" for="LAN">LAN :</label>
+							</div>
+							<div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+								<ui:outputText aura:id="LAN" value="{!v.loanNumber}" />
+							</div>
+						</aura:if>
+                        <aura:if isTrue="{!v.hidefewmoreFields}">
+	                        <aura:if isTrue="{! !v.fewmoreFields}">
+	                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+	                                <label class="slds-form-element__label" for="text-input-Type">Offer ROI :</label>
+	                            </div>
+	                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+	                                <ui:outputText aura:id="OfferROI" value="{!v.po.Offer_ROI__c}" />
+	                            </div>
+								<div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+	                                <label class="slds-form-element__label" for="text-input-Type">Offer Rate :</label>
+	                            </div>
+	                            <div class="slds-p-horizontal slds-size--1-of-2 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+	                                <ui:outputText aura:id="OfferRate" value="{!v.po.Offer_Rate__c}" />
+	                            </div>
+	                        </aura:if>
+						</aura:if>
+                        <aura:if isTrue="{!v.fewmoreFields}">
+                            <div class="slds-p-horizontal slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                <div align="right" class="slds-float--right">
+                                <a onclick="{!c.showMoreFields}" href="javascript:void(0);" >
+                                    <lightning:icon iconName="utility:add" size="x-small" alternativeText="Few more fields" />
+                                </a>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.hidefewmoreFields}">
+                            <aura:if isTrue="{! !v.fewmoreFields}">
+                                <div class="slds-p-horizontal slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+                                    <div align="right" class="slds-float--right">
+                                    <a onclick="{!c.hideMoreFields}" href="javascript:void(0);" >
+                                        <lightning:icon iconName="utility:dash" size="x-small" alternativeText="Few more fields" />
+                                    </a>
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </aura:if>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+	<div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

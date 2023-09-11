@@ -1,0 +1,120 @@
+<!--
+****************************************************************************************************************************************************
+Comp Name : RererralNewAddSection.cmp
+Bug id    : 19263
+Description : This component will called on click of Proceed button and later on click of Add button to add new Referral(Lead) entries  
+****************************************************************************************************************************************************-->
+
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" controller="SALMobilityCntrl_V2" >
+    
+    <aura:attribute name="rowIndex" type="String" />
+    <aura:attribute name="refName" type="String"  default=""/>
+    <aura:attribute name="refMobile" type="String"  default=""/>
+    <aura:attribute name="refCity" type="String"  default=""/>
+    <aura:attribute name="employer" type="String"  default=""/>
+    <aura:attribute name="referralNumber" type="Integer" />
+    <aura:attribute name="leadList" type="lead[]"/>
+    <aura:attribute name="lead" type="lead" default="{'sobjectType': 'lead'}"/>
+    <aura:attribute name="EmployerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="empsearching" type="Boolean" default="false"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="isEmployerSelected" type="Boolean" default="true"/>
+    <aura:attribute name="isCitySelected" type="Boolean" default="true"/>
+       <aura:attribute name="isKeyPressed" type="Boolean" default="false"/>
+    <aura:attribute name="User" type="User" default="{'sobjectType': 'User'}" />
+    <aura:attribute name="EmployerList" type="Segment_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedEmployer" type="Segment_Master__c" default="{}"/>
+    <aura:attribute name="CityList" type="Demographic_Mapping__c[]" default="[]"/>
+    <aura:attribute name="selectedArea" type="Demographic_Mapping__c" default="{}"/>
+    <aura:attribute name="oldAreaKeyword" type="String" default=""/>
+     <aura:attribute name="oldAreaKeywordCity" type="String" default="false"/>
+  
+    <aura:attribute name="CitySearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+  
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:method name="validateReferralSection" action="{!c.validateReferralSection}" access="PUBLIC"/>
+   
+
+    <div class="slds-box slds-box_x-small applyColor " style="margin-top:15px;margin-bottom:2px;margin-right:0px;background:color:red" >
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+            <div class="slds-text-heading_small">
+                <ui:outputText value="Reference "/> <ui:outputText value="{!v.referralNumber+1}" ></ui:outputText>
+            </div>
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="refName"  value="{!v.lead.LastName}" label="NAME"  name="refName" placeholder="Enter Name"/>        
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="refMobile"  value="{!v.lead.Customer_Mobile__c}" label="Mobile Number" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile Number" maxlength="10"  name="refMobile" placeholder="Enter Mobile Number"/>  
+                            </div>
+                        </div>
+                       
+                        <!-- City add section   -->
+                         <div aura:id="CitySearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1  slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <aura:if isTrue="{!$Browser.isIPhone==false}">
+    						<div id="{!v.referralNumber}"></div>
+    					    </aura:if>
+                             <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="areaName"><span class="slds-required">*</span>City</label>
+                                <ui:inputText aura:id="City" required="true" class="slds-input"  updateOn="keyup" keyup="{!c.areaKeyPressController}" value="{!v.CitySearchKeyword}" placeholder="Enter city" />                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="CityList">
+                                    <div aura:id="areaMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.CityList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectArea}">{!singleRec.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div> 
+                            </div>
+                        </div>
+                        
+                        <!-- end  --> 
+                        <div aura:id="EmployerSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="employer"><span class="slds-required">*</span>Employer</label>
+                                <ui:inputText aura:id="employer" required="true" class="slds-input "  updateOn="keyup" keyup="{!c.empKeyPressController}" value="{!v.EmployerSearchKeyword}" placeholder="Enter Employer"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="EmployerList">
+                                    <div aura:id="empMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.EmployerList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectEmployer}">{!singleRec.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </p>
+        </lightning:card>
+    </div>
+    
+</aura:component>

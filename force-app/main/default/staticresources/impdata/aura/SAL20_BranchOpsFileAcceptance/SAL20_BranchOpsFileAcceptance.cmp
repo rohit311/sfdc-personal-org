@@ -1,0 +1,112 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="SAL20_BranchOpsFileAcceptanceController">
+    
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="loanTargetRecord" type="Object"/>
+    <aura:attribute name="loanRecord" type="Opportunity"/>
+    <aura:attribute name="loanRecordError" type="String"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="optionsFileAcceptance" type="List"/>
+    <aura:attribute name="optionsLoanVariant" type="List"/>
+    <aura:attribute name="optionsLoanType" type="List"/>
+    <aura:attribute name="optionsProductSegment" type="List"/>
+    <aura:attribute name="schemeSelected" type="String"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name="lookupCleared" type="Boolean" default="false"/>
+    <aura:attribute name="searchWord" type="String"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <aura:if isTrue="{! v.isProcessing }">
+        <lightning:spinner size="large" />
+    </aura:if>
+    
+    <force:recordData aura:id="loanRecordHandler"
+                      recordId="{!v.oppId}"
+                      fields = "Sales_Submit_to_Branch_Ops_Date__c, File_Acceptance__c, CPA_Acceptance_time__c, Approved_Rate__c, Loan_Type__c, Loan_Variant__c, Type_Of_Loan__c, Scheme_Master__c,Scheme_Master__r.Name"
+                      targetRecord="{!v.loanTargetRecord}"
+                      targetFields="{!v.loanRecord}"
+                      targetError="{!v.loanRecordError}"
+                      mode="EDIT"
+                      />
+    
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+        <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Branch Ops File Acceptance</h1>
+    </div>
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->	
+    <table class="slds-table ">
+        <tr>
+            <td>Sales Submit to Branch Ops Date</td>
+            <td>
+                <lightning:input label=" " type="date" value="{!v.loanRecord.Sales_Submit_to_Branch_Ops_Date__c}" disabled="true" style="width: 130px;"/>
+            </td>
+            <td>Branch Ops File Acceptance</td>
+            <td style="width: 130px;">
+                <lightning:select name="selectFA" label="" value="{!v.loanRecord.File_Acceptance__c}">
+                    <aura:iteration items="{!v.optionsFileAcceptance}" var="oFA">
+                        <option value = "{!oFA.value}" 
+                                label = "{!oFA.label}" 
+                                selected = "{! oFA.value ==  v.loanRecord.File_Acceptance__c}"
+                                />
+                    </aura:iteration>
+                </lightning:select>
+            </td>
+            <td >Branch Ops Accepted Date</td>
+            <td>
+                <lightning:input label=" " type="date" value="{!v.loanRecord.CPA_Acceptance_time__c}" disabled="true" style="width: 130px;"/> <!--Bug 22562 Added type="date" -->                
+            </td>
+        </tr>                               
+        <tr>
+            <td>Loan Variant</td>
+            <td style="width: 130px;">
+                <lightning:select name="selectLV" label="" value="{!v.loanRecord.Loan_Variant__c}">
+                    <aura:iteration items="{!v.optionsLoanVariant}" var="oLV">
+                        <option value = "{!oLV.value}" 
+                                label = "{!oLV.label}" 
+                                selected = "{! oLV.value ==  v.loanRecord.Loan_Variant__c}"
+                                />
+                    </aura:iteration>
+                </lightning:select>
+            </td>
+            <td style="padding-top:1.5%;">Scheme</td>
+            <td style="padding-top:1.5%;width: 30%;">
+                <c:customLookup ObjectName="Scheme_Master__c" SearchKeyWord="{!v.searchWord}" isCleared = "{!v.lookupCleared}" schemeId="{!v.schemeSelected}" FieldName="Name"/>
+            </td>
+        </tr>
+        <tr>
+            <td>Product Segment/Scheme</td>
+            <td style="width: 130px;">
+                <lightning:select name="selectProduct" label="" value="{!v.loanRecord.Loan_Type__c}" onchange ="{!c.onProductSegmentChange}" required="true">
+                    <aura:iteration items="{!v.optionsProductSegment}" var="oPS">
+                        <option value = "{!oPS.value}" 
+                                label = "{!oPS.label}" 
+                                selected = "{! oPS.value ==  v.loanRecord.Loan_Type__c}"
+                                />
+                    </aura:iteration>
+                </lightning:select>
+            </td>
+            <td>Type Of Loan</td>
+            <td style="width: 130px;">
+                <lightning:select name="selectLT" label="" value="{!v.loanRecord.Type_Of_Loan__c}" required="true">
+                    <aura:iteration items="{!v.optionsLoanType}" var="oLT">
+                        <option value = "{!oLT.value}" 
+                                label = "{!oLT.label}" 
+                                selected = "{! oLT.value ==  v.loanRecord.Type_Of_Loan__c}"
+                                />
+                    </aura:iteration>
+                </lightning:select>
+            </td>
+        </tr>
+    </table>
+    <div style="margin-left:50%;" >
+        <lightning:button variant="brand" label="Save" title="Save" disabled="{! v.isProcessing == true }" onclick="{!c.onSave}" />
+    </div>
+    <!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <c:Toast aura:id="toastCmp"/>    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

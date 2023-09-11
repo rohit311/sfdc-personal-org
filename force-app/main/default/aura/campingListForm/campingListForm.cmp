@@ -1,0 +1,15 @@
+<aura:component >
+	<aura:attribute name="newItem" type="Camping_Item__c" default="{'sObjectType':'Camping_Item__c','Price__c':0,'Quantity__c':0}"/>
+    
+    <aura:registerEvent name="addItem" type="c:addItemEvent"/>
+    
+    <ui:inputText aura:id="cName" label="Camping item name" value="{!v.newItem.Name}"/>
+    
+    <ui:inputNumber aura:id="cQuantity" label="Quantity" value="{!v.newItem.Quantity__c}"/>
+    
+    <ui:inputCurrency aura:id="cCurrency" label="Currency" value="{!v.newItem.Price__c}"/>
+    
+    <ui:inputCheckbox aura:id="cPacked" label="Packed" value="{!v.newItem.Packed__c}"/>
+    
+     <ui:button label="Create CampingItem" press="{!c.submitForm}"/>
+</aura:component>

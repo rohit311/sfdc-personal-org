@@ -1,0 +1,191 @@
+<aura:component controller="SFDCMobileLoanController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes">
+    
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="loadSection" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    
+    <aura:attribute name="contact" type="Contact" access="global"/>
+    <aura:attribute name="applicantObject" type="Applicant__c" access="global"/>
+    
+    <aura:attribute name="feesNChargesCKYCList" type="Contact" access="global"/>
+    
+    <aura:attribute name="maritalStatusList" type="List"/>
+    
+    <aura:attribute name="fatherOrSpouseList" type="List"/>
+    
+    <aura:attribute name="fatherSpouseSalutationlist" type="List"/>
+    
+    <aura:attribute name="employmentTypeList" type="List"/>
+    
+    <aura:attribute name="docProofList" type="List"/>
+    
+    <aura:attribute name="permDocumentList" type="List"/>
+    
+    <aura:attribute name="resiDocumentList" type="List"/>
+
+    <aura:attribute name="shouldBeDisable" type="Boolean" />
+    <aura:handler event="c:DisableFormEvent" action="{!c.disablecKycForm}"/>
+    <aura:handler event="c:EnableFormEventOnSendBack" action="{!c.enablecKycForm}"/>
+
+    <aura:if isTrue="{!v.loadSection}">
+        <div class="kyc-container">
+            <ui:scrollerWrapper class="OppWrapScroller">
+                <fieldset aura:id="commercialDetails" class="slds-form--stacked slds-p-bottom--medium">
+                <h3 class="slds-section-title--divider">CKYC Details</h3>
+                    <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="ckycNo" label="CKYC No" value="{!v.applicantObject.CKYC_No__c }" name="ckycNo" maxlength="14" placeholder="CKYC No" type="text"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                     <label class="slds-form-element__label" for="maritalStatusLabel"><span style="color:red">*</span>Marital Status</label><!-- US_27806_CKYC Details to be mandatory -->
+                                    <ui:inputSelect class="slds-input" aura:id="marital_status" value="{!v.contact.Marital_Status__c}">
+                                        <ui:inputSelectOption aura:id="marital_status_SelectOption" text="" label="-- None --"/>
+                                        <aura:iteration items="{!v.maritalStatusList}" var="maritalstatus">
+                                            <aura:if isTrue="{!v.contact.Marital_Status__c == maritalstatus}" >
+                                                <ui:inputSelectOption aura:id="marital_status_SelectOption" text="{!maritalstatus}" label="{!maritalstatus}" value="true" />
+                                                <aura:set attribute="else">
+                                                    <ui:inputSelectOption aura:id="marital_status_SelectOption" text="{!maritalstatus}" label="{!maritalstatus}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                     <label class="slds-form-element__label" for="conFatherSpouseLabel"><span style="color:red">*</span>Father / Spouse</label><!-- US_27806_CKYC Details to be mandatory -->
+                                    <ui:inputSelect class="slds-input" aura:id="conFatherSpouse" value="{!v.contact.Father_Spouse__c}">
+                                        <ui:inputSelectOption aura:id="conFatherSpouse_SelectOption" text="" label="-- None --"/>
+                                        <aura:iteration items="{!v.fatherOrSpouseList}" var="fatherOrSpouse">
+                                            <aura:if isTrue="{!v.contact.Father_Spouse__c == fatherOrSpouse}" >
+                                                <ui:inputSelectOption aura:id="conFatherSpouse_SelectOption" text="{!fatherOrSpouse}" label="{!fatherOrSpouse}" value="true" />
+                                                <aura:set attribute="else">
+                                                    <ui:inputSelectOption aura:id="conFatherSpouse_SelectOption" text="{!fatherOrSpouse}" label="{!fatherOrSpouse}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                     <label class="slds-form-element__label" for="conFatherSpouseSalutationLabel"><span style="color:red">*</span>Father / Spouse Salutation</label><!-- US_27806_CKYC Details to be mandatory -->
+                                    <ui:inputSelect class="slds-input" aura:id="conFatherSpouseSalutation" value="{!v.contact.Father_Spouse_Salutation__c}">
+                                        <ui:inputSelectOption aura:id="conFatherSpouseSalutation_SelectOption" text="" label="-- None --"/>
+                                        <aura:iteration items="{!v.fatherSpouseSalutationlist}" var="fatherSpouseSalutation">
+                                            <aura:if isTrue="{!v.contact.Father_Spouse_Salutation__c == fatherSpouseSalutation}" >
+                                                <ui:inputSelectOption aura:id="conFatherSpouseSalutation_SelectOption" text="{!fatherSpouseSalutation}" label="{!fatherSpouseSalutation}" value="true" />
+                                                <aura:set attribute="else">
+                                                    <ui:inputSelectOption aura:id="conFatherSpouseSalutation_SelectOption" text="{!fatherSpouseSalutation}" label="{!fatherSpouseSalutation}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="conFatherSpouseFirstNameVal" label="Father / Spouse First Name" value="{!v.contact.Father_Spouse_First_Name__c}" placeholder="First Name" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter Text value"   required="true" messageWhenValueMissing="Please enter Father / Spouse First Name"/> <!-- US_27806_CKYC Details to be mandatory -->
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="conFatherSpouseMiddleNameVal" label="Father / Spouse Middle Name" value="{!v.contact.Father_Spouse_Middle_Name__c}" placeholder="Middle Name"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="conFatherSpouseLastNameVal" label="Father / Spouse Last Name" value="{!v.contact.Father_Spouse_Last_Name__c}" placeholder="Last Name" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter Text value"  required="true" messageWhenValueMissing="Please enter Father / Spouse Last Name"/> <!-- US_27806_CKYC Details to be mandatory -->
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="motherFirstNameVal" label="Mother's First Name" value="{!v.contact.Mother_First_Name__c}" placeholder="Mother's First Name" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter Text value"  required="true" messageWhenValueMissing="Please enter Mother's first Name"/> <!-- US_27806_CKYC Details to be mandatory -->
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="motherMiddleNameVal" label="Mother's Middle Name" value="{!v.contact.Mother_Middle_Name__c}" placeholder="Mother's Middle Name"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="motherLastNameVal" label="Mother's Last Name" value="{!v.contact.Mother_Last_Name__c}" placeholder="Mother's Last Name" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter Text value"  required="true" messageWhenValueMissing="Please enter Mother's Last Name"/> <!-- US_27806_CKYC Details to be mandatory -->
+                                </div>
+                            </div>
+                            
+	
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    
+                                     <label class="slds-form-element__label" for="perm_documet_typeLabel"><span style="color:red">*</span>Proof of Address Submitted for Permanent</label><!-- US_27806_CKYC Details to be mandatory -->
+                                    <ui:inputSelect class="slds-input" aura:id="perm_documet_type" value="{!v.applicantObject.Proof_of_Address_Submitted_for_Permanent__c}">
+                                        <ui:inputSelectOption aura:id="perm_documet_type_SelectOption" text="" label="-- None --"/>
+                                        <aura:iteration items="{!v.permDocumentList}" var="permDocument">
+                                            <aura:if isTrue="{!v.applicantObject.Proof_of_Address_Submitted_for_Permanent__c == permDocument}" >
+                                                <ui:inputSelectOption aura:id="perm_documet_type_SelectOption" text="{!permDocument}" label="{!permDocument}" value="true" />
+                                                <aura:set attribute="else">
+                                                    <ui:inputSelectOption aura:id="perm_documet_type_SelectOption" text="{!permDocument}" label="{!permDocument}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                     <label class="slds-form-element__label" for="perm_documet_typeLabel"><span style="color:red">*</span>Proof of Address Submitted for Residence</label> <!-- US_27806_CKYC Details to be mandatory -->
+                                    <ui:inputSelect class="slds-input" aura:id="resi_documet_type" value="{!v.applicantObject.Proof_of_Residence_Address_Submitted__c}">
+                                        <ui:inputSelectOption aura:id="resi_documet_type_SelectOption" text="" label="-- None --"/>
+                                        <aura:iteration items="{!v.resiDocumentList}" var="resiDocument">
+                                            <aura:if isTrue="{!v.applicantObject.Proof_of_Residence_Address_Submitted__c == resiDocument}" >
+                                                <ui:inputSelectOption aura:id="resi_documet_type_SelectOption" text="{!resiDocument}" label="{!resiDocument}" value="true" />
+                                                <aura:set attribute="else">
+                                                    <ui:inputSelectOption aura:id="resi_documet_type_SelectOption" text="{!resiDocument}" label="{!resiDocument}"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+	   
+                            
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <br/>
+                <div class="slds-p-top--x-small">
+                    <div class="slds-p-horizontal_medium">
+                    <lightning:button aura:id="save" variant="brand" label="Save Details" class="" onclick="{!c.saveCKYCData }"/>
+                    </div>
+                 </div>
+            </ui:scrollerWrapper>
+            
+        </div>
+	</aura:if>
+     <!-- commented by Sachin -->
+    <!--
+        <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows slds-spinner_container':'slds-hide slds-spinner_container'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+   -->
+    
+    
+</aura:component>

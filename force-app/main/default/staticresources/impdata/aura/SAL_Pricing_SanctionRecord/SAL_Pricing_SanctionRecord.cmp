@@ -1,0 +1,87 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="discrepancy" type="Discrepancy__c" default="{'sobjectType': 'Discrepancy__c'}"/>
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:registerEvent name="AddRowEvt" type="c:SAL_Opp_PerfiosEvent"/> 
+    <aura:attribute name="discrepancyList" type="Discrepancy__c[]"/>
+    <aura:attribute name="OTPDiscrepancyCategory__c" type="List"/>
+    <aura:attribute name="OTPDiscrepancyDocuments__c" type="List"/>
+    <aura:attribute name="OTPDiscrepancyDocumentlist" type="List"/>
+    <aura:attribute name="Status__c" type="List"/>
+    <aura:attribute name="DependentList" type="Object" />
+     <aura:attribute name="loan" type="Opportunity"/>
+    <aura:attribute name="loanid" type="ID"/> 
+     <aura:attribute name="disabledocuments" type="Boolean" default="true"/>
+    <aura:attribute name="instance" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:method name="validate" action="{!c.validateData}" />   
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <!--<div style="position:relative">
+        <ui:scrollerWrapper class="scrollerSize">
+            <div class="innerDivWrapper"> -->
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+        <lightning:card title="" class="applyColor">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded" >
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:select required="true" messageWhenValueMissing="Please select a value" disabled="{!if(or(v.discrepancy.Id == '',v.discrepancy.Id == null),false,true)}" aura:id="category" name="category" label="Category" value="{!v.discrepancy.OTPDiscrepancyCategory__c}" onchange="{!c.getSubPicklist}">
+                            <option value="" text="--None--" />
+                            <aura:iteration items="{!v.DependentList}" var="ch">  
+                                <option value="{!ch.value}" text="{!ch.label}" selected="{!v.discrepancy.OTPDiscrepancyCategory__c == ch.value}"></option>
+                            </aura:iteration>
+                        </lightning:select>                                                        
+                    </div>        
+                </div>
+                
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:select required="true" messageWhenValueMissing="Please select a value" aura:id="documents" name="documents" label="Documents" value="{!v.discrepancy.OTPDiscrepancyDocuments__c}" disabled="{!if(and(v.discrepancy.OTPDiscrepancyCategory__c != '',or(v.discrepancy.Id == '',v.discrepancy.Id == null)),false,true)}">
+                            <option value="" text="--None--" />
+                            <aura:iteration items="{!v.OTPDiscrepancyDocumentlist}" var="type">
+                                <option value="{!type.value}" text="{!type.label}" selected="{!v.discrepancy.OTPDiscrepancyDocuments__c == type.value}"></option>
+                            </aura:iteration>
+                        </lightning:select>             
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    
+                    <div class="slds-form-element__control">
+                        <lightning:select required="true" messageWhenValueMissing="Please select a value" disabled="{!if(v.loan.StageName == 'Post Approval Sales',true,false)}" aura:id="status" name="status" label="Status" value="{!v.discrepancy.Status__c}"><!--status disbled for bug20435-->
+                            <option value="" text="--None--" />
+                            <aura:iteration items="{!v.Status__c}" var="type">
+                                <option value="{!type}" text="{!type}" selected="{!v.discrepancy.Status__c == type}"></option>
+                            </aura:iteration>
+                        </lightning:select>                             
+                    </div>   
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    
+                    <div class="slds-form-element__control">
+                        <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="remark" label="Resolution Remarks" value="{!v.discrepancy.Resolution_Remarks__c}"  name="remark" type="text"  />                                    
+                        
+                    </div>   
+                </div>
+                <div class="slds-form-element slds-p-top--x-large slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <aura:if isTrue="{!or(v.discrepancy.OTPDiscrepancyCategory__c == null,v.discrepancy.OTPDiscrepancyCategory__c  == '')}">
+                            <button value="" class="slds-m-left_x-small slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!v.displayReadOnly}"> <!-- CR 22307 --> <lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                        </aura:if>
+                    </div>
+                </div>
+                <aura:if isTrue="{!and(v.discrepancy.OTPDiscrepancyCategory__c == 'Document',and( v.flow == 'pricing',v.loan.StageName == 'Post Approval Sales'))}"> <!-- 22307 added flow check -->
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            
+                            <c:DocumentUploader stage="{!v.loan.StageName}" aura:id="file-uploader-1" instance="{!v.instance+1}" forPricingDashboard="yes" parentId="{!v.loan.Id}" fileName="{!'Sanc_'+v.discrepancy.OTPDiscrepancyDocuments__c}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!if(v.discrepancy.OTPDiscrepancyDocuments__c == '',false,true)}"/><!-- Need to add showUploadButton="false" -->
+                        </div>
+                        
+                    </div>
+                </aura:if>
+            </div>
+        </lightning:card>
+    </div>
+    <!--  </div></ui:scrollerWrapper></div>-->
+    
+    
+</aura:component>

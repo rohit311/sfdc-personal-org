@@ -1,0 +1,184 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   
+    <aura:attribute name="salsolpolicy" type="SOL_Policy__c" default=""/>
+    <aura:attribute name="agesolpolicy" type="SOL_Policy__c" default=""/>
+    <aura:attribute name="expsolpolicy" type="SOL_Policy__c" default=""/>
+    <aura:attribute name="netsalary" type="Object" default=""/>
+    <aura:attribute name="account" type="Account" default=""/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="age" type="Object" default="0"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="appType" type="String" default="Primary"/><!--24668 added for coApplicant dashboard-->
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    
+    <c:GenericBackCmp/> <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        
+        <lightning:card title="" class="applyMarginToCard slds-box">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                   
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                        
+                        
+                                <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--12-of-12">    
+                                    
+                                    <!--    <thead  class="slds-grid slds-hyphenate"> -->
+                                    
+                                    
+                                    
+                                    
+                                    <!--    </thead> -->
+                                    <tbody class="slds-grid slds-wrap">
+                                        
+                                        <aura:if isTrue="{!and(and(!empty(v.agesolpolicy),!empty(v.salsolpolicy)),!empty(v.expsolpolicy))}">
+                                            <aura:if isTrue="{!and(and(v.agesolpolicy.Policy_Status__c  == 'OK',v.salsolpolicy.Policy_Status__c  == 'OK'),v.expsolpolicy.Policy_Status__c  == 'OK')}" >
+                                                
+                                                <tr class ="slds-align_absolute-center slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right green-color" style="text-align :center">  
+                                                    <td colspan="3" class="slds-align_absolute-center" style="border-top:none !important"> 
+                                                        MCP Check : Successful
+                                                    </td>
+                                                </tr>
+												<aura:set attribute="else">
+                                                
+                                                <tr class ="slds-align_absolute-center slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right orange-color" style="text-align :center">  
+                                                    <td colspan="3" class="slds-align_absolute-center" style="border-top:none !important"> 
+                                                        MCP Check : Not Confirmed
+                                                    </td>
+                                                </tr>
+                                            </aura:set>
+                                            </aura:if>
+                                            <aura:set attribute="else">
+                                                
+                                                <tr class ="slds-align_absolute-center slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right orange-color" style="text-align :center">  
+                                                    <td colspan="3" class="slds-align_absolute-center" style="border-top:none !important"> 
+                                                        MCP Check : Not Confirmed
+                                                    </td>
+                                                </tr>
+                                            </aura:set>
+                                        </aura:if>
+                                        <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                                            <th class="slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                MCP Parameter
+                                            </th>
+                                            
+                                            <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                                                Output
+                                            </th>
+                                            <th class="slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right">
+                                                MCP Check 
+                                            </th>
+                                        </tr>
+                                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                            
+                                            <td class="WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                                                Age
+                                            </td> 
+                                            
+                                            <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                {!v.age}
+                                            </td>
+                                            <td class="slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                <aura:if isTrue="{!!empty(v.agesolpolicy)}">
+                                                    <aura:if isTrue="{!v.agesolpolicy.Policy_Status__c  == 'OK'}" >
+                                                        Met
+                                                        <aura:set attribute="else">
+                                                            Not Met
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        Not Met
+                                                    </aura:set>
+                                                </aura:if> 
+                                            </td>
+                                        </tr>
+                                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                            
+                                            <td class="WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                                                Net Salary
+                                            </td> 
+                                            
+                                            <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                {!v.netsalary}
+                                            </td>
+                                            <td class="slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                <aura:if isTrue="{!!empty(v.salsolpolicy)}">
+                                                    <aura:if isTrue="{!v.salsolpolicy.Policy_Status__c  == 'OK'}" >
+                                                        Met
+                                                        <aura:set attribute="else">
+                                                            Not Met
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        Not Met
+                                                    </aura:set>
+                                                </aura:if> 
+                                            </td>
+                                        </tr>
+                                        <!--24668 added appType-->
+                                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                            
+                                            <td class="WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                                                Current Work Experience
+                                            </td> 
+                                            
+                                            <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                {!v.account.Current_experiance_in_Years__c}
+                                            </td>
+                                            <td class="slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                <aura:if isTrue="{!!empty(v.expsolpolicy)}">
+                                                    <aura:if isTrue="{!v.expsolpolicy.Policy_Status__c  == 'OK'}" >
+                                                        Met
+                                                        <aura:set attribute="else">
+                                                            Not Met
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        Not Met
+                                                    </aura:set>
+                                                </aura:if> 
+                                            </td>
+                                        </tr>
+                                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                            
+                                            <td class="WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                                                Total Work Experience
+                                            </td> 
+                                            
+                                            <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                {!v.account.Total_Work_Experience_Yrs__c}
+                                            </td>
+                                            <td class="slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                                <aura:if isTrue="{!!empty(v.expsolpolicy)}">
+                                                    <aura:if isTrue="{!v.expsolpolicy.Policy_Status__c  == 'OK'}" >
+                                                        Met
+                                                        <aura:set attribute="else">
+                                                            Not Met
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        Not Met
+                                                    </aura:set>
+                                                </aura:if> 
+                                            </td>
+                                        </tr>
+                                        </aura:if>
+                                    </tbody>
+                                </table>    
+                           
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

@@ -1,0 +1,37 @@
+<apex:page standardController="Opportunity">
+  <apex:form id="reason3">
+   <apex:pageBlock >
+     Opportunity Name:<apex:inputField value="{!opportunity.name}"/>
+     <br/>
+
+     Stage:<apex:inputField value="{!opportunity.StageName}">
+                       <apex:actionSupport event="onchange" rerender="reason3" status="actionstatusdisplay"/>
+          <apex:actionstatus startText="applying value..." id="actionstatusdisplay"></apex:actionstatus>
+          
+     </apex:inputField>
+     
+
+     <br/>
+     Amount:<apex:inputField value="{!opportunity.Amount}">
+     
+     </apex:inputField>
+     <br/>
+     Close Date:<apex:inputField value="{!opportunity.CloseDate}"/>
+     <br/>
+     <br/>
+     <apex:commandButton action="{!save}" value="SAVE"/>
+     
+     <apex:variable value="{!opportunity.StageName}" var="x"/>
+   <!--  {!x} -->
+   <apex:outputPanel rendered="{!IF(x=='Closed Lost',true,false)}">
+     <apex:pageBlockSection title="Closed Information" >
+     <br/>
+     <apex:inputField value="{!Opportunity.Reason_Lost__c}"/>
+     <br/>
+     
+     </apex:pageBlockSection>
+      </apex:outputPanel>
+   </apex:pageBlock>
+   </apex:form>
+  
+</apex:page>

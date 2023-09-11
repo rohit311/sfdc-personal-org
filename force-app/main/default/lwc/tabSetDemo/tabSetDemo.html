@@ -1,0 +1,14 @@
+<template>
+  <lightning-tabset active-tab-value={activetabvalue}>
+
+    <!--<lightning-tab label="Item Two" value="two">
+        Two Content !
+    </lightning-tab>-->
+    <lightning-tab label="Item One" value="search" class="search">
+      One Content !
+  </lightning-tab>
+    <lightning-tab if:false={isGuestUser} label="Item Three" value="three">
+        Three Content !
+    </lightning-tab>
+</lightning-tabset>
+</template>

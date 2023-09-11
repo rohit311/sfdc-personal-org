@@ -1,0 +1,388 @@
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    
+    <aura:attribute name="obligLst" type="Object" default=""/>
+    <aura:attribute name="updateLst" type="List" default=""/>
+    <aura:attribute name="deleteLst" type="List" default=""/>
+    <aura:attribute name="oppId" type="List" default=""/>
+    <aura:attribute name="oblType" type="List"/>
+    <aura:attribute name="statusLst" type="List"/>
+    <aura:attribute name="finLst" type="List"/>
+    <aura:attribute name="allApps" type="List"/>
+    <aura:attribute name="loanTypeLst" type="List"/>
+    <aura:attribute name="camObj" type="CAM__c" default="{'sobjectType':'CAM__c',Id:'',sal_max_loan__c:'',ROI__c:'',Tenor__c:''}" />
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/>
+     <aura:attribute name="isCredit" type="Boolean" default="false"/>
+    <aura:attribute name="applicantObj" type="Applicant__c"/> 
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="isViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="showcibilpopup" type="boolean" default="false"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="theme" type="String" default=""/>   
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="totalObligations" type="Decimal" default=""/> 
+    <aura:attribute type="String" name="stageName" default=""/>
+    
+    <!-- 16270 -->
+    <aura:attribute name="enhancedFlag" type="Boolean" />
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="obligEditProfCheck" type="Boolean" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!-- 16270 -->
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium" >
+        <lightning:card title="Obligation Details" class="applyColor" >
+            <aura:if isTrue="{!and(not(empty(v.obligLst)),v.obligLst.length >0)}">
+                <div id="obligation-table-div" style="overflow-y:hidden; overflow-x:scroll;">
+                    
+                    <table class="slds-m-top_small slds-table  slds-hyphenate slds-size--12-of-12 ">    
+                        
+                        
+                        <thead  class="slds-grid slds-wrap slds-table_bordered">
+                            
+                            
+                            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Applicant </b>
+                                </th>
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Loan Type </b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Loan Amount</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Current balance </b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Declared EMI</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Derived EMI</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Start Date</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Status</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>MOB</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Remark</b>
+                                </th>
+                                
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    <b>Financier Name </b>
+                                </th>
+                                
+                               
+                                <th class="floatLeft slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                    
+                                    <aura:if  isTrue="{!or(v.stageName == 'DSA/PSF Login', v.stageName == 'Post Approval Sales')}" >
+                                        <b> Delete</b>
+                                        <aura:set attribute="else">
+                                            <b>Delete </b>
+                                        </aura:set>
+                                    </aura:if>  
+                                </th>
+                               
+                                
+                                
+                                
+                                
+                            </tr>
+                            
+                            
+                            
+                            
+                        </thead>
+                        
+                        <tbody class="slds-grid slds-wrap slds-table_bordered">
+                            
+                            <aura:iteration items="{!v.obligLst}" var="exstLoanObj">
+                                
+                                
+                                <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                  
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        <!--applicant -->
+                                        <div class="slds-p-around_none" style="border-left:solid red;border-right:solid red;border-top:solid red;border-bottom:solid red ">
+                                        <lightning:select  disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck ) }" aura:id="{!exstLoanObj.exObj.Id + 'Applicant'}" label="" value="{!exstLoanObj.exObj.Applicant__c}" class="slds-m-around_none" >
+                                            <option value="-- None --">-- None --</option>
+                                            <aura:iteration items="{!v.allApps}" var="app">                                               
+                                                <option value="{!app.Id}" text="{!app.Contact_Name__r.Name}" selected="{!exstLoanObj.exObj.Applicant__c == app.Id}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                      </div>  
+                                    </td>
+                                   
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        <aura:if  isTrue="{!or(v.stageName == 'DSA/PSF Login', v.stageName == 'Post Approval Sales')}" >
+                                            <lightning:select aura:id="OblType" label="" value="{!exstLoanObj.exObj.Loan_Type__c}" disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" >
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.loanTypeLst}" var="status">                                                 
+                                                    <option value="{!status}" text="{!status}" selected="{!exstLoanObj.exObj.Loan_Type__c == status}" ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                            <aura:set attribute="else">  
+                                                <lightning:select disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" aura:id="OblType" label="" value="{!exstLoanObj.exObj.Loan_Type__c}" >
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration items="{!v.loanTypeLst}" var="status">                                                 
+                                                        <option value="{!status}" text="{!status}" selected="{!exstLoanObj.exObj.Loan_Type__c == status}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </aura:set>
+                                        </aura:if> 
+                                        
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        <aura:if  isTrue="{!or(v.stageName == 'DSA/PSF Login', v.stageName == 'Post Approval Sales')}" >
+                                        	<lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" value="{!exstLoanObj.exObj.Loan_Amount__c}" aura:id="{!exstLoanObj.exObj.Id + 'amt'}" pattern= "^[0-9]+$" messageWhenPatternMismatch="Please Enter Valid input" />
+                                            <aura:set attribute="else">
+                                                <lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" value="{!exstLoanObj.exObj.Loan_Amount__c}" aura:id="{!exstLoanObj.exObj.Id + 'amt'}" pattern= "^[0-9]+$" messageWhenPatternMismatch="Please Enter Valid input" />
+                                            </aura:set>
+                                        </aura:if> 
+                                        
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        
+                                        <div class="slds-p-around_none" style="border-left:solid red;border-right:solid red;border-top:solid red;border-bottom:solid red ">
+                                            <aura:if  isTrue="{!or(v.stageName == 'DSA/PSF Login', v.stageName == 'Post Approval Sales')}" >
+                                        		<lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" class="slds-align_absolute-center slds-m-around_none" value="{!exstLoanObj.exObj.POS__c}"  pattern= "^[0-9]+$" messageWhenPatternMismatch="Please Enter Valid input" />
+                                                <aura:set attribute="else">
+                                                    <lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" class="slds-align_absolute-center slds-m-around_none" value="{!exstLoanObj.exObj.POS__c}"  pattern= "^[0-9]+$" messageWhenPatternMismatch="Please Enter Valid input" />
+                                                </aura:set>
+                                            </aura:if>
+                                    </div>
+                                        </td>
+                                        
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                         
+                                        <lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck ) }" value="{!exstLoanObj.exObj.EMI__c}" messageWhenPatternMismatch="Please Enter Valid input" pattern= "^[0-9]+$"/>
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                           
+                                        <lightning:formattedNumber disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" value="{!exstLoanObj.exObj.Derived_EMI__c}" maximumFractionDigits="2"/>
+                                        
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        <div class="slds-p-around_none" style="border-left:solid red;border-right:solid red;border-top:solid red;border-bottom:solid red ">
+                                            <lightning:input disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck) }" class="slds-m-around_none" type="date" value="{!exstLoanObj.exObj.Start_On__c}" />
+                                        </div>
+                                    </td> 
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                      <div class="slds-p-around_none" style="border-left:solid red;border-right:solid red;border-top:solid red;border-bottom:solid red ">  
+                                        <lightning:select disabled = "{! and (exstLoanObj.exObj.Identifier__c != 'Manual' , v.obligEditProfCheck ) }" class="slds-m-around_none" aura:id="oblStatus" label="" value="{!exstLoanObj.exObj.Status__c}" >
+                                            <option value="-- None --">-- None --</option>
+                                            <aura:iteration items="{!v.statusLst}" var="status">                                                 
+                                                <option value="{!status}" text="{!status}" selected="{!exstLoanObj.exObj.Status__c == status}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                        </div>
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                           
+                                        <lightning:input value="{!exstLoanObj.exObj.MOB__c}" disabled="true"/>
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                          
+                                        <lightning:input value="{!exstLoanObj.exObj.Remark__c}" disabled="false"/>
+                                    </td>
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                           
+                                        <lightning:select aura:id="financers" label="" value="{!exstLoanObj.exObj.financers__c}">
+                                            <option value="">-- None --</option> 
+                                            <aura:iteration items="{!v.finLst}" var="finName">
+                                                <option value="{!finName}" text="{!finName}" selected="{!exstLoanObj.exObj.financers__c == finName}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </td>
+                                    
+                                    
+                                    <td class="slds-col slds-size--1-of-6 slds-small-size--1-of-3 slds-medium-size--1-of-4 slds-large-size--1-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate" >
+                                        <div class="slds-align_absolute-center slds-m-top_small slds-m-right_x-small" >
+                                            <aura:if  isTrue="{! and (or(v.stageName == 'DSA/PSF Login', v.stageName == 'Post Approval Sales'), exstLoanObj.exObj.Identifier__c == 'Manual' )}" >
+                                                    <ui:inputCheckbox value="{!exstLoanObj.deleteRecord}"  />  
+                                            </aura:if>
+                                        </div>
+                                    </td>
+                                    
+                                    
+                                    
+                                </tr>
+                            </aura:iteration>
+                            
+                        </tbody>     
+                        
+                        
+                    </table>                                                        
+                </div>
+                
+                <br/> 
+                
+                
+                
+                
+                <aura:set attribute="else">
+                   <ui:message severity="warning" closable="false">
+                        <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+                        <span> No records added currently </span>
+                    </ui:message>
+                </aura:set>
+            </aura:if>
+             <aura:if isTrue="{!!v.isCredit}" >
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <ui:outputText value="Total Obligation Including CC : " />
+                    <ui:outputText value="{!v.totalObligations}" />
+                </div>
+            </div> 
+            </aura:if>
+      <aura:if isTrue="{!v.isCredit}" >
+    <lightning:card title="" class="applyColor">
+        <p class="slds-p-horizontal_small slds-theme_shade">  
+            <div class="slds-p-horizontal--small">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                         <ui:outputText value="Total Obligation Including CC : " />
+                          <ui:outputText value="{!v.totalObligations}" />                            
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="select-01"> View CIBIL- link </label> <br/>
+                            <aura:if isTrue="{!v.cibil.Id}">
+                                <a onclick="{!c.redirectToViewCibilReport}">
+                                    View CIBIL Report
+                                </a>
+                                <aura:set attribute="else">
+                                    Link Not Available
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="select-01"> View CIBIL Report- link </label> <br/>
+                            <aura:if isTrue="{!v.cibilExt1.Id}">
+                                <a onclick="{!c.redirectToOneViewCibilReport}">
+                                    One View CIBIL Report
+                                </a>
+                                <aura:set attribute="else">
+                                    Link Not Available
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    </aura:if>
+    <aura:if isTrue="{!v.isViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isOneViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+            <!-- 16270 -->
+            <aura:if isTrue="{!v.enhancedFlag}" >
+            <div class="slds-align_absolute-center">
+                <lightning:button label="Save" iconName="utility:save" class="slds-theme_alt-inverse slds-p horizontal" variant="brand" title="SaveTable " onclick="{! c.saveDetails }" disabled="{!or(not(and(not(empty(v.obligLst)),v.obligLst.length >0)),v.displayReadOnly)}"/>
+                <lightning:button label="Add Obligation" class="slds-theme_alt-inverse slds-p horizontal" variant="brand" title="Add Row " onclick="{! c.addRec }" disabled="{!v.displayReadOnly}"/>
+            </div>
+                </aura:if>
+            <!-- 16270 -->
+        </lightning:card>
+    </div>
+</aura:component>

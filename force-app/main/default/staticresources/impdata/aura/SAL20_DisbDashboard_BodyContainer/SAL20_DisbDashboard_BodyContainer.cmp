@@ -1,0 +1,125 @@
+<aura:component >
+    <!--- START : Attributes and handlers --> 
+    <aura:attribute name="CurrentNavigation" type="String" default="Home" />
+   	<aura:attribute name="oId" 	type="String" default="006O000000AETsM" />
+    <aura:attribute name="opp" 	type="Opportunity" />
+    <aura:attribute name="dedFrmDisList" type="List" description="Deducted_from_Disbursement__c picklist values (Fees_and_Charge__c)" />
+    <aura:handler event="c:SAl20_DisbDashboard_Navigator" action="{! c.routeNavigation }"/>
+    <aura:attribute name="disbList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+     <aura:attribute name="userProfile" type="String"/>
+    <aura:attribute name="sanctionList" type="Discrepancy__c[]"/>
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:attribute name="accntValidateList" type="List"/>
+    <!-- Added for DMS 24317 -->
+    <aura:attribute name="Applicant" 	type="Applicant__c" />
+    <aura:attribute name="parentId" 	type="String" />
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.updateDocumentPanel}"/>
+        <!-- Added for DMS 24314 -->
+	<!--22552-->
+	<aura:attribute name="navigationURL" type="String"/>
+    
+    <!--- END   : Attributes and handlers --> 
+    <!--Added for Bug 25679/US 1476 s-->
+    <c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />
+     <!--Added for Bug 25679/US 1476 e-->
+    <aura:if isTrue="{! v.CurrentNavigation == 'Home'}">
+		<c:SAL20_DisbDashboard_Body oId ="{! v.oId }" /> 
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Ops_Dashboard' }">
+        <c:SAL20_OpsDashboard oId="{! v.oId }" loan="{! v.opp}"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Branch_Ops_File_Acceptance' }">
+        <c:SAL20_BranchOpsFileAcceptance oppId="{! v.oId }" />
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Discrepancy_Update' }">
+        <c:SAL20_DiscrepancyUpdateNew loanId="{!v.oId}" />
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Standard_Documents' }">
+        <c:SAL20_Standard_Documents loanId="{! v.oId }" documentType="Standard_Document" /> <!-- Bug 20391 : Bug 22065 : Documents Section -->
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Deviation_Documents' }">
+        <c:SAL20_Standard_Documents loanId="{! v.oId }" documentType="Deviation_Document" /> <!-- Bug 20391 : Bug 22065 : Documents Section -->
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Sanction_Conditions' }">
+        <!--Bug 22811 Added flow = 'credit' in the parameters so that Add button of sanction condition is visible always -->
+        <c:SAL_Pricing_SanctionConditions flow = 'credit' existingDisList="{!v.existingDisList}" loan="{!v.opp}" loanid="{!v.oId}" discrepancyList="{!v.sanctionList}"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Verifications' }">
+        <c:SAL20_Verifications recordId="{! v.oId }" />
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Line_Details' }">
+        <c:SAL20_LineDetails oppId="{! v.oId }"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Approved_Details' }">
+        <c:SAL20_ApprovedDetails oppId="{! v.oId }"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Other_Loan_Proposition' }">
+        <c:SAL20_SpecialOffers oppId="{! v.oId }"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Insurance_Details' }">
+        <c:GenericRecordDetails isDisbDashboard = "true" loanAppID="{! v.oId }" /><!--Bug 22835: Added isDisbdashboard--> 
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Fees_And_Charges' }">
+        <c:SAL20_Fees_And_Charges oId="{! v.oId }" opp="{!v.opp}" dedFrmDisList="{!v.dedFrmDisList}"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Dedupe_Referral' }">
+        <c:DedupeReferral loanId="{! v.oId }" isDisbDashboard="true" />
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Top_Up' }">
+        <c:TopUp oppId="{! v.oId }" isDisbDashboard="true"/><!--Bug:23506 Added isDisbDashboard="true" -->
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Disbursement_Details' }">
+        <c:Sal_Pricing_DisbursementDetails accntValidateList = "{!v.accntValidateList}" userProfile="{!v.userProfile}" disbList="{!v.disbList}" loanId="{!v.oId}" loan="{!v.opp}" isDisbDashboard="true" />  <!-- Bug 20391 : Bug 22062 : Added isDisbDashboard -->  
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Instrument_Details' }">
+        <c:Sal_Pricing_Repayment repayList="{!v.repayList}" loanId="{!v.oId}" loan="{!v.opp}" isDisbDashboard="true" disbList="{!v.disbList}"  /> <!-- Bug 20391 : Bug 22065 : Added for point 10 : Added isDisbDashboard flag --><!-- disbList="{!v.disbList}"  for merging issue to handle bug 22064 -->
+    </aura:if>
+    
+    <!-- Bug 21565 moved credit status before Sent to Finnone.Now as part of adhoc 22065 moved before blind data entry -->
+    <aura:if isTrue="{! v.CurrentNavigation == 'Credit_Status' }">
+        <c:SAL20_Credit_Status oId="{! v.oId }" />
+    </aura:if>
+    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Blind_Data_Entry' }">
+        <c:SAL20_Blind_Data_Entry  oId="{! v.oId }" />
+    </aura:if>
+    
+    <!--Bug 22065-S -->    
+    <aura:if isTrue="{! v.CurrentNavigation == 'Document_Upload' }">
+        <!-- Bug 22065 - S Added SAL20_DocumentUploader component as well as article tag-->
+        <c:SAL20_DocumentUploader aura:id="docUploaded" oppId = "{! v.oId }" parentId="{!v.parentId}"/> <!-- DMS Aura id added 24317 -->
+        <article class="slds-card slds-m-around_xx-small" style="padding-left: 1em; padding-right: 1em;">
+            <br/>
+            <c:DocumentUploader fileName="Ops Dashboard Document" isDisbDashboard="true" aura:id="file-uploader-CustomerConsent" parentId="{!v.parentId}" instance="1" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" showUploadButton="true" /><!-- added by swapnil for DMS 24317 -->
+             <c:DocumentsList parentId="{!v.parentId}" flow="Mobility2" isDisbDashboard="true"/><!-- Parent id and flow added for DMS 24317 -->
+        </article>
+        <!-- Bug 22065 -E -->
+    </aura:if>
+    
+    <!--Bug 22552-->
+	<aura:if isTrue="{! and(v.CurrentNavigation == 'DSS', v.navigationURL != null, v.navigationURL != '')}">
+		<iframe aura:id="vfFrame" src="{!v.navigationURL}"  frameBorder="0" style="width: 100%; min-height: 1000px;"/>
+		<aura:if isTrue="{! or(v.navigationURL == null, v.navigationURL == '') }" >
+			<ui:outputText class="slds-text-color_error" value="You are not authorized to view this data."/>
+		</aura:if>
+	</aura:if>
+    
+</aura:component>

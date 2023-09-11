@@ -1,0 +1,12 @@
+.THIS {
+}
+
+.THIS .hidecls{
+    display : none;
+}
+.THIS .userInfocls{
+  position:absolute;
+  top:0;
+  right:0;
+    
+}

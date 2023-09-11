@@ -1,0 +1,177 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobilePOController">
+	<!--<ltng:require scripts="/resource/bootstrap" />-->
+    <aura:registerEvent name="initiateKYCFormEvent" type="c:InitiateKYCForm"/>
+    <!--Rohit 16111 Ekyc added init start-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<!--Rohit 16111 Ekyc added init stop-->
+    <aura:registerEvent name="shareAadhaarHashCode" type="c:shareAadhaarHashCode"/><!-- Bug 16111 - Hemant keni-->
+    <aura:handler event="c:LoanConversionEvent" action="{!c.disableForm}"/>
+	<!--Bug - 16111 S - Hemant Keni-->
+    <aura:attribute name="showHeading" type="Boolean" default="true"/>
+    <aura:attribute name="parentObj" type="String" default=""/>
+    <aura:attribute name="parentId" type="String" default=""/>
+	<!--Bug - 16111 E - Hemant Keni-->
+    <!--rohit 16111 S-->
+	<aura:attribute name="vaultData" type="List" default=""/>
+    <aura:attribute name="isDSS" type="Boolean" default="false"/>
+    <aura:attribute name="isMobility" type="Boolean" default="false"/>
+    <aura:attribute name="CoAppAadharNo" type="String" default=""/>
+    <aura:attribute name="AgreeFlag" type="Boolean" default="false"/>
+    <aura:attribute name="kyc" type="eKYC__c" default="{eKYC_First_Name__c:'',eKYC_Last_Name__c:'',eKYC_Gender__c:''}"/>
+    <aura:attribute name="ekycDone" type="String" default=""/>
+	<!--rohit 16111 E -->
+    <aura:attribute name="Product" type="String" default=""/>
+    <aura:attribute name="HashCode" type="String" default=""/><!-- added for Bug 15230 -->
+     <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+    <fieldset class="slds-form--stacked slds-p-bottom--small">
+        <h3 class="{!v.showHeading == 'true'  ? 'slds-section-title--divider' : 'slds-hide'}">AADHAAR DETAILS</h3><!--Bug - 16111 - Hemant Keni-->
+         <!--added style for bug id 21851 start--> 
+       <aura:if isTrue ="{!(v.hideAadhaarSection == true)}">
+        <div style="margin-left: 5%;font-size: 150%;" id="abcDiv">
+            As per UIDAI Aadhaar is not applicable.
+        </div>
+           </aura:if>
+        <!--added style for bug id 21851 end-->
+        <div class="slds-p-around--small">
+            <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+            <div class="slds-form-element slds-is-required" id="aadharNumberInputDivCo">
+                <div class="slds-form-element__control">
+                    <label class="slds-form-element__label" for="aadharNumber">Enter Aadhaar Number</label>
+                    <ui:inputText aura:id="aadharNumberCo" class="slds-input" placeholder="Provide 12 Digit Aadhaar Number" maxlength="12" disabled="false" required="false" />
+                </div>
+            </div>   
+            <div class="slds-text-align--left slds-m-top--x-small" id="aadharNumberInputDiv1Co">
+            	<lightning:icon iconName="utility:info_alt" size="x-small" class="brand"/>
+				<ui:outputText aura:id="helpTextCo" value=" One Time Password will be sent to mobile number registered with Aadhaar Card"/>
+            </div>
+            <br/>
+             <!-- Ekyc 16111(Rohit) added consent agreement start-->
+            
+            <div id="consentDivCo"  >
+                <div style="display:block" >
+                   
+        			<p style="color:#fffff3;"><span style="background-color:#3366ff;">Consent for Authentication</span></p>
+    				<br/>
+   				 	<p>I hereby state that I have no objection in authenticating myself with Aadhaar based authentication system and hereby consent for providing my Aadhaar number to carry any mode of Aadhaar based authentication permitted under law/regulation for the purposes of availing this product/service and for availing such other third party products/service from BFL under this Application form. I understand that the Aadhaar based authentication shall be used only for authenticating my identity with Central Identities Data Repository for the aforementioned specific purpose(s).</p> 
+					<br/>
+                	
+                </div>  
+             </div>
+           
+            <!-- rohit 16111 link changes S-->
+            <aura:if isTrue="{!v.isDSS}"> 
+                <div id="myModalCo" class="modal">
+                    <div id = "userConsentDivCo" name="userConsentDiv1" style="display:block;margin-top: 20px;" class="modal-content"> <!--class="popBox-skin"-->
+                    	<div class="modal-header">
+                        	<div onclick="{!c.hideModal}"><span class="close1" >&times;</span></div>
+                        </div>
+                        <div class="modal-body">
+                        <h3><center>Ekyc details</center></h3>
+                           <!-- <center> -->
+                                <table border="1" id="vaultTableCo">
+                                    <aura:iteration items="{!v.vaultData}" var="obj"> 
+                                       <tr> 
+                                           <td><div style="column left">{!obj.Name}</div></td>
+                                           <td><div style="column middle"> {!obj.Value}</div></td>
+                                       </tr>       
+                                    </aura:iteration>  
+                                    
+                                   <!-- <tr>
+                                        <td><div style="column left">First Name</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[0].Value}" /></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div style="column left">Last Name</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[1].Value}" /></div></td>
+                                    </tr> 
+                                    <tr>
+                                        <td><div style="column left">Gender</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[2].Value}" /></div></td>
+                                    </tr>  
+                                     <tr>
+                                        <td><div style="column left">DOB</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[3].Value}" /></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div style="column left">StreetAddress</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[4].Value}" /></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div style="column left">City</div></td>
+                                    	<td><div style="column left"><ui:outputText value="{!v.vaultData[5].Value}" /></div></td>
+                                    </tr> -->
+                               </table>
+                          <!--</center> -->
+                        <br/>
+                        <center>
+                                <lightning:button aura:id="SavePopUpCo" variant="brand" label="Save EKYC" onclick="{!c.saveEKYC}" />
+                                <lightning:button aura:id="CancelPopUpCo" variant="brand" label="Cancel" onclick="{!c.generateOTP}" />
+                        </center>    
+                        </div>
+                        <div class="modal-footer"></div>            
+                        </div>
+                </div>
+            </aura:if> 
+            <!-- Bug 16111 Krish s -->
+            <aura:if isTrue="{!v.isDSS}"> 
+                <div id="myModalDetailsCo" class="modal">
+                    <div id = "userConsentDivCo" name="userConsentDiv1" style="display:block;margin-top: 20px;" class="modal-content"> <!--class="popBox-skin"-->
+                    	<div class="modal-header">
+                        	<div onclick="{!c.hideModal}"><span class="close1" >&times;</span></div>
+                        </div>
+                        <div class="modal-body">
+                        <h3><center>Ekyc details</center></h3>
+                           <!-- <center> -->
+                                <table border="1" id="vaultTableCo">
+                                    <aura:iteration items="{!v.vaultData}" var="obj"> 
+                                       <tr> 
+                                           <td><div style="column left">{!obj.Name}</div></td>
+                                           <td><div style="column middle"> {!obj.Value}</div></td>
+                                       </tr>       
+                                    </aura:iteration>  
+                                   
+                               </table>
+                          <!--</center> -->
+                        <br/>
+                        <center>
+                                <lightning:button aura:id="CancelPopUpDetCo" variant="brand" label="Cancel" onclick="{!c.cancelDetails}" />
+                        </center>    
+                        </div>
+                        <div class="modal-footer"></div>            
+                        </div>
+                </div>
+            </aura:if> 
+            <div id="VaultFailureCo" style="display:none;">Aadhar details not received successfully !</div><!--for bug id 16111-->
+            <!-- Bug 16111 Krish e -->
+            <div id="VaultSuccessCo" style="display:none;">Aadhar details received successfully !</div><!--for bug id 16111-->
+             <div id="checkBoxIdCo" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding:1%">
+                 <div id="IAgreeCo" class="slds-form-element__control">
+                <lightning:input type="checkbox" name="IagreeChk" label="I Agree" aura:id="IagreeChkCo" class="slds:input" onchange="{!c.validateButton}" checked="{!v.AgreeFlag}"/>           
+                </div>
+             
+            <!-- rohit 16111 link changes E-->
+    		<!-- Ekyc 16111(Rohit) added consent agreement stop-->
+                <div class="slds-p-top--x-small">
+                    <lightning:button aura:id="generateOTPCo" variant="brand" label="Generate OTP" onclick="{!c.generateOTP}" />
+                </div>
+           </div>
+           <div aura:id="otpDetailsCo" class="slds-p-top--small slds-hide">
+                <div class="slds-form-element slds-is-required">
+                    <div class="slds-form-element__control">
+                        <label class="slds-form-element__label" for="aadharNumber">Enter OTP</label>
+                        <ui:inputText aura:id="otpCo" class="slds-input" placeholder="Enter OTP Recieved in mobile" maxlength="12" disabled="false"/>
+                    </div>
+                </div>   
+                <div id="otpSubmitCo" class="slds-p-top--medium">
+                    <lightning:button aura:id="submitOTPCo" variant="brand" label="Submit" onclick="{!c.submitOTP}" />
+                    <lightning:button aura:id="regenerateOTPCo" variant="brand" label="Regenerate OTP" onclick="{!c.generateOTP}" />
+                </div>
+            </div>    
+            </aura:if>
+        </div>
+    </fieldset>
+    <div aura:id="waitingCo" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+   
+</aura:component>

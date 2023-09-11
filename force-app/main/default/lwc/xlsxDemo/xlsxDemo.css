@@ -1,0 +1,5 @@
+.sticky-div {
+  position: sticky;
+  overflow: scroll;
+  max-height: 50vh;/*Give max height as per your requirement */
+}

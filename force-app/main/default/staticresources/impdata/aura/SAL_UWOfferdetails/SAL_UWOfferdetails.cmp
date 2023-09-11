@@ -1,0 +1,72 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SALMobilityCntrl_V2">
+    <aura:attribute name="isOther" type="Boolean" default="false"/>
+    <aura:attribute name="oppId" type="string" default=""/>
+    <aura:attribute name="loan" type="Opportunity" default="{}"/>
+    <aura:attribute name="accObj" type="Account" default="{}"/>
+    <aura:attribute type="Applicant__c" name="applicantObj"/>
+    <aura:attribute type="Contact" name="conObj" default="{}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+    <lightning:card title="Offer Details" class="applyColor">
+        <p class="slds-p-horizontal_small slds-theme_shade">
+            <div class="slds-p-horizontal--small">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="firstname" name="firstname" required="false" label="First Name" value="{!v.accObj.First_Name__c}" disabled="true" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" messageWhenValueMissing="Please Enter Value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="lastname" name="lastname" required="false" label="Last Name" value="{!v.accObj.Last_Name__c}" disabled="true"  placeholder="" pattern="^([a-zA-Z ]+$)" messageWhenPatternMismatch="Please enter valid name" messageWhenValueMissing="Please Enter Value"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="Mobile" type="text" name="mobile" value="{!v.accObj.Mobile__c}" label="Mobile No" placeholder="" disabled="true" maxlength="10" required="false" pattern="^[7-9]\d{9}" messageWhenValueMissing="Please Enter Mobile Number" messageWhenPatternMismatch="Please Enter Valid Mobile Number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="AltMobile" type="text" name="mobile" value="{!v.accObj.Mobile__c}" label="Alternate Contact No" disabled="true" maxlength="10" required="false" pattern="^[7-9]\d{9}" messageWhenValueMissing="Please Enter Number" messageWhenPatternMismatch="Please Enter Valid Alternate Number"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="employer" name="employer" value="{!v.accObj.Employer__r.Name}" label="Employer" required="false" disabled="true"/>
+                        </div>
+                    </div> 
+                    
+                    <aura:if isTrue="{!v.isOther}">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="EmpNameIFOthers" name="EmpNameIFOthers" value="{!v.accObj.Name_of_the_Company_Employer__c}" label="Employer Name(If Others)" disabled="true"/>
+                            </div>
+                        </div> 
+                    </aura:if>
+                     <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                         <div class="slds-form-element__control">
+                             <lightning:input aura:id="companycategory" name="companycategory" value="{!v.accObj.Type_Of_Industry__c}" label="Company Category" disabled="true"/>
+                         </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input type="number" aura:id="score" value="{!v.applicantObj.CIBIL_Score__c}" name="cibilscore" label="Cibil Score" disabled="true"/>
+                        </div>
+                    </div>
+                   <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                         <div class="slds-form-element__control">
+                             <lightning:input aura:id="designation" name="designation" value="{!v.conObj.DesignationOTP__c}" label="Designation" disabled="true"/>
+                         </div>
+                    </div>
+                   
+                    
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    </div>
+</aura:component>

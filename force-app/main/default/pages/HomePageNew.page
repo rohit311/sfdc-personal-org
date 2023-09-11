@@ -1,0 +1,22 @@
+<apex:page controller="OpportunityPageController" tabStyle="Opportunity">
+  <apex:pageBlock title="Opportunities Overview">
+     <apex:pageBlockSection title="My Opportunities">
+        <apex:pageBlockTable value="{!opportunities}" var="opp">
+          <apex:column >
+             <apex:facet name="Header"> Name
+             </apex:facet>
+             <apex:outputLink value="/{!opp.Id}" target="_blank">
+                 <apex:outputField value="{!opp.Name}"/>
+             </apex:outputLink>
+          </apex:column>
+          <apex:column value="{!opp.Account.Name}" />
+          <apex:column value="{!opp.CloseDate}" />
+        </apex:pageBlockTable>
+      
+     </apex:pageBlockSection>
+  </apex:pageBlock>
+  <!-- Begin Default Content REMOVE THIS -->
+  <h1>Congratulations</h1>
+  This is your new Page
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

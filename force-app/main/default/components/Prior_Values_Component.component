@@ -1,0 +1,20 @@
+<apex:component controller="PVComponent_Controller"  access="global">
+   <apex:attribute name="hId" type="id" description="object id" assignTo="{!hisID}"/>
+  <!-- <table border = "2" cellspacing = "5">
+        <tr>
+            <td>Score</td>
+            <td>Grade</td>                
+        </tr>
+        <apex:repeat value="{!historyTrackingList}" var="h">
+        <tr>
+            <td>{!h.OldValue}</td>
+            <td>{!h.NewValue}</td> 
+            <td>{!h.Field}</td>
+             
+        </tr>
+        </apex:repeat>        
+    </table>  -->
+     New Grade : {!newValue}
+     
+     Prior Grade : {!priorValue} 
+</apex:component>

@@ -1,0 +1,155 @@
+<aura:component access="global" controller="TopUpController">
+    <!-- -+-+-+-+-+-+-+ START : COMPONENT ATTRIBUTES/INITIAILIZATION #13793 +-+-+-+-+-+-+- -->
+    <aura:attribute name="data" type="Object[]"  />
+    <aura:attribute name="lstTopUp" type="TelePDQuestionMaster__c[]"   />
+    <aura:attribute name="opts" type="List"  />
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="rowIndex" type="String" />
+    <aura:attribute name="isAddNewDisabled" type="Boolean" default="false" />
+    <aura:attribute name="isAddNewDisabledn" type="Boolean" default="false" />
+    <aura:registerEvent name="DeleteEvt" type="c:TopUpEvent" />
+    <aura:attribute name="disabled" type="boolean" default="false" />
+	<aura:attribute name="opp" type="Opportunity"  />
+    <!--<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/> -->
+  	<aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler name="init" action="{! c.doInit }"	value="{!this}" />
+    <aura:attribute name="isDisbDashboard" type="Boolean" default="false"/><!-- Bug:23506 Added isDisbDashboard-->
+    <!-- -+-+-+-+-+-+-+ END   : COMPONENT ATTRIBUTES/INITIAILIZATION #13793 +-+-+-+-+-+-+- -->
+    
+    <!-- 20391 heading ***S*** -->
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{!v.isDisbDashboard == true}">
+		<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">TopUp Details</h1>
+		</div>
+    </aura:if>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    <!-- 20391 heading ***E*** -->
+    
+	<aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner slds-spinner--medium slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ 	</aura:if>
+    <!-- -+-+-+-+-+-+-+ START : COMPONENT HEADER #13793 +-+-+-+-+-+-+- -->
+    <div clas="slds">
+        <div class="slds-page-header">
+            <div class="slds-media__body slds-align_absolute-center">
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Top Up Details">Top Up Details</h1>
+            </div>
+        </div>
+    </div>
+    <!-- -+-+-+-+-+-+-+ END : COMPONENT HEADER #13793 +-+-+-+-+-+-+- -->
+
+
+    <!-- -+-+-+-+-+-+-+ START : COMPLETE TABLE #13793 +-+-+-+-+-+-+- -->
+    <div clas="slds">
+        <ui:scrollerWrapper class="scrollerSize">
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                <thead>
+                    <tr class="slds-text-title--caps">
+                        
+                        <th style="width:1.25rem;" class="slds-text-align--right">
+                            <span class="slds-truncate" title="Delete"></span>
+                        </th>
+                        <th>
+                            <span class="slds-truncate" title="Existing LAN">Existing LAN</span>
+                        </th>
+                        <th>
+                            <span class="slds-truncate" title="Balance Amount(POS + Charges)">Balance Amount(POS + Charges)</span>
+                        </th>
+                        <th>
+                            <span class="slds-truncate" title="Customer Name">Customer Name</span>
+                        </th>
+                        <th>
+                            <div class="slds-truncate" title="Disbursement Type">Disbursement Type</div>
+                        </th>
+                        <th>
+                            <div class="slds-truncate" title="API Response">API Response</div>
+                        </th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                	<aura:iteration var="objIterator" items="{! v.lstTopUp }" indexVar="iVar"> 
+                        <tr>
+                            
+                            <td scope="row" class="slds-text-align--right" style="width:1.25rem;">
+                                <span class="slds-assistive-text">Delete</span>
+                                <aura:if isTrue="{! objIterator.Id != null }">
+                                    <button class="slds-button slds-button--brand ButtonStyle"  data-index="{!objIterator.Id }" onclick="{!c.removeRow}" title="Delete" disabled="{!v.isAddNewDisabledn}"><lightning:icon iconName="utility:delete"  size="x-small" variant="inverse"/></button>
+                                    
+                                    <aura:set attribute="else">
+                                        <button class="slds-button slds-button--brand ButtonStyle"  data-index="{!iVar }" onclick="{!c.removeRow}" title="Delete" disabled="{!v.isAddNewDisabledn}"><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                                        
+                                    </aura:set>
+              					</aura:if>
+                            </td>
+                            <td scope="row">
+                                <div class="slds-truncate" title="{! objIterator.ExistingLAN__c }">
+                                    <ui:inputText value="{!objIterator.ExistingLAN__c}" maxlength="18" />
+                                </div>
+                            </td>
+                            <td scope="row">
+                                <div class="slds-truncate" title="{! objIterator.BalanceAmount__c }">
+                                    {! objIterator.BalanceAmount__c }
+                                </div>
+                            </td>
+                            <td scope="row">
+                                <div class="slds-truncate" title="{! objIterator.CustomerName__c }">
+                                    {! objIterator.CustomerName__c }
+                                </div>
+                            </td>
+                            <td scope="row">
+                                
+                               <div class="slds-truncate" title="{! objIterator.DisbursementType__c }">
+                                	 <ui:inputSelect class="dynamic" aura:id="InputSelectDynamic"  
+                                                    value="{! objIterator.DisbursementType__c }"
+									  > 
+										<aura:iteration var="index" items="{!v.opts}" >
+                                            <ui:inputSelectOption text="{! index.key }"
+                                                                  label="{! index.value}"/>
+                                        </aura:iteration>
+                                     </ui:inputSelect>
+									<!--<force:inputField value="{!objIterator.DisbursementType__c}" 
+                                                      /> -->
+								</div>
+									
+                                	
+                                <!--{! objIterator.DisbursementType__c } -->
+                                
+                            </td>
+                            
+                            <td scope="row">
+                                <div class="slds-truncate" title="{! objIterator.ApiResponse__c }">
+                                    {! objIterator.ApiResponse__c }
+                                </div>
+                            </td>
+                        </tr>
+                   </aura:iteration>     
+                </tbody>
+            </table>
+        </ui:scrollerWrapper>
+        
+        <!--  -+-+-+-+-+-+-+  Buttons for CRUD operation +-+-+-+-+-+-+- -->
+        <div class="slds-align_absolute-center slds-p-top_x-small">
+        	<lightning:button class="slds-button slds-button__neutral slds-p-right_large" 
+        						variant="brand" label="Add Row"  title="Add Row" disabled="{!v.isAddNewDisabled}" onclick="{! c.onAddRow }" />
+        	<lightning:button class="slds-button slds-button__neutral slds-p-right_large" 
+        						variant="brand" label="Fetch POS" title="Fetch POS" disabled="{!v.disabled}" onclick="{! c.onFetchPOS }" />
+        	<lightning:button class="slds-button slds-button__neutral slds-p-right_large"
+								variant="brand" label="Save" title="Save" disabled="{!v.disabled}" onclick="{! c.onSaveRow }" />
+        	<!--lightning:button class="slds-button slds-button__neutral slds-p-right_large" 
+        						variant="brand" label="Delete Selected Rows" title="Delete Selected Rows" disabled="{!v.disabled}" onclick="{! c.onDelRow }" /-->
+		</div>	
+        <!--  -+-+-+-+-+-+-+  Buttons for CRUD operation +-+-+-+-+-+-+- -->
+    </div>
+    <!-- -+-+-+-+-+-+-+ END : COMPLETE TABLE #13793 +-+-+-+-+-+-+- -->
+	<!-- Other component markup here -->
+    
+</aura:component>

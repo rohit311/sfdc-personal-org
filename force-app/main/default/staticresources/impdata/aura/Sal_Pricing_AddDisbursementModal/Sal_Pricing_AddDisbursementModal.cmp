@@ -1,0 +1,107 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="global" controller="SAL_PricingCtrlV2"> 
+        <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute type="String" name="header"/>
+    <aura:attribute type="Current_Disbursal_Details__c" name="disb"/>
+    <aura:attribute type="String" name="disbId"/>
+    <aura:attribute type="Id" name="loanId"/>
+    <aura:handler action="{!c.doInit}" value="{!this}" name="init"/>
+    <aura:registerEvent name="updateDisbursementList" type="c:updateDisbursementList"/>
+    <aura:attribute name="isTransactionalError" type="Boolean" default="false"/>
+    <aura:attribute name="isAPIError" type="Boolean" default="false"/>
+        <aura:attribute name="checkboxStatus" type="Boolean" default="false"/>
+        <aura:attribute name="isRepayAndDisb_Different" type="Boolean" default="true"/>
+     <aura:attribute name="isTopup" type="String" />
+    <aura:attribute name="BranchName" type="String"/>
+     <aura:method name="fetchData" action="{!c.fetchData}" access="PUBLIC"/>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header mobHeader">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <a onclick="{!c.goBack}" href="" style="text-decoration: none;">
+                        <lightning:icon iconName="utility:close" variant="inverse"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </a>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.header}</h2>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1"  >
+                <ui:scrollerWrapper class="wrapStyle">
+                    <lightning:recordEditForm aura:id="edit" recordId="{!v.disb.Id}" objectApiName="Current_Disbursal_Details__c"  onsubmit="{!c.beforeSave}" onsuccess="{!c.handleSuccess}" >
+                            <lightning:inputField type="checkbox" class="" fieldName="Repay_Disb_Diff__c" aura:id="Repay_Disb_Diff__c"  value="{!v.checkboxStatus}" onchange="{! c.makeFieldsEditable }" />
+
+                        <div class="slds-p-horizontal--small">
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Disbursal_Mode__c" aura:id="disbursalMode" value="" onchange="{!c.displayMandatoryFields}" class="slds-has-error slds-scope [role=combobox] input[readonly]"/>
+                                    </div>
+                                </div>
+                                <div class=" demo-only demo-only--sizing slds-grid slds-wrap slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <lightning:inputField fieldName="Favouring__c" aura:id="favouring"  value="" />                                
+                                </div>
+                                <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="IFSC_Code__c" aura:id="ifscCode" id="ifscCode" onfocusout = "{!c.ifscOnBlur}" disabled="" />
+                                    </div>
+                                </div>
+                                <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Bank_Name__c" aura:id="bankName" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Bank_Account__c" aura:id="bankAccount" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Bank_Branch__c" aura:id="bankBranch" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Disbursement_Amount__c" aura:id="disbAmount" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="IMPS_Flag__c" aura:id="impsFlag" value=""  />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="Payable_at__c" aura:id="payableAt"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-large slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:inputField fieldName="FinnOne_Disbursement_Date__c" aura:id="finnoneDisbDate" />
+                                    </div>
+                                </div>
+
+                                <div class="slds-hide">
+                                    <lightning:inputField fieldName="Successful_IMPS_Count__c" aura:id="successCount"  />
+                                    <lightning:inputField fieldName="Failure_IMPS_Count__c" aura:id="failureCount" />
+                                    <lightning:inputField fieldName="isTopUp__c" aura:id="isTopUp__c" />
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </lightning:recordEditForm>
+                </ui:scrollerWrapper>
+            </div>
+            <footer class="slds-modal__footer mobFooter">
+                <div class="slds-align_absolute-center">
+                    <lightning:button class="slds-m-top_small  slds-theme--alt-inverse" iconName="utility:clear" variant="brand" label="Cancel" onclick="{! c.goBack }" />
+                    <lightning:button class="slds-m-top_small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Save" onclick="{!c.saveDisbursement }" />
+                <lightning:button aura:id="cloneRepay" disabled=""  class="slds-m-top_small slds-theme--alt-inverse " iconName="utility:save" variant="brand" label="Clone (Repay Record)" onclick="{! c.cloneFromRepay }" />
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

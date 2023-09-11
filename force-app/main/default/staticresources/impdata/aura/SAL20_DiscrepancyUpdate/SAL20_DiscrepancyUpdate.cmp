@@ -1,0 +1,369 @@
+<aura:component controller="SAL20_DiscrepancyUpdateController" >
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="attributeWrapperObj" type="object"/>
+    <aura:attribute name="loanId" type="String" default="006O000000AETsM"/>
+    
+    <aura:attribute name="isProcessing" type="Boolean" default="false"/> 
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <div class="slds-p-around_xxx-small" >
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+            <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">
+                <aura:if isTrue="{!v.attributeWrapperObj.centralisedOpsShow}">
+                    Central Ops QC Discrepancy
+                    <aura:set attribute="else">
+                        Discrepancy Update(Non Document)
+                    </aura:set>
+                </aura:if>
+            </h1>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Add Discrepancy : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Form : Start +-+-+-+-+-+-+-+ -->
+        <div class="slds-grid slds-wrap">
+            <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12 slds-p-around_x-small" >
+                    <lightning:select name="selectKA" label="Kit Acceptance" value="{!v.attributeWrapperObj.kitAcceptanceValue}" >
+                        <aura:iteration items="{!v.attributeWrapperObj.KitAcceptanceSelect}" var="oKA">
+                            <option value = "{!oKA.value}" 
+                                    label = "{!oKA.label}" 
+                                    selected = "{! oKA.value ==  v.attributeWrapperObj.kitAcceptanceValue}" 
+                                    >{!oKA.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </aura:if>
+            
+            <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12 slds-p-around_x-small slds-p-top_large">
+                <lightning:button variant="brand" disabled="{!v.isProcessing }"
+                                  label="{!if(v.attributeWrapperObj.centralisedOpsShow, 'Add QC Discrepancy', 'Add Discrepancy')}" 
+                                  title="{!if(v.attributeWrapperObj.centralisedOpsShow, 'Add QC Discrepancy', 'Add Discrepancy')}"
+                                  onclick="{!c.onAddDiscrepancy}" 
+                                  iconName="utility:add" iconPosition="left"
+                                  />
+            </div>
+        </div>
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Form : End +-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Table : Start +-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!not(empty(v.attributeWrapperObj.discrepancyData))}">
+            <table class="slds-table discrepancy-table " >
+                <thead>
+                    <tr class="slds-text-heading_small discrepancy-table-title">
+                        <td colspan="5">Discrepancy Details</td>
+                    </tr>
+                    <tr class="slds-hint-parent slds-text-title  discrepancy-table-header">
+                        <td>Stage</td>
+                        <td>Name</td>
+                        <td>Raised Date</td>
+                        <td>Raiser By</td>
+                        <td>Raiser Role</td>
+                        <td>Party Name</td>
+                        <td>Party</td>
+                        <td>Category</td>
+                        <td>Description</td>
+                        <td>Status</td>
+                        <td>Resolution Remarks</td>
+                        <td>Closed Date</td>
+                        <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                            <td>Remarks</td>
+                        </aura:if>
+                    </tr>
+                </thead>
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyData}" var="dRec" indexVar="index">
+                    <tr class="slds-text-body_small">
+                        <td>
+                            <span>{!dRec.Discrepancy_Stage__c}</span>
+                        </td>
+                        <td>
+                            <a href="" id="{!dRec.Id}" onclick = "{!c.openDiscrepancyRecord}">{!dRec.Name}</a>
+                        </td>
+                        <td>
+                            <span>{!dRec.CreatedDate}</span>
+                        </td>
+                        <td>
+                            <span>{!v.attributeWrapperObj.currentUser.Name}</span>
+                        </td>
+                        <td>
+                            <span>{!dRec.Raiser_Role__c}</span>
+                        </td>
+                        <td>
+                            <lightning:select name="selectApplicant" label="" value="{!dRec.Discrepancy_Party__c}" >  
+                                <aura:iteration items="{!v.attributeWrapperObj.ApplicantList}" var="oA">
+                                    <option value = "{!oA.value}" 
+                                            label = "{!oA.label}" 
+                                            selected = "{!oA.value == dRec.Discrepancy_Party__c}"
+                                            >{!oA.label}</option>  
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td>
+                            <span>{!dRec.Party_Type__c}</span>
+                        </td>
+                        <td>
+                            <lightning:select name="selectCategory" label="" value="{!dRec.Category__c}" title="{!dRec.Category__c}">
+                                <aura:iteration items="{!v.attributeWrapperObj.optionsCategory}" var="oC">
+                                    <option value = "{!oC.value}" 
+                                            label = "{!oC.label}" 
+                                            selected = "{! oC.value ==  dRec.Category__c}"
+                                            >{!oC.label}</option>
+                                </aura:iteration>
+                            </lightning:select>						
+                        </td>
+                        <td>
+                            <lightning:textarea value="{!dRec.Discrepancy_Description__c}" title="{!dRec.Discrepancy_Description__c}" />
+                        </td>
+                        <td>
+                            <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                    <option value = "{!oS.value}" 
+                                            label = "{!oS.label}" 
+                                            selected = "{! oS.value ==  dRec.Status__c}"
+                                            >{!oS.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td>
+                            <lightning:textarea value="{!dRec.Resolution_Remarks__c}" title="{!dRec.Resolution_Remarks__c}" />
+                        </td>
+                        <td>
+                            <lightning:input label=" " value="{!dRec.Closed_Date__c}" type="date" title="{!dRec.Closed_Date__c}"/>
+                        </td>
+                        <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                            <td>
+                                <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" title="{!dRec.Remarks__c}"/>
+                                <!-- <span>{!dRec.Remarks__c}</span> -->
+                            </td>
+                        </aura:if>
+                    </tr>
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="6">
+                        <div >
+                            <lightning:button variant="brand" label="Save Discrepancy" title="Save Discrepancy" disabled="{!v.isProcessing }" onclick="{!c.onAddSaveDiscrepancy}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Email" title="Send Email" disabled="{! v.isProcessing }" onclick="{!c.onSendEmail}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Table : End +-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Add Discrepancy : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing QC Discrepancy details : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!if( and( not(empty(v.attributeWrapperObj.discrepancyListDis)) , v.attributeWrapperObj.centralisedOpsShow  , v.attributeWrapperObj.mortgageFlag ) , true , false )}">
+            <table class="slds-table  discrepancy-table" >
+                <thead>
+                    <tr class="slds-text-heading_small discrepancy-table-title">
+                        <td colspan="6">Existing QC Discrepancy details</td>
+                    </tr>
+                    <tr class="slds-hint-parent slds-text-title discrepancy-table-header">
+                        <td>Raiser By</td>
+                        <td>Category</td>
+                        <td>Description</td>
+                        <td>Status</td>
+                        <td>Discrepancy Type</td>
+                        <td>Resolution Remarks</td>
+                        <td>Remarks</td>
+                    </tr>
+                </thead>
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyListDis}" var="dRec"  >
+                    
+                    <tr class="slds-text-body_small">
+                        <td>
+                            <span>{!dRec.RaiserName__r.Name}</span>
+                        </td>
+                        <td>
+                            <span>{!dRec.Category__c}</span>
+                        </td>
+                        <td>
+                            <lightning:textarea value="{!dRec.Discrepancy_Description__c}" title="{!dRec.Discrepancy_Description__c}" />
+                        </td>
+                        <td>
+                            <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                    <option value = "{!oS.value}" 
+                                            label = "{!oS.label}" 
+                                            selected = "{! oS.value ==  dRec.Status__c}"
+                                            >{!oS.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td>
+                            <lightning:select name="selectDiscrepancyType" label="" value="{!dRec.Discrepancy_Type__c}" title="{!dRec.Discrepancy_Type__c}">
+                                <aura:iteration items="{!v.attributeWrapperObj.optionsDiscrepancyType}" var="oD">
+                                    <option value = "{!oD.value}" 
+                                            label = "{!oD.label}" 
+                                            selected = "{! oD.value ==  dRec.Discrepancy_Type__c}"
+                                            >{!oD.label}</option>
+                                </aura:iteration>
+                            </lightning:select>						
+                        </td>
+                        <td>
+                            <lightning:textarea value="{!dRec.Resolution_Remarks__c}" title="{!dRec.Resolution_Remarks__c}" />
+                        </td>
+                        <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                            <td>
+                                <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" title="{!dRec.Remarks__c}"/>
+                                <!-- <span>{!dRec.Remarks__c}</span> -->
+                            </td>
+                        </aura:if>
+                    </tr>
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="8">
+                        <div >
+                            <lightning:button variant="brand" label="Save QC Changes" title="Save QC Changes" disabled="{!v.isProcessing }" onclick="{!c.onSaveDiscrepancyQC}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Pending QC Discrepancy" title="Send Mail for Pending QC Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailPending}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Resolved QC Discrepancy" title="Send Mail for Resolved QC Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailAll}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing QC Discrepancy details : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing Discrepancy details : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!not(empty(v.attributeWrapperObj.discrepancyList))}">
+            
+            <table class="slds-table  discrepancy-table slds-wrap " > <!-- slds-max-medium-table_stacked-horizontal -->
+                <thead>
+                    <tr class="slds-text-heading_small discrepancy-table-title">
+                        <td colspan="6">Existing Discrepancy details</td>
+                    </tr>
+                    
+                    <tr class="slds-hint-parent slds-text-title discrepancy-table-header">
+                        <td >Stage</td>
+                        <td >Name</td>
+                        <td >Attach File</td>
+                        <td >Raised Date</td>
+                        <td >Raiser By</td>
+                        <td >Raiser Role</td>
+                        <td >Party Name</td>
+                        <td >Party</td>
+                        <td>Category</td>
+                        <td>Description</td>
+                        <td>Status</td>
+                        <td>Resolution Remarks</td>
+                        <td>Closed Date</td>
+                        <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                            <td>Remarks</td>
+                        </aura:if>
+                    </tr>
+                </thead>
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyList}" var="dRec"  >
+                    
+                    <tr class="slds-text-body_small">
+                        <td title="Stage" data-label="Stage">
+                            <span>{!dRec.Discrepancy_Stage__c}</span>
+                        </td>
+                        <td title="Name" data-label="Name">
+                            <a href="{!concat('/',dRec.Id)}"  target="_blank" style="color: black;" >{!dRec.Name}</a>
+                        </td>
+                        <td title="Attach File" data-label="Attach File">
+                            <a href="{!join( '' , concat('/p/attach/NoteAttach?pid=',dRec.Id) , concat('&amp;parentname=',dRec.name) , concat('&amp;retURL=%2F',dRec.Id) )}" target="_blank" style="color: black;" >Attach File</a>
+                        </td>
+                        <td title="Raised Date" data-label="Raised Date">
+                            <ui:outputDateTime value="{!dRec.CreatedDate}"   />
+                        </td>
+                        <td title="Raiser By" data-label="Raiser By">
+                            <span>{!dRec.RaiserName__r.Name}</span>
+                        </td>
+                        <td title="Raiser Role" data-label="Raiser Role">
+                            <span>{!dRec.Raiser_Role__c}</span>
+                        </td>
+                        <td title="Party Name" data-label="Party Name">
+                            <span>{!dRec.Applicant_Name__c}</span>
+                        </td>
+                        <td title="Party" data-label="Party">
+                            <span>{!dRec.Party_Type__c}</span>
+                        </td>
+                        <td title="Category" data-label="Category">
+                            <span>{!dRec.Category__c}</span>
+                        </td>
+                        <td title="Description" data-label="Description">
+                            <lightning:textarea value="{!dRec.Discrepancy_Description__c}" title="{!dRec.Discrepancy_Description__c}" />
+                        </td>
+                        <td title="Status" data-label="Status">
+                            <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                    <option value = "{!oS.value}" 
+                                            label = "{!oS.label}" 
+                                            selected = "{! oS.value ==  dRec.Status__c}"
+                                            >{!oS.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td title="Resolution Remarks" data-label="Resolution Remarks">
+                            <lightning:textarea value="{!dRec.Resolution_Remarks__c}" title="{!dRec.Resolution_Remarks__c}" />
+                        </td>
+                        <td title="Closed Date" data-label="Closed Date">
+                            <lightning:input label=" " value="{!dRec.Closed_Date__c}" type="date" title="{!dRec.Closed_Date__c}"/> 
+                        </td>
+                        <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}" >
+                            <td title="Remarks" data-label="Remarks">
+                                <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" title="{!dRec.Remarks__c}" />
+                            </td>
+                        </aura:if>
+                    </tr>
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="10">
+                        <div >
+                            <lightning:button variant="brand" label="Save Changes" title="Save Changes" disabled="{!v.isProcessing }" onclick="{!c.onSaveDiscrepancy}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Pending Discrepancy" title="Send Mail for Pending Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailPending}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Resolved Discrepancy" title="Send Mail for Resolved Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailAll}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing Discrepancy details : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{! v.isProcessing }">
+            <div class="spinner-overlay">
+                <div class=".slds-is-relative" style="height: 6rem;">
+                    <div role="status" class="slds-spinner slds-spinner_large">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- <lightning:spinner alternativeText="Loading" /> -->
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div aura:id="customToast" class="slds-notify_container slds-hide" >
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">  
+                            <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

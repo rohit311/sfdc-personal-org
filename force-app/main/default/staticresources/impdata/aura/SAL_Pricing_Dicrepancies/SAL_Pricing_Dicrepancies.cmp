@@ -1,0 +1,136 @@
+<aura:component controller="SALMobilityCntrl_V2" >
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+	<aura:attribute name="Status__c" type="List"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="loan" type="Opportunity"/>
+    
+    <aura:iteration items="{!v.existingDisList}" var="disObj" indexVar="index">
+        
+        <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+            <lightning:card title="" class="applyColor">
+                
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                            
+                            
+                            <div class="slds-form-element slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1">
+                                <div class="slds-form-element__control">
+                                    <a onclick="{!c.toggleAssVersion}" id="{! disObj.Id }" style="text-decoration: none;">
+                                        <aura:if isTrue="{!v.class =='hideCls'}">
+                                            
+                                            <span class="font-weight-bold important-message" id="{! disObj.Id }">+ </span>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.myid == disObj.Id}">
+                                                    <span class="font-weight-bold slds-p-right_x-small important-message" id="{! disObj.Id }">-</span> 
+                                                    
+                                                    <aura:set attribute="else"  >
+                                                        <span class=" important-message">+
+                                                        </span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </a>
+                                    <a href="{!'/'+disObj.Id}" target="_blank">{!disObj.Name}</a>
+                                </div>
+                            </div>
+                            <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                <div class="slds-form-element__control slds-grid">       
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appType">Stage:</label>
+                                    
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appType" value="{!disObj.Discrepancy_Stage__c}"/></strong></div>
+                                
+                            </div>
+                            <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                <div class="slds-form-element__control slds-grid">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Raised Date:</label>
+                                    
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disObj.createdDate}"/></strong></div>
+                            </div>
+                            <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                <div class="slds-form-element__control slds-grid">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appMobile"> Raiser By:</label>
+                                    
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!disObj.RaiserName__c}" /></strong></div>
+                            </div>
+                            <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                <div class="slds-form-element__control slds-grid">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appDOB"> Raiser Role:</label>
+                                    
+                                    <strong><ui:outputDate class="slds-col slds-size--3-of-5" aura:id="appDOB" value="{!disObj.Raiser_Role__c}"/></strong></div>
+                            </div>
+                            
+                            <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                <div class="slds-form-element__control slds-grid">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Party Name:</label>
+                                    
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Applicant_Name__c}"/></strong></div>
+                            </div>
+                            <aura:if isTrue="{!v.myid == disObj.Id}">
+                                <aura:if isTrue="{!v.class == 'showCls' }">
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                        <div class="slds-form-element__control slds-grid">
+                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Party:</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Party_Type__c}"/></strong></div>
+                                    </div>
+                                    
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                        <div class="slds-form-element__control slds-grid">
+                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Category:</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Category__c}"/></strong></div>
+                                    </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                        <div class="slds-form-element__control slds-grid">
+                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Description :</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Discrepancy_Description__c}"/></strong></div>
+                                    </div>
+                                    <div class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                    
+                                            <div class="slds-form-element__control">
+                                                <lightning:select required="" messageWhenValueMissing="Please select a value" aura:id="status" name="status" label="Status" value="{!disObj.Status__c}"><!--status disbled for bug20435-->
+                                                    <option value="" text="--None--" />
+                                                    <aura:iteration items="{!v.Status__c}" var="type">
+                                                        <option value="{!type}" text="{!type}" selected="{!disObj.Status__c == type}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>                             
+                                            </div>   
+                                        </div>
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                        <div class="slds-form-element__control slds-grid">
+                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Resolution Remarks :</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Resolution_Remarks__c}"/></strong></div>
+                                    </div>
+                                    
+                                    <div aura:id="allDiv" class="{!if(v.theme == 'Theme4d','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2','slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-5')}">
+                                        <div class="slds-form-element__control slds-grid">
+                                            <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="appPAN">Closed Date :</label>
+                                            
+                                            <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="appPAN" value="{!disObj.Closed_Date__c}"/></strong></div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            
+                                            <c:DocumentUploader stage="{!v.loan.StageName}" aura:id="file-uploader-1" instance="{!'1'+index+1}" forPricingDashboard="yes" parentId="{!v.loan.Id}" fileName="{!'Disc_'+disObj.Category__c}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="{!if(v.discrepancy.OTPDiscrepancyDocuments__c == '',false,true)}"/><!-- Need to add showUploadButton="false" -->
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                </aura:if>
+                            </aura:if>
+                        </div>
+                    </div>
+                </p>
+            </lightning:card>
+        </div>
+    </aura:iteration>
+    <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+        <lightning:button variant="brand" aura:id="saveSanc" label="Save Discrepancy" class="{!if(v.existingDisList.length == 0,'slds-theme--alt-inverse slds-hide','slds-theme--alt-inverse slds-show')}" iconName="utility:save" iconPosition="left" onclick="{! c.saveSanctionDiscDetails }"/>
+    </div>
+</aura:component>

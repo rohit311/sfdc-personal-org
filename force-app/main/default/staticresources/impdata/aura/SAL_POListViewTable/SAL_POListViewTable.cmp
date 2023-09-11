@@ -1,0 +1,251 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <ltng:require scripts="/resource/jqueryformobility" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    <aura:attribute name="lstPo" type="Product_Offerings__c[]"/> 
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute type="Boolean" name="sortAsc" default="true"/>
+    <aura:attribute type="Boolean" name="sortAscDist" default="true"/> 
+    <aura:attribute type="Boolean" name="showFilter" default="false"/> <!-- 981 -->
+    <aura:attribute name="allPOsList" type="Product_Offerings__c[]"/> <!--981-->
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="PaginationList" type="Product_Offerings__c[]"/>
+    <aura:attribute name="distPOList" type="List[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="latitude" type="String"/>
+    <aura:attribute name="longitude" type="String"/>
+    <aura:attribute name="isGPSEnabled" type="boolean"/>
+    <aura:attribute name="myid" type="String"/>
+    <!-- 23064 -->
+    <aura:attribute name="displayExotel" type="boolean" default="true"/> 
+    <aura:attribute name="newPoList" type="List"/> <!--Bug 23064-->
+    <aura:attribute name="validExotelProd" type="String[]"/>
+     <!-- 23064 -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:registerEvent name="SetPOId" type="c.SetPOId"/>
+    <aura:handler event="c:DestroyChild" action="{!c.DestroyChildCmp}"/>
+   <!--<ui:scrollerWrapper class="{!$Browser.isIPhone ? 'scrollerSize ' : ''}">-->
+    <div id="waitingDiv" style="display:none" class="slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    
+    <div id="successToast" style="display:none;" >
+        <div class="slds-notify_container">
+            <div aura:id="alert" class="slds-notify slds-notify--toast slds-theme--success" role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <strong><ui:outputText value="Success!"/></strong>
+                    <h2 id ="successmsg1"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_12-of-12" style="width: 20rem;"><!-- Style tage added for Bug 17697-->    
+            <div id="errorToast" style="display:none">
+                <div class="slds-notify_container" >
+                    <div aura:id ="alert" class="slds-notify slds-notify--toast slds-theme--info " style="min-width: 22rem !important;padding-right: 0.5rem !important;padding-left: 0.5rem !important;font-size: 14px !important;" role="alert" ><!-- Style tage added for Bug 17697-->    
+                        <!--<lightning:icon aura:id="messageicon" iconName="utility:error" variant="success" size="medium" class="iconContainer"/>&nbsp;-->
+                        <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                        <div class="slds-align-middle">
+                            <h2 class="slds-text-heading--x-small">
+                                <strong><ui:outputText value="Info!"/></strong> &nbsp;
+                                <h2 id="errormsg" style="float:right"/>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      	</div>
+    </div>
+    <aura:if isTrue="{!v.showFilter}">
+    <div class="slds-p-horizontal--small">                
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                       
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="from" label="From Date" type="date" value="" name="from" placeholder=""  onblur="{!c.performSearch}" />     
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="to" label="To Date" type="date" value="" name="from" placeholder=""  onblur="{!c.performSearch}"/>     
+                </div>
+            
+            
+            </div>
+        </div>
+    </div>
+        <div class="slds-m-bottom_xx-large"></div>
+    </aura:if>
+    <div class="slds-m-top_xx-large"></div>
+    <div class="slds-form-element__control slds-m-bottom_small slds-m-left_x-small">
+        Count:
+        <b><ui:outputText value="{!v.lstPo.length}"/></b>
+    </div>
+    <aura:if isTrue="{!v.lstPo.length > 0}" >
+        
+        <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--12-of-12">    
+            <thead  class="slds-grid slds-hyphenate">
+                <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                    <th class="slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                        PO Name 
+                    </th>
+                    
+                    <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                        Loan Amt
+                        <lightning:buttonIcon onclick="{!c.sortByAmt}"  class="slds-show slds-float_right slds-theme--shade" aura:id="sortList" iconName="utility:sort" size="x-small" alternativeText="Sort"/>
+                    </th>
+                    <th class="slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right">
+                        Distance
+                        <lightning:buttonIcon onclick="{!c.sortByDist}"  class="slds-show slds-float_right slds-theme--shade" aura:id="sortList" iconName="utility:sort" size="x-small" alternativeText="Sort"/>
+                    </th>
+                </tr>
+                
+                
+            </thead>
+            <tbody class="slds-grid slds-wrap">
+                
+                <aura:iteration items="{!v.PaginationList}" var="obj">
+                    <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                        
+                        <td class="floatLeft WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            <a onclick="{!c.toggleAssVersion}" id="{! obj.Id }">
+                                <aura:if isTrue="{!v.class =='hideCls'}">
+                                    
+                                    <span class=" important-message" id="{! obj.Id }">+ </span>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.myid == obj.Id}">
+                                            <span class=" slds-p-right_x-small important-message" id="{! obj.Id }">-</span> 
+                                                                              
+                                            <aura:set attribute="else"  >
+                                               <span class=" important-message">+
+                                                </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            
+                            <a id="{!obj.Id}" onclick="{!c.navigateToPoCmp}" href="" target="_blank">
+                                {!obj.Name} </a>
+                            
+                        </td> 
+                        
+                        <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            {!obj.Offer_Amount__c} 
+                        </td>
+                        <td class="slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            
+                            <aura:iteration items="{!v.distPOList}" var="dist" >
+                                <aura:if isTrue="{!dist.name.Id == obj.Id}">
+                                    <ui:outputNumber value="{!dist.value}" format=".00"/>
+                                </aura:if>
+                            </aura:iteration>
+                        </td>
+                    </tr>
+                    
+                    <!-- start of Add row --> 
+                    <aura:if isTrue="{!v.myid == obj.Id}">
+                        <aura:if isTrue="{!v.class == 'showCls' }">
+                            
+                            <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                <div style="width:100%;">
+                                    <fieldset class="slds-form--compound">
+                                        <div class="slds-form-element__row slds-m-top--x-small ">
+                                            
+                                            <lightning:card class=" slds-size--12-of-12" >
+                                                <header class="slds-hide"></header>
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--10-of-12 slds-align_absolute-center ">                   
+                                                    <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left ">
+                                                            Name:
+                                                            <b><ui:outputText value="{!obj.Lead_Name__c}"/></b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left floatLeft">
+                                                            Mobile Number:
+                                                            <b><a href="{! 'tel:' + '' + obj.Lead_Customer_Mobile__c}" target="_blank">{!obj.Lead_Customer_Mobile__c}</a></b><!--23064 Sprint 6 -->
+                                                            <!--23064 start -->
+                                                            <aura:iteration items="{!v.newPoList}" var="callItem">
+                                                                <aura:if isTrue="{!and(callItem.po.Id == obj.Id,callItem.showCall == true)}">
+                                                             
+                                                                    <!-- 23064 changed by swapnil -->
+                                                                    <c:Exotel_APICmp frommobile="none" tomobile="{!obj.Lead_Customer_Mobile__c}"  recordId="{!obj.Lead__c}" objName="Lead"  Product="{!obj.Products__c}"/>
+                                                                </aura:if>	
+                                                            </aura:iteration>
+                                                            <!--23064 start -->
+                                                        </div>
+                                                    </div>
+                                                    <aura:if isTrue="{!obj.Product_Offering_Converted__c}">
+                                                    <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left ">
+                                                            LAN:
+                                                            <b><ui:outputText value="{!obj.Opportunity__r.Loan_Application_Number__c}"/></b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                        <div class="slds-form-element__control slds-float_left ">
+                                                            Stage:
+                                                            <b><ui:outputText value="{!obj.Opportunity__r.StageName}"/></b>
+                                                        </div>
+                                                    </div>
+                                                        </aura:if>
+                                                </div>
+                                                
+                                            </lightning:card>
+                                            
+                                            
+                                            
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                
+                            </tr>
+                            
+                            
+                        </aura:if>
+                    </aura:if>
+                    
+                    <!-- End row -->
+                    
+                </aura:iteration>
+            </tbody>
+        </table>
+        <br />
+        <lightning:buttonGroup class="slds-align_absolute-center">
+            <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+                              onclick="{!c.previous}" variant="brand"
+                              iconName='utility:back'/>
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                              onclick="{!c.next}" variant="brand"
+                              iconName='utility:forward' iconPosition='right'/>
+            
+        </lightning:buttonGroup>
+        <div class="slds-align_absolute-center slds-text-body_regular">
+            Page {!v.currentPage} of {!v.totalPages}
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-align_absolute-center slds-text-heading_medium">
+                No Records Found
+            </div>
+        </aura:set>
+    </aura:if>
+    <!--</ui:scrollerWrapper> -->
+</aura:component>

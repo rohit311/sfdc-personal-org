@@ -1,0 +1,38 @@
+<apex:page showHeader="false" applyHtmlTag="false" docType="html-5.0" controller="AngularWithVfPage">
+    <head>    
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+        <script>
+        var App = angular.module("myapp",[]);
+        App.controller("myctrl",function($scope,$http){
+            $scope.contacts = {!contacts}
+            
+            $http.get('http://rest-service.guides.spring.io/greeting').then(function(response){
+            	$scope.greeting = response.data;
+            });
+        });
+        </script>
+    </head>
+    
+    <body ng-app="myapp" class="container" ng-controller="myctrl">
+        <table class="table table-bordered">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Id</th>
+            </tr>
+            <tr ng-repeat="contact in contacts | filter:query">
+                <td>{{contact.Name}}</td>
+                <td>{{contact.Email}}</td>
+                <td>{{contact.Id}}</td>
+            </tr>
+        </table>
+        
+        <br/>
+        <div>
+            {{greeting}}
+        </div>
+    </body>    
+</apex:page>

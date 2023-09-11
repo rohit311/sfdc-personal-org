@@ -1,0 +1,608 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.doInit}" />
+    <aura:attribute name="allVeriList" type="Verification__c[]"/>
+    <aura:attribute name="verAtt" type="List"/>
+    <aura:attribute name="allVeriAgency" type="Verification__c[]"/>
+    <aura:attribute name="veriAgencyList" type="List"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="Oppobj" type="Opportunity"/>
+    <aura:attribute name="camObj" type="CAM__c"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c"/>
+    <aura:attribute name="dedupeList" type="De_Dupe__c[]"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="nameTheme" type="String"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="statusList" type="String[]" />
+    <aura:attribute name="upStatusList" type="String[]" />
+    <aura:attribute name="monList" type="String[]" />
+    <aura:attribute name="verCategoryList" type="String[]" />
+    <aura:attribute name="RSAList" type="String[]" />
+    <aura:attribute name="veriTypesList" type="List" />
+    <aura:attribute name="primaryApp" type="Applicant__c"/>
+    <aura:attribute name="contObj" type="Contact"/><!--CR 27077--> 
+    <aura:attribute type="String" name="selectFlag" default=""/><!--US_5574-->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+  <aura:attribute type="Boolean" name="cetralisedSampling" default="false"/><!-- Bug 5331 -->  
+    <c:Custom_Toast_Mobility /><!--US_5574-->
+    <c:LoaderForMobility /><!--US_5574-->
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div style="position:relative">
+                        <div class="innerDivWrapper">
+                            <div aura:id='MainPopUp'>
+                                <div style="font-size: 14px;">
+                                    <!--US_5574 S-->
+                                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                       <lightning:select name="veritype" aura:id="veritype" label="Verification Type" onchange="{!c.onChange}">
+                                           <option value="">Please select value</option>
+                                           <option value="RSA verifications">RSA verifications</option>
+                                           <option value="RCU verifications">RCU verifications</option>
+                                            <aura:if isTrue="{!v.cetralisedSampling}">
+                                           <option value="Centralised sampling">Centralised sampling</option>
+                                           </aura:if>
+                                        </lightning:select>
+                                                </div>
+                                        </div>
+                                    </div>
+                                     <!--US_5574 E-->
+                                     <aura:if isTrue="{!v.selectFlag == 'RSA'}"><!--US_5574-->
+                                    <div class="slds-p-horizontal--small">                
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select aura:id="rsaFlag" name="rsaFlag" label="RSA Flag" required="true" messageWhenValueMissing="Please Select Value" value="{!v.primaryApp.Check_RSA__c}" disabled="{!and(v.profileName == 'Area Credit Manager', v.primaryApp.Check_RSA__c == 'Yes'?true :false)}"><!--25337 added disabled-->
+                                                        <option value="" text="--None--" />
+                                                        <aura:iteration items="{!v.RSAList}" var="rsa">
+                                                            <option value="{!rsa}" text="{!rsa}" selected="{!v.primaryApp.Check_RSA__c == rsa}"></option>
+                                                        </aura:iteration>
+                                                    </lightning:select>  
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </div> 
+                                  </aura:if><!--US_5574-->
+                                    <aura:if isTrue="{!v.selectFlag != ''}"><!--US_5574-->	
+                                    <aura:if isTrue="{!v.primaryApp.Check_RSA__c == 'Yes' || v.selectFlag == 'RCU' || v.selectFlag =='Centralised sampling' }"><!--US_5574-->
+                                        <aura:if isTrue="{!v.nameTheme != 'Theme4t'}">
+                                            <table class="slds-table slds-hyphenate slds-table_bordered slds-m-top_small slds-size--8-of-8">    
+                                                <thead class="slds-grid slds-hyphenate">
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Salary Slip  
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Form-16
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Dual PAN check 
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Office Set-up
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Residence Profile
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            KYC verification
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Banking verification
+                                                        </th>
+                                                        <th class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Profile Check – Demographic change 
+                                                        </th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody  class="slds-grid slds-hyphenate">
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Pay_Slips_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Pay_Slips_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Pay_Slips_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.FORM_16__c}">
+                                                                    <lightning:input type="checkbox" aura:id="FORM_161__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="FORM_16__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.PAN_Check__c}">
+                                                                    <lightning:input type="checkbox" aura:id="PAN_Check1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="PAN_Check__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Office_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Office_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Office_Status__c" disabled="{!v.primaryApp.Office_Status__c}" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Residence_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Residence_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Residence_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.KYC_Verifications__c}">
+                                                                    
+                                                                    <lightning:input type="checkbox" aura:id="KYC_Verifications1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        
+                                                                        <lightning:input type="checkbox" aura:id="KYC_Verifications__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Bank_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Bank_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Bank_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-8 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.PROFILE_VERIFICATION__c}">
+                                                                    <lightning:input type="checkbox" aura:id="PROFILE_VERIFICATION1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="PROFILE_VERIFICATION__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </aura:if>
+                                        <aura:if isTrue="{!v.nameTheme == 'Theme4t'}">
+                                            <table class="slds-table slds-hyphenate slds-table_bordered slds-m-top_small slds-size--8-of-8">    
+                                                <thead class="slds-grid slds-hyphenate">
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <th class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Verification Type  
+                                                        </th>
+                                                        <th class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-wrap slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Initiate
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody  class="slds-grid slds-wrap slds-hyphenate">
+                                                    
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Salary Slip
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Pay_Slips_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Pay_Slips_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Pay_Slips_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Form-16
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.FORM_16__c}">
+                                                                    <lightning:input type="checkbox" aura:id="FORM_161__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="FORM_16__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Dual PAN check 
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.PAN_Check__c}">
+                                                                    <lightning:input type="checkbox" aura:id="PAN_Check1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="PAN_Check__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Office Set-up
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Office_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Office_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Office_Status__c" disabled="{!v.primaryApp.Office_Status__c}" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Residence Profile
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Residence_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Residence_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Residence_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            KYC verification
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.KYC_Verifications__c}">
+                                                                    
+                                                                    <lightning:input type="checkbox" aura:id="KYC_Verifications1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        
+                                                                        <lightning:input type="checkbox" aura:id="KYC_Verifications__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Banking verification
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.Bank_Status__c}">
+                                                                    <lightning:input type="checkbox" aura:id="Bank_Status1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="Bank_Status__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class ="slds-grid slds-hyphenate slds-size--8-of-8">
+                                                        <td class="slds-align_absolute-center WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            Profile Check – Demographic change
+                                                        </td>
+                                                        <td class="WrapText slds-size--1-of-2 slds-col slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                                                            <div class="slds-align_absolute-center">
+                                                                <aura:if isTrue="{!v.primaryApp.PROFILE_VERIFICATION__c}">
+                                                                    <lightning:input type="checkbox" aura:id="PROFILE_VERIFICATION1__c" checked="true" disabled="true" />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input type="checkbox" aura:id="PROFILE_VERIFICATION__c" disabled="false" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </aura:if>
+                                        <div class="slds-p-around--x-small" align="center">
+                                            <lightning:button iconName="utility:add" class="slds-theme_alt-inverse" aura:id="addButtonId"  variant="brand" label="Add Verification" onclick="{!c.addRecords}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307/23064 -->
+                                        </div>
+                                        <table>
+                                            <tbody> 
+                                                
+                                                <aura:iteration items="{!v.allVeriList}" var="verItem" indexVar="num">
+                                                   
+                                                    <div class="slds-box slds-box_x-small slds-m-top_small" style="border-bottom-width: 5px;background-color:gainsboro !important;"> 
+                                                        
+                                                        <div class="wrap">
+                                                            <div class="left">
+                                                                <a class="slds-float_left" style="text-decoration:none" onclick="{!c.toggleAssVersion}" id="{! verItem.Verification_Type__c }">
+                                                                    <aura:if isTrue="{!v.class =='hideCls'}">
+                                                                        
+                                                                        <span class=" important-message" id="{! verItem.Verification_Type__c }">+ </span>
+                                                                        <aura:set attribute="else">
+                                                                            <aura:if isTrue="{!v.myid == verItem.Verification_Type__c}">
+                                                                                <span class=" slds-p-right_x-small important-message" id="{! verItem.Verification_Type__c }">-</span> 
+                                                                                
+                                                                                <aura:set attribute="else"  >
+                                                                                    <span class=" important-message">+
+                                                                                    </span>
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </a>
+                                                            </div>
+                                                            <div class="right">
+                                                                    <lightning:input type="toggle" label="Send Mail" checked="" name="{!'sendMail'+verItem.Id}" aura:id="mailCheckbox" disabled="{!if(verItem.Id != null,false,true)}"/>
+                                                            </div>
+                                                            <div class="center">
+                                                                <div style="padding-top:4px;text-align :center;"> <b>{!verItem.Verification_Type__c} </b>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    <aura:if isTrue="{!v.myid == verItem.Verification_Type__c}">
+                                                        <aura:if isTrue="{!v.class == 'showCls' }">
+                                                            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_x-small" >
+                                                                <lightning:card title="" class="applyColor">
+                                                                    <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                                        <div class="slds-p-horizontal--small">                
+                                                                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:input label="Name of the borrower" value="{!if(verItem.Contact__r.Name != null, verItem.Contact__r.Name, v.primaryApp.Contact_Name__r.Name)}" name="nameOfTheBorrower" disabled="true"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <aura:if isTrue="{!verItem.Verification_Type__c == 'Office verification' || verItem.Verification_Type__c == 'Residence verification' || verItem.Verification_Type__c == 'Profile Verification' || verItem.Verification_Type__c == 'PAN'}" >
+                                                                                            <lightning:textArea label="Document Particulars" value="{!verItem.Document_particulars__c}" name="docPar" disabled="true"/>
+                                                                                            <aura:set attribute="else">
+                                                                                                <lightning:textArea label="Document Particulars" value="{!verItem.Document_particulars__c}" name="docPar" disabled="false"/>
+                                                                                            </aura:set>
+                                                                                        </aura:if>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:textArea disabled="{!v.profileName != 'RSA Manager'}" label="RSA Remarks" value="{!verItem.RSA_Verification_Remark__c}" name="rsaRem"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Salary Slip Format'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Product" value="{!v.Oppobj.Product__c}" name="product" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:select aura:id="month" name="month" label="Month" required="" messageWhenValueMissing="Please Select Value" value="{!verItem.Month__c}">
+                                                                                                <option value="" text="--None--" />
+                                                                                                <aura:iteration items="{!v.monList}" var="mon">
+                                                                                                    <option value="{!mon}" text="{!mon}" selected="{!verItem.Month__c == mon}"></option>
+                                                                                                </aura:iteration>
+                                                                                            </lightning:select> 
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Net Salary" value="{!verItem.Net_Salary__c}" name="verSal" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input type="date" label="Salary Credit Date" value="{!verItem.Salary_Credit_Date__c}" name="verSalDate" disabled="false"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Salary Slip Format' || verItem.Verification_Type__c == 'Bank Statements'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Bank Name" value="{!verItem.Name_of_the_Bank__c}" name="bankName" disabled="{!if(verItem.Verification_Type__c == 'Salary Slip Format',true,false)}"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Bank Account Number" value="{!verItem.Account_No__c}" name="accNo" disabled="{!if(verItem.Verification_Type__c == 'Salary Slip Format',true,false)}"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Salary Slip Format'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:select aura:id="upStatus" name="upStatus" label="Upload Status" required="" messageWhenValueMissing="Please Select Value" value="{!verItem.Upload_status__c}" disabled="{!and(v.profileName == 'Area Credit Manager',v.selectFlag == 'RSA'?true:false)}"><!--changed disabled condition for us 25337-->
+                                                                                                <option value="" text="--None--" />
+                                                                                                <aura:iteration items="{!v.upStatusList}" var="status">
+                                                                                                    <option value="{!status}" text="{!status}" selected="{!verItem.Upload_status__c == status}"></option>
+                                                                                                </aura:iteration>
+                                                                                            </lightning:select> 
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Bank Statements'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Branch" value="{!verItem.Name_of_the_Branch__c}" name="branch" disabled="false"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Bank Statements'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="PAN Card Number" value="{!verItem.PAN_Number__c}" name="PAN" disabled="false"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Residence verification'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:textarea label="Residence Address" value="{!verItem.Address__c}" name="resiAdd" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Telephone Number" value="{!verItem.Phone_number__c}" name="verTel" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Mobile Number" value="{!verItem.Mobile_Number__c}" name="verMob" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Office verification' || verItem.Verification_Type__c == 'Pay Slips'}" >
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Name of the Employer" value="{!verItem.Employer_Name__c}" name="verEmp" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!verItem.Verification_Type__c == 'Office verification'}">
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Office Address Type" value="{!verItem.Office_Address_Type__c}" name="verOffcType" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:textArea label="Office Address" value="{!verItem.Employer_Address__c}" name="verOffcAdd" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control">
+                                                                                            <lightning:input label="Designation" value="{!verItem.Designation__c}" name="verDesig" disabled="true"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        
+                                                                                        <lightning:select aura:id="verAg" name="verStatus" label="Verification Agency" required="" messageWhenValueMissing="Please Select Value" value="{!verItem.Verification_Agency__c}">
+                                                                                            <option value="" text="--None--" />
+                                                                                            <aura:iteration items="{!v.veriAgencyList}" var="vam">
+                                                                                                <aura:if isTrue="{!vam.verType == verItem.Verification_Type__c}">
+                                                                                                    <aura:iteration items="{!vam.verAgencies}" var="ver">
+                                                                                                        <option value="{!ver.Id}" text="{!ver.Name}" selected="{!verItem.Verification_Agency__c == ver}"></option>
+                                                                                                    </aura:iteration>
+                                                                                                </aura:if>
+                                                                                            </aura:iteration>
+                                                                                        </lightning:select> 
+                                                                                        
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:select disabled="{!and(v.profileName != 'RSA Manager',v.profileName != 'Sys Admin Persistent')}" aura:id="verStatus" name="verStatus" label="Status" required="" messageWhenValueMissing="Please Select Value" value="{!verItem.Status__c}">
+                                                                                            <option value="" text="--None--" />
+                                                                                            <aura:iteration items="{!v.statusList}" var="status">
+                                                                                                <option value="{!status}" text="{!status}" selected="{!verItem.Status__c == status}"></option>
+                                                                                            </aura:iteration>
+                                                                                        </lightning:select> 
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:textarea label="Remarks" value="{!verItem.Remarks__c}" name="verRem" disabled="{!v.profileName == 'RSA Manager'}" maxlength="500"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:select aura:id="verCat" name="verCat" label="Verification Category" required="" messageWhenValueMissing="Please Select Value" value="{!verItem.VerificationCategory__c}" disabled="{!and(v.profileName == 'Area Credit Manager',v.selectFlag == 'RSA'?true:false)}"><!--changed disabled condition for us 25337-->
+                                                                                            <option value="" text="--None--" />
+                                                                                            <aura:iteration items="{!v.verCategoryList}" var="category">
+                                                                                                <option value="{!category}" text="{!category}" selected="{!verItem.VerificationCategory__c == category}"></option>
+                                                                                            </aura:iteration>
+                                                                                        </lightning:select> 
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:input label="Verification Rate" value="{!verItem.VerificationRate__c}" name="verRate" disabled="{!and(v.profileName == 'Area Credit Manager',v.selectFlag == 'RSA'?true:false)}"/><!--changed disabled condition for us 25337-->
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:textarea label="Ops Remarks" value="{!verItem.OpsRemarks__c}" name="opsRem" disabled="{!and(v.profileName == 'Area Credit Manager',v.selectFlag == 'RSA'?true:false)}"/><!--changed disabled condition for us 25337-->
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <lightning:input type="toggle" label="No Bill" checked="{!verItem.NoBill__c}" name="verRate" disabled="{!and(v.profileName == 'Area Credit Manager',v.selectFlag == 'RSA'?true:false)}"/><!--changed disabled condition for us 25337-->
+                                                                                    </div>
+                                                                                </div>
+                                                                                
+                                                                                <aura:if isTrue="{!verItem.Id != null}">
+                                                                                    
+                                                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                                        <div class="slds-form-element__control slds-grid">
+                                                                                            <c:DocumentUploader aura:id="file-uploader-1" instance="{!num}" forPricingDashboard="yes" parentId="{!verItem.Id}" fileName="{!verItem.Verification_Type__c+'_veri'}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="true"/><!-- Need to add showUploadButton="false" -->
+                                                                                        </div>
+                                                                                        
+                                                                                        <div class="slds-form-element__control slds-grid">
+                                                                                            
+                                                                                            <aura:iteration items="{!v.verAtt}" var="verat">
+                                                                                                
+                                                                                                <aura:if isTrue="{!verat.verId == verItem.Id}">
+                                                                                                    <lightning:input type="toggle" label="Document Uploaded" checked="{!verat.att}" name="verDoc" disabled="true"/>    
+                                                                                                </aura:if>
+                                                                                            </aura:iteration>
+                                                                                        </div>
+                                                                                    </div>  
+                                                                                </aura:if>
+                                                                            </div>
+                                                                        </div>
+                                                                    </p>
+                                                                </lightning:card>
+                                                            </div>
+                                                        </aura:if>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </tbody>
+                                        </table>
+                                        
+                                    </aura:if>
+                                    
+                                    <div class="slds-p-around--x-small" align="center">
+                                        <lightning:button iconName="utility:save" class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.updateRecords}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                        <aura:if isTrue="{!v.allVeriList.length > 0}">
+                                            <lightning:button iconName="utility:email" class="slds-theme_alt-inverse" aura:id="sendEmail"  variant="brand" label="Send Email" onclick="{!c.sendEmail}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                        </aura:if>
+                                    </div>
+                                    </aura:if><!--US_5574-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            
+        
+</aura:component>

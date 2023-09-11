@@ -1,0 +1,91 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="VerificationImageUploadCntrl">
+	<ltng:require scripts="{!$Resource.PO_APP_EXIF}"/>
+    
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="one" type="Boolean"/>
+    <aura:attribute name="two" type="Boolean"/>
+    <aura:attribute name="three" type="Boolean"/>
+    <aura:attribute name="none" type="Boolean"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+         <aura:if isTrue="{!v.one}">
+            
+            <div class="container uploads2 col-xs-12 ">
+                <div id="one" >
+            		 <c:DocumentUploader aura:id="file-uploader-1" parentId="{!v.parentId}" instance="1" fileName="Premise_Picture1" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/>  
+                </div>
+             </div>
+             <div class="container uploads3 col-xs-12 ">
+                <div id="two" >
+            		<c:DocumentUploader aura:id="file-uploader-2" parentId="{!v.parentId}" instance="2" fileName="Premise_Picture2" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/>  
+                </div>
+             </div> 
+  		 </aura:if>
+    	<aura:if isTrue="{!v.two}">
+             <div class="container uploads3 col-xs-12 ">
+                <div id="three" >
+            		<c:DocumentUploader aura:id="file-uploader-3" parentId="{!v.parentId}" instance="3" fileName="Premise_Picture3" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/> 
+                </div>
+             </div> 
+  		 </aura:if> 
+    	<aura:if isTrue="{!v.none}">
+            
+            <div class="container uploads1 col-xs-12 ">
+                <div id="one" >
+            		 <c:DocumentUploader aura:id="file-uploader-1" parentId="{!v.parentId}" instance="1" fileName="Premise_Picture1" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/> 
+                </div>
+             </div>
+             <div class="container uploads2 col-xs-12 ">
+                <div id="two" >
+            		 <c:DocumentUploader aura:id="file-uploader-2" parentId="{!v.parentId}" instance="2" fileName="Premise_Picture2" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/> 
+                </div>
+             </div> 
+             <div class="container uploads3 col-xs-12 ">
+                <div id="three" >
+            		 <c:DocumentUploader aura:id="file-uploader-3" parentId="{!v.parentId}" instance="3" fileName="Premise_Picture3" uploadType="feed" refreshPage="true" uploadImageFilesOnly="true"/>  
+                </div>
+             </div> 
+  		 </aura:if> 
+    
+    <style>
+ 		.container {
+          display: flex;
+        }
+        .container > div {
+        //flex: 1; /*grow*/
+        }
+        .uploads1{
+        	position: absolute;
+            top: 119%;
+            left: 15%;
+            transform: translate(-50%,-50%);         
+    		padding: 8rem;
+        	width: 32%;
+        	height: 50%;
+        
+        }
+        .uploads2{
+        	position: absolute;
+            top: 119%;
+            left: 48%;
+            transform: translate(-50%,-50%);         
+    		padding: 8rem;
+        	width: 32%;
+        	height: 50%;
+        
+        }
+         .uploads3{
+        	position: absolute;
+            top: 119%;
+            left: 84%;
+            transform: translate(-50%,-50%);         
+    		padding: 8rem;
+        	width: 32%;
+        	height: 50%;
+        
+        }
+        .hide{
+        	display:none;
+        }
+    </style>
+</aura:component>

@@ -1,0 +1,51 @@
+<template>
+  <!--<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+    <thead>
+      <tr class="slds-line-height_reset">
+          <th class="" scope="col">
+             <div class="slds-truncate" title="Product">Product</div>
+          </th>
+          <th class="" scope="col">
+             <div class="slds-truncate" title="Last sale">Last sale</div>
+          </th>
+      </tr>
+     </thead>
+     <tbody>
+      <template for:each={products} for:item="productItem">
+        <tr class="slds-hint-parent" key={productItem.Id}>
+          <td class="product-accordion">
+            <lightning-accordion active-section-name={activeSections} onsectiontoggle={handleSectionToggle}>
+              <lightning-accordion-section name={productId} label={productName}>
+              </lightning-accordion-section>
+            </lightning-accordion>
+          </td>
+        </tr>
+      </template>
+     </tbody>
+  </table>
+  <lightning-accordion allow-multiple-sections-open active-section-name={activeSections} onsectiontoggle={handleSectionToggle}>
+    <lightning-accordion-section name="Section1" label="Section 1">
+      Section 111
+    </lightning-accordion-section>
+  </lightning-accordion>-->
+
+  <lightning-button class="slds-m-left_xx-small slds-m-bottom_small slds-m-top_x-small"
+  variant="brand"
+  label="Add New"
+  data-id="myField"
+  onclick={handleClick}>
+</lightning-button>
+
+  <template for:each={modifiedActualHoursItems} for:item="record" for:index="index">
+    <tr key={record.Id} data-id={index}>
+      <td role="gridcell" width="15">
+        <lightning-input type="text" data-index={index} name="totalHours"
+           value={record.totalHours} onchange={handleActualHoursUpdate} disabled></lightning-input>
+     </td>
+     <td role="gridcell" width="15">
+           <lightning-button data-index={index} variant="base" label="Clone Prev Row values" disabled={record.isDisabled}
+           onclick={handleActualHoursClonePrev} ></lightning-button>
+     </td>
+    </tr>
+  </template>
+</template>

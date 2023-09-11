@@ -1,0 +1,12 @@
+.THIS {
+}
+.THIS.outerScroller {
+    border-radius: 1px;
+    height: 600px;
+    width: 100%;
+}
+.THIS.innerScroller {
+    border-radius: 1px;
+    width: 100%;
+
+}

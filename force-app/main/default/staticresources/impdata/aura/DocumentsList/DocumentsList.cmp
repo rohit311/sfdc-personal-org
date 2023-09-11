@@ -1,0 +1,66 @@
+<aura:component controller="LighteningUtilities" access="global">
+    <aura:attribute name="Oppobj" type="Opportunity" default="" /> <!--DMS new -->
+    <aura:attribute name="uploadedAttachments" type="SObject[]"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="documentToast" type="String" default="" />
+	<aura:attribute name="recordId" type="String"/> <!--Bug 20391 added recordid attribute. It was missing-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler event="c:DocumentUploadEventStd" action="{!c.showUploadedDocs}"/> <!--Doc Uploader -->
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.showUploadedDocs}"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="isEmployeeLoans" default="false"/><!-- 20934 -->
+	 <!-- DMS 24317 -->
+     <aura:attribute name="DMSDocmap" type="Map" default="{}"/>
+    <aura:method name="getDMSDocs" action="{!c.getDMSDocs}" access="PUBLIC">
+        <aura:attribute name="DMSDocmaps" type="map" default="{}"/>
+    </aura:method>
+     <!-- DMS 24317 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute name="flow" type="string"/> <!--17138-->
+    <aura:attribute name="isUnderwitercmp" type="Boolean"/><!--17138-->
+	<aura:attribute name="applAttachments" type="SObject[]"/><!--23578 -->
+    <aura:attribute name="isPhotoPres" type="Boolean"/><!--23578 -->
+    <aura:attribute name="applId" type="String"/><!--23578 -->
+    <!--25333 Neha Changes -->
+    <aura:attribute name="isDisbDashboard" type="boolean" default="false"/>
+    <!-- 25333 end -->
+    <div class="slds-box slds-box--small slds-m-top--small">
+        <strong>Uploaded Documents</strong>
+        <div aura:id="uploadedDocs" class="slds-p-around--medium slds-hide">
+            <!-- PSL changes : Nikhil Bugfix #11891 : Removed table, added grid structure -->
+            <div class="slds-grid slds-has-divider--top">
+                <div class="slds-col slds-size--2-of-12 slds-align_absolute-center"> Action </div>
+                <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Name</div>
+                <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Created Date</div>
+            </div>
+            <aura:iteration items="{!v.uploadedAttachments}" var="obj">
+                <div class="slds-grid slds-has-divider--top">
+                    <div class="slds-col slds-size--2-of-12 slds-text-align--center">
+                        <!--17138 added if-->
+                        <aura:if isTrue="{!!obj.hideDelete}">
+                        	<lightning:buttonIcon class="del-btn" aura:id="del-btn" iconName="utility:delete" variant="bare" alternativeText="Delete Attachment." value="{! obj.ContentDocumentId ? obj.ContentDocumentId : obj.Id}" onclick="{!c.deleteAttachment}" name="{! obj.Title ? obj.Title : obj.Name}" disabled="{!v.displayReadOnly}"/><!--17138 added name attribute-->
+                        </aura:if>
+                    </div> 
+                    <aura:if isTrue="{!v.flow == 'Mobility2'}">
+                        <aura:if isTrue="{!v.isDisbDashboard}"> <!-- added isDisbDashboard for 25333 Neha chnages S-->
+                        	<div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><a href="{!'/'+obj.Id}" target="_blank" >{! obj.Title ? obj.Title : obj.Name}</a></div>
+                                <aura:set attribute="else">
+                            		<div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><a href="{!if(v.isUnderwitercmp,'/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&amp;versionId='+obj.Id+'&amp;operationContext=CHATTER&amp;contentId='+obj.Id,'/sfc/servlet.shepherd/version/download/'+obj.Id)}" target="_blank">{! obj.Title ? obj.Title : obj.Name}</a></div>							        
+                                </aura:set>
+                        	</aura:if> <!-- added isDisbDashboard for 25333 Neha chnages E-->
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.isDisbDashboard}"> <!-- added isDisbDashboard for 25333 Neha chnages S-->
+                        	<div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><a href="{!'/'+obj.Id}" target="_blank" >{! obj.Title ? obj.Title : obj.Name}</a></div>
+                                <aura:set attribute="else">
+                            		<div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">{! obj.Title ? obj.Title : obj.Name}</div>
+                                </aura:set>
+                        	</aura:if> <!-- added isDisbDashboard for 25333 Neha chnages E-->
+                        </aura:set>
+                    </aura:if>
+                    <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><ui:outputDateTime value="{!obj.CreatedDate}"/></div>
+                </div> 
+            </aura:iteration>
+        </div>
+    </div> 	
+    
+</aura:component>

@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" 
+                access="global" 
+                controller="SAL20_DisbController"
+                >
+	
+    <!-- +-+-+-+-+-+-+-+- START: Attributes +-+-+-+-+-+-+-+-+ -->
+	<aura:attribute name="recordId" type="String"/>
+	<aura:attribute name="groupType" type="String" />
+	<aura:attribute name="cpvURL" type="String" />
+    <aura:attribute name="verificationReportURL" type="String" />
+	<aura:handler name="init" value="{! this }"  action="{! c.onInit }" />
+    
+    <aura:registerEvent name="SAL20_DisbNavigator" type="c:SAl20_DisbDashboard_Navigator"/>
+	<!-- +-+-+-+-+-+-+-+- END : Attributes +-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+	<div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+		<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Verifications</h1>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+
+	<!-- +-+-+-+-+-+-+ START: Links part +-+-+-+-+-+-+  -->
+	<div class="slds-page-body slds-p-around_large">
+		<div>
+			<span class="slds-p-left_large slds-text-heading--medium">
+                <a style="color:red;" href="{! v.verificationReportURL }" target="_blank" > View Verification Report </a>
+            </span>
+			<span class="slds-p-left_large slds-text-heading--medium">
+                <a style="color:red;" href="{! v.cpvURL }" target="_blank" > CPV Geo-Tagging Details </a>
+			</span>
+		</div>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Links part +-+-+-+-+-+-+  -->
+    
+    <c:Toast aura:id="toastCmp"/>
+	<!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

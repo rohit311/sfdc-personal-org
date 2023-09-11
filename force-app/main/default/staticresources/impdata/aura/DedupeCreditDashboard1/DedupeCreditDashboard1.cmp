@@ -1,0 +1,243 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="dedupeList" type="De_Dupe__c[]"/>
+    <aura:attribute name="dedupesourceList" type="List"/>
+    <aura:attribute name="decisionList" type="List"/>
+    <aura:attribute name="resultList" type="List"/>
+    <aura:attribute name="customerList" type="CUSTOMER_INFO__c[]"/>
+    <aura:attribute name="custId" type="String" default=""/>
+    <aura:attribute name="LANnumber" type="String"/>
+    <aura:attribute name="isViewOppPageOpen" type="boolean" default="false"/>
+    <aura:attribute name="displayreferral" type="boolean" default="false"/>
+    <aura:attribute name="loan" type="Opportunity"/>
+    <aura:attribute name="loanProduct" type="String"/>
+    <aura:attribute name="isViewCustomerEyeModal" type="boolean" default="false"/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:attribute name="dedupeDashboardData" type="Object" default=""/>  
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="setParentAttribute" type="c:SetParentAttributes"/>
+     <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+	 <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <c:GenericBackCmp/>
+    <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card title="" class="applyMarginToCard slds-box">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                         <table>
+                                    
+                                    <tbody> 
+										<aura:if isTrue="{! v.dedupeDashboardData != '' }">
+											<aura:if isTrue="{!v.dedupeDashboardData.codified_dedupe_output == 'POSITIVE'}" >
+												<tr class="green-color" style="height:30px;text-align :center"> 
+													<div style="padding-top:8px"> Dedupe : {!v.dedupeDashboardData.codified_dedupe_output}   </div> </tr>
+												
+												<aura:set attribute="else">
+													<tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Dedupe : {!v.dedupeDashboardData.codified_dedupe_output}  </div> </tr>
+												</aura:set>
+											</aura:if> 
+											<aura:set attribute="else">
+													<tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Dedupe : {!v.dedupeDashboardData.codified_dedupe_output}  </div> </tr>
+												</aura:set>
+											</aura:if> 			
+                                        <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <aura:iteration items="{!v.dedupeList}" var="dedupeRec">
+                                                <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+                                                <lightning:card title="" class="applyColor">
+                                                    <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                        <div class="slds-p-horizontal--small">                
+                                                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <lightning:input label="Source or Target" value="{!dedupeRec.Source_Or_Target__c}" name="source" disabled="true"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <!--  <lightning:input label="Dedupe Source" value="{!dedupeRec.Dedupe_Source__c}" name="source" disabled="false"/> -->
+                                                                        <lightning:select name="source" aura:id="dedupesource" label="Dedupe Source" disabled="true" required="false" messageWhenValueMissing="Please Select Dedupe Source" value="{!dedupeRec.Dedupe_Source__c}">
+                                                                            <option value="">-- None --</option>
+                                                                            <aura:iteration items="{!v.dedupesourceList}" var="product">
+                                                                                <option value="{!product}" text="{!product}" selected="{!dedupeRec.Dedupe_Source__c == product}"></option>
+                                                                            </aura:iteration>
+                                                                        </lightning:select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <lightning:input name="custid" label="Customer ID" value="{!dedupeRec.Customer_ID__c}" disabled="true"/>
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <lightning:input name="rules" label="Application ID" value="{!dedupeRec.Application_ID__c}" disabled="true"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <lightning:input type="text" name="lanMatch" value="{!dedupeRec.Dedupe_Lan_Matches__c}" label="Dedupe LAN matches" placeholder="" disabled="true"/>
+                                                                    </div>
+                                                                </div>
+                                                                <aura:if isTrue="{!dedupeRec.Source_Or_Target__c == 'Target'}">
+                                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                        <div class="slds-form-element__control">
+                                                                            <label class="slds-form-element__label" for="select-01"> View Previous Loan Application </label> <br/>
+                                                                            <aura:if isTrue="{!!empty(dedupeRec.REJ_MATCHED_PRCNTG__c)}">
+                                                                                <a onclick="{!c.redirectToOppPage}" id="{!dedupeRec.REJ_MATCHED_PRCNTG__c}">
+                                                                                    View Opportunity Details
+                                                                                </a>
+                                                                                <aura:set attribute="else">
+                                                                                    Link Not Available
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                        <div class="slds-form-element__control">
+                                                                            <lightning:input type="text" name="result" value="{!v.dedupeDashboardData.codified_dedupe_list}" label="Dedupe Target Result" placeholder="" disabled="true"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </aura:if> 
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <lightning:input type="text" name="status" label="Customer Status" value="{!dedupeRec.Customer_Status__c}" placeholder="" disabled="true"/>
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <!-- <lightning:input type="text" name="status" label="Dedupe Decision" value="{!dedupeRec.De_Dupe_Decision__c}" placeholder="" disabled="false"/> -->
+                                                                        <lightning:select name="Decision" label="Dedupe Decision" value="{!dedupeRec.De_Dupe_Decision__c}">
+                                                                            <option value="">-- None --</option>
+                                                                            <aura:iteration items="{!v.decisionList}" var="product">
+                                                                                <option value="{!product}" text="{!product}" selected="{!dedupeRec.De_Dupe_Decision__c == product}"></option>
+                                                                            </aura:iteration>
+                                                                        </lightning:select> 
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                    <div class="slds-form-element__control">
+                                                                        <!-- <lightning:input type="text" name="status" label="Dedupe Result" value="{!dedupeRec.De_Dupe_result__c}" placeholder="" disabled="false"/> -->
+                                                                        <lightning:select name="status" label="Dedupe Result" value="{!dedupeRec.De_Dupe_result__c}">
+                                                                            <option value="">-- None --</option>
+                                                                            <aura:iteration items="{!v.resultList}" var="product">
+                                                                                <option value="{!product}" text="{!product}" selected="{!dedupeRec.De_Dupe_result__c == product}"></option>
+                                                                            </aura:iteration>
+                                                                        </lightning:select>   
+                                                                    </div>
+                                                                </div>
+                                                                <aura:if isTrue="{!!empty(dedupeRec.Customer_ID__c)}">		
+                                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                        <div class="slds-form-element__control">
+                                                                            <label class="slds-form-element__label" for="select-01"> Customer Eye </label> <br/>
+                                                                            <a href="" onclick="{!c.OpenCustomerEyePage}" style="margin-left: 1.6%;" id="{!dedupeRec.Customer_ID__c}">Customer Eye</a>
+                                                                            
+                                                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </aura:if>
+                                                                <!-- Rohit added for 9465 Start -->
+                                                                 <div style="margin-left: 2%;" class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+    																<div class="slds-form-element__control">
+                                                                
+  																		<a href="{!'/'+dedupeRec.Id}" target="_blank">View Dedupe</a>
+																	</div>
+                                                                </div>
+                                                                 <!-- Rohit added for 9465 stop -->
+                                                            </div>
+                                                        </div>
+                                                    </p>
+                                                </lightning:card>
+                                                <br/> <br/>
+                                                </div>
+                                            </aura:iteration>
+                                        </div></tbody>
+                                    
+                                </table>
+                                <div  class="slds-p-top--x-small slds-align_absolute-center">
+                                    <lightning:button variant="brand" label="Save Dedupe" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.saveDedupe}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                    <aura:if isTrue="{!v.displayreferral}">  <c:DedupeReferral displayReadOnly="{!v.displayReadOnly}" loanId="{!v.oppId}" isSALMobility="true"/></aura:if>
+                                </div>
+                            
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        
+    </div>
+    <aura:if isTrue="{!v.isViewOppPageOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel1}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View Opportunity Details </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <c:DedupeOppPage LANnumber="{!v.LANnumber}"/>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel1}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isViewCustomerEyeModal}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View Customer Eye</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe aura:id="frame1" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe aura:id="frame2" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe aura:id="frame3" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe aura:id="frame4" id="frame4" src="{!'/apex/CustomerEyeVF?id=' + v.custId}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <!-- code added by hrushikesh STOP -->
+	{!v.body}
+</aura:component>

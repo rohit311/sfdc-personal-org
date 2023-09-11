@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" >
+	<aura:attribute name="accObj" type="Account"/>
+    <aura:attribute name="appObj" type="Applicant__c"/>
+    <aura:attribute name="conObj" type="Contact"/>
+</aura:event>

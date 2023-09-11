@@ -1,0 +1,13 @@
+<aura:event type="APPLICATION" description="Event to display Existing Offer panel">
+    <aura:attribute name="offer" type="OfferDetails"/>
+    <!--<aura:attribute name="cibilScore" type="String"/>
+    <aura:attribute name="offerAmount" type="String"/>
+    <aura:attribute name="segmentation" type="String"/>
+    <aura:attribute name="LAN" type="String"/>-->
+    <aura:attribute name="poObj" type="Product_Offerings__c"/>
+    <aura:attribute name="Lead" type="Lead"/>
+  <!-- Bug 22425 CC Code changes SME S  -->
+    <aura:attribute name ="MCPResult" type = "String"/> 
+    <aura:attribute name = "SegmentMatched" type = "String"/>
+     <!-- Bug 22425 CC Code changes SME E  -->
+</aura:event>

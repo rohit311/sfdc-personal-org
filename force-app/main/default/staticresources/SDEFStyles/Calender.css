@@ -1,0 +1,43 @@
+    .CMDBWindow .x-date-middle, .CMDBWindow .x-date-left,.CMDBWindow .x-date-right {
+        background:none repeat-x scroll 0 -83px #083772 ; 
+     }
+ 
+    .CMDBWindow  .x-date-middle .x-btn {
+        background:none repeat-x scroll 0 -83px Transparent;
+        color: #FFFFFF;
+        border-color:#083772;
+      }
+     
+    .CMDBWindow .x-date-middle .x-btn button {
+        background:none repeat-x scroll 0 -83px Transparent;
+        font: 11px arial,helvetica,tahoma,sans-serif;
+        color: #FFFFFF;
+      }
+      
+   .CMDBWindow .x-date-middle .x-btn-mc em.x-btn-arrow {
+       background-image: url(SDEFimages/btn-arrow-light.gif);
+        color:#FFFFFF;
+      }
+    .CMDBWindow .x-date-middle .x-btn .x-btn-text { 
+        color: #FFFFFF;
+      }
+    .x-date-mp-btns {
+        background: none repeat scroll 0 0 #DFECFB;
+      }
+    .x-date-mp-btns td {
+        border-top: 0 none;
+        background:#DFECFB;
+      }
+    .x-date-mp-btns button {
+        background: #083772;
+        color: #FFFFFF;
+        font: 11px arial,helvetica,tahoma,sans-serif;
+      }
+     
+     .x-shadow  {
+        display: none;
+        left: 0;
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+       }

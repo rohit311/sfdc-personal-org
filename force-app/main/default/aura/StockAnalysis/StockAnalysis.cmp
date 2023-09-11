@@ -1,0 +1,75 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="StockAnalysisCtrl">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="StkName" type="String" default=""/>
+    <aura:attribute name = "stkData" type="List" default=""/>
+    <aura:attribute name = "isDataFetched" type="Boolean" default="false"/>
+    <aura:attribute name = "isError" type="Boolean" default="false"/>
+    <aura:attribute name = "isLoading" type="Boolean" default="false"/>
+    <aura:attribute name = "headers" type="List" default="['Match Score','Currency','Time zone','Region','Type','Name','Symbol']"/>
+	<aura:attribute name="errorMsg" type="String" default=""/>
+    <aura:attribute name="contact" type="Contact" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>   
+    <aura:registerEvent name="ShareAPIResponse" type="c:shareAPIResponse"/>   
+    
+    <br/>
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                 <span class="slds-assistive-text">Loading</span>
+                 <div class="slds-spinner__dot-a"></div>
+                 <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+ 	</aura:if>
+    <div aura:id="SearchDiv">
+        <aura:if isTrue="{!and(v.contact != null)}">
+            <div class="userInfocls">
+            	Hi, {!v.contact.FirstName}
+                <br/>
+                <lightning:button variant="brand" label="Log out" onclick="{! c.logout }" />
+            
+            </div>
+            <lightning:layout horizontalAlign="center">
+            <div class="slds-form-element__control slds-float--right">
+                <!--<ui:inputText aura:id="SearchName" label="Keyword :" value="{!v.StkName}" required="true"/>-->
+                <lightning:layoutItem size="6">          
+                    <lightning:input name="input3" label="Search" placeholder="type here..." style="width: 255px !important;" value="{!v.StkName}"/>
+                    <br/>
+                    <lightning:button variant="brand" label="Search" onclick="{! c.searchData }" />        	
+                </lightning:layoutItem>
+            </div>
+            </lightning:layout> 
+            <aura:set attribute="else">
+                <div aura:id="loginLinkDiv">	
+                	Please login to access portal :<a onclick="{!c.redirectToLogin}">Login</a>
+                </div>    
+            </aura:set>
+        </aura:if>
+    </div>
+    <div>
+        <c:PopupComp title="Error" isOpen="{!v.isError}" message="{!v.errorMsg}"/>    
+    </div>
+    
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="demo-only" style="height: 6rem;">
+            <div role="status" class="slds-spinner .slds-spinner_medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>    
+    <div>
+        <br/>
+        <br/>
+        <div aura:id="tablediv">	
+             <aura:if isTrue="{!v.isDataFetched}">    
+                <c:tableCmp headers="{!v.headers}" dataRows="{!v.stkData}" conId="{!v.contact.Id}"/>
+            </aura:if>
+        </div>
+    </div>
+    
+    
+</aura:component>

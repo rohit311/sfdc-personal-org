@@ -1,0 +1,158 @@
+<aura:component controller="DP_DocUploader_Controller">
+    
+    <aura:attribute type="String" name="oppId" required="true" default="0065D000004aMFwQAM" />
+    <aura:attribute type="Applicant__c[]" name="appList"  />
+    <aura:attribute type="Map" name="typeList" />
+    <aura:attribute name="showSpinner" type="boolean" default="false" />
+    <ltng:require scripts="{!$Resource.Confetti }"  />
+    <aura:attribute name="fileName" type="String" />
+    
+    <aura:handler name="init" value="{! this }"  action="{! c.doInit }" />
+    <!--aura:handler name="change" value="{! v.typeList }" action="{! c.onTypeChange }" /-->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Heading  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <div class="slds-page-header slds-border_bottom" role="banner">
+        <div class="slds-grid">            
+            <div class="slds-col">
+                <div class="slds-media slds-media--center slds-no-space slds-text-heading_large slds-grow ">
+                    <div class="slds-media__figure">
+                        <button class="slds-button">
+                            <lightning:icon  title="Document Uploader" iconName="standard:document" size="large" />
+                        </button>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-heading--label">DP - Document uploader</p>
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle" title="Document Uploader">Document Uploader</h1>
+                    </div>
+                    <div class="slds-media__body">                        
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+- END : Heading  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    <div class="slds-grid slds-section-header slds-align_absolute-center" style="color: white;background-color: #0072bc;font-size: 120%;padding-top:.3em;padding-bottom:.3em">
+            <p>DP Document Uploader</p>
+    </div>
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Spinner and Toast  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <aura:if isTrue="{! v.showSpinner }">
+        <lightning:spinner />
+    </aura:if>
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+- END   : Spinner and Toast +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : DP table  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <div class="slds-grid">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-m-around_xxx-small slds-m-right_small slds-border_right slds-border_left">
+            <!-- +-+-+-+-+-+-+-+-+-+- START : DP table ::: Heading +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <thead class="slds-m-around_xxx-small">
+                <tr class="slds-m-around_xxx-small" scope="row"> 
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Applicants</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Type of Applicant</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">List of Document</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Browse and Upload</span>
+                    </th>
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Remarks</span>
+                    </th>                                        
+                    <th scope="col" class="slds-cell-wrap">
+                        <span class="slds-align_absolute-center">Uploaded Documents
+                            <lightning:buttonIcon iconName="utility:refresh" 
+                                                      title="Refresh" 
+                                                      alternativeText="Refresh"  
+                                                      size="medium"  
+                                                      variant="bare"
+                                                  
+                                                      onclick = "{! c.doInit }"
+                                                      />
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <!-- +-+-+-+-+-+-+-+-+-+- END  : DP table ::: Heading +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <!-- +-+-+-+-+-+-+-+-+-+- START  : DP table ::: BODY  +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <tbody>
+                <aura:iteration items="{!v.appList}" var="app" indexVar="appIndex">
+                    <tr>
+                        <td scope="col" class="slds-cell-wrap"> 
+                            <span class="slds-align_absolute-center">
+                                {! app.ContactName__c } 
+                            </span>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap"> 
+                            <span class="slds-align_absolute-center">
+                                {! app.Applicant_Type__c }
+                            </span>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <aura:if isTrue="{! not(empty(v.typeList))}">
+                                <aura:iteration items="{! v.typeList }" var="t" indexVar ="typeIndex">
+                                    <aura:if isTrue="{! typeIndex == appIndex}">
+                                        <lightning:select value="{! t.value }" name="{! typeIndex + '-' + app.Id }" label="" aura:id="test"  onchange="{!c.onTypeChange }">  
+                                            <option value="">--None--</option>
+                                            <option value="Application Form">Application Form</option>
+                                            <option value="Mandate Form">Mandate Form</option>
+                                            <option value="Kyc Document">Kyc Document</option>
+                                            <option value="Other Document">Other Document</option>
+                                        </lightning:select>
+                                    </aura:if>
+                                </aura:iteration>
+                            </aura:if>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <aura:if isTrue="{! not(empty(v.typeList)) }">
+                                <aura:iteration items="{! v.typeList }" var="t" indexVar ="typeIndex">
+                                    <aura:if isTrue="{! typeIndex == appIndex}">
+                                         
+                                        <c:DocumentUploader instance="{! appIndex }"
+                                                            parentId="{!app.Id}"
+                                                            refreshPage  = "true"
+                                                            displayUpload="false"
+                                                            fileName =  "{! app.Id + '_DP_'  + t.value + t.count}" 
+                                                            />
+                                    </aura:if>
+                                </aura:iteration>
+                            </aura:if>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">
+                            <span class="slds-align_absolute-center">
+                                N/A
+                            </span>
+                        </td>
+                   		<td scope="col" class="slds-cell-wrap">
+                            <span class="slds-align_absolute-center">
+                                <ol>
+                                    <aura:iteration items="{! app.ContentDocumentLinks}" var="appDoc" indexVar="appDocIndex">
+                                    	<li>
+                                            <a href="{! '/'+ appDoc.ContentDocumentId }" target="_blank">{! appDoc.ContentDocument.Title }</a>
+                                            &nbsp;
+                                            <lightning:buttonIcon iconName="utility:delete" 
+                                                      title="Delete" 
+                                                      alternativeText="Delete"  
+                                                      size="medium"  
+                                                      variant="bare"
+                                                      name="{! appDoc.ContentDocumentId }"
+                                                      aura:id="{! appDoc.ContentDocumentId }"
+                                                      onclick = "{! c.onDelete }"
+                                                      />
+                                        </li>
+                                    </aura:iteration>
+                                </ol>
+                            </span>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+            <!-- +-+-+-+-+-+-+-+-+-+- END  : DP table ::: BODY  +-+-+-+-+-+-+-+-+-+-+-+- -->
+        </table>
+    </div>
+</aura:component>

@@ -1,0 +1,155 @@
+<aura:component >
+    <aura:attribute name ='uploadedDataMap' type='Map'/>
+    <aura:attribute name ='uploadedDataMapKey' type='String' />
+    <aura:attribute name ='submitButtonMap' type='Map'/>
+    <aura:attribute name ='showSubmitButton' type='boolean' />
+    <aura:attribute name ='disableSubmitButton' type='boolean' default='false' />
+    <aura:attribute name ='showToastOnce' type='boolean' default='false'/>
+    <aura:attribute name ='count' type='String' default='0'/>
+    <aura:attribute name ='uploadedDataSize' type='Double' />
+    <aura:attribute name ='uploadedDataMapValue' type='ContentVersion[]' />
+    <aura:attribute name = 'ApplicantType' type='String' />
+    <aura:attribute name = 'LoanGuardRegNo' type='String' />
+    <aura:attribute name = 'ApplicationNo' type='String' />
+    <aura:attribute name='NumberOfApplicants' type='Integer' />
+    <aura:attribute name= 'selectedDocuments' type="List" default="[]" />
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="isMobility" type="Boolean" default="false"/><!--added  for 24316-->
+    
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/> 
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="LGDocSubmitEvent" type="c:LGDocSubmit"/>
+    
+    <aura:handler name="change" value="{!v.uploadedDataMap}" action="{!c.updatedlist}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <!-- <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/> -->
+    <aura:handler event="c:LoaderClose" action="{!c.closeLoader}"/>
+    <!--<c:Custom_Toast_Mobility /> -->
+    <!-- <c:LoaderForMobility /> -->
+    
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead class="slds-grid slds-hyphenate" >
+            <tr class="slds-grid slds-hyphenate slds-size--12-of-12"  >
+                <th scope="col" class="slds-col slds-size_9-of-12 slds-hyphenate">
+                    Applicant Type
+                </th>
+                <th scope="col" class="slds-size--3-of-12 blue-color slds-cell-wrap slds-hyphenate WrapText">
+                    LG Registration No
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items='{!v.uploadedDataMapValue}' var='udobj' indexVar="indx" >
+                <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                    <td class="floatLeft WrapText slds-col slds-size_9-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        <a onclick="{!c.toggleAssVersion}" id="{!udobj.Id}">
+                            <aura:if isTrue="{!v.class =='hideCls'}">
+                                
+                                <span class=" important-message" id="{!udobj.Id}">+ </span>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.myid == udobj.Id}">
+                                        <span class=" slds-p-right_x-small important-message" id="{!udobj.Id}">-</span> 
+                                        
+                                        <aura:set attribute="else"  >
+                                            <span class=" important-message">+
+                                            </span>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </a>
+                        
+                        <input type="Checkbox" id="{!'cbox'+indx}"
+                               name="cbox" 
+                               onchange="{!c.selectoptionvalue}"
+                               value = "{!udobj.ContentDocumentId + '_' +  udobj.ContentSize/1000}"
+                               text="{!udobj.ContentDocumentId + '_' +  udobj.ContentSize/1000}"
+                               disabled="{!not(equals(udobj.Document_no__c , null))}" />
+                        {!v.ApplicantType}
+                    </td>
+                    <td class="floatLeft WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">{!v.LoanGuardRegNo}</td>
+                </tr>
+                <aura:if isTrue="{!equals(v.myid, udobj.Id)}" >
+                    
+                    <aura:if isTrue="{!v.class == 'showCls'}">
+                        <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                            <div style="width:100%;">
+                                <div class="slds-form-element__row slds-m-top--x-small ">
+                                    
+                                    <lightning:card class=" slds-size--12-of-12" >
+                                        <header class="slds-hide"></header>
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--12-of-12 slds-align_absolute-center ">                   
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    Document Type:
+                                                    <b><ui:outputText value="{!udobj.Document_Type__c}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    Document Name:
+                                                    <b><ui:outputText value="{!udobj.Document_Name__c}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left floatLeft">
+                                                    File Name:
+                                                    <b><ui:outputText value="{!udobj.Title}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    File Size:
+                                                    <b><ui:outputText value="{!udobj.ContentSize/1000 +' Kb'}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    Last Submit to LG:
+                                                    <b><ui:outputText value="{!udobj.LG_Request_Time__c}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    Last Response from LG:
+                                                    <b><ui:outputText value="{!udobj.LG_Response_Time__c}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    File Submission API Error:
+                                                    <b><ui:outputText value="{!udobj.File_Submission_Error__c}"/></b>
+                                                </div>
+                                            </div>
+                                            <div class="slds-float_left slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--6-of-12">
+                                                <div class="slds-form-element__control slds-float_left ">
+                                                    Vendor Remarks:
+                                                    <b><ui:outputText value="{!udobj.Vendor_Remarks__c}"/></b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </lightning:card>
+                                    
+                                    
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </tr>
+                    </aura:if>
+                </aura:if>
+            </aura:iteration>
+        </tbody>
+    </table>
+     <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+    <lightning:button variant="brand" class="slds-button slds-button_brand slds-align_absolute-center" onclick="{!c.processButton}" disabled="{!v.disableSubmitButton}">Submit</lightning:button><br /><!--24316-->
+    <aura:set attribute="else">
+      <lightning:button variant="brand" class="slds-button slds-button_brand slds-align_absolute-center slds-theme--alt-inverse" onclick="{!c.processButton}" disabled="{!v.disableSubmitButton}">Submit</lightning:button><br /><!--24316-->
+     </aura:set>
+            </aura:if>
+{!v.body}
+</aura:component>

@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title="AccountFieldSet" icon-name="custom:custom63">
+        <div class="slds-m-around_medium">
+            <template if:true={accs}>
+                <div class="slds-box slds-box_x-small">
+                    <p>Name:  <lightning-input type="text" value={accs.Name}></lightning-input></p>
+                    <p>Account Source: {accs.AccountSource}</p>
+                    <p>Billing Street: <lightning-input type="text" value={accs.BillingStreet}></lightning-input></p>
+                </div>
+            </template>
+            <template if:true={error}>
+                {error}
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,80 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SAL20_DisbController">
+    
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="loanTargetRecord" type="Object"/>
+    <aura:attribute name="loanRecord" type="Opportunity"/>
+    <aura:attribute name="loanRecordError" type="String"/>
+    <aura:attribute name="finnoneRecordId" type="String"/>
+    <aura:attribute name="finnoneTargetRecord" type="Object"/>
+    <aura:attribute name="finnoneRecord" type="Object"/>
+    <aura:attribute name="finnoneRecordError" type="String"/>
+    <aura:attribute name="oppId" type="String"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <force:recordData aura:id="loanRecordHandler"
+      recordId="{!v.oppId}"
+      layoutType="FULL"
+      targetRecord="{!v.loanTargetRecord}"
+      targetFields="{!v.loanRecord}"
+      targetError="{!v.loanRecordError}"
+      mode="EDIT"
+      />
+    <force:recordData aura:id="finnoneRecordHandler"
+      recordId="{!v.finnoneRecordId}"
+      fields = "Finnone_Upload_Update__c,Finnone_Upload_Status__c"                
+      layoutType="FULL"
+      targetRecord="{!v.finnoneTargetRecord}"
+      targetFields="{!v.finnoneRecord}"
+      targetError="{!v.finnoneRecordError}"
+      mode="EDIT"
+      />
+    
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->    
+    <article class="slds-card slds-m-around_xx-small">
+        <div class="slds-page-header" role="banner">
+            <div class="slds-grid">
+                <div class="slds-media slds-media--center slds-no-space slds-grow">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle">Reverse Upload</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-scrollable_x" style="width: 100%;">
+            <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+                <thead>
+                    <tr>
+                        <td >S 2 F Date</td>
+                        <td >Success/Failure</td>
+                        <td >LAN No</td>
+                        <td >Disbursement Date</td>
+                        <td >Disbursement Amount</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <lightning:input label=" " value="{!v.finnoneRecord.Finnone_Upload_Update__c}" disabled="true"/>
+                        </td>
+                        <td>
+                            <lightning:input label=" " value="{!v.finnoneRecord.Finnone_Upload_Status__c}" disabled="true"/>
+                        </td>
+                        <td>
+                            <lightning:input label=" " value="{!v.loanRecord.LAN__c}" disabled="true"/>
+                        </td>
+                        <td>
+                            <lightning:input label=" " value="{!v.loanRecord.Disbursal_Date__c}" disabled="true"/>
+                        </td>
+                        <td>
+                            <lightning:input label=" " value="{!v.loanRecord.Disbursed_Amount__c}" disabled="true"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </article>
+</aura:component>

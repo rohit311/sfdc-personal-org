@@ -1,0 +1,13 @@
+<aura:component >
+    <aura:attribute name="num1" type="integer"></aura:attribute>
+	<ui:inputNumber aura:id="inputOne" value="{!v.num1}"></ui:inputNumber>
+    
+    <aura:attribute name="num2" type="integer"></aura:attribute>
+	<ui:inputNumber aura:id="inputTwo" value="{!v.num2}"></ui:inputNumber>
+    
+     <aura:attribute name="num3" type="integer"></aura:attribute>
+	<ui:inputNumber aura:id="inputThree" value="{!v.num3}"></ui:inputNumber>
+    
+    <ui:outputNumber aura:id="totalValue" value="0"></ui:outputNumber>
+    {!c.calculate}
+</aura:component>

@@ -1,0 +1,20 @@
+<template>
+    
+    <template if:true={showToast}>
+        <div class="slds-notify_container slds-is-relative slds-m-bottom_small">
+            <lightning-icon icon-name={iconName} alternative-text={iconName} ></lightning-icon>
+        </div>        
+
+        <div class="slds-notify__content">
+            <h2 class="slds-text-heading_small">
+                {message}
+            </h2>
+        </div>
+
+        <div class="slds-notify__close">
+            <lightning-button-icon icon-name="utility:close" onclick={handleCloseClick} size="small" variant="bare-inverse" >
+                </lightning-button-icon>
+        </div>
+    </template>
+
+</template>

@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="addOnsolID" type="id" />
+    <aura:attribute name="addOnsolObj" type="SOL_Policy__c" />
+</aura:event>

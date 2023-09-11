@@ -1,0 +1,11 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+	<aura:attribute name="panStr" type="String" default=""/>
+    <aura:attribute name="errors" type="List" default=""/>
+    
+    <aura:iteration items="{!v.errors}" var="error"><p>{!error}</p></aura:iteration>
+    
+    <lightning:input aura:id="panInp" type="text" name="panInput" value="{!v.panStr}" label="PAN" style="width:25% !important;" messageWhenBadInput="You must say foo"/>
+    
+    <br/>
+    <lightning:button variant="brand" label="Submit" onclick="{!c.sumbit}" />
+</aura:component>

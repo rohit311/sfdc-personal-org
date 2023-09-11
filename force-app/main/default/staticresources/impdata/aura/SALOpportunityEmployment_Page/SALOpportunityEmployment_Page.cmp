@@ -1,0 +1,220 @@
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    <!--City CR s-->
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="finalCity" type="List"/>
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+    <!--City CR e-->
+    <aura:attribute name="empOpp" type="Opportunity" default="{'sobjectType':'Opportunity','Id':'0065D000002utW9QAI','Application_Source__c':'Call Center PLTB','Product__c':'SAL',Branch_Name__c:'a0A5D000000H5PF'}"/>
+    <aura:attribute name="empContact" type="Contact" default="{}"/>
+    <aura:attribute name="empAccount" type="Account" default="{'sobjectType':'Account','Current_experiance_in_Years__c':'3','Id':'0015D00000GWvLm','Total_Work_Experience_Yrs__c':'0','Gross_Salary_Turn_Over__c':'65000','Type_Of_Industry__c':'Information Technology / Telecom','Date_of_Birth__c':'1984-04-04','Total_Work_Experience_Months__c':'0'}"/> 
+    <aura:attribute name="accTotalExpYrs" type="List"/>
+    <aura:attribute name="TypeForMCP" type="String" default="Experience"/>
+    <aura:attribute name="solPolicySrc" type="String" default="Sales2.0"/>
+    <aura:attribute name="accCurrExpMonths" type="List"/>
+    <aura:attribute name="accCurrExpYrs" type="List"/>
+    <aura:attribute name="accTotalExpMonths" type="List"/>
+    <aura:attribute name="typeOfEduInstitute" type="List"/>
+    <aura:attribute name="qualification" type="List"/>
+    <aura:attribute name="designationList" type="List"/>
+    <aura:attribute name="contObj" type="Contact" default="{}"/>
+    <aura:attribute name="isUWCheck" type="Boolean" default="false"/>
+    <aura:attribute name="areasearching" type="Boolean" default="false"/>
+    <aura:attribute name="areaList" type="Area_Locality__c[]" default="[]"/>
+    <aura:attribute name="selectedArea" type="Area_Locality__c" default="{}"/>
+    <aura:attribute name="oldAreaKeyword" type="String" default=""/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="officeAddress" type="String" default=""/>
+    <aura:attribute name="OccupationList" type="List"/>
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+     <aura:attribute name="priAppObj" type="Applicant__c" default="{}"/>
+     <aura:attribute name="stageCompletion" type="String"/>
+    <!-- <lightning:accordion activeSectionName="">
+       <lightning:accordionSection name="Employment Details" label="Employment Details">
+        </lightning:accordionSection>     
+     </lightning:accordion> -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <div  class="slds-box slds-box_x-small slds-theme_shade">
+        <lightning:card title="Employment Details"  class="applyColor" >
+            <p class="slds-p-horizontal_small" >
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                        <div aura:id="designationSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="designationName" required="true" label="Designation" value="{!v.empAccount.DesignationOTP__c}" messageWhenValueMissing="Please Select Value">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.designationList}" var="level">
+                                        <option value="{!level}" text="{!level}" selected="{!v.empAccount.DesignationOTP__c == level}"></option>
+                                    </aura:iteration>                              
+                                </lightning:select>    
+                            </div>
+                        </div>                                                            
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="qualificationName" name="HighestQ" label="Highest Qualification" value="{!v.empAccount.Qualification__c}"  messageWhenValueMissing="Please Select Value" required="true" >
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.qualification}" var="level">
+                                        <option value="{!level}" text="{!level}" selected="{!v.empAccount.Qualification__c == level}"></option>
+                                    </aura:iteration>   
+                                </lightning:select>    
+                            </div>
+                        </div>     
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <lightning:select aura:id="institutionName" name="insName" label="Institution" required="true" messageWhenValueMissing="Please Select Value"  value="{!v.empAccount.Type_of_Educational_Institution__c}" >           	
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.typeOfEduInstitute}" var="level">
+                                    <option value="{!level}" text="{!level}" selected="{!v.empAccount.Type_of_Educational_Institution__c == level}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>                 
+                    </div>
+                </div>       
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">    
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-medium-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <div style="float:left;display:inline">
+                                    <lightning:select aura:id="totalWorkExpYrs" value="{!v.empAccount.Total_Work_Experience_Yrs__c}" label="Total Work Experience Years" required="true" messageWhenValueMissing="Please Select Value">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.accTotalExpYrs}" var="level">
+                                            <option value="{!level}" text="{!level}"  selected="{!level == v.empAccount.Total_Work_Experience_Yrs__c}"/>
+                                        </aura:iteration>  
+                                    </lightning:select>     
+                                </div>
+                                <div style="float:left;display:inline">
+                                    <lightning:select aura:id="accTotalExpMonths" label="Months" value="{!v.empAccount.Total_Work_Experience_Months__c}" required="true" messageWhenValueMissing="Please Select Value">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.accTotalExpMonths}" var="level">
+                                            <option value="{!level}" text="{!level}"  selected="{!level == v.empAccount.Total_Work_Experience_Months__c}"/>
+                                        </aura:iteration> 
+                                    </lightning:select>  
+                                </div>    
+                            </div>
+                        </div>                              
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-medium-size--4-of-12">                      
+                            <div class="slds-form-element__control">	
+                                <div style="float:left;display:inline">                              
+                                    <lightning:select aura:id="currWorkExpYrs" value="{!v.empAccount.Current_experiance_in_Years__c}" label="Current Work Experience Years" required="true" messageWhenValueMissing="Please Select Value">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.accCurrExpYrs}" var="level">
+                                            <option value="{!level}" text="{!level}"  selected="{!level == v.empAccount.Current_experiance_in_Years__c}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>   
+                                <div style="float:left;display:inline">
+                                    <lightning:select aura:id="currWorkExpMon" label="Months" value="{!v.empAccount.Current_experiance_in_Month__c}" required="true" messageWhenValueMissing="Please Select Value">
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.accCurrExpMonths}" var="level">
+                                            <option value="{!level}" text="{!level}"  selected="{!level == v.empAccount.Current_experiance_in_Month__c}"/>
+                                        </aura:iteration>
+                                    </lightning:select>    
+                                </div>     
+                            </div>
+                        </div> 
+                    </div>        
+                </div>   
+            </p>        
+            
+            
+        </lightning:card>
+    </div>        
+    <div class="slds-box slds-box_x-small slds-theme_default slds-m-top_medium slds-theme_shade" >
+        <lightning:card title="Other Employment Details" class="slds-hyphenate slds-m-top_medium applyColor">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded" >                   
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select messageWhenValueMissing="Please Select Value" required="true" aura:id="occupation_type" label="Occupation / Employment Type" value="{!v.empContact.Occupation_CKYC__c}" disabled="false" name="occupation_type">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.OccupationList}" var="Occupation">
+                                        <option value="{!Occupation}" text="{!Occupation}" selected="{!v.empContact.Occupation_CKYC__c == Occupation}"></option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </div>
+                        </div>   
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="office_address" maxlength="35" name="office_address" value="{!v.empContact.Address_Line_One__c}" label="Office Address Line 1" placeholder="" required="true" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="office_address2"  maxlength="35" name="office_address2" value="{!v.empContact.Address_2nd_Line__c}" label="Office Address Line 2" placeholder="" required="true" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="office_address3" maxlength="35" name="office_address3" value="{!v.empContact.Address_3rd_Line__c}" label="Office Address Line 3" placeholder="" required="true" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$" messageWhenPatternMismatch="Please Enter Valid Address" messageWhenValueMissing="Please Enter value"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="office_pincode" label="Office Pin code" value="{!v.empContact.Office_Pin_Code__c }" name="office_pincode" placeholder="" type="text" maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pin code" pattern="^([0-9]{6})" messageWhenBadInput="Pin Code should contain only digits."/>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!!v.isUWCheck}">
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Office  STD code" value="{!v.empContact.Office_STD_Code__c}" pattern="[0-9]*"  messageWhenValueMissing="Please Enter Value" disabled="false" />  
+                                </div>
+                            </div> 
+						</aura:if>        <!--Bug 22624 Start - Hrushikesh Sprint 5C (Changed Aura:if Close) -->
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="office_tele" messageWhenValueMissing="Please Enter Value" label=" Office Telephone number" value="{!v.empContact.Office_Phone_Number__c}"  maxlength="10" pattern="[0-9]*" required="true" messageWhenPatternMismatch="Please enter correct number" disabled="false"  placeholder=""/>
+                                </div>
+                            </div>
+                        
+                        
+                        <!--City CR s -->
+                        <div aura:id="citySearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="cityField"><span class="requiredClass">*</span>Office City</label>
+                                <ui:inputText aura:id="cityField" class="slds-input"  updateOn="keyup" keyup="{!c.cityKeyPressController}" value="{!v.citySearchKeyword}" placeholder="Enter City"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="referralList">
+                                    <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.finalCity}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCity}">{!singleRec.city} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="state" label="Office State" value="{!v.empContact.Office_State__c}" name="state" disabled="true"/>        
+                            </div>
+                        </div>
+                        <!--City CR e -->
+                        <!--2.0 CR removed section-->
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:centre;overflow-x:hidden !important;">
+        <div class="slds-p-around--x-small" align="center">
+            <lightning:button class="slds-theme_alt-inverse" variant="brand" aura:id="saveButtonId" iconName="utility:save" label="Save" onclick="{!c.saveinfo}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+        </div>
+    </div> 
+</aura:component>

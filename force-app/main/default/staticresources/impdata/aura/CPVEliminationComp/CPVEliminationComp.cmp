@@ -1,0 +1,112 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="BLMobilityController">
+    <aura:attribute name="leadID" type="Id"/>
+    <aura:attribute name="allowBrowse" type="Boolean" default="false"/>
+    <aura:attribute name="applicantList" type="String[]" default="--Select--,Customer,Co applicants"/>
+    <aura:attribute name="selectedApplicant" type="String" />
+    <aura:attribute name="verificationType" type="String[]" default="--Select--,Residence Verification,Office Verification"/>
+    <aura:attribute name="selectedVerification" type="String" />
+    <aura:attribute name="salesStatus" type="String[]" default="--Select--,Positive,Deferral,Negative"/> 
+    <aura:attribute name="selectedStatus" type="String" />
+    <aura:attribute name="POid" type="Id" default=""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="latitude" type="Object" default="null"/>
+    <aura:attribute name="longitude" type="Object" default="null"/>
+    <aura:registerEvent name="verificationInsertEvent" type="c:VerificationInsertEvent"/>
+    <aura:handler event="c:EnableSubmitButtonEvent" action="{!c.enableSubmitButton}"/>
+    <aura:attribute name="showSubmitButtonFlag" type="Boolean" default="true"/>
+    <aura:attribute name="isConverted" type="Boolean" default="false"/>
+    <div  class="slds-box slds-box--small slds-m-top--x-small"> 
+        <div style="padding-top: 10px; ">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div>
+                        Applicant:
+                        <ui:inputSelect aura:id="applicant_Select" value="{!v.selectedApplicant}"  change="{!c.isAllowBrowse}">
+                            <aura:iteration items="{!v.applicantList}" var="app">
+                                <ui:inputSelectOption text="{!app}" label="{!app}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding-top: 10px; ">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div>
+                        Verification Type:
+                        <ui:inputSelect aura:id="verificationType_Select" value="{!v.selectedVerification}" change="{!c.isAllowBrowse}">
+                            <aura:iteration items="{!v.verificationType}" var="verification">
+                                <ui:inputSelectOption text="{!verification}" label="{!verification}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-box slds-box--small slds-m-top--x-small" style="padding-top: 20px; padding-left: 20px;">
+        	<div class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+		    	<label class="slds-form-element__label" >Premise Picture 1 :</label>
+			</div>
+        	<c:SingleFileUploadComp aura:id="Premise" instance="{!v.recordId + 'Premise1'}" filePrefix="PremisePicture1" allowUpload="false" uploadType="feed"/>
+        </div>
+        <div class="slds-box slds-box--small slds-m-top--x-small" style="padding-top: 20px; padding-left: 20px;">
+            <div class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+		    	<label class="slds-form-element__label" >Premise Picture 2 :</label>
+			</div>
+            <c:SingleFileUploadComp aura:id="Premise" instance="{!v.recordId + 'Premise2'}" filePrefix="PremisePicture2" allowUpload="false" uploadType="feed"/>
+        </div>        
+        <div class="slds-box slds-box--small slds-m-top--x-small" style="padding-top: 20px; padding-left: 20px;">
+            <div class="slds-size--1-of-1 slds-small-size--2-of-4 slds-medium-size--2-of-8">
+		    	<label class="slds-form-element__label" >Premise Picture 3 :</label>
+			</div>
+            <c:SingleFileUploadComp aura:id="Premise" instance="{!v.recordId + 'Premise3'}" filePrefix="PremisePicture3" allowUpload="false" uploadType="feed"/>
+        </div>
+        
+        <div style="padding-top: 10px; ">
+           <div class="slds-form-element">
+               <div class="slds-form-element__control">
+                   <div>
+                       Visit Status:
+                       <ui:inputSelect aura:id="salesStatus_Select"  value="{!v.selectedStatus}" >
+                           <aura:iteration items="{!v.salesStatus}" var="salesStatusText">
+                               <ui:inputSelectOption text="{!salesStatusText}" label="{!salesStatusText}"/>
+                           </aura:iteration>
+                       </ui:inputSelect>
+                   </div>
+               </div>
+           </div>
+       </div>
+        
+		<aura:renderIf isTrue="{!!v.isConverted}">
+            <div style="padding-top: 20px; padding-left: 20px;padding-bottom: 10px" >
+                <lightning:button aura:id="saveButtonId" variant="brand" label="Submit" onclick="{!c.saveData}" />
+            </div>
+        </aura:renderIf>
+
+       <div aura:id="customToast" class="slds-notify_container slds-hide">
+            <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                <span class="slds-assistive-text">Info</span>
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-notify__content ">
+                    <div class="slds-align-middle">
+                        <h2 class="slds-text-heading--x-small">
+                            <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                            <ui:outputText aura:id="toastText" value=""/>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+    <div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+</aura:component>

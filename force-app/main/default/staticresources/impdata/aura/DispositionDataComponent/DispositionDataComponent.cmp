@@ -1,0 +1,85 @@
+<aura:component>
+    <aura:attribute name = "fieldDispositionValue" type = "String"/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="followDateError" type="Boolean" default="false"/>
+    <aura:attribute name="FieldDispositionError" type="Boolean" default="false"/>
+   <aura:attribute name="FieldDisposition1Error" type="Boolean" default="false"/>
+    <aura:attribute name="poId" type="String"/>
+    <aura:registerEvent name="DispositionPicklistEvent" type="c:DispositionPicklistEvent"/>
+    <c:Custom_Toast_Mobility />
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="slds-m-around_x-large">
+            <!--Modal Start--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="width:100%;height:100%;padding:3px;">
+                <div class="slds-modal__container">
+                    <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+                        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+                    </div>
+                    <!-- <c:Custom_Toast_Mobility />-->
+                    <c:LoaderForMobility />
+                    <!-- Header Starts-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeDispositionModal}"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">CUSTOMER DISPOSITION STATUS</h2>
+                    </header>
+                    <!--Body Starts-->
+                    
+                    <ui:scrollerWrapper> 
+                        <div class="slds-modal__content  slds-p-around_small slds-scrollable_x " id="modal-content-id-1" style=" min-width:500px !important; overflow-x:auto !important;" >
+                            
+                            <lightning:recordEditForm recordId="{!v.poId}" objectApiName="Product_Offerings__c"
+                                                      onload = "{!c.handleOnload}" 
+                                                      onsuccess = "{!c.handleSuccess}"
+                                                      onsubmit = "{!c.handleSubmit}"
+                                                      onerror = "{!c.handleError}">
+                                <!--<lightning:messages /> -->
+                                <div class="slds-form-element">
+                                    <lightning:inputField fieldName="Field_Disposition_1__c" aura:id = "fieldDisposition" onchange = "{!c.onDispChange}"/>
+                                    <aura:if isTrue = "{!v.FieldDisposition1Error == true}">
+                                        <div class="slds-form-element__help followDateError slds-text-color_destructive" id="form-error-01">Please Select Field Disposition </div>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-form-element">
+                                    <lightning:inputField aura:id = "dispStatus" fieldName="Field_Desposition_Status__c" />
+                                    <aura:if isTrue = "{!v.FieldDispositionError == true}">
+                                        <div class="slds-form-element__help followDateError slds-text-color_destructive" id="form-error-01">Please Select Field Disposition Status</div>
+                                    </aura:if>
+                                </div>
+                                <lightning:inputField fieldName="Field_Check_Status__c" />
+                                <aura:if isTrue="{!v.fieldDispositionValue == 'Followup'}">
+                                    <div class="slds-form-element">
+                                        <lightning:inputField  class="customRequired" aura:id = "followDate" fieldName="Field_Followup_Date__c" />
+                                        <aura:if isTrue = "{!v.followDateError == true}">
+                                            <div class="slds-form-element__help followDateError slds-text-color_destructive" id="form-error-01">Please Select Follow Up Date</div>
+                                        </aura:if>
+                                    </div>
+                                </aura:if>
+                                
+                                <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Save" />
+                            </lightning:recordEditForm>
+                            
+                        </div>
+                    </ui:scrollerWrapper>
+                    
+                    
+                    <footer class="slds-modal__footer">                        
+                        <lightning:button variant="brand" class="slds-m-around_xxx-small"
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{!c.closeDispositionModal}"/>
+                        
+                    </footer>
+                    <!-- </ui:scrollerWrapper> -->
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            
+            <!-- MODAL BOX Part END Here -->
+        </div> 
+    </aura:if>
+</aura:component>

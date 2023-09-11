@@ -1,0 +1,6 @@
+<aura:component controller='Sales_Compliance_Cntrl' implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String" />
+   <aura:attribute name="oppId" type="String" />
+
+</aura:component>

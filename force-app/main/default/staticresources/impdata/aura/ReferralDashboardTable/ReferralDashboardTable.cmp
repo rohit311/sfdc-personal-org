@@ -1,0 +1,202 @@
+<aura:component controller="SALMobilityCntrl_V2" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    
+    <!--<ltng:require styles="/resource/slds213/assets/styles/salesforce-lightning-design-system.min.css" 
+                  scripts="/resource/jquery224" />-->
+    <aura:attribute name="selectedRadio" type="String" default="15"/>
+    <aura:handler event="c:referradDashboardSearch" action="{!c.removerecord}"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="lstPo" type="Object"/> 
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute type="Boolean" name="sortAsc" default="true"/>
+    <aura:attribute type="Boolean" name="sortAscDist" default="true"/> 
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="PaginationList" type="Object"/>
+    <aura:attribute name="distPOList" type="List[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="isGPSEnabled" type="boolean"/>
+    <aura:attribute name="myid" type="String"/>
+   <!-- 23064 -->
+    <aura:attribute name="displayExotel" type="boolean" default="true"/> 
+    <aura:attribute name="newPoList" type="List"/> <!--Bug 23064-->
+    <aura:attribute name="validExotelProd" type="String[]"/>
+     <!-- 23064 -->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:registerEvent name="SetPOId" type="c.SetPOId"/>
+    <aura:handler event="c:DestroyChild" action="{!c.DestroyChildCmp}"/>
+    
+    <div id="waitingDiv" style="display:none" class="slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    
+    
+    <aura:if isTrue="{!v.lstPo.length > 0}" >
+        <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--12-of-12">    
+            <thead  class="slds-grid slds-hyphenate">
+                <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                    <th class="slds-col slds-size_5-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                        Referral 
+                    </th>
+                    
+                    <th class=" slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate" style="margin-right:0px;margin-left:0px">
+                        Response
+                    </th>
+                    <th class=" slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right" style="margin-right:2px;margin-left:2px">
+                        Disposition
+                    </th>
+                </tr>
+                
+                
+            </thead>
+            <tbody class="slds-grid slds-wrap">
+                
+                <aura:iteration items="{!v.PaginationList}" var="obj">
+                    <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                        
+                        <td class="floatLeft WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            <a onclick="{!c.toggleAssVersion}" id="{! obj.poObj.Id }">
+                                <aura:if isTrue="{!v.class =='hideCls'}">
+                                    
+                                    <span class="font-weight-bold important-message" id="{! obj.poObj.Id }">+ </span>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.myid == obj.poObj.Id}">
+                                            <span class=" important-message" id="{! obj.poObj.Id }">-</span> 
+                                            
+                                            <aura:set attribute="else"  >
+                                                <span class="floatLeft important-message">+
+                                                </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            
+                            <span id="{!obj.poObj.Id}">
+                                {!obj.poObj.Lead__r.Name}</span>
+                            
+                        </td> 
+                        
+                        <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            {!obj.poObj.Customer_Acceptance_Flag__c}
+                        </td>
+                        <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                            {!obj.poObj.Field_Disposition_1__c}
+                        </td>
+                    </tr>
+                    
+                    <!-- start of Add row --> 
+                    <aura:if isTrue="{!v.myid == obj.poObj.Id}">
+                        <aura:if isTrue="{!v.class == 'showCls' }">
+                            
+                            <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                <div style="width:100%;">
+                                    <fieldset class="slds-form--compound">
+                                        <div class="slds-form-element__row slds-m-top--x-small ">
+                                            
+                                            <lightning:card class=" slds-size--12-of-12" >
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--10-of-12 slds-align_absolute-center ">                   
+                                                    <table>
+                                                        <tr>
+                                                             <!--23064 start -->
+                                                           <td>
+                                                               Referral Mobile</td><td>
+                                                            <b><a  href="{! 'tel:' + '' + obj.poObj.Lead__r.Customer_Mobile__c}" target="_blank">{!obj.poObj.Lead__r.Customer_Mobile__c}</a></b><!--23064 Sprint 6 -->
+                                                          
+                                                            <aura:iteration items="{!v.newPoList}" var="callItem">
+                                                             
+                                                                <aura:if isTrue="{!and(callItem.po.Id == obj.poObj.Id,callItem.showCall == true)}">
+                                                                  
+                                                                     <c:Exotel_APICmp frommobile="none" tomobile="{!obj.poObj.Lead__r.Customer_Mobile__c}"  recordId="{!obj.poObj.Lead__c}" objName="Lead"  Product="{!obj.poObj.Products__c}"/>
+                                                                </aura:if>	
+                                                            </aura:iteration>
+                                                           
+                                                            </td>
+                                                            
+                                                            <!--23064 start -->
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td>Referred By </td>
+                                                            <td> <ui:outputText class="boldText" value="{!obj.referredByName}"/></td>
+                                                            
+                                                        </tr>
+                                                        <tr>     
+                                                            <td> Referrer Mobile</td>
+                                                            <td><a href="{! 'tel:' + '' + obj.referredByMobile}" target="_blank">
+                                                                <ui:outputText class="boldText" value="{!obj.referredByMobile}"/></a>
+                                                                
+                                                                 <aura:iteration items="{!v.newPoList}" var="callItem">
+                                                             
+                                                                <aura:if isTrue="{!and(callItem.po.Id == obj.poObj.Id,callItem.showCall == true)}">
+                                                                   
+                                                                      <c:Exotel_APICmp frommobile="none" tomobile="{!v.account.Mobile__c}"  recordId="{!obj.poObj.Lead__c}" objName="Lead"  Product="{!obj.poObj.Products__c}"/>
+                                                                </aura:if>	
+                                                            </aura:iteration>
+                                                               
+                                                            </td>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <td>LA Stage</td>
+                                                            <td> <ui:outputText class="boldText" value="{!obj.loanObj.StageName}"/></td>
+                                                        </tr>             
+                                                        <tr> 
+                                                            <td>Loan Amount</td>
+                                                            <td><ui:outputCurrency class="boldText" aura:id="curr" value="{!obj.loanObj.Loan_Amount__c}" format="##,##,###,###.00"/></td>
+                                                            <!--<ui:outputText value="{!obj.loanObj.Loan_Amount__c}" format="$##,##,###,###.00"/> -->
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                
+                                            </lightning:card>
+                                            
+                                            
+                                            
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                
+                            </tr>
+                            
+                            
+                        </aura:if>
+                    </aura:if>
+                    
+                    <!-- End row -->
+                    
+                </aura:iteration>
+            </tbody>
+        </table>
+        <br />
+        <lightning:buttonGroup class="slds-align_absolute-center">
+            <lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+                              onclick="{!c.previous}" variant="brand"
+                              iconName='utility:back'/>
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                              onclick="{!c.next}" variant="brand"
+                              iconName='utility:forward' iconPosition='right'/>
+            
+        </lightning:buttonGroup>
+        <div class="slds-align_absolute-center slds-text-body_regular">
+            Page {!v.currentPage} of {!v.totalPages}
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-align_absolute-center slds-text-heading_medium">
+                No Records Found
+            </div>
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

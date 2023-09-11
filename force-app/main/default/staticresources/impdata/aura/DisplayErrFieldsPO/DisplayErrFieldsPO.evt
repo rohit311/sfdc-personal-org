@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="errFields" type="List" default=""/>
+    <aura:attribute name="passFields" type="List" default=""/>
+</aura:event>

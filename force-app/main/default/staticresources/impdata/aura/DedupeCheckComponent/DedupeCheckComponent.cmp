@@ -1,0 +1,210 @@
+<aura:component controller="dedupeCheckController" implements="flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="Dedupe" type="De_Dupe__c[]" />
+    <!--<aura:attribute name="tableColumns" type="List" />-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+    <aura:attribute name="wallletId" type="ID"  />
+    <aura:attribute name="waitingFlag" type="boolean" default="false"/>
+    <aura:attribute name="matchedDedupe" type="De_Dupe__c"  />
+   	<aura:attribute name="selectedRecId" type="ID"  />
+    <aura:attribute name="InsWalletRec" type="Insurance__c" />
+    <!--<aura:attribute name="disabled" type="boolean" default="true" />-->
+    <aura:attribute name="FinnOneCustID" type="String" />
+    <aura:attribute name="SOLRecord" type="Sales_Officer_Limit__c[]" />
+    <aura:attribute name="disableCustButton" type="Boolean" />
+    {!v.body}
+	
+	<!--<div class="slds-page-header__title">
+		<span style="padding-left: 1%;">Dedupe Linking</span>
+	</div>-->
+    
+	<div class="slds-page-header" style="background-color:rgb(0, 95, 178); color:white">
+		<div class="slds-media">
+			<div class="slds-media__body">
+				<h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Dedupe Linking">Dedupe Results</h1>
+				
+			</div>
+		</div>
+	</div> 
+    
+   
+	<!--<lightning:datatable data="{!v.Dedupe}" 
+						 columns="{!v.tableColumns}"  
+						 keyField="Id"
+						 onrowselection="{! c.getSelectedName }"
+						 />
+	<br/>
+	<lightning:button variant="brand" label="REINITIATE DEDUPE" onclick="{! c.reInitDedupe }" />
+	<lightning:button variant="brand" label="CREATE CUSTOMER" onclick="{! c.createCustomer }" />
+	<lightning:button variant="brand" label="PROCEED" onclick="{! c.createDedupeCust}" /> -->
+        
+	<aura:if isTrue="{!v.waitingFlag}">
+		<div class="overlay">
+			<div class="slds-spinner_container">
+				<div role="status" class="slds-spinner slds-spinner_medium">
+					<span class="slds-assistive-text">Loading</span>
+					<div class="slds-spinner__dot-a"></div>
+					<div class="slds-spinner__dot-b"></div>
+				</div>
+			</div>
+		</div>   
+	</aura:if>
+	<div class="slds-modal__content slds-p-around--large">
+		<div class="slds" style="overflow:auto;">
+			<table  class="slds-table slds-table--bordered slds-table--cell-buffer">
+				<thead>
+					<tr class="slds-text-title--caps">
+						<th>
+							<span class="slds-truncate" title="Select">Select</span>
+						</th>
+						<th>
+							<span class="slds-truncate" title="Customer ID">Customer ID</span>
+						</th>
+                        <th>
+							<span class="slds-truncate" title="First Name">Name</span>
+						</th>
+						<!--<th>
+							<span class="slds-truncate" title="First Name">First Name</span>
+						</th>
+						<th>
+							<span class="slds-truncate" title="Last Name">Last Name</span>
+						</th>-->
+						<th>
+							<span class="slds-truncate" title="Date Of Birth">Date Of Birth</span>
+						</th>
+						<th>
+							<div class="slds-truncate" title="City">City</div>
+						</th>
+						<th>
+							<div title="Address">Address</div>
+						</th>
+						<th>
+							<div class="slds-truncate" title="Mobile Number">Mobile Number</div>
+						</th>
+						<th>
+							<div class="slds-truncate" title="PAN Number">PAN Number</div>
+						</th>
+                        <th>
+							<div class="slds-truncate" title="PAN Number">Email ID</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<aura:iteration items="{!v.Dedupe}" var="ded">
+						<tr>
+							<td scope="row">
+                                <div class="slds-truncate">
+                                    <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                        <lightning:icon iconName="utility:info" size="small" alternativeText="Source" title="Source Dedupe Record" />
+                                    </aura:if>
+                                    
+                                    <!--<lightning:icon iconName="utility:success" size="small" alternativeText="Done" title="Dedupe Linking Done"/>-->
+                                    <aura:if isTrue="{!ded.Source_Or_Target__c != 'Source'}">
+                                        <ui:inputRadio aura:id="r0" name="select" text="{!ded.Id}" change="{!c.getSelectedName}"  />
+                                    </aura:if>
+                                    
+								</div>
+							</td>
+                            <td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.Customer_ID__c}" />
+								</div>
+							</td>
+							
+                            <td scope="row">
+							    <div class="slds-truncate">
+								<aura:if isTrue="{!ded.Source_Or_Target__c == 'Target'}">
+									<lightning:formattedText value="{!ded.Name}" />
+									<aura:set attribute="else">
+									<lightning:formattedText value="{!ded.First_Name__c + ' ' + ded.Last_Name__c}" />
+									</aura:set>								 
+								</aura:if>
+								</div>
+							</td>
+							
+							
+                            <!--<td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.First_Name__c}" />
+								</div>
+							</td>
+                            <td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.Last_Name__c}" />
+								</div>
+							</td>-->
+                            <td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.DOB__c}" />
+								</div>
+							</td>
+							<td scope="row">
+                                <div class="slds-truncate">
+                                    <!--<aura:if isTrue= "{!ded.City_Residence__c != null}">
+										<lightning:formattedText value="{!ded.City_Residence__c}" />
+                                    </aura:if>
+                                      <aura:if isTrue= "{!ded.City_Office__c != null}">
+										<lightning:formattedText value="{!ded.City_Office__c}" />
+                                    </aura:if>-->
+                                    <lightning:formattedText value="{!ded.City_Residence__c}" />
+								</div>
+							</td>
+							<td scope="row">
+                                <!--lass="slds-rich-text-area__content slds-grow slds-cell-wrap colWidth"-->
+                                <div class="slds-truncate">
+                                    <!--<lightning:formattedText value="{!ded.PIN__c }" />-->
+                                    <aura:if isTrue="{!ded.Source_Or_Target__c == 'Target'}">
+                                        <lightning:formattedText value="{!ded.Address1_Residence__c}" />
+                                        <aura:set attribute="else">
+                                            <ui:outputText value="{!ded.Address1_Residence__c + ',' + ded.Address2_Residence__c + ',' + ded.Address3_Residence__c + ','+ ded.Area_Residence__c + ',' + ded.PIN__c}"/>
+                                        </aura:set>								 
+								</aura:if>
+                                </div>
+							</td>
+							<td scope="row" >
+                                <div class="slds-truncate">
+                                
+								<aura:if isTrue="{!ded.Source_Or_Target__c == 'Target'}">
+								<lightning:formattedText value="{!ded.Landline1_Residence__c}" />
+								<aura:set attribute="else">
+                                    <lightning:formattedText value="{!ded.Mobile_Residence__c}" />
+								</aura:set>
+								</aura:if>
+									<!--<ui:outputphone value="{!ded.Mobile_Residence__c}" />
+                                    -<ui:outputphone value="{!ded.Mobile_Office__c}" />-->
+								</div>
+							</td>
+                            <td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.PAN__c}" />
+								</div>
+							</td>
+                            <td scope="row">
+                                <div class="slds-truncate">
+									<lightning:formattedText value="{!ded.Email_Residence__c}" />
+								</div>
+							</td>
+						</tr>
+						
+					</aura:iteration>
+				</tbody>
+			</table>
+			
+			<br/>
+			<lightning:button variant="brand" label="REINITIATE DEDUPE" onclick="{! c.reInitDedupe }" />
+            <!-- {!or(v.ValueFourisFalse, v.ValueTwoisFalse)}-->
+            <aura:if isTrue="{!or(v.matchedDedupe != null ,v.disableCustButton == true)}">
+            	<lightning:button aura:id="idCreatCustBtn" variant="brand" label="CREATE CUSTOMER" onclick="{! c.createCustCallout }" disabled="true" />
+                <aura:set attribute="else">
+                    <lightning:button aura:id="idCreatCustBtn" variant="brand" label="CREATE CUSTOMER" onclick="{! c.createCustCallout }" disabled="false" />
+                </aura:set>
+            </aura:if>
+			
+            
+            <lightning:button aura:id="idProceedBtn" variant="brand" label="PROCEED" onclick="{! c.createDedupeCust}" />
+            
+		</div>
+	</div>
+			
+    
+ 
+</aura:component>

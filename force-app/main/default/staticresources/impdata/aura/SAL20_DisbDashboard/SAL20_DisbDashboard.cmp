@@ -1,0 +1,20 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="SALMobilityCntrl_V2">
+    <!-- +-+-+-+-+-+- START: Attributes and Handlers-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="recordId" 	type="String"  default="0065D000004KUPd"/> <!-- 0060k000006oO80 -->
+    <aura:attribute name="record" 		type="Opportunity" />
+    <aura:attribute name="Applicant" 	type="Applicant__c" /><!-- Added for DMS  -->
+    <aura:attribute name="parentId" 	type="String" /><!-- Added for DMS  -->
+    <aura:attribute name="dedFrmDisList" type="List" description="Deducted_from_Disbursement__c picklist values (Fees_and_Charge__c)"/>
+    <aura:attribute name="disbList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+    <aura:attribute name="userProfile" type="String"/>
+    <aura:attribute name="sanctionList" type="Discrepancy__c[]"/>
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="accntValidateList" type="List"/>
+    <!-- +-+-+-+-+-+- END  : Attributes and Handlers-+-+-+-+-+-+-+-+-+ -->
+    
+    <c:SAL20_DisbDashboard_Header oId ="{!v.recordId }" />    
+    <c:SAL20_DisbDashboard_BodyContainer accntValidateList = "{!v.accntValidateList}" existingDisList ="{!v.existingDisList}" sanctionList ="{!v.sanctionList}" userProfile ="{!v.userProfile}" oId ="{!v.recordId }" parentId="{!v.Applicant.Id}" opp ="{!v.record}" dedFrmDisList ="{!v.dedFrmDisList}" disbList="{!v.disbList}" repayList="{!v.repayList}" /><!--Parent id added for DMS 24317 -->
+    
+</aura:component>

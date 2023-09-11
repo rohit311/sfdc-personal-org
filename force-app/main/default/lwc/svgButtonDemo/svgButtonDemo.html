@@ -1,0 +1,94 @@
+<template>
+  <lightning-card>
+    Button demo :
+    <lightning-button-icon
+    icon-name="utility:quick_text"
+    class="slds-m-left_xx-small quick-text-btn"
+    label=""
+    title="Quick Text"
+  ></lightning-button-icon>
+  <div
+  class="slds-dropdown-trigger slds-dropdown-trigger_click text-direction-items"
+>
+  <div
+    class="slds-dropdown slds-dropdown_bottom slds-dropdown_actions menu-container"
+  >
+    <ul class="slds-dropdown__list" role="menu">
+      <template if:false={disableUserActions}>
+        <li class="slds-dropdown__item" role="presentation">
+          <a
+            role="menuitem"
+            onclick={handleTextDirectionClick}
+            data-id="auto"
+          >
+            <span class="slds-truncate" title="Automatic"
+              ><svg class="slds-m-right_x-small" width="24" height="24" viewBox="0 0 560 560" fill="#747474" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M472 156V164V212V220H464H216V284L88 188L216 92V156H464H472ZM88 404V396V348V340H96H344V276L472 372L344 468V404H96H88Z" />
+              </svg>
+              <span class="slds-text-color_default"
+                >Automatic</span
+              >
+            </span>
+          </a>
+        </li>
+      </template>
+      <li class="slds-dropdown__item" role="presentation">
+        <a
+          role="menuitem"
+          onclick={showReductScreen}
+          class="redaction-item"
+        >
+          <span
+            class="slds-truncate"
+            title="Left to Right"
+            >
+            <svg class="slds-m-right_x-small" width="24" height="24" viewBox="0 0 560 560" fill="#747474" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M472 93H88V125H472V93ZM472 163H88V195H472V163ZM88 233H288V265H88V233ZM88 403V395V347V339H96H344V275L472 371L344 467V403H96H88Z" />
+            </svg>
+            <span class="slds-text-color_default"
+                >Left to Right</span
+              >
+          </span>
+        </a>
+      </li>
+      <li class="slds-dropdown__item" role="presentation">
+        <a
+          role="menuitem"
+          onclick={showReductScreen}
+          class="redaction-item"
+        >
+          <span
+            class="slds-truncate"
+            title="Right to Left"
+            >
+            <svg class="slds-m-right_x-small" width="24" height="24" viewBox="0 0 560 560" fill="#747474" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M472 93H88V125H472V93ZM472 163H88V195H472V163ZM272 233H472V265H272V233ZM472 403V395V347V339H464H216V275L88 371L216 467V403H464H472Z" />
+            </svg>
+            <span class="slds-text-color_default"
+                >Right to Left</span
+              >
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+    <button class="slds-button slds-button_icon slds-button_icon-border slds-m-left_xx-small" onclick={handleTextDirectionBtnClick} onblur={handleMenuBlur}>
+      <svg class="svg-theme" width="24" height="24" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M472 156V164V212V220H464H216V284L88 188L216 92V156H464H472ZM88 404V396V348V340H96H344V276L472 372L344 468V404H96H88Z"/>
+      </svg>
+    </button>
+    <!--<button class="slds-button slds-button_icon slds-button_icon-border slds-m-left_xx-small">
+      <svg width="24" height="24" viewBox="0 0 560 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M472 93H88V125H472V93ZM472 163H88V195H472V163ZM88 233H288V265H88V233ZM88 403V395V347V339H96H344V275L472 371L344 467V403H96H88Z" fill="black"/>
+      </svg>
+    </button>
+    <button class="slds-button slds-button_icon slds-button_icon-border slds-m-left_xx-small">
+      <svg width="560" height="560" viewBox="0 0 560 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M472 93H88V125H472V93ZM472 163H88V195H472V163ZM272 233H472V265H272V233ZM472 403V395V347V339H464H216V275L88 371L216 467V403H464H472Z" fill="black"/>
+      </svg>
+    </button>-->
+    <br/>
+    <textarea id="message-box" placeholder="Placeholder text…" dir={textDirection} class="slds-textarea" onchange={handleTextareaChange}></textarea>
+  </lightning-card>
+</template>

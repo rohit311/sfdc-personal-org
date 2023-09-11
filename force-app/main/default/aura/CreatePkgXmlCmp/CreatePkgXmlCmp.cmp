@@ -1,0 +1,24 @@
+<aura:component controller="PackageXmlCntrl">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="metaDataTypes" type="List" default="Apex Class,Profile,Object"/>
+    <aura:attribute name="compLst" type="List" />
+    <aura:attribute name="dataType" type="String" />
+    <aura:attribute name="cmpName" type="String" />
+    
+    
+    <div class="slds-size_1-of-3">
+        <lightning:select name="metaData" label="Type of Component" value="{!v.dataType}" onchange="{!c.fetchData}">
+            <option value="">choose one...</option>
+            <aura:iteration items="{!v.metaDataTypes}" var="item">
+                <option value="{!item}">{!item}</option>
+            </aura:iteration>
+        </lightning:select>
+        
+        <lightning:select name="cmpData" label="Component" value="{!v.cmpName}">
+            <option value="">choose one...</option>
+            <aura:iteration items="{!v.compLst}" var="item">
+                <option value="{!item.Name}">{!item.Name}</option>
+            </aura:iteration>
+        </lightning:select>
+    </div>    
+</aura:component>

@@ -1,0 +1,17 @@
+<apex:page docType="HTML-5.0" standardController="Speaker__c" extensions="assign6_2_extension">
+   <apex:form >
+     Bio: <apex:inputField value="{!Speaker__c.Bio__c}"/>
+     <br/>
+     First Name:<apex:inputField value="{!Speaker__c.FirstName__c}"/>
+     <br/>
+     Last Name:<apex:inputField value="{!Speaker__c.LastName__c}"/>
+     <br/>
+     Image Path: <apex:inputField value="{!Speaker__c.Picture_Path__c}"/>
+     <br/>
+     Select Image:  <apex:inputFile value="{!document.body}" filename="{!document.name}" id="file" rendered="IF({!document.body}!=null,true,false)"/> 
+     <apex:commandButton action="{!upload}" value="Upload"/>  <br/>
+   <apex:commandButton action="{!save}" value="SAVE"/>
+   </apex:form>
+ 
+ 
+</apex:page>

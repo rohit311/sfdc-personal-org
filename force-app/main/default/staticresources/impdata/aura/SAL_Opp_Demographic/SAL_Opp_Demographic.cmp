@@ -1,0 +1,173 @@
+<!-- SAL_Opp_Demographic -->
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="cibilReinitiated" type="Boolean"/> <!--SAL 2.0 CR's-->
+    <!--City CR s-->
+    <aura:attribute name="isUnderwriter" type="Boolean" default="false"/>
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="finalCity" type="List"/>
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+    <!--City CR e-->
+    <aura:attribute name="isUnderwitercmp" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="newAddress" type="String"/>
+    <aura:attribute name="newAddress2" type="String"/><!-- Bug 18914 -->
+    <aura:attribute name="newAddress3" type="String"/><!-- Bug 18914 -->
+    <aura:attribute name="newPin" type="String"/>
+    <aura:attribute name="newCity" type="String"/>
+    <aura:attribute name="newState" type="String"/>
+    <aura:attribute name="disableAadhaar" type="Boolean" default="true"/>
+    <aura:attribute name="disableText" type="Boolean" default="false"/>
+    <aura:attribute name="disablePin" type="Boolean" default="true"/>
+    <aura:attribute name="disablePO" type="Boolean" default="true"/>
+    <aura:attribute name="ValidAreaLocality" type="Boolean" default="false"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{'sobjectType': 'eKYC__c'}"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default="{'sobjectType': 'Product_Offerings__c'}"/>
+    <aura:attribute name="conObj" type="Contact" default="{'sobjectType': 'Contact'}"/>
+    <aura:attribute name="accObj" type="Account" default="{'sobjectType': 'Account'}"/>
+    <aura:attribute name="oppObj" type="Opportunity" />
+    <aura:attribute name="priAppObj" type="Applicant__c" />
+     <aura:attribute name="copyaadhaar" type="Boolean" default="false"/>
+    <aura:attribute name="copypo" type="Boolean" default="false"/>
+    <aura:attribute name="copynewaddress" type="Boolean" default="false"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>    
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:firePanBreCheck" action="{!c.callPANBre}"/>
+    <aura:attribute name="areaList" type="Area_Locality__c[]" default="[]"/>
+    <aura:attribute name="selectedArea" type="Area_Locality__c" default="{}"/>
+    <aura:attribute name="oldAreaKeyword" type="String" default=""/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="AddressFrom" type="String" default=""/>
+    <aura:attribute name="solPolicylist" type="SOL_Policy__c[]" default="[]"/>
+    <aura:attribute name="addresschangepolicy" type="SOL_Policy__c" default="{}"/>
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+   <aura:registerEvent type="c:setPincode" name="setpin"/>
+   <aura:registerEvent name="updateconacc" type="c:UpdateConAcc"/><!-- prod issue 23466-->
+   <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+	<!--<aura:handler name="change" value="{!v.conObj.Pin_Code__c}" action="{!c.pinChange}"/>-->
+    <div style=" overflow-x:hidden !important;" class="slds-box slds-box_x-small slds-theme_shade">
+        <lightning:card title="" class="applyColor" >
+            <div style="position:relative">
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <label> Current Address </label>
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851  -->
+                                <lightning:input type="radio" label="Aadhaar Address" name="radioAddress" value="red" disabled="{!v.disableAadhaar}" onchange="{!c.changeAadhaaraddress}" checked="{!v.copyaadhaar}"/>
+                                </aura:if>
+                                <lightning:input type="radio" label="PO Address" name="radioAddress" value="red"  disabled="{!v.disablePO}" onchange="{!c.changePOaddress}" checked="{!v.copypo}"/>
+                                <lightning:input type="radio" label="New Address" name="radioAddress" value="red" onchange="{!c.changeNewaddress}" checked="{!v.copynewaddress}"/>
+                            </div>
+                            <br/><br/>
+                        </div>
+                        <!-- Bug 18914 Start-->
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd" maxlength="35" label="Residence Address Line 1" value="{!v.conObj.Address_1__c}" disabled="{!or(v.disableText,or(v.priAppObj.Data_Source__c == 'Copy CKYC Data',v.priAppObj.Data_Source__c == 'Edit CKYC Data'))}" name="resAdd" placeholder="Enter Residence Address"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd2" maxlength="35" label="Residence Address Line 2" value="{!v.conObj.Address_2__c}" disabled="{!or(v.disableText,or(v.priAppObj.Data_Source__c == 'Copy CKYC Data',v.priAppObj.Data_Source__c == 'Edit CKYC Data'))}" name="resAdd2" placeholder="Enter Residence Address"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd3" maxlength="35" label="Residence Address Line 3" value="{!v.conObj.Address_3__c}" disabled="{!or(v.disableText,or(v.priAppObj.Data_Source__c == 'Copy CKYC Data',v.priAppObj.Data_Source__c == 'Edit CKYC Data'))}" name="resAdd3" placeholder="Enter Residence Address"/>
+                            </div>
+                        </div>
+                        <!--Bug 18914 End -->
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control"><!--23578 added applicant condition in disabled -->
+                                <lightning:input onchange="{!c.pinChange}" messageWhenValueMissing="Please Enter Value" aura:id="resPin" label="Residence Pincode" required="true" disabled="{!v.disablePin}" value="{!v.conObj.Pin_Code__c}" type="text" maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pin code" pattern="^([0-9]{6})" name="resPin" />
+                            </div>
+                        </div>
+                        <!--City CR s -->
+                        <div aura:id="citySearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="cityField"><span class="requiredClass">*</span>City</label>
+                                <ui:inputText disabled="{!v.disablePin}" aura:id="cityField" class="slds-input"  updateOn="keyup" keyup="{!c.cityKeyPressController}" value="{!v.citySearchKeyword}" placeholder="Enter City" />                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="referralList">
+                                    <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.finalCity}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCity}">{!singleRec.city} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="resState" label="State" value="{!v.conObj.State__c}" name="state" disabled="true"/>        
+                            </div>
+                        </div>
+                        <!--City CR e -->
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="areaLoc" label="Area/Locality" value="{!v.conObj.Resi_Area__c}" name="areaLoc" placeholder="Area/Locality" messageWhenPatternMismatch="" disabled="{!v.disablePin}"/>        
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!or($Browser.isIPhone,$Browser.isPhone)}">
+			<div class="demo-only demo-only--sizing slds-grid slds-wrap">
+  				<div class="slds-size_2-of-2">
+    				<div class="slds-p-top--x-small slds-m-left_x-small slds-align_absolute-center slds-align_absolute-center"><lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{!c.saveContactDetails}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --></div>
+  					</div>
+  						<aura:if isTrue = "{!!v.isUnderwitercmp}">
+                    <div class="slds-size_2-of-2">
+    						<div class="slds-p-top--x-small slds-m-left_x-small slds-align_absolute-center slds-align_absolute-center"><lightning:button variant="brand" label="Re-Trigger CIBIL" class=" slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerCIBIL}" disabled="{!v.displayReadOnly}"/></div>
+  						</div>
+ 				    <div class="slds-size_2-of-2">
+    					<div class="slds-p-top--x-small slds-m-left_x-small slds-align_absolute-center slds-align_absolute-center"><lightning:button variant="brand" label="Re-Trigger Dedupe" class="slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerDedupe}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --></div>
+  					</div>
+   						</aura:if>
+				 </div>
+					</aura:if>
+
+                    
+                    	<aura:if isTrue="{!not(or($Browser.isIPhone,$Browser.isPhone))}">
+					<div class="slds-grid slds-grid--pull-padded slds-align_absolute-center">
+                        <div class="slds-p-top--x-small">
+                            <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{!c.saveContactDetails}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                        </div>  
+                        	<aura:if isTrue = "{!!v.isUnderwitercmp}">
+                            	<!--SAL 2.0 CR's s -->
+                            	<div class="slds-p-top--x-small slds-m-left_x-small">
+                                	<lightning:button variant="brand" label="Re-Trigger CIBIL" class=" slds-theme--alt-inverse" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerCIBIL}" disabled="{!v.displayReadOnly}"/>
+                            	</div>
+                            	<!--SAL 2.0 CR's e -->
+                            	<div class="slds-p-top--x-small slds-m-left_x-small">
+                                	<lightning:button variant="brand" label="Re-Trigger Dedupe" class="slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:change_record_type" iconPosition="left" onclick="{!c.retriggerDedupe}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                            	</div>
+                        	</aura:if>
+                    </div>
+						</aura:if>
+                    
+                </div>  
+            </div>
+        </lightning:card>
+    </div>
+</aura:component>

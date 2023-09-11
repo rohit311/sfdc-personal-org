@@ -1,0 +1,10 @@
+<apex:page controller="Chapter7_1_controller" tabStyle="Account">
+<apex:form >
+  <apex:pageBlock >
+     <apex:inputField value="{!account.name}"/>
+     <br/>
+     <br/>
+     <apex:commandButton action="{!save}" value="save"/>
+  </apex:pageBlock>
+</apex:form>
+  </apex:page>

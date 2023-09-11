@@ -1,0 +1,27 @@
+.THIS .tabIcon svg{
+    fill : white;
+}
+.THIS .headerStyle {
+    color: white !important; 
+    background-color: #0072bc !important;
+}
+.THIS .bglightBlue {
+    background: #ADD8E6  !important;
+    text-align: center;
+}
+.THIS .slds-modal__container
+{
+     margin-left: 0px;
+         margin-top: 0px;
+             margin-right: 0px;
+    height:100%;
+     padding-top: 10px;
+        width: 100%;
+}
+
+.THIS .slds-modal--large 
+{
+     width: 100%;
+    height: 100%;
+
+}

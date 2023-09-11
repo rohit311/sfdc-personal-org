@@ -1,0 +1,64 @@
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <!--<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>-->
+    <aura:attribute name="oppId" type="String" default="0065D000002Kssv"/>
+    <aura:attribute name="loanstage" type="String" default=""/>
+    <aura:attribute name="contObj" type="Contact" default="{'sobjectType':'Contact'}"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType':'Applicant__c'}"/>
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <div class="slds-p-horizontal--small">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <label class="slds-form-element__label"> FFR Subscribe </label>
+                    <div class="slds-form-element__control">
+                        <lightning:input name="ffrSubscribe" type="checkbox" label="" checked="{!v.applicantObj.Financial_Health_Check_Guide__c}" aura:id="ffrSubscribe" disabled="{!v.loanstage == 'Approved'}"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <label class="slds-form-element__label"> Subscribed to credit vidya</label>
+                    <div class="slds-form-element__control">
+                        <lightning:input name="creditvidya" type="checkbox" label="" checked="{!v.applicantObj.Subscribed_to_Credit_Vidya__c}" aura:id="creditvidya"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input name="promocode"  label="Promo Code" value="{!v.applicantObj.Refferal_Identifier__c}" aura:id="promocode" maxlength="60"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:input type="text" name="stampduty" label="Stamp Duty" value="{!v.contObj.Stamp_Duty__c}" aura:id="stampduty" maxlength="16" messageWhenPatternMismatch="Please enter valid Stamp Duty" pattern="[0-9]*" messageWhenBadInput="Stamp Duty should contain only digits." placeholder="Stamp Duty"/>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </ui:scrollerWrapper>
+    <br/>
+                    <div class="slds-form-element__control">
+                       <lightning:button aura:id="saveButtonId" class="slds-align_absolute-center" iconName="utility:save" iconPosition="left"  variant="brand" label="Save Fees &amp; Charges" onclick="{!c.subscribetoFFR}" />
+                    </div>
+    
+   <div id="SuccessToastfees" style="display:none; ">
+        <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsgfees"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="ErrorToastfees" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                 <div class="slds-notify__content">
+                     <h2 id ="errormsgfees"><b>Fail!</b>, Failed To Save</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

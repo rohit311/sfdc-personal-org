@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Event template" >
+    <aura:attribute name="leadObj" type="Object"/>
+    <aura:attribute name="insObj" type="Object"/>
+</aura:event>

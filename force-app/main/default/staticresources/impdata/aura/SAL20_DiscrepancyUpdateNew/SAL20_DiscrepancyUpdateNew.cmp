@@ -1,0 +1,514 @@
+<aura:component controller="SAL20_DiscrepancyUpdateController" >
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="attributeWrapperObj" type="object"/>
+    <aura:attribute name="loanId" type="String" default="006O000000AETsM"/>
+    
+    <aura:attribute name="isProcessing" type="Boolean" default="false"/> 
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <div class="slds-p-around_xxx-small" >
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+            <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">
+                <aura:if isTrue="{!v.attributeWrapperObj.centralisedOpsShow}">
+                    Central Ops QC Discrepancy
+                    <aura:set attribute="else">
+                        Discrepancy Update(Non Document)
+                    </aura:set>
+                </aura:if>
+            </h1>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Add Discrepancy : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Form : Start +-+-+-+-+-+-+-+ -->
+        <div class="slds-grid slds-wrap">
+            <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12 slds-p-around_x-small" >
+                    <lightning:select name="selectKA" label="Kit Acceptance" value="{!v.attributeWrapperObj.kitAcceptanceValue}" >
+                        <aura:iteration items="{!v.attributeWrapperObj.KitAcceptanceSelect}" var="oKA">
+                            <option value = "{!oKA.value}" 
+                                    label = "{!oKA.label}" 
+                                    selected = "{! oKA.value ==  v.attributeWrapperObj.kitAcceptanceValue}" 
+                                    >{!oKA.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </aura:if>
+            
+            <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12 slds-p-around_x-small slds-p-top_large">
+                <lightning:button variant="brand" disabled="{!v.isProcessing }"
+                                  label="{!if(v.attributeWrapperObj.centralisedOpsShow, 'Add QC Discrepancy', 'Add Discrepancy')}" 
+                                  title="{!if(v.attributeWrapperObj.centralisedOpsShow, 'Add QC Discrepancy', 'Add Discrepancy')}"
+                                  onclick="{!c.onAddDiscrepancy}" 
+                                  iconName="utility:add" iconPosition="left"
+                                  />
+            </div>
+        </div>
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Form : End +-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Table : Start +-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!not(empty(v.attributeWrapperObj.discrepancyData))}">
+            <table>
+                
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyData}" var="dRec" indexVar="index">
+                    
+                    <!-- Card Row Start -->
+                    <tr>
+                        <td >
+                            <lightning:card class="slds-m-around_xxx-small customCard">
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small ">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-01">Stage</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Discrepancy_Stage__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Name</label>
+                                                    <div class="slds-form-element__control">
+                                                        {!dRec.Name}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raised Date</label>
+                                                    <div class="slds-form-element__control">
+                                                        <ui:outputDateTime value="{!dRec.CreatedDate}"   />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raiser By</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!v.attributeWrapperObj.currentUser.Name}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raiser Role</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Raiser_Role__c}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small ">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-01">Party Name</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectApplicant" label="" value="{!dRec.Discrepancy_Party__c}" >  
+                                                            <aura:iteration items="{!v.attributeWrapperObj.ApplicantList}" var="oA">
+                                                                <option value = "{!oA.value}" 
+                                                                        label = "{!oA.label}" 
+                                                                        selected = "{!oA.value == dRec.Discrepancy_Party__c}"
+                                                                        >{!oA.label}</option>  
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Party</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Party_Type__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Category</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectCategory" label="" value="{!dRec.Category__c}" title="{!dRec.Category__c}">
+                                                            <aura:iteration items="{!v.attributeWrapperObj.optionsCategory}" var="oC">
+                                                                <option value = "{!oC.value}" 
+                                                                        label = "{!oC.label}" 
+                                                                        selected = "{! oC.value ==  dRec.Category__c}"
+                                                                        >{!oC.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>	
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Description</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Discrepancy_Description__c}"  />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Status</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                                            <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                                                <option value = "{!oS.value}" 
+                                                                        label = "{!oS.label}" 
+                                                                        selected = "{! oS.value ==  dRec.Status__c}"
+                                                                        >{!oS.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Resolution Remark</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Resolution_Remarks__c}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <!-- <label class="slds-form-element__label" for="input-01">Closed Date</label> -->
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input value="{!dRec.Closed_Date__c}" type="date" label="Closed Date" />
+                                                    </div>
+                                                </div>
+                                                <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                                                    <div class="slds-form-element slds-size_2-of-12">
+                                                        <label class="slds-form-element__label" for="input-01">Remarks</label>
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" />
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                            </lightning:card>
+                        </td>
+                    </tr>
+                    <!-- Card Row End -->
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="6">
+                        <div >
+                            <lightning:button variant="brand" label="Save Discrepancy" title="Save Discrepancy" disabled="{!v.isProcessing }" onclick="{!c.onAddSaveDiscrepancy}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Email" title="Send Email" disabled="{! v.isProcessing }" onclick="{!c.onSendEmail}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+ Add Discrepancy : Table : End +-+-+-+-+-+-+-+ -->
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Add Discrepancy : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing QC Discrepancy details : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <aura:if isTrue="{!if( and( not(empty(v.attributeWrapperObj.discrepancyListDis)) , v.attributeWrapperObj.centralisedOpsShow  , v.attributeWrapperObj.mortgageFlag ) , true , false )}">
+            <hr/>
+            <table  > <!-- class="slds-table  discrepancy-table" -->
+                
+                <tr class="slds-text-heading_small discrepancy-table-title">
+                    <td colspan="6">Existing QC Discrepancy details</td>
+                </tr>
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyListDis}" var="dRec"  >
+                    
+                    <!-- Card Row Start -->
+                    <tr>
+                        <td >
+                            <lightning:card class="slds-m-around_xxx-small customCard">
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raiser By</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.RaiserName__r.Name}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Category</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Category__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Description</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Discrepancy_Description__c}" title="{!dRec.Discrepancy_Description__c}" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Status</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                                            <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                                                <option value = "{!oS.value}" 
+                                                                        label = "{!oS.label}" 
+                                                                        selected = "{! oS.value ==  dRec.Status__c}"
+                                                                        >{!oS.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-01">Discrepancy Type</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectDiscrepancyType" label="" value="{!dRec.Discrepancy_Type__c}" title="{!dRec.Discrepancy_Type__c}">
+                                                            <aura:iteration items="{!v.attributeWrapperObj.optionsDiscrepancyType}" var="oD">
+                                                                <option value = "{!oD.value}" 
+                                                                        label = "{!oD.label}" 
+                                                                        selected = "{! oD.value ==  dRec.Discrepancy_Type__c}"
+                                                                        >{!oD.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>	
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Resolution Remark</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Resolution_Remarks__c}" title="{!dRec.Resolution_Remarks__c}" />
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                                                    <div class="slds-form-element slds-size_2-of-12">
+                                                        <label class="slds-form-element__label" for="input-01">Remarks</label>
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" title="{!dRec.Remarks__c}" />
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                
+                            </lightning:card>
+                        </td>
+                    </tr>
+                    <!-- Card Row End -->
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="8">
+                        <div >
+                            <lightning:button variant="brand" label="Save QC Changes" title="Save QC Changes" disabled="{!v.isProcessing }" onclick="{!c.onSaveDiscrepancyQC}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Pending QC Discrepancy" title="Send Mail for Pending QC Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailPending}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Resolved QC Discrepancy" title="Send Mail for Resolved QC Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailAll}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing QC Discrepancy details : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing Discrepancy details : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!not(empty(v.attributeWrapperObj.discrepancyList))}">
+            <hr/>
+            <table   > <!-- class="slds-table  discrepancy-table slds-wrap " slds-max-medium-table_stacked-horizontal -->
+                
+                <tr class="slds-text-heading_small discrepancy-table-title">
+                    <td colspan="6">Existing Discrepancy details</td>
+                </tr>
+                
+                <aura:iteration items="{!v.attributeWrapperObj.discrepancyList}" var="dRec" indexVar="index"  >
+                    
+                    <!-- Card Row Start -->
+                    <tr >
+                        <td >
+                            <lightning:card class="slds-m-around_xxx-small customCard">
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row" >
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-01">Stage</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Discrepancy_Stage__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Name</label>
+                                                    <div class="slds-form-element__control">
+                                                        <a href="{!concat('/',dRec.Id)}"  target="_blank" style="color: black;" >{!dRec.Name}</a>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Attach File</label>
+                                                    <div class="slds-form-element__control" style="overflow-x:scroll;">
+                                                        <!-- <a href="{!join( '' , concat('/p/attach/NoteAttach?pid=',dRec.Id) , concat('&amp;parentname=',dRec.name) , concat('&amp;retURL=%2F',dRec.Id) )}" target="_blank" style="color: black;" >Attach File</a> -->
+                                                        <c:DocumentUploader fileName="Discrepany Attachment" aura:id="{!concat('file-uploader-discrepancy',dRec.Name)}" parentId="{!dRec.Id}" instance="{!add(100,index)}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" showUploadButton="true"  /> 
+                                                         
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raised Date</label>
+                                                    <div class="slds-form-element__control">
+                                                        <ui:outputDateTime value="{!dRec.CreatedDate}"   />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raiser By</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.RaiserName__r.Name}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Raiser Role</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Raiser_Role__c}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-01">Party Name</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Applicant_Name__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Party</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Party_Type__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Category</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{!dRec.Category__c}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Description</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Discrepancy_Description__c}" title="{!dRec.Discrepancy_Description__c}" />
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Status</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="selectStatus" label="" value="{!dRec.Status__c}" title="{!dRec.Status__c}">
+                                                            <aura:iteration items="{!v.attributeWrapperObj.optionsStatus}" var="oS">
+                                                                <option value = "{!oS.value}" 
+                                                                        label = "{!oS.label}" 
+                                                                        selected = "{! oS.value ==  dRec.Status__c}"
+                                                                        >{!oS.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <label class="slds-form-element__label" for="input-02">Resolution Remark</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:textarea value="{!dRec.Resolution_Remarks__c}" title="{!dRec.Resolution_Remarks__c}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                                <fieldset class="slds-form-element slds-form_compound slds-p-bottom_xxx-small">
+                                    <legend class="slds-form-element__legend slds-form-element__label"></legend>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__group">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_2-of-12">
+                                                    <!-- <label class="slds-form-element__label" for="input-01">Closed Date</label> -->
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input value="{!dRec.Closed_Date__c}" type="date" title="{!dRec.Closed_Date__c}" label="Closed Date"/>
+                                                    </div>
+                                                </div>
+                                                <aura:if isTrue="{!v.attributeWrapperObj.mortgageFlag}">
+                                                    <div class="slds-form-element slds-size_2-of-12">
+                                                        <label class="slds-form-element__label" for="input-01">Remarks</label>
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:textarea value="{!dRec.Remarks__c}"  disabled="true" title="{!dRec.Remarks__c}" />
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                            </lightning:card>
+                        </td>
+                    </tr>
+                    <!-- Card Row End -->
+                    
+                    
+                </aura:iteration>
+                <tr>
+                    <td colspan="10">
+                        <div >
+                            <lightning:button variant="brand" label="Save Changes" title="Save Changes" disabled="{!v.isProcessing }" onclick="{!c.onSaveDiscrepancy}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Pending Discrepancy" title="Send Mail for Pending Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailPending}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                            <lightning:button variant="brand" label="Send Mail for Resolved Discrepancy" title="Send Mail for Resolved Discrepancy" disabled="{! v.isProcessing }" onclick="{!c.onSendEmailAll}" class="slds-m-around_xx-small" iconName="utility:email" iconPosition="left" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Existing Discrepancy details : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{! v.isProcessing }">
+            <div class="spinner-overlay">
+                <div class=".slds-is-relative" style="height: 6rem;">
+                    <div role="status" class="slds-spinner slds-spinner_large">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- <lightning:spinner alternativeText="Loading" /> -->
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <c:Toast aura:id="toastCmp"/>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

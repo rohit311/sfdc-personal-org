@@ -1,0 +1,30 @@
+<template>
+    <template if:true={isShowSpinner}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    <div class="slds-m-around_small">
+        <lightning-card title="Profiles" icon-name="utility:profile">
+            <template for:each={pageList} for:item="profile">
+                <div class="slds-text-title" key={profile}>{profile}</div>
+            </template>
+        </lightning-card>
+
+        <lightning-layout>
+            <lightning-layout-item>
+                <lightning-button label="Previous"
+                    icon-name="utility:chevronleft"
+                    disabled={isPreviousButtonDisabled}
+                    onclick={handlePreviousClick}>
+                </lightning-button>
+            </lightning-layout-item>
+            <lightning-layout-item>
+                <lightning-button label="Next"
+                    icon-name="utility:chevronright"
+                    icon-position="right"
+                    disabled={isNextButtonDisabled}
+                    onclick={handleNextClick}>
+                </lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>

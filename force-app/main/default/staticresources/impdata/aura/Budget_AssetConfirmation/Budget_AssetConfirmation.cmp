@@ -1,0 +1,96 @@
+<aura:component controller="BudgetReport">
+    <aura:attribute name="isDownloadDone" type="boolean" default="false" />
+    <aura:handler name="init" action="{! c.onInit }" value="{! this }" />
+    <aura:attribute name="rejectReason" type="String" default=""/>
+    <aura:attribute name="profiles"  type="Object[]" />
+    <aura:attribute name="showRejectionPanel" type="boolean" default="false" />
+    <aura:attribute name="showSpinner" type="boolean" default="false" />    
+    <aura:attribute name="ipAddr" type="String" />
+    <aura:handler name="change" value="{!v.showRejectionPanel}" action="{!c.setRejectionFocus }"/>
+    
+     
+    <div class="Budget-Report" style="height: 640px;">        
+        	<!-- +-+-+-+-+-+-+- START : Toast and spinner  +-+-+-+-+-+-+-+-+-+-+-+- -->
+        	<c:Toast aura:id="toastCmp"/>
+            <aura:if isTrue="{! v.showSpinner }">
+                <lightning:spinner />
+            </aura:if>
+        	<!-- +-+-+-+-+-+-+- END   : Toast and spinner  +-+-+-+-+-+-+-+-+-+-+-+- -->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.closeModal }" 
+                                              alternativeText="Close" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            Asset Confirmation!
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-m-around_xxx-small slds-m-right_small slds-border_right slds-border_left">
+                            <thead class="slds-m-around_xxx-small font-size-11">
+                                <tr class="slds-m-around_xxx-small" scope="row"> 
+                                    <th scope="col" class="slds-cell-wrap slds-border_right">
+                                        Profile Name
+                                    </th>
+                                    <th scope="col" class="slds-cell-wrap slds-border_right">
+                                        Active User Count
+                                    </th>
+                                </tr>                                
+                            </thead>
+                            <tbody>      
+                                <aura:if isTrue ="{! or(v.profiles == null, empty(v.profiles) ) }">
+                                    <tr>
+                                        <td colspan="2">
+                                            <span class="slds-align_absolute-center">There is no data to display.</span>
+                                        </td>
+                                    </tr>
+                                </aura:if>
+                                <aura:if isTrue="{! not(empty(v.profiles) ) }">
+                                    <aura:iteration items="{! v.profiles}" var="oProfile">
+                                        <tr>
+                                            <td class="slds-m-around_xxx-small" scope="row">
+                                                {! oProfile.Name }
+                                            </td>
+                                            <td class="slds-m-around_xxx-small" scope="row">
+                                                {! oProfile.cnt }
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </aura:if>
+                            </tbody>
+                        </table>                                                
+                        
+                        <p class="slds-m-around_xxx-small">{!$Label.c.User_Creation_Budget_Disclaimer}</p>
+                        
+                        <aura:if isTrue="{! v.showRejectionPanel }">
+                            <div id="rPanel" aura:id="rPanelAura" tabindex="0" class="slds-has-focus slds-m-top-x-small slds-border--left slds-border--right slds-border--top slds-border--bottom" >
+                                <lightning:input type="text" 
+                                                 access="GLOBAL"
+                                                 label="Rejection reason"
+                                                 value="{! v.rejectReason }" 
+                                                 tabindex="0"
+                                                 required="true"
+                                                 aura:id="rejection-input"
+                                                 title="Please enter your rejection reason!"
+                                                 placeholder="Please enter rejection reason!"
+                                                 />    
+                                <div class="slds-m-left-x-small slds-align_absolute-center">
+                                    <lightning:button  label="Done"   variant="brand" onclick ="{! c.onRejectionDone }"/>
+                                    <lightning:button  label="Cancel" variant="brand" onclick ="{! c.onRejectionCancel }"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" label="Download User Report" title="Download user report" onclick="{! c.downloadUserList }" />
+                        <lightning:button variant="brand" label="Accept" 	title="Accept" onclick="{! c.onAccept }" disabled="{! v.showRejectionPanel }"/>
+                        <lightning:button variant="brand" label="Reject" 	title="Reject" onclick="{! c.onReject }" disabled="{! v.showRejectionPanel }"/>
+                        <lightning:button variant="brand" label="Cancel" 	title="Reject" onclick="{! c.closeModal }" disabled="{! v.showRejectionPanel }"/>
+                    </footer>
+                </div>
+            </section>
+            
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        
+    </div>
+</aura:component>

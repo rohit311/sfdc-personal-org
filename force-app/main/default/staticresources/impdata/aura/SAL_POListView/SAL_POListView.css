@@ -1,0 +1,13 @@
+/*Bug 18681*/
+.THIS{
+    width:100%;
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 22rem;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}

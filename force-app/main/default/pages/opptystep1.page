@@ -1,0 +1,33 @@
+<apex:page controller="NewOpportunityController" tabStyle="Opportunity">
+    <script>
+    function confirmCancel(){
+    var isCancel=confirm("Are you sure you wish to cancel?");
+        if(isCancel)
+            return true;
+        return false;  
+   }     
+   </script>
+   <apex:sectionHeader title="New Customer Opportunity" subtitle="Step 1 of 3"/>
+   
+   <apex:form >
+     <apex:pageBlock title="Customer Information" mode="edit">
+     
+     
+       <apex:pageBlockButtons >
+         <apex:commandButton action="{!step2}" value="Next"/>
+         <apex:commandButton action="{!cancel}" onclick="return confirmCancel()" value="Cancel" immediate="true"/>
+       </apex:pageBlockButtons>
+       
+          <apex:pageBlockSection title="Account information">
+             <apex:inputField id="accountName" value="{!account.name}"/>
+             <apex:inputField id="accountSite" value="{!account.site}"/>
+          </apex:pageBlockSection>
+          
+          <apex:pageBlockSection title="Contact Information">
+             <apex:inputField id="contactFirstName" value="{!contact.firstName}"/>
+             <apex:inputField id="contactLastName" value="{!contact.lastName}"/>
+             <apex:inputField id="contactPhone" value="{!contact.phone}"/>
+          </apex:pageBlockSection>
+     </apex:pageBlock>
+   </apex:form>
+</apex:page>

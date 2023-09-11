@@ -1,0 +1,82 @@
+<aura:component access="global" controller="SAL_PricingCtrlV2"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"  >
+	<aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="oppObj" type="Opportunity" default=""/>
+    <aura:attribute name="isCustomerConsent" type="Boolean" default="false"/>
+    <aura:attribute name="isEkyc" type="Boolean" default="false"/>
+    <aura:attribute name="isPerfiosResponse" type="Boolean" default="false"/>
+    <aura:attribute name="isAppForm" type="Boolean" default="false"/>
+    <aura:attribute name="isBanking" type="Boolean" default="false"/>
+    <aura:attribute name="isSPDCApplicable" type="Boolean" default="false"/>
+    <aura:attribute name="isGeoTagging" type="Boolean" default="true"/>
+    <aura:attribute name="isDegreeCertificate" type="Boolean" default="false"/>
+	<aura:attribute name="checklistMap" type="List"/>
+    <!-- Bug 25333  changes s -->
+    <aura:attribute name="rateApprDone" type="Boolean" default="true"/> <!--22624 -->
+     <aura:attribute name="primaryapplicant" type="Applicant__c" default=""/> 
+    <!-- Bug 25333 chnages end -->
+ <!-- Added for DMS 24317 s -->
+    <aura:attribute name="parentId" 	type="String" /> 
+   
+      <aura:attribute name="DMSDocmap" type="Map" default="{}"/>
+     <aura:method name="updateChkRec" action="{!c.updateChkRecords}" access="PUBLIC">
+      <aura:attribute name="filename" type="String" default=""/>
+      <aura:attribute name="uploadStatus" type="String" default=""/>
+     </aura:method>
+        <!-- Added for DMS 24317 e -->
+    <!--Bug:23568**S** -->
+    <aura:attribute name="AddressChange" type="boolean" default="false"/>
+    <aura:attribute name="ekycops" type="boolean" default="false" />
+    <!--Bug:23568**E** -->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+		<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Document Upload</h1>
+		</div>
+		<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    
+	
+    <div class="slds-grid slds-wrap">
+    <aura:iteration items="{!v.checklistMap}" var="checklist" indexVar="indx">
+		<aura:if isTrue="{! (checklist.name != 'Degree' || and(checklist.name == 'Degree',(v.oppObj.Product__c =='DOCTORS' || v.oppObj.Product__c =='PRO')))}">	
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+            <article class="slds-card slds-m-around_xx-small">
+                <div class="slds-card__header slds-grid">
+				<div class="slds-media slds-media-center">
+					<!-- +-+-+-+-+-+- Green Tick ICON End -+-+-+-+-+-+-+- -->
+						<aura:if isTrue="{! checklist.isComplete}">
+							<span class="slds-media__figure slds-icon_container slds-icon-action-approval" title="{!checklist.Name }">
+								<lightning:icon iconName="action:approval" size="x-small" />
+							</span>
+						</aura:if>
+					<!-- +-+-+-+-+-+- Green Tick ICON End -+-+-+-+-+-+-+- -->
+					<!-- +-+-+-+-+-+- RED Cross ICON start -+-+-+-+-+-+-+- -->
+						<aura:if isTrue="{! checklist.isComplete != 'true' }">
+							<span class="slds-media__figure slds-icon_container slds-icon-action-close" title="{! checklist.Name }">
+								<lightning:icon iconName="action:close" size="x-small" />
+							</span>
+						</aura:if>
+					<!-- +-+-+-+-+-+- RED Cross ICON End -+-+-+-+-+-+-+- -->
+					<div class="slds-media__body" style ="height:30px;" >
+                        <span class="slds-media__body slds-card__header-title slds-p-around_medium">
+                        	<h2 class="slds-text-heading_small"> {!checklist.name} </h2>
+                   		 
+                        <div class="{!if(checklist.showDocUploader == 'true','slds-tile__detail','slds-tile__detail slds-hide')}">
+                            <dl class="slds-list_horizontal slds-grid slds-wrap">
+                                <dd class="slds-size_1-of-2 slds-item_detail slds-truncate fontColor" title=""  style="width:100%;">
+                                    <lightning:input label=" " class="fontColor" type="toggle" checked="{!if(checklist.toggle == 'true',true,false)}" disabled="true" messageToggleActive="File Uploaded" messageToggleInactive="File Not Uploaded"/>
+                                </dd>
+                            </dl>
+                        </div>
+                            </span>
+                    </div>
+				</div>
+                </div>
+			</article>
+            </div>
+            </aura:if>
+	</aura:iteration>
+    </div>
+         <br/>
+</aura:component>

@@ -1,0 +1,47 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="SFDCMobileLoanController">
+    <!-- Bug 22141 S -->
+    <aura:attribute name = "FraudResult" type = "String" default = ""/>
+    <!-- 22141 E -->
+    <aura:attribute name="loanAppID" type="String"/>
+    <!--Bug 24237 S-->
+    <aura:attribute name ="stpNonStp" type = "String"/>
+     <!--Bug 24237 E-->
+    
+    <!-- added 2 parameter of contact and applicant obje for US_27806_CKYC -->
+    <aura:attribute name="contact" type="Contact" access="global"/>
+    <aura:attribute name="applicantObject" type="Applicant__c" access="global"/>
+    <!-- added 2 parameter of contact and applicantObject obje for US_27806_CKYC -->
+    
+    <aura:attribute name="OppObj" type="Opportunity"/>
+    <aura:attribute name="showDetailsComponent" type="Boolean" default="false"/>
+    <aura:attribute name="FieldList" type="Object[]" description="This contains a list of field configuration"/>
+    <aura:attribute name="IdList" type="String[]" description="This contains a list of id which are used to get records"/>
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:handler name="posLAFlowEvent" event="c:PosLAFlowEvent" action="{!c.doInit}"/>
+    <aura:registerevent name="DisableFormEvent" type="c:DisableFormEvent" />
+    <aura:handler event="c:EnableFormEventOnSendBack" action="{!c.enableObligationForm}"/>
+
+    <aura:attribute name="isReadOnly" type="Boolean" default="false"/>
+    <aura:attribute name="shouldBeDisable" type="Boolean" />
+
+    
+    <h3 class="slds-section-title--divider">EXISTING OBLIGATIONS</h3>
+    <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242);overflow: auto;height: 53vh;">
+   		<div class="slds-grid slds-wrap slds-grid--pull-padded"></div>
+        <div>
+            <aura:if isTrue="{!v.showDetailsComponent == true}" >
+                <c:DynamicFields ObjectName="Existing_Loan_Details__c" isPosLaFlow="true" IdList="{!v.IdList}" FieldList="{!v.FieldList}" isReadOnlyPOSLA="{!v.isReadOnly}"/>
+            </aura:if>
+            <br/>        
+        </div>
+        
+        <div class="well">
+        	<div class="slds-p-top--x-small">
+            	<lightning:button variant="brand" iconName="utility:forward" label="Proceed For Disbursal" class="slds-align_absolute-cente" onclick="{!c.processToDisbursal}" disabled="{!if(v.OppObj.StageName != 'DSA/PSF Login', 'true','false')}"/>
+        	</div>   
+        </div>
+    </div> 
+    
+</aura:component>

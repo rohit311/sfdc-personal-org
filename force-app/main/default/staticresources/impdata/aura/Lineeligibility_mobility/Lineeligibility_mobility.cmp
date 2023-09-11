@@ -1,0 +1,55 @@
+<aura:component controller="SALMobilityController">
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{}"/>
+	<aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="lineoptedList" type="List" />
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/> 
+     <ui:scrollerWrapper class="scrollerSize">
+    <div class="slds-p-horizontal--small">
+    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:select aura:id="lineopted" name="lineopted" label="Line Opted" value="{!v.scam.Line_opted__c}">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.lineoptedList}" var="lineopt">
+                            <option value="{!lineopt}" text="{!lineopt}" selected="{!v.scam.Line_opted__c == lineopt}"></option>
+                        </aura:iteration>
+                    </lightning:select>                   
+                    
+                </div>
+            </div>
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-form-element__control">
+                    <lightning:input label="Line Eligibility" name="lineeligibility" aura:id="lineeligibility" value="{!v.scam.Line_assigned_basis_Credit_Assessment__c}" disabled="true"/>
+                </div>
+            </div>
+
+    </div>
+    <br/>
+       
+                       <lightning:button aura:id="saveButtonId" class="slds-align_absolute-center" iconName="utility:save" iconPosition="left"  variant="brand" label="Save" onclick="{!c.savedetails}" />
+         </div>
+    </ui:scrollerWrapper>
+    <div id="SuccessToast1" style="display:none; ">
+        <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsg1"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="ErrorToast" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                 <div class="slds-notify__content">
+                     <h2 id ="errormsg"><b>Fail!</b>, Failed To Save</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

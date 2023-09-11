@@ -1,0 +1,94 @@
+<aura:component >
+    <ltng:require styles="{! $Resource.bootStrap337 + '/bootstrap-4.3.1-dist/css/bootstrap.min.css'}" 
+      scripts="{!join(',', 
+        $Resource.jqueryv3 , 
+        $Resource.bootStrap337 + '/bootstrap-4.3.1-dist/js/bootstrap.min.js')
+      }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+    <div class="container" >
+        <ul >
+           <li class="active"><a href="#">Home</a></li>
+         <li><a href="#">Menu 1</a></li>
+         <li><a href="#">Menu 2</a></li>
+         <li><a href="#">Menu 3</a></li>
+      </ul>
+        
+       <br/> 
+       <button type="button" class="btn btn-default">Default</button>
+      <button type="button" class="btn btn-primary">Primary</button>
+      <button type="button" class="btn btn-success">Success</button>
+      <button type="button" class="btn btn-info">Info</button>
+      <button type="button" class="btn btn-warning">Warning</button>
+      <button type="button" class="btn btn-danger">Danger</button>
+      <button type="button" class="btn btn-link">Link</button> 
+        
+        <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo">Simple collapsible</button>
+      <div id="demo" class="collapse">
+         this part is controll by the Simple collapse Button 
+      </div>
+        
+       <!--Display glyphicon icon part-->  <br/>
+      <p>Envelope icon: <span class="glyphicon glyphicon-envelope"></span></p> 
+        
+      <!--Display table part-->  <br/>
+      <table class="table table-striped">
+         <thead>
+            <tr>
+               <th>Firstname</th>
+               <th>Lastname</th>
+               <th>Email</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>John</td>
+               <td>Doe</td>
+               <td>john@example.com</td>
+            </tr>
+            <tr>
+               <td>Mary</td>
+               <td>Moe</td>
+               <td>mary@example.com</td>
+            </tr>
+            <tr>
+               <td>July</td>
+               <td>Dooley</td>
+               <td>july@example.com</td>
+            </tr>
+         </tbody>
+      </table> 
+        
+         <!--Display pagination part-->  <br/>
+      <ul class="pagination">
+         <li><a href="#">1</a></li>
+         <li class="active"><a href="#">2</a></li>
+         <li><a href="#">3</a></li>
+         <li><a href="#">4</a></li>
+         <li><a href="#">5</a></li>
+      </ul>
+      
+       <!--Display Model part-->  <br/>
+      <!-- Trigger the modal with a button -->
+      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+      <!-- Modal -->
+      <div id="myModal" class="modal fade" role="dialog">
+         <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Modal Header</h4>
+               </div>
+               <div class="modal-body">
+                  <p>Some text in the modal.</p>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!--end-->  
+    </div>
+</aura:component>

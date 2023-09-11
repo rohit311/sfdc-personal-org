@@ -1,0 +1,147 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" controller="SAL20_ApprovedDetailsController">
+    
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="loanTargetRecord" type="Object"/>
+    <aura:attribute name="loanRecord" type="Opportunity"/>
+    <aura:attribute name="loanRecordError" type="String"/>
+    <aura:attribute name="applicantRecordId" type="String"/>
+    <aura:attribute name="applicantTargetRecord" type="Object"/>
+    <aura:attribute name="applicantRecord" type="Object"/>
+    <aura:attribute name="applicantRecordError" type="String"/>
+    <aura:attribute name="schemeTargetRecord" type="Object"/>
+    <aura:attribute name="schemeRecord" type="Scheme_Master__c"/>
+    <aura:attribute name="schemeRecordError" type="String"/>
+    <aura:attribute name="IsHybridFlexi" type="Boolean" default="false"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="dedupeLinkFlag" type="Boolean" default="false"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="isdisabled" type="String"/>
+    <aura:attribute name="schemeRecordId" type="String"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <force:recordData aura:id="loanRecordHandler"
+      recordId="{!v.oppId}"
+      layoutType="FULL"
+      targetRecord="{!v.loanTargetRecord}"
+      targetFields="{!v.loanRecord}"
+      targetError="{!v.loanRecordError}"
+      mode="EDIT"
+      />
+    <force:recordData aura:id="applicantRecordHandler"
+      recordId="{!v.applicantRecordId}"
+      layoutType="FULL"
+      targetRecord="{!v.applicantTargetRecord}"
+      targetFields="{!v.applicantRecord}"
+      targetError="{!v.applicantRecordError}"
+      mode="EDIT"
+      />
+    <force:recordData aura:id="schemeMasterRecord"
+      recordId="{!v.schemeRecordId}"
+      layoutType="FULL"
+      targetRecord="{!v.schemeTargetRecord}"
+      targetFields="{!v.schemeRecord}"
+      targetError="{!v.schemeRecordError}"
+      mode="EDIT"
+      />
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+        <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Approved Details</h1>
+    </div>
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->	
+    <div class="slds-scrollable_x" style="width: 100%;">
+    <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small" >
+        <thead>
+    	<tr>
+             <th scope="col" class="slds-cell-shrink">Approved Loan Amount</th>
+             <th scope="col" class="slds-cell-shrink">Approved Tenor</th>
+             <th scope="col" class="slds-cell-shrink">Approved Rate</th>
+             <aura:if isTrue="{! (v.IsHybridFlexi==true)}">
+                 <th scope="col" class="slds-cell-shrink">Pure Flexi Period</th>
+                 <th scope="col" class="slds-cell-shrink">Drop Line Period</th>
+             </aura:if>
+             <th scope="col" class="slds-cell-shrink">Approved PF</th>
+             <th scope="col" class="slds-cell-shrink">Approver Name</th>
+             <!--th scope="col" class="slds-cell-shrink">Sales Approver</th-->
+             <th scope="col" class="slds-cell-shrink">Approved Insurance</th>
+            <th scope="col" class="slds-cell-shrink">Approved Loan Amount with Insurance</th>
+             <th scope="col" class="slds-cell-shrink">EMI with Insurance</th>
+             <aura:if isTrue="{! (v.IsHybridFlexi==true)}">
+                <th scope="col" class="slds-cell-shrink">Pure Flexi Period EMI</th>
+             </aura:if>
+             <th scope="col" class="slds-cell-shrink">DSA subventions amount</th>
+             <th scope="col" class="slds-cell-shrink">DSA subventions %</th>
+ 		</tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Approved_Loan_Amount__c}" disabled="true"/>
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Approved_Tenor__c}" disabled ="{!v.isdisabled}"/>
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Approved_Rate__c}" />
+            </td>
+            <aura:if isTrue="{! (v.IsHybridFlexi==true)}">  
+            	<td>
+                	<lightning:input label=" " aura:id="pureFlexiPeriod" value="{!v.applicantRecord.Pure_Flexi_Period__c}"  onchange="{!c.calculateDroplinePeriod}" /> <!-- Bug 022440 onchange was earlier written as onChange -->
+                </td>
+                <td>
+                	<lightning:input label=" " value="{!v.applicantRecord.Drop_Line_Flexi_Period__c}" aura:id="dropLinePeriod" disabled ="true" /> <!-- Bug 022440 Added disabled -->
+                </td>
+            </aura:if>
+            <td>
+                <lightning:input  label=" " value="{!v.loanRecord.Processing_Fees__c}" />
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Approver__c}" disabled ="true"/>
+            </td>
+            <!--td>
+                <lightning:input label=" " value="{!v.loanRecord.Pricing_Details_Approved_by__c}" disabled ="true"/>
+            </td-->
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Insurance_Premium_Amt__c}" disabled ="true"/>
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.Loan_Amount_with_Premium__c}" disabled ="true"/>
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.EMI_CAM__c}" disabled ="true"/>
+            </td>
+            <aura:if isTrue="{! (v.IsHybridFlexi==true)}"> 
+                <td>
+                    <lightning:input label=" " value="{!v.applicantRecord.Pure_Flexi_EMI__c}" disabled ="true"/>
+                 </td>
+            </aura:if>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.MonthlyBonus__c}" />
+            </td>
+            <td>
+                <lightning:input label=" " value="{!v.loanRecord.DSA_Sharing__c}" />
+            </td>
+		</tr>
+        </tbody>
+    </table>
+    </div>
+    <div style="margin-left:50%;" >
+    	<lightning:button label="Save" variant="brand" disabled="{! v.isProcessing }" onclick="{!c.onSave}" />
+    </div>
+    <!-- Bug 21634 removed dedupe referral-->
+    <!--div style="margin-top: 10px;">
+        <aura:if isTrue="{! (v.dedupeLinkFlag==true)}"> 
+            <c:DedupeReferral loanId="{!v.oppId}"/>
+        </aura:if>
+    </div-->
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<c:Toast aura:id="toastCmp"/>       
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

@@ -1,0 +1,128 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="allVeriList" type="Verification__c[]"/>
+    <aura:attribute name="camObj" type="CAM__c"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c"/>
+    <aura:attribute name="dedupeList" type="De_Dupe__c[]"/>
+    <aura:attribute name="nameTheme" type="String"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="appObj" type="Applicant__c" />
+    <aura:attribute name="LoanObj" type="Object" />
+    <aura:attribute name="DemogAction" type="String"/>
+    <aura:attribute name="DemogChange" type="String" />
+     <aura:attribute name="LastModifiedDate" type="String" />
+    <aura:attribute name="Address1" type="String" />
+    <aura:attribute name="Address2" type="String" />
+    <aura:attribute name="Address3" type="String" />
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute name="profileName" type="String"/>    
+    <c:GenericBackCmp/>
+    <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        
+        <lightning:card class="applyMarginToCard  slds-box  slds-size--12-of-12 slds-align_absolute-center" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                         <div class="slds-box  slds-size--12-of-12 .slds-text-heading_large" style="background-color:gainsboro;height:50px;text-align :center"> Demographic Details </div>
+                        <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--striped  slds-table_resizable-cols" role="grid">
+                          <tbody>
+                            <tr >
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> PAN Number </td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.LoanObj.CUSTOMER__r.PAN_Demog__c}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Bank Account number</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.LoanObj.CUSTOMER__r.Bank_account_number_demog__c}"/>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Mobile Number</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.LoanObj.CUSTOMER__r.Mobile_Demog__c}"/>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> DOB</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.LoanObj.CUSTOMER__r.DOB_Demog__c}"/>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Address 1</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.Address1}"/>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Address 2</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.Address2}"/>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Address 3</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.Address3}"/>
+                                </td>
+                            </tr>
+                               <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Customer demographic change</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.DemogChange}"/>
+                                </td>
+                            </tr>
+                               <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Customer demographic change action</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.DemogAction}"/>
+                                </td>
+                            </tr>
+                               <tr>
+                                <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Last modified date</td>
+                                <td>
+                                    <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.LastModifiedDate}"/>
+                                </td>
+                            </tr>
+                              <tr>
+                                  <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap">App Score</td>
+                                  <td>
+                                      <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.appObj.Score_card__c}"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap"> Suspected PAN Score</td>
+                                  <td>
+                                      <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.appObj.suspacted_pan_score__c}"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td class="slds-text-title_bold slds-size--6-of-12 slds-cell-wrap">Aiding Underwriter</td>
+                                  <td>
+                                      <ui:outputText class="boldText slds-size--6-of-12 slds-cell-wrap" value="{!v.appObj.aiding_underwritter__c}"/>
+                                  </td>
+                              </tr>
+                              
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                    
+    </div>
+            </p>
+</lightning:card>
+</div>
+    <c:SAL_RSAVerifications profileName="{!v.profileName}" stageName="{!v.stageName}" salesprofilecheck = "{!v.salesprofilecheck}" oppId="{!v.LoanObj.Id}" primaryApp="{!v.appObj}" Oppobj="{!v.LoanObj}" bankObj="{!v.bankObj}" camObj="{!v.camObj}" dedupeList="{!v.dedupeList}" nameTheme="{!v.nameTheme}" displayReadOnly="{!v.displayReadOnly}"/>
+</aura:component>

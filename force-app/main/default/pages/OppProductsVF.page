@@ -1,0 +1,34 @@
+<apex:page >
+  <apex:includeLightning />
+  <apex:slds />
+  <div id="Con" />
+
+         <script>
+
+            $Lightning.use("c:OppProdApp", function() {
+
+                $Lightning.createComponent(
+
+                    "c:OpportunityProductsListView",
+
+                    {oppId : $CurrentPage.parameters.id,
+                    priceBookId : $CurrentPage.parameters.id.pId
+                    },
+
+                    "Con",
+
+                    function(cmp) {
+
+                        console.log("Component is created!");
+
+                        console.log(cmp);
+
+                    });
+
+                });
+
+        
+
+          </script>
+  
+</apex:page>

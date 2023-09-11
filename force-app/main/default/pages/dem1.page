@@ -1,0 +1,9 @@
+<apex:page controller="MyTimeController" docType="html-5.0"> 
+   <apex:form >
+   DateTime: {!myDateTime}
+   <br/>
+     Time: {!myTime}
+     <br/>
+  
+ </apex:form>
+</apex:page>

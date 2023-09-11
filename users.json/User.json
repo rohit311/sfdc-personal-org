@@ -1,0 +1,124 @@
+{
+    "records": [
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef1"
+            },
+            "Username": "autoproc@00d280000019pk2eai",
+            "Email": "autoproc@00d280000019pk2eai",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef2"
+            },
+            "Username": "contact_creation@rohit311-developer-edition.ap7.force.com",
+            "Email": "rohit_chavan@persistent.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef3"
+            },
+            "Username": "demo_service@00d280000019pk2eai.org.force.com",
+            "Email": "demo_service@00d280000019pk2eai.org.force.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef4"
+            },
+            "Username": "guestadmin311@admin.com",
+            "Email": "rohit_chavan@persistent.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef5"
+            },
+            "Username": "integration@00d280000019pk2eai.com",
+            "Email": "integration@example.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef6"
+            },
+            "Username": "insightssecurity@00d280000019pk2eai.com",
+            "Email": "insightssecurity@example.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef7"
+            },
+            "Username": "rohitc@sf.com",
+            "Email": "scorpiorohit311@gmail.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef8"
+            },
+            "Username": "lynda1@herman.com",
+            "Email": "lynda@herman.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef9"
+            },
+            "Username": "rmustang@sf.com",
+            "Email": "rohit_chavan@persistent.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef10"
+            },
+            "Username": "rohit.chavan@helpshift.com",
+            "Email": "rohit.chavan@helpshift.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef11"
+            },
+            "Username": "cloud@00d280000019pk2eai",
+            "Email": "noreply@salesforce.com",
+            "Phone": null,
+            "MobilePhone": null
+        },
+        {
+            "attributes": {
+                "type": "User",
+                "referenceId": "UserRef12"
+            },
+            "Username": "chatty.00d280000019pk2eai.664a6jclriam@chatter.salesforce.com",
+            "Email": "noreply@chatter.salesforce.com",
+            "Phone": null,
+            "MobilePhone": null
+        }
+    ]
+}

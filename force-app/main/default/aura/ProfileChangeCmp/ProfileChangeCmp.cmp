@@ -1,0 +1,40 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="ProfileController">
+	<aura:attribute name="profileList" type="List" default=""/>
+    <aura:attribute name="selProfile" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th>
+                	Name
+                </th>
+                <th>
+                	User Type
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.profileList}" var="profile">
+                <tr class="slds-hint-parent">
+                    <th>
+                    	{!profile.Name}
+                    </th>
+                    <th>
+                    	{!profile.UserType}
+                    </th>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table> -->
+    <div class="slds-grid slds-gutters slds-m-left_medium">
+        <div class="slds-size_2-of-6">
+            <lightning:select value="{!v.selProfile}" onchange="{!c.handleProfileChange}" name="profilePicklist" label="Profile" class="selectCls">
+                <option value="">--None--</option>
+                <aura:iteration items="{!v.profileList}" var="profile" indexVar="key">
+                    <option text="{!profile.Name}" value="{!profile.Name}" selected="{!profile.Name==v.selProfile}" />
+                </aura:iteration>
+            </lightning:select>            
+        </div>    
+    </div>
+</aura:component>

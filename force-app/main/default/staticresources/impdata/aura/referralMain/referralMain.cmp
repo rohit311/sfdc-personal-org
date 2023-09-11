@@ -1,0 +1,126 @@
+<!--
+****************************************************************************************************************************************************
+Comp Name : referralMain.cmp
+Controller: ReferralMobilityControllerapxc
+BUG id    : 19263
+****************************************************************************************************************************************************-->
+
+<aura:component implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes"  access="global" controller="ReferralMobilityController" >
+    <aura:attribute name="isKeyPressedisKeyPressed" type="boolean" default="false" />
+    <aura:attribute name="showGrid" type="boolean" default="false" />
+    <aura:attribute name="addReferrelGrid" type="boolean" default="false" />
+    <aura:attribute name="disableProceed" type="boolean" default="false" />
+    <aura:attribute name="emptyResult" type="boolean" default="false" />
+    <aura:attribute name="referrarMobile" type="string" default=""/> 
+    <aura:attribute name="MobileReferral" type="String" default=""/> 
+    <aura:attribute name="SelectedContact" type="String" default=""/> 
+    <aura:attribute name="counter" type="String" default="Referral1"/>   
+    <aura:attribute name="leadList" type="lead[]"/>
+    <aura:attribute name="lead" type="lead"/>
+    <aura:attribute name="User" type="User" default="{'sobjectType': 'User'}" />
+    <aura:attribute name="referralNumber" type="Integer" default="0" />
+    <aura:attribute name="contacts" type="Object[]" />
+    <aura:attribute name="contactRecord" type="Object"  default="{'sobjectType': 'Object'}"/> 
+    <aura:attribute name="selectedContactRecord" type="Object"  default="{'sobjectType': 'Object'}"/> 
+    <!--Register Events-->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <!--handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-size--1-of-1">
+        <!-- contact search -->
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+            <div class="slds-text-heading_small"> Referred By : </div>
+            <p class="slds-p-horizontal_small  slds-theme_shade">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <div style="float:left;display:inline">
+                                
+                                <lightning:input messageWhenValueMissing="Please Enter Value"  aura:id="referrarMobile" required='true' label="Mobile Number" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile Number" maxlength="10" value="{!v.referrarMobile}" name="referrarMobile" placeholder="Enter Mobile Number" />                                 
+                                
+                            </div>
+                        </div>
+                        <div style="float:left;display:inline;margin-top:20px;margin-left:30px">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:search" variant="brand" label="Search"  onclick="{!c.searchReferrar}" />
+                        </div>
+                    </div>
+                </div>
+                
+            </p>
+            
+        </lightning:card>
+    </div>
+    <aura:if isTrue="{!v.emptyResult}">
+        
+        <lightning:card title="No Records Found" class="applyMarginToCard slds-section-title--divider "/>
+        
+    </aura:if>
+    <!-- Contact display table-->
+    <aura:if isTrue="{!v.showGrid}">
+        
+        <div class="slds-grid slds-wrap  slds-grid_align-center slds-size--1-of-1" align="center" style="float:centre; background-color:red">
+            <table id="referralList" class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--1-of-1">    
+                <thead class="slds-grid slds-hyphenate">
+                    <tr class="slds-grid slds-hyphenate slds-size--1-of-1 ">
+                        <th class=" WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate  " style="margin-left:0px;padding-top:10px "><div class="slds-checkbox_add-button" style="margin-top:5px">
+                            <input type="checkbox"  disabled="true" class="slds-assistive-text " id="add-checkbox-40" value="add-checkbox-40" />
+                            <label for="add-checkbox-40" style="
+                                                                width: 16.988636px;
+                                                                height: 16.988636px;
+                                                                " class="slds-checkbox_faux slds-align_absolute-center">
+                                <span class="slds-assistive-text "></span>
+                            </label>
+                            </div>
+                        </th>
+                        <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left" style="text-align:center">Customer Name
+                        </th>
+                        
+                        <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right" style="padding-left:0px;padding-right:0px;margin-left:0px; text-align:center">Mobile</th>
+                        <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right" style="padding-left:0px;padding-right:0px;margin-left:0px ;text-align:center">SFDC ID
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="slds-grid slds-wrap WrapText">
+                    
+                    <aura:iteration items="{!v.contacts}" var="contact">
+                        <tr class=" floatLeft slds-grid slds-hyphenate slds-size--1-of-1 slds-border_top slds-border_bottom slds-border_left slds-hyphenate ">
+                            <td class="floatLeft WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right border_left  slds-hyphenate slds-align_absolute-center"><div class="" style="margin-left:5px;" ><input type="checkbox" value="{!contact.contObj.Id}" Name="chk" class="account-name" onchange="{!c.enableProceed}"/></div></td>
+                            <td class="floatLeft WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right border_left  slds-hyphenate"><div class="" title="{!contact.Name}">{!contact.contObj.Name}</div></td>
+                            <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right border_left slds-hyphenate" style="padding-left:0px;padding-right:0px;margin-left:0px"><div class="" title="{!contact.mobile__c}">{!contact.contObj.Mobile__c}</div></td>
+                            <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_rightborder_left  slds-hyphenate" style="padding-left:0px;padding-right:0px;margin-left:0px" ><div class="" title="">{!contact.appObj.Loan_Application__r.Loan_Application_Number__c}</div></td>            
+                            
+                        </tr> 
+                    </aura:iteration> 
+                </tbody>
+            </table>
+        </div>
+        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-grid_align-center slds-size--1-of-1" align="center" style="float:centre">
+            <div class="slds-p-around--x-small" align="center">
+                <lightning:button class="slds-theme_alt-inverse" aura:id="proceedButton" disabled="{!v.disableProceed}"  variant="brand" label="Proceed" onclick="{!c.createFirstPanel}" />
+                 <aura:if isTrue="{!$Browser.isIPhone}">
+    					<div id="{!v.referralNumber}"></div>
+    		</aura:if>
+            </div>
+        </div>
+        
+    </aura:if>
+    
+    <!-- Adding new referral section on clcik of add or proceed button-->
+    <aura:if isTrue="{!v.addReferrelGrid}">
+        <div class="slds-box slds-size--1-of-1" id="referralAdd" style="overflow: auto;" onclick="{!c.callFocus}">
+            <aura:iteration items="{!v.leadList}"  var="lead" indexVar="index">
+                
+                <c:ReferralNewAddSection aura:id="referralCompList" leadList="{!v.leadList}" lead="{!lead}" User="{!v.User}"  rowIndex="{!index}" referralNumber="{!index}" />
+            </aura:iteration>
+            <div class="slds-grid slds-wrap slds-grid--pull-padded  slds-grid_align-center" align="center" style="float:centre">
+                <div class="slds-p-around--x-small" align="center">
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:add" variant="brand" label="Add" onclick="{!c.addNewRow}" />
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="resetButtonId" iconName="utility:clear" variant="brand" label="Remove" onclick="{!c.RemoveRow}"/>
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="SaveLead" iconName="utility:save" variant="brand" label="Save" onclick="{!c.SaveLead}"/>
+                </div>
+            </div>   
+        </div>                
+    </aura:if>
+</aura:component>

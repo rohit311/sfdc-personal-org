@@ -1,0 +1,102 @@
+<aura:component access="global" controller="SFDCMobilePOController">
+    
+    <aura:attribute name="po" type="Product_Offerings__c"/>
+    <aura:attribute name="kyc" type="eKYC__c"/>
+    <aura:attribute name="uploadedAttachments" type="ContentVersion[]"/>
+    <!-- PSL changes : Nikhil Bugfix #11766 -->
+    <aura:attribute name="offer" type="SFDCMobilePOUtility.OfferDetails" default="{}"/>
+    <aura:attribute name="showCPV" type="Boolean" default="false"/><!-- Bug 15855 - Hemant Keni-->
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.getDetails}"/>
+    <aura:handler event="c:DocumentUploadEvent" action="{!c.showUploadedDocs}"/>
+    <!-- PSL changes : Nikhil Bugfix #11766 -->
+    <aura:handler event="c:LoanConversionEvent" action="{!c.setOfferConverted}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <div class="doc-container">
+        <ui:scrollerWrapper class="doc-wrapper">
+            <c:Offer_Details />
+            <div class="slds-box slds-box--small alert">
+                <strong>Please note:</strong> Maximum attachment size should be 5 MB per file.
+            </div>
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Medical registration certificate/degree certificate</strong>
+                <c:DocumentUploader aura:id="file-uploader-1" parentId="{!v.po.Id}" instance="1" fileName="Medical_Certificate" uploadType="attachment"/>
+            </div>
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Banking </strong>
+                <c:DocumentUploader aura:id="file-uploader-2" parentId="{!v.po.Id}" instance="2" fileName="Bank_Statement" uploadType="attachment"/>
+            </div>
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Identity Proof</strong>
+                <c:DocumentUploader aura:id="file-uploader-3" parentId="{!v.po.Id}" instance="3" fileName="Id_Proof" uploadType="attachment"/>
+            </div>
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Address Proof</strong>
+                <c:DocumentUploader aura:id="file-uploader-4" parentId="{!v.po.Id}" instance="4" fileName="Address_Proof" uploadType="attachment"/>
+            </div>
+            <div class="slds-box slds-box--small slds-m-top--small">
+                <strong>Uploaded Documents</strong>
+                <div aura:id="uploadedDocs" class="slds-p-around--medium slds-hide">
+					<!-- PSL changes : Nikhil Bugfix #11891 : Removed table, added grid structure -->
+                    <div class="slds-grid slds-has-divider--top">
+                        <div class="slds-col slds-size--2-of-12">Action</div>
+                        <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Name</div>
+                        <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">Created Date</div>
+                    </div>
+                    <aura:iteration items="{!v.uploadedAttachments}" var="obj">
+                        <div class="slds-grid slds-has-divider--top">
+                            <div class="slds-col slds-size--2-of-12 slds-text-align--center">
+								<lightning:buttonIcon class="del-btn" aura:id="del-btn" iconName="utility:delete" variant="bare" alternativeText="Delete Attachment." value="{!obj.ContentDocumentId}" onclick="{!c.deleteAttachment}"/>
+                            </div>
+                            <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left">{!obj.Title}</div>
+                            <div class="slds-col slds-m-left--xx-small slds-size--5-of-12 slds-hyphenate slds-border--left"><ui:outputDateTime value="{!obj.CreatedDate}"/></div>
+                        </div> 
+                    </aura:iteration>
+                </div>
+            </div>
+            <div aura:id="kycSection" class="slds-box slds-box--small slds-m-top--small">
+                <strong>Ekyc Link :</strong><span class="slds-m-left--small"/><lightning:button variant="brand" label="View Ekyc" value="{!v.kyc.Id}" onclick="{!c.viewEkyc }"/>
+            </div>
+            <!-- Bug 15855 S - Commented by hemant keni
+			<div class="slds-box slds-box-small slds-m-top-small">
+                <strong>Premise Pictures</strong>
+                <c:DocumentUploader aura:id="file-uploader-5" parentId="{!v.po.Id}" instance="5" fileName="Premise_Picture" uploadType="feed"/>
+            </div>
+			Bug 15855 E -->
+			<!-- Bug 15855 S - Added CPV Link -->
+            <div class="slds-accordion__list-item">
+                <section class="slds-accordion__section">
+                    <div class="slds-accordion__summary">
+                        <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                            <div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection3">
+                                <b><span id="cpvIcon" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                <span class="slds-truncate" title="Accordion summary">Click here for CPV</span>
+                            </div>
+                        </h3>
+                    </div>
+                   
+                     <div aria-hidden="true" class="slds-hide" aura:id="cpvContent">
+                         
+                         <!--<c:VerificationImageUpload loanApplicationId="{!v.po.Id}" parentObj="PO"  />-->
+                         <div class="slds-modal__content slds-p-around_medium" aura:id="verificationDiv">
+							
+						</div>
+                         <br/><br/><br/>
+                        
+                    </div>
+                </section>
+            </div>
+            
+  			 </ui:scrollerWrapper>
+     
+          
+    </div>
+    
+    <div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we process the document"/>
+    </div>
+   
+</aura:component>

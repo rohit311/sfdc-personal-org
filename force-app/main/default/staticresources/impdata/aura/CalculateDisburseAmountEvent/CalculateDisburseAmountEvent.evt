@@ -1,0 +1,1 @@
+<aura:event type="APPLICATION" description="event to trigger calculation of disbursement amount after adding insurance and fetcnhing fees and charges." />

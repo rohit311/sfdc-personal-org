@@ -1,0 +1,56 @@
+<aura:component controller="LighteningUtilities" access="global">
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="allDocs" type="SObject[]" />
+    <aura:attribute name="attachmentUrl" type="String" default="https://bflhts--Partial.cs72.my.salesforce.com/servlet/servlet.FileDownload?file="/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute name="prefixURL" type="String" default="/sfc/servlet.shepherd/version/download/"/>
+    <c:GenericBackCmp/>
+    <lightning:button class="slds-m-top_small slds-align_absolute-center slds-theme--alt-inverse" iconName="utility:download" variant="brand" label="Download All" onclick="{! c.downloadAll }" />
+    <div class="slds-align_absolute-center slds-grid slds-wrap slds-grid--pull-padded">
+        <aura:iteration items="{!v.allDocs}" var="obj">
+            <div class="slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-size--3-of-12 slds-col slds-box slds-box_x-small slds-m-top_medium slds-m-right_medium " >
+                <div class="slds-align_absolute-center">
+                    <p class=" title">{!obj.cvData.Title}</p>
+                    <a href="{!'/sfc/servlet.shepherd/version/download/'+obj.cvData.Id}" target="_blank" ><lightning:icon iconName="utility:download" size="small" ></lightning:icon></a>
+                </div>
+                <a onclick="{!c.openPop}" name="{!obj.cvData.Id}"  >
+                    <aura:if isTrue="{!obj.cvData.FileType == 'UNKNOWN' || obj.cvData.FileType == 'PNG' || obj.cvData.FileType == 'JPG' || obj.cvData.FileType == 'JPEG' || obj.cvData.FileType == 'PDF'}"> 
+                        <!--<img src="{!v.prefixURL+obj.cvData.Id}" />-->
+                        <img class="slds-align_absolute-center" src="{!$Resource.ImagePreview+'/preview-image.png'}" />
+                        <aura:set attribute="else">
+                            <img class="slds-align_absolute-center" src="{!$Resource.ImagePreview+'/no-preview-image.png'}" />
+                        </aura:set>
+                    </aura:if>
+                    
+                </a>
+            </div>
+        </aura:iteration>
+
+    </div>
+    
+    
+    <section aura:id="pop" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="modalContent slds-modal slds-modal_large slds-fade-in-open slds-hide slds-align_absolute-center">
+        <div class="slds-modal__container" >
+            <header class="slds-modal__header mobHeader">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <a onclick="{!c.closePop}" href="" style="text-decoration: none;">
+                        <lightning:icon iconName="utility:close" variant="inverse"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </a>
+                </button>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1" >
+                <div aura:id="iframeHolder">
+                    
+                </div>
+            </div>
+            <footer class="slds-modal__footer mobFooter">
+            </footer>
+        </div>
+        
+    </section>
+    <div aura:id="backdrop" class="slds-backdrop slds-backdrop_open slds-hide"></div>
+    
+</aura:component>

@@ -1,0 +1,31 @@
+.THIS th{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+.THIS .wrap{
+    text-align:center
+}
+.THIS .left{
+    float: left;
+}
+.THIS .right{
+    float: right;
+}
+.THIS .center{
+    margin:0 auto;
+   display:inline-block
+}
+.THIS .WrapText
+{
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    -ms-hyphens: auto !important;
+   -moz-hyphens: auto !important;
+}
+
+.THIS .important-message {
+    font-weight: bold;
+    font-size: 170%;
+}

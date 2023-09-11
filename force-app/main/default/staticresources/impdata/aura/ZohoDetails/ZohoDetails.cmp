@@ -1,0 +1,183 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" controller="ZohoDetailsController" access="global" >
+    
+
+    <!-- PAGE HEADER -->
+    <lightning:layout class="slds-page-header slds-page-header--object-home">
+        <lightning:layoutItem >
+            <lightning:icon iconName="standard:scan_card" />
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+            <div class="page-section page-header">
+                <h1 class="slds-text-heading--label">Zoho Ticket Details</h1>
+                
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <!-- / PAGE HEADER -->
+
+    
+	<!--<aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>
+    <aura:attribute name="isDoneRendering" type="Boolean" default="false"/>-->
+    <aura:registerEvent name="showToast" type="force:showToast" />
+    <aura:attribute name="product" type="String" default=''/>        
+    <aura:attribute name="item" type="String" default=''/>
+    <aura:attribute name="subject" type="String" default=''/>
+    <aura:attribute name="Description" type="String" default=''  />
+    <aura:attribute name="attch" type="String" default=''  />
+    <aura:attribute name="fileContent" type="Blob" default='' />
+    <aura:attribute name="taskid" type="string" default='' />
+    <aura:attribute name="zoho_logid" type="string" default='' />
+	<aura:attribute name="errormsg" type="string" default='' />
+    <!-- NEW Zoho Details FORM -->
+    <lightning:layout >
+        <lightning:layoutItem padding="around-small" >
+            <div aria-labelledby="newticketform">
+                    <form >  
+                        
+                        <div class="slds-form slds-form_stacked">
+                          <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <label class="slds-form-element__label" >Product*</label>
+                            <div class="slds-form-element__control">
+                           <ui:inputSelect required="true"   blur="{!c.ValidateCmp}"   aura:id="productId" value="{!v.product}" class="slds-select" >
+                                       <ui:inputSelectOption text="" label="--None--" />
+                                        <ui:inputSelectOption text="Business Loan" label="Business Loan"  />
+                                        <ui:inputSelectOption text="Professional Loan" label="Professional Loan"  />
+                                      <ui:inputSelectOption text="Mortgage Loan-Salaried" label="Mortgage Loan-Salaried"  />
+                                        <ui:inputSelectOption text="Mortgage Loan-Self-Employed" label="Mortgage Loan-Self-Employed"  />
+                                      <ui:inputSelectOption text="Insurance" label="Insurance"  />
+                                        <ui:inputSelectOption text="Salaried Loans" label="Salaried Loans"  />
+                                      <ui:inputSelectOption text="RM" label="RM"  />                                                                
+                                    </ui:inputSelect>
+                              </div>
+                          </div>                      
+                                                 
+                          <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <label class="slds-form-element__label" >Item*</label>
+                            <div class="slds-form-element__control">
+                           <ui:inputSelect blur="{!c.ValidateCmp}" required="true" aura:id="itemId" value="{!v.item}"   class="slds-select"  >
+                                       <ui:inputSelectOption text="" label="--None--"   />
+                                        <ui:inputSelectOption text="Addition of value in dropdown"  label="Addition of value in dropdown" />
+                                    <ui:inputSelectOption text="Authorization required error" label="Authorization required error"  />
+                                    <ui:inputSelectOption text="Branch/City code updation for new branches" label="Branch/City code updation for new branches"  />
+                                    <ui:inputSelectOption text="Bug in Access Right" label="Bug in Access Right"  />
+                                    <ui:inputSelectOption text="Bug in Case Approval" label="Bug in Case Approval" />
+                                    <ui:inputSelectOption text="Bug in Ownership assignment" label="Bug in Ownership assignment" />
+                                    <ui:inputSelectOption text="Cibil issue -application" label="Cibil issue -application" />
+                                    <ui:inputSelectOption text="Cibil issue -salesforce" label="Cibil issue -salesforce"  />
+                                    <ui:inputSelectOption text="Cibil report not available" label="Cibil report not available" />
+                                    <ui:inputSelectOption text="Customer not able to submit online application" label="Customer not able to submit online application"  />
+                                    <ui:inputSelectOption text="Data changes required" label="Data changes required"  />
+                                    <ui:inputSelectOption text="Dedupe issue -application" label="Dedupe issue -application"  />
+                                    <ui:inputSelectOption text="Dedupe issue -salesforce" label="Dedupe issue -salesforce"  />
+                                    <ui:inputSelectOption text="Email alert changes" label="Email alert changes"  />
+                                    <ui:inputSelectOption text="Email not being received"  label="Email not being received" />
+                                    <ui:inputSelectOption text="Enhancement" label="Enhancement"  />
+                                    <ui:inputSelectOption text="Export report access required"  label="Export report access required" />
+                                    <ui:inputSelectOption text="Field update changes" label="Field update changes"  />
+                                    <ui:inputSelectOption text="FinnOne flow" label="FinnOne flow" />
+                                    <ui:inputSelectOption text="Issue in accessing the loan application" label="Issue in accessing the loan application" />
+                                    <ui:inputSelectOption text="Issue in approving the case" label="Issue in approving the case"/>
+                                    <ui:inputSelectOption text="Issue in eligibility" label="Issue in eligibility"  />
+                                    <ui:inputSelectOption text="Issue in PO conversion" label="Issue in PO conversion"  />
+                                    <ui:inputSelectOption text="Not able to login in SFDC" label="Not able to login in SFDC"   />
+                                    <ui:inputSelectOption text="Not able to submit application Credit/Sales/Ops"  label="Not able to submit application Credit/Sales/Ops"  />
+                                    <ui:inputSelectOption text="Other Bug" label="Other Bug"  />
+                                    <ui:inputSelectOption text="Other Requests" label="Other Requests"   />
+                                    <ui:inputSelectOption text="Report access required" label="Report access required"  />
+                                    <ui:inputSelectOption text="Request for ACM/RCM mapping"  label="Request for ACM/RCM mapping" />
+                                    <ui:inputSelectOption text="Technical Error"  label="Technical Error"  />
+                                    <ui:inputSelectOption text="User ID activation/deactivation" label="User ID activation/deactivation"  />
+                                    <ui:inputSelectOption text="User ID creation" label="User ID creation"  />
+                                    <ui:inputSelectOption text="User manager mapping" label="User manager mapping"  />
+                                    <ui:inputSelectOption text="User modification" label="User modification"  />
+                                    <ui:inputSelectOption text="User not receiving OTP" label="User not receiving OTP" />
+                                    <ui:inputSelectOption text="User password reset" label="User password reset"  />
+                                    <ui:inputSelectOption text="Workflow changes" label="Workflow changes"  />
+
+                                    </ui:inputSelect>
+                          </div>
+                         </div>                       
+                         
+                          <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <label class="slds-form-element__label" >Subject*</label>
+                            <div class="slds-form-element__control">
+                               
+                                      <ui:inputText blur="{!c.ValidateCmp}" required="true" maxlength="255" aura:id="subjectId" class="slds-input" value="{!v.subject}"/>
+                         
+                              </div>
+                          </div>                                             
+                        
+                          <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                            <label class="slds-form-element__label" >Description*</label>
+                            <div class="slds-form-element__control">
+                                   <ui:inputTextArea blur="{!c.ValidateCmp}" required="true" class="slds-textarea" aura:id="descId"   value="{!v.Description}"  />
+                          
+                              </div>
+                          </div>
+                         
+                              
+                          <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">                        
+                            <div class="slds-form-element__control">
+                                
+                                <div class="slds-file-selector slds-file-selector--files">
+                                <div class="slds-file-selector__dropzone">
+                                    <input type="file"  aura:id="file-upload-input" id="file-upload-input" class="slds-file-selector__input slds-assistive-text" aria-describedby="file-selector-id" onchange="{!c.handleUploadFinished }" />
+                                    <label class="slds-file-selector__body" for="file-upload-input">
+                                        <span class="slds-file-selector__button slds-button slds-button--neutral inputSelector" >
+                                            <lightning:icon iconName="utility:upload" size="xx-small" alternativeText="Upload File" class="slds-p-right--small uploader"/>
+                                        Choose File
+                                    </span>
+                                    <ui:outputText aura:id="file-name" class="slds-file-selector__text slds-truncate docNameLong" value="No file chosen"/>
+                                </label>
+                            	</div>
+                				</div>
+                                
+                                
+                                   <!--<lightning:input type="file" label="Attachment" aura:id="fileContentId" name="fileContent" multiple="true" accept=".pdf,.png,.zip,.jpg,.txt" value="{!v.fileContent}" onchange="{!c.handleUploadFinished }"/>
+-->                              
+</div>  
+                          </div>   
+                         </div> 
+                        <div align = "center">
+                            <lightning:button aura:id="submitBtn" label="Create Ticket" class="slds-m-top--medium slds-button" variant="brand" onclick="{!c.clickCreate}" />
+                        </div>
+                    </form>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <div aura:id="customToastSuccess" class="slds-notify_container slds-hide">
+        <div class="slds-notify slds-notify--alert slds-theme_success" role="alert">
+            <span class="slds-assistive-text">Success</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small slds-wrap">
+                        <!--Task Id:<a href="{!'/'+v.taskid}"> {!v.taskid} </a> and  Request created successfully. Please note ZOHO WorkLog Id :{!v.zoho_logid} for your reference.-->
+                        Your ZOHO Id {!v.zoho_logid} has been successfully created.                        
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div aura:id="customToastError" class="slds-notify_container slds-hide">
+        <div class="slds-notify slds-notify--alert slds-theme_error" role="alert">
+            <span class="slds-assistive-text">Error</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small slds-wrap">
+                       Some error occurred. Please try Later.
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

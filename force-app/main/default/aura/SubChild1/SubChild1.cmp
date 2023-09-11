@@ -1,0 +1,11 @@
+<aura:component >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="num" type="Integer" default="0"/>
+    <aura:attribute name="title" type="String" default="SubChild1"/>
+    <aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>
+    <aura:handler name="change" value="{!v.num}" action="{!c.valueChanged}"/>
+
+    <div>SubChild1
+	<ui:button aura:id="button" label="Plus1" press="{!c.update}"/>totalClicks={!v.num}
+    </div>
+</aura:component>

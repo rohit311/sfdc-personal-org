@@ -1,0 +1,28 @@
+<template>
+    <!--<lightning-card title="ApexWireMethodToProperty" icon-name="custom:custom63">
+        
+        Search Contacts : <lightning-input label="Name" value={contactName} onchange={fetchContacts}></lightning-input>
+        <div class="slds-m-around_medium">
+            <template if:true={contacts.data}>
+                <template for:each={contacts.data} for:item="contact">
+                    <p key={contact.Id}>{contact.Name}</p>
+                </template>
+            </template>
+            <template if:true={contacts.error}>
+            </template>
+        </div>
+    </lightning-card> -->
+    <lightning-card>
+        <template if:true={contacts.data}>
+            <lightning-datatable
+                key-field="Id"
+                data={contacts.data}
+                columns={columns}
+            >
+           </lightning-datatable>
+        </template>
+        <template if:true={errors}>
+            <p>{errors}</p>
+        </template>
+    </lightning-card>
+</template>

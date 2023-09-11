@@ -1,0 +1,2410 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:attribute type="CIBIL_Extension__c" name="cibilext"/>
+    <aura:attribute type="Cibil_Extension1__c" name="cibilext1"/>
+    <aura:attribute type="CIBIL__c" name="objCIBIL"/>
+    
+    
+    <lightning:accordionSection  name="Account Information(29)" label="Account Information(29)">
+                                                <div class="slds-grid slds-wrap">
+                                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                                        <thead></thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Member28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Member28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Account Type28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Account_Type28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr> 
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Ownership28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Ownership28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Account Info28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Account_Info28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Days Past Due28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Days_Past_Due28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr> 
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Date Opened28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Date_Opened28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>		                                                   
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Date Last Payment28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Date_Last_Payment28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Date Closed28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Date_Closed28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Sanction Amount28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Sanction_Amount28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Current Balance28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Current_Balance28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Date Reported28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Date_Reported28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Amount Overdue28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Amount_Overdue28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Suit Filed Status28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Suit_Filed_Status28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Actual payment28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Actual_payment28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Cash Limit28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Cash_limit28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>                                                              
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Collateral Type28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Collateral_Type28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr> 
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Collateral Value28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Collateral_Value28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Credit Limit28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Credit_Limit28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Date Reported and Certified28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Date_Reported_Certified28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="EMI28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.EMI28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Interest rate28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Interest_rate28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Payment Frequency28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Payment_Frequency28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Repayment Tenure28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Repayment_tenure28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Settlement28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Settlement28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Written Off (principal)28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Written_Off_principal28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Written Off and settled status28"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext1.Written_Off_and_settled_status28__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Payment History Start Date29"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Payment_History_Start_Date29__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>
+                                                            <tr>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">
+                                                                        <ui:outputText value="Payment History End Date29"/>
+                                                                    </div>
+                                                                </th>
+                                                                <th>    
+                                                                    <div class="slds-col slds-size_6-of-12">       
+                                                                        <ui:outputText value="{!v.cibilext.Payment_History_End_Date29__c}"/>
+                                                                    </div>
+                                                                </th>    
+                                                            </tr>                                                               
+                                                        </tbody>             
+                                                    </table>
+                                                </div>
+                                            </lightning:accordionSection>
+    <lightning:accordionSection  name="Account Information(30)" label="Account Information(30)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Account Type29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Account_Type29__c}"/>
+                            </div>
+                        </th>    
+                    </tr> 
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Ownership29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Ownership29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Account Info29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Account_Info29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Days Past Due29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Days_Past_Due29__c}"/>
+                            </div>
+                        </th>    
+                    </tr> 
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date Opened29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_Opened29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>		                                                   
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date Last Payment29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_Last_Payment29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date Closed29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_Closed29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Sanction Amount29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Sanction_Amount29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Current Balance29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Current_Balance29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date Reported29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_Reported29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Amount Overdue29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Amount_Overdue29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Suit Filed Status29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Suit_Filed_Status29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Actual payment29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Actual_payment29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Cash Limit29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Cash_limit29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>                                                              
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Collateral Type29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Collateral_Type29__c}"/>
+                            </div>
+                        </th>    
+                    </tr> 
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Collateral Value29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Collateral_Value29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Credit Limit29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Credit_Limit29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date Reported and Certified29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Date_Reported_Certified29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="EMI29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.EMI29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Interest rate29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Interest_rate29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Payment Frequency29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Payment_Frequency29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Repayment Tenure29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Repayment_tenure29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Settlement29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Settlement29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Written Off (principal)29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Written_Off_principal29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Written Off and settled status29"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext1.Written_Off_and_settled_status29__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Payment History Start Date30"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Payment_History_Start_Date30__c}"/>
+                            </div>
+                        </th>    
+                    </tr>
+                    <tr>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Payment History End Date30"/>
+                            </div>
+                        </th>
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Payment_History_End_Date30__c}"/>
+                            </div>
+                        </th>    
+                    </tr>                                                               
+                </tbody>             
+            </table>
+        </div>
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(1)" label="Enquiry Details(1)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name1"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name1__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>   
+     <lightning:accordionSection  name="Enquiry Details(2)" label="Enquiry Details(2)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name2"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name2__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry1"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry1__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose1"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose1__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount1"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount1__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(3)" label="Enquiry Details(3)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name3"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name3__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry2"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry2__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose2"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose2__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount2"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount2__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(4)" label="Enquiry Details(4)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name4"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name4__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry3"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry3__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose3"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose3__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount3"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount3__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+     <lightning:accordionSection  name="Enquiry Details(5)" label="Enquiry Details(5)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name5"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name5__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry4"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry4__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose4"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose4__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount4"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount4__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(6)" label="Enquiry Details(6)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name6"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name6__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry5"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry5__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose5"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose5__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount5"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount5__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(7)" label="Enquiry Details(7)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name7"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name7__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry6"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry6__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose6"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose6__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount6"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount6__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+     <lightning:accordionSection  name="Enquiry Details(8)" label="Enquiry Details(8)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name8"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name8__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry7"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry7__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose7"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose7__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount7"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount7__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(9)" label="Enquiry Details(9)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name9"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name9__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry8"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry8__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose8"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose8__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount8"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount8__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(10)" label="Enquiry Details(10)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name10"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name10__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry9"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry9__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose9"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose9__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount9"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount9__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(11)" label="Enquiry Details(11)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name11"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name11__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry10"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry10__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose10"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose10__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount10"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount10__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(12)" label="Enquiry Details(12)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name12"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name12__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry11"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry11__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose11"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose11__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount11"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount11__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(13)" label="Enquiry Details(13)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name13"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name13__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry12"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry12__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose12"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose12__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount12"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount12__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(14)" label="Enquiry Details(14)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name14"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name14__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry13"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry13__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose13"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose13__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount13"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount13__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(15)" label="Enquiry Details(15)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name15"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name15__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry14"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry14__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose14"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose14__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount14"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount14__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(16)" label="Enquiry Details(16)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name16"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name16__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry15"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry15__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose15"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose15__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount15"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount15__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(17)" label="Enquiry Details(17)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name17"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name17__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry16"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry16__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose16"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose16__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount16"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount16__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(18)" label="Enquiry Details(18)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name18"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name18__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry17"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry17__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose17"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose17__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount17"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount17__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+     <lightning:accordionSection  name="Enquiry Details(19)" label="Enquiry Details(19)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name19"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name19__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry18"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry18__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose18"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose18__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount18"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount18__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(20)" label="Enquiry Details(20)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name20"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Member_Name20__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry19"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Date_of_Enquiry19__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose19"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Purpose19__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount19"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.objCIBIL.Enquiry_Amount19__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(21)" label="Enquiry Details(21)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name21"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name21__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry20"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry20__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose20"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose20__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount20"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount20__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(22)" label="Enquiry Details(22)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name22"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name22__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry21"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry21__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose21"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose21__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount21"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount21__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(23)" label="Enquiry Details(23)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name23"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name23__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry22"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry22__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose22"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose22__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount22"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount22__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(24)" label="Enquiry Details(24)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name24"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name24__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry23"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry23__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose23"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose23__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount23"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount23__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(25)" label="Enquiry Details(25)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name25"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name25__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry24"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry24__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose24"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose24__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount24"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount24__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(26)" label="Enquiry Details(26)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name26"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name26__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry25"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry25__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose25"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose25__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount25"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount25__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(27)" label="Enquiry Details(27)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name27"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name27__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry26"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry26__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose26"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose26__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount26"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount26__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(28)" label="Enquiry Details(28)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name28"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name28__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry27"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry27__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose27"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose27__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount27"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount27__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(29)" label="Enquiry Details(29)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name29"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name29__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry28"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry28__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose28"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose28__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount28"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount28__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+    <lightning:accordionSection  name="Enquiry Details(30)" label="Enquiry Details(30)">
+        <div class="slds-grid slds-wrap">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Member Name30"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Member_Name30__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Date of Enquiry29"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Date_of_Enquiry29__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Purpose29"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Purpose29__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th> 
+                            <div class="slds-col slds-size_6-of-12">
+                                <ui:outputText value="Enquiry Amount29"/>
+                            </div>
+                        </th> 
+                        <th>    
+                            <div class="slds-col slds-size_6-of-12">       
+                                <ui:outputText value="{!v.cibilext.Enquiry_Amount29__c}"/>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>    
+            </table>    
+        </div>    
+    </lightning:accordionSection>
+</aura:component>

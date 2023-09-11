@@ -1,0 +1,34 @@
+<aura:component >
+    <!-- Declare attributes -->
+    <aura:attribute name="record" type="sObject" description="This stores reference to the selected sObject record"/>
+    
+    <!-- Register the component level event to store reference to the selected record -->
+    <aura:registerEvent name="SelectedRecordEvent" type="c:SelectedRecordEvent" description="This event is fired after selecting sObject record"/>
+    
+    <!-- Start - SAL Mobility Flow -->
+    <aura:attribute name="isSALMobilityFlow" type="boolean" default="false"/>
+    <aura:attribute name="ObjectName" type="String" description="Used to store lookup object name"/>
+    <!-- End - SAL Mobility Flow -->
+    
+    <!-- Start of list to display sObject records -->
+    <li role="presentation">
+        <span class="slds-lookup__item-action slds-media slds-media--center" id="lookup-option-350" role="option">
+         	<div class="slds-media__body">
+                <div class="slds-input-has-icon slds-input-has-icon--right">
+                    <c:SVG class="slds-input__icon" xlinkHref="{!$Resource.SLDSv2 + '/assets/icons/standard-sprite/svg/symbols.svg#account'}" />                   
+                    <div class="slds-lookup__result-text WrapText">
+                        <a onclick="{!c.selectRecord}">
+                        	<aura:if isTrue="{!and(v.isSALMobilityFlow, v.ObjectName == 'Referral__c')}" >
+                                {!v.record.Branch_Master__r.Name + ' - ' + v.record.Name}
+                                <aura:set attribute="else">
+                                    {!v.record.Name}
+                                </aura:set>
+                            </aura:if>
+                        </a>
+                    </div>
+                </div>
+         	</div>    
+        </span>
+    </li>
+    <!-- End of list to display sObject records -->
+</aura:component>

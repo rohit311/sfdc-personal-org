@@ -1,0 +1,232 @@
+<aura:component controller="SALMobilityCntrl_V2"  implements="forceCommunity:availableForAllPageTypes" access="GLOBAL">
+        <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+        <aura:attribute name="oppId" type="Id" default=""/>
+     <aura:attribute name="finAppl" type="Applicant__c"/>
+     <aura:attribute name="finApplCon" type="Contact"/>
+	<aura:attribute name="allVeriList" type="Verification__c[]"/> 
+    <aura:attribute name="sanctionList" type="Discrepancy__c[]"/>
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="dedupeObj" type="De_Dupe__c"/>
+    <aura:attribute name="primaryApp" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="Accobj" type="Account" />
+    <aura:attribute name="conObj" type="Contact" />
+       <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+ <aura:attribute name="Oppobj" type="Opportunity" default="" />
+
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/>
+       <c:GenericBackCmp/>
+    <div class="slds-align_absolute-center" style="width: 50%; align: center;">
+    <table style="border-style: groove;" class=" slds-hyphenate  slds-size--12-of-12 slds-wrap" aura:id="uploadedDocs">    
+        <thead  class="slds-grid slds-hyphenate slds-wrap">
+             <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Approved loan amount
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.camObj.Proposed_Loan_Amt__c}
+                 </th>
+            </tr>
+             <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                     Approved tenor in month
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.camObj.Tenor__c}
+                 </th>
+            </tr>
+             <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Approved Rate
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.camObj.ROI__c}
+                 </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Unsecured FOIR
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    {!v.camObj.Unsecured_FOIR__c	}
+                    
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Final FOIR
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    {!v.camObj.Final_FOIR__c}
+                    
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Scheme
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.Oppobj.Scheme_Master__r.Name}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    POS
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.Oppobj.POS__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Perfios type
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.bankObj.Source_Of_Data__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    DPD Cluser Segment
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                {!v.cibilTemp.DPD_cluster_Segment__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    CIBIL score
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                                {!v.primaryApp.CIBIL_Score__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Risk Segment
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                                {!v.primaryApp.Risk_Segmentation__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    EPFO Status
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    {!v.primaryApp.EPFO_Result__c} 
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Office mail confirmation
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                 <aura:if isTrue="{!v.primaryApp.Office_Email_Id_Verified__c}">
+                     Yes
+                    <aura:set attribute="else">
+                        No
+                     </aura:set>
+                    </aura:if>
+
+                   
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Domain Status
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                      {!v.primaryApp.Domain_Check_Result__c} 
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Salary credited dates
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                                 {!v.bankObj.Salary_Credit_Date1__c} ,  {!v.bankObj.Salary_Credit_Date2__c} ,  {!v.bankObj.Salary_Credit_Date3__c} 
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Dedupe Status
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+            {!v.dedupeObj.Customer_Status__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Company Category
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    {!v.conObj.Employer__r.Company_Category__c}
+                    
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Company Name
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                   {!v.conObj.Employer__r.Name}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Net Income
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                   {!v.camObj.Avg_Net_Sal__c}
+                </th>
+            </tr>
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Residence Type
+                </th>
+                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+               {!v.conObj.Residence_Type__c	}
+
+                </th>
+            </tr>
+                      
+                       
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <th style="  text-decoration: underline;" class="WrapText slds-col slds-size_12-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Sanction Condition
+                </th>
+            </tr>
+                            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+
+                <th class="WrapText slds-col slds-size_12-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                	<table style=" border-style: groove;" class="slds-header  slds-hyphenate slds-table_bordered slds-wrap">
+                        <tr>
+                            <th style="text-decoration: underline;  border-style: groove;" class="slds-size--2-of-6"> Category</th>
+                               <th style="text-decoration: underline; border-style: groove;" class="slds-size--2-of-6"> Document Name</th>
+                             <th style="text-decoration: underline; border-style: groove;" class="slds-size--2-of-6" > Status</th>
+
+                        </tr>
+                       
+                    <aura:iteration items="{!v.sanctionList}" var="discr">
+                         <tr> 
+                        <td style="border-style: groove;"  class="slds-size--2-of-6  slds-wrap"> {!discr.OTPDiscrepancyCategory__c}</td>
+                        <td   class="" style="word-wrap: break-word !important;border-style: groove;"> {!discr.OTPDiscrepancyDocuments__c}</td>
+                         <td style=" border-style: groove;"  class="slds-size--2-of-6 slds-wrap">{!discr.Status__c}</td> 
+
+                        </tr>
+                    </aura:iteration>
+                    </table>
+                </th>
+            </tr>
+            
+        </thead>
+        <tbody class="slds-grid slds-wrap">
+            
+            
+        </tbody>
+    </table>
+    </div>  
+    
+    
+</aura:component>

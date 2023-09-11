@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="hashCode" type="String"/>
+    <aura:attribute name="ekycid" type="String"/>
+    <aura:attribute name="fromObj" type="String"/>
+</aura:event>

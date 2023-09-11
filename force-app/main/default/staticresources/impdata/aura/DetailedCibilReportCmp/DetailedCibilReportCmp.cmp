@@ -1,0 +1,1272 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="cibDetails" type="Object" /><!--Bug 22624 Rohit -->
+    <aura:attribute name="itrId" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    
+    <lightning:tabset selectedTabId="DetailsTab">
+        <div class="slds-size--6-of-6 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+            <lightning:tab label="Details" id="DetailsTab">            
+                <table class="slds-table slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps header" scope="col">
+                                <div class="slds-truncate" title="Data">Data</div>
+                            </th>
+                            <!--<th class="slds-text-title_caps slds-line-height_reset header" scope="col">
+                            <div class="slds-truncate" title="Count">Count</div>
+                        </th>-->
+                        </tr>    
+                    </thead> 
+                    <tbody class= "slds-size--2-of-6 slds-medium-size--1-of-6 slds-large-size--2-of-12">
+                        <tr class="slds-hint-parent">
+                            <th data-label="Ever Write-off" scope="row">                            
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize anchorCls" id="ever_write">+&nbsp;&nbsp;&nbsp;</a>
+                                    Ever Write-off
+                                </div>                            
+                                <div id="ever_write_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <aura:if isTrue="{!v.cibDetails.cibil.Cibil_Extension1__r.Ever_Write_off__c}">
+                                            <ui:outputText value="true"/>
+                                            <aura:set attribute="else">
+                                                <ui:outputText value="false"/>
+                                            </aura:set>    
+                                        </aura:if>
+                                        <!--<ui:outputCheckbox value="{!v.cibDetails.cibil.Cibil_Extension1__r.Ever_Write_off__c}"/>-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data" >
+                                
+                            </td>
+                        </tr> 
+                        <tr class="slds-hint-parent">
+                            <th data-label="First Loan Mob" scope="row">
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="First_Loan">+&nbsp;&nbsp;&nbsp;</a>
+                                    First Loan Mob
+                                </div>
+                                <div id="First_Loan_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <lightning:formattedDateTime value="{!v.cibDetails.cibil.Cibil_Extension1__r.First_Loan_MOB__c}" year="2-digit" day="2-digit" month="2-digit"/>
+                                        <!--<ui:outputDate value="{!v.cibDetails.cibil.Cibil_Extension1__r.First_Loan_MOB__c}" />-->
+                                    </center>
+                                </div>    
+                            </th>
+                            <td data-label="data">
+                                
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Latest Loan Mob" scope="row">
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Latest_loan">+&nbsp;&nbsp;&nbsp;</a>
+                                    Latest Loan Mob
+                                </div>
+                                <div id="Latest_loan_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <lightning:formattedDateTime value="{!v.cibDetails.cibil.Cibil_Extension1__r.Latest_Loan_MOB__c}" year="2-digit" day="2-digit" month="2-digit"/>
+                                        <!--<ui:outputDate value="{!v.cibDetails.cibil.Cibil_Extension1__r.Latest_Loan_MOB__c}" />-->
+                                    </center>
+                                </div>    
+                            </th>
+                            <td data-label="data">
+                                
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured ratio" scope="row">
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Unsecured_ratio">+&nbsp;&nbsp;&nbsp;</a>
+                                    Ratio of Number of unsecured loans to total Number of loans
+                                </div> 
+                                <div id="Unsecured_ratio_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_to_total_ratio__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data">
+                                
+                            </td>    
+                        </tr>  
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured ratio" scope="row">
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Max_Lifetime">+&nbsp;&nbsp;&nbsp;</a>
+                                    Max Lifetime Delinquency
+                                </div>
+                                <div id="Max_Lifetime_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Max_Lifetime_Delq__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data">
+                                
+                            </td>    
+                        </tr>
+                    </tbody>    
+                </table>
+                <br/>
+                <br/>
+                <table class="slds-table slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps header" scope="col">
+                                <div class="slds-truncate" title="Data">Data</div>
+                            </th>
+                            <!--<th class="slds-text-title_caps slds-line-height_reset header" scope="col">
+                            <div class="slds-truncate" title="Count">&nbsp;&nbsp;&nbsp;Count</div>
+                        </th>-->
+                        </tr> 
+                    </thead>
+                    <tbody class= "slds-size--2-of-6 slds-medium-size--2-of-6 slds-large-size--3-of-12">
+                        <tr class="slds-hint-parent">
+                            <th data-label="Total Amt Overdue" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub"> 
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_Amt">+&nbsp;</a>
+                                    Total Amt Overdue
+                                </div>
+                                <div id="Total_Amt_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Total_Amount_overdue__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr> 
+                        <tr class="slds-hint-parent">
+                            <th data-label="Credit Card utilization" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Credit_Card">+&nbsp;&nbsp;</a>
+                                    Credit Card utilization
+                                </div>  
+                                <div id="Credit_Card_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Credit_Card_utilization__c}&nbsp;%</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Outstanding bal" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Outstanding_bal">+&nbsp;&nbsp;</a>
+                                    Outstanding bal to loan amount (Unsecured)
+                                </div> 
+                                <div id="Outstanding_bal_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.OSB_to_loan_amount_unsecured__c}&nbsp;%</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured loan ratio" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Unsecured_Loan_ratio">+&nbsp;&nbsp;</a>
+                                    Unsecured loan Sanction amount to <br/> total loan Sanction amount
+                                </div> 
+                                <div id="Unsecured_Loan_ratio_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_to_total_amount__c}&nbsp;%</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Ratio of Secured to unsecured  Line" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Ratio_of_SecUnSec">+&nbsp;&nbsp;</a>
+                                    Ratio of Secured to unsecured  Line
+                                </div>
+                                <div id="Ratio_of_SecUnSec_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Secured_to_unsecured_ratio__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                    </tbody>    
+                </table>
+                <br/>
+                <br/>
+                <table class="slds-table slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps header" scope="col">
+                                <div class="slds-truncate WrapText" title="Data">Data</div>
+                            </th>
+                            <!--<th class="slds-text-title_caps header" scope="col">
+                            <div class="slds-truncate" title="Count">&nbsp;&nbsp;&nbsp;Count</div>
+                        </th>-->
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured loans in 12M" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Unsecured_loans_in_12M">+&nbsp;&nbsp;</a>
+                                    Number of Unsecured loans in last 12M
+                                </div>  
+                                <div id="Unsecured_loans_in_12M_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_Tradelines_in_last_12m__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured loan amount" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Avg_unsec_amt">+&nbsp;&nbsp;</a>
+                                    Average unsecured loan amount
+                                </div>
+                                <div id="Avg_unsec_amt_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Avg_unsecured_loan_amount__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Avg_unsecured_loan_amount__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Unsecured_Loan_Balance">+&nbsp;&nbsp;</a>
+                                    Unsecured Loan Balance
+                                </div> 
+                                <div id="Unsecured_Loan_Balance_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_loan_balance__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_loan_balance__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_loan_amount_Unsec">+&nbsp;&nbsp;</a>
+                                    Total loan amount for unsecured accounts open in last 12m
+                                </div>  
+                                <div id="Total_loan_amount_Unsec_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Total_Sanction_Amnt_unsecured__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Total_Sanction_Amnt_unsecured__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_loan_amount_Secured">+&nbsp;&nbsp;</a>
+                                    Total Secured Loan Amount
+                                </div>
+                                <div id="Total_loan_amount_Secured_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Total_Sanction_Amnt_secured__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Total_Sanction_Amnt_secured__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                    </tbody>                
+                </table>  
+                <br/>
+                <br/>
+                <table class="slds-table slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps header" scope="col">
+                                <div class="slds-truncate" title="Data">Data</div>
+                            </th>
+                            <!--<th class="slds-text-title_caps header" scope="col">
+                            <div class="slds-truncate" title="Count">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Count</div>
+                        </th>-->
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_Current_obl">+&nbsp;&nbsp;</a>
+                                    Total Current Obligation (LIVE Current Balance)
+                                </div>  
+                                <div id="Total_Current_obl_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_All__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_All__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_Current_Secured_obl">+&nbsp;&nbsp;</a>
+                                    Total Secured Current Obligation (LIVE Current Balance)
+                                </div> 
+                                <div id="Total_Current_Secured_obl_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_Secured__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_Secured__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Total_Current_Unsecured_obl">+&nbsp;&nbsp;</a>
+                                    Total Unsecured Current Obligation (LIVE Current Balance)
+                                </div> 
+                                <div id="Total_Current_Unsecured_obl_value" style="display:none">
+                                    <center>Count : &nbsp;
+                                        <ui:outputNumber value="{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_unsecured__c}" format="###,###,###,###,##0.00"/>
+                                        <!--{!v.cibDetails.cibil.Cibil_Extension1__r.Current_Obligation_unsecured__c}-->
+                                    </center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_Enq_three">+&nbsp;&nbsp;</a>
+                                    Number Enquiries in last 3M
+                                </div> 
+                                <div id="Number_Enq_three_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Enquiries_past_3_mnths__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_Enq_Unsec_three">+&nbsp;&nbsp;</a>
+                                    Number of enquiries of unsecured loans in 3m
+                                </div>  
+                                <div id="Number_Enq_Unsec_three_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Unsecured_Enquiries_past_3_mnths__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                    </tbody>    
+                </table>
+                <br/>
+                <br/>
+                <table class="slds-table slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps header" scope="col">
+                                <div class="slds-truncate WrapText" title="Data">Data</div>
+                            </th>
+                            <!--<th class="slds-text-title_caps header" scope="col">
+                            <div class="slds-truncate" title="Count">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Count</div>
+                        </th>-->
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_Tradelines_twelve">+&nbsp;&nbsp;</a>
+                                    Number of Tradelines 30+ in 12M
+                                </div>  
+                                <div id="Number_Tradelines_twelve_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Tradelines_30plus_DPD__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_Live_Trades">+&nbsp;&nbsp;</a>
+                                    Number Live Trades
+                                </div> 
+                                <div id="Number_Live_Trades_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.No_Of_Live_Trades__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_secured_trades">+&nbsp;&nbsp;</a>
+                                    Number of secured tradelines 90+ ever
+                                </div> 
+                                <div id="Number_secured_trades_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Secured_Tradelines_90plus_DPD__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <th data-label="Unsecured Loan Balance" scope="row">
+                                
+                                <div class="slds-truncate WrapText" title="Cloudhub">
+                                    <a onclick="{!c.displayValue}" class="fontsize" id="Number_Tradelines">+&nbsp;&nbsp;</a>
+                                    Number Tradelines ( Live + Close)
+                                </div> 
+                                <div id="Number_Tradelines_value" style="display:none">
+                                    <center>Count : &nbsp;{!v.cibDetails.cibil.Cibil_Extension1__r.Total_No_of_Trades__c}</center>
+                                </div>
+                            </th>
+                            <td data-label="data"></td>
+                        </tr>
+                    </tbody>    
+                </table>    
+            </lightning:tab>   
+            <lightning:tab label="Report" id="ReportTab">
+                <ui:scrollerWrapper>
+                    <div class="slds-scrollable" style="width:100% !important;">
+                        <lightning:accordion>
+                            <lightning:accordionSection  name="Total Trade lines" label="Total Trade lines">
+                                <div class="slds-grid slds-wrap">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                        <thead></thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TOTAL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cibil.Cibil_Extension1__r.Total_No_of_Trades__c}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="PL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.pl}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="HL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.hl}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="AL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.al}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CARD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.card}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="Education Loan"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.el}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TW"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.tw}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="OD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.od}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="GL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.gl}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection  name="Live Trade lines" label="Live Trade lines">
+                                <div class="slds-grid slds-wrap">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                        <thead></thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TOTAL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cibil.Cibil_Extension1__r.No_Of_Live_Trades__c}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="PL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.pllive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="HL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.hllive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="AL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.allive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CARD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cardlive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="Education Loan"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.ellive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cdlive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TW"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.twlive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="OD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.odlive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="GL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.gllive}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection  name="Trade lines with w/off or 30dpd" label="Trade lines with w/off or 30dpd">
+                                <div class="slds-grid slds-wrap">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                        <thead></thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TOTAL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.totaldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="PL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.pldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="HL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.hldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="AL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.aldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CARD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.carddpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="Education Loan"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.eldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cddpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TW"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.twdpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="OD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.oddpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="GL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.gldpd}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection  name="Enquiries in last 3 months" label="Enquiries in last 3 months">
+                                <div class="slds-grid slds-wrap">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                        <thead></thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TOTAL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cibil.Cibil_Extension1__r.Enquiries_past_3_mnths__c}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="PL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.plenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="HL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.hlenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="AL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.alenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CARD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cardenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="Education Loan"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.elenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="CD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.cdenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="TW"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.twenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="OD"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.odenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                            <tr>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                        <ui:outputText value="GL"/>
+                                                    </div>
+                                                </th>
+                                                <th>    
+                                                    <div class="slds-col slds-size_6-of-12">       
+                                                        <ui:outputText value="{!v.cibDetails.glenq}"/>
+                                                    </div>
+                                                </th>    
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:accordionSection>
+                        </lightning:accordion>
+                    </div>
+                </ui:scrollerWrapper>
+            </lightning:tab>
+            <lightning:tab label="Live Treadlines" id="treadLinesTab">
+                <ui:scrollerWrapper>
+                    <div class="slds-scrollable" style="width:100% !important;">
+                        <lightning:accordion>		
+                            <aura:iteration items="{!v.cibDetails.liveAccounts}" var="item">
+                                <lightning:accordionSection  name="{!item.AccountType}" label="{!item.AccountType}">
+                                    <div class="slds-grid slds-wrap">
+                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                            <thead></thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="TreadLines"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.AccountType}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="LA High Credit"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.sactionAmt}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Current Balance"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.currentBal}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="OverDue"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.overdue}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Start Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.startdate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Closed Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.closeddate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Last Payment Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.lastpaydate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Reported Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.reportedDate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value=" DPDS in Treadlines"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <aura:if isTrue="{!item.DPDs == 'Y'}">
+                                                                <td data-label="data" class= "Redclr">
+                                                                    {!item.DPDs}                                                                                           
+                                                                </td>
+                                                                <aura:set attribute="else">
+                                                                    
+                                                                    <td data-label="data" class= "greenclr">
+                                                                        <strong>{!item.DPDs}</strong>                                                                                         
+                                                                    </td>
+                                                                </aura:set>    
+                                                            </aura:if>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value=" DPD"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <aura:if isTrue="{!item.DPDs == 'Y'}">
+                                                                {!item.DPDString}                                  
+                                                            </aura:if> 
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </lightning:accordionSection>
+                            </aura:iteration>	
+                        </lightning:accordion>
+                    </div>
+                </ui:scrollerWrapper>
+            </lightning:tab>
+            <lightning:tab label="Closed Treadlines" id="ClosedtreadLinesTab">
+                <ui:scrollerWrapper>
+                    <div class="slds-scrollable" style="width:100% !important;">
+                        <lightning:accordion>		
+                            <aura:iteration items="{!v.cibDetails.closedAccounts}" var="item">
+                                <lightning:accordionSection  name="{!item.AccountType}" label="{!item.AccountType}">
+                                    <div class="slds-grid slds-wrap">
+                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                                            <thead></thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="TreadLines"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.AccountType}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="LA High Credit"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.sactionAmt}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Current Balance"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.currentBal}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="OverDue"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputText value="{!item.overdue}"/>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Start Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.startdate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Closed Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.closeddate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Last Payment Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.lastpaydate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value="Reported Date"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <ui:outputDate value="{!item.reportedDate}" />
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value=" DPDS in Treadlines"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <aura:if isTrue="{!item.DPDs == 'Y'}">
+                                                                <td data-label="data" class= "Redclr">
+                                                                    {!item.DPDs}                                                                                           
+                                                                </td>
+                                                                <aura:set attribute="else">
+                                                                    
+                                                                    <td data-label="data" class= "greenclr">
+                                                                        <strong>{!item.DPDs}</strong>                                                                                       
+                                                                    </td>
+                                                                </aura:set>    
+                                                            </aura:if>
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                                <tr>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <ui:outputText value=" DPD"/>
+                                                        </div>
+                                                    </th>
+                                                    <th>    
+                                                        <div class="slds-col slds-size_6-of-12">       
+                                                            <aura:if isTrue="{!item.DPDs == 'Y'}">
+                                                                {!item.DPDString}                                  
+                                                            </aura:if> 
+                                                        </div>
+                                                    </th>    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </lightning:accordionSection>
+                            </aura:iteration>	
+                        </lightning:accordion>
+                    </div>
+                </ui:scrollerWrapper>
+            </lightning:tab>				
+        </div>    
+    </lightning:tabset>    
+</aura:component>

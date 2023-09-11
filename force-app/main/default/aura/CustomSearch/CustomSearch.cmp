@@ -1,0 +1,15 @@
+<aura:component >
+    <ltng:require scripts="{!$Resource.jqueryv3}"  afterScriptsLoaded="{!c.loadJquery}"/>
+    <aura:attribute name="text" type="String" default="" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <label for="textareaChars">Search:</label>
+    <textarea id="textareaChars" maxlength="100" value="{!v.text}"></textarea> <br/>
+    
+    <div id="selectDiv" style="display:none;background-color:white;width:10.5%;margin-left: 3%;margin-top:-0.5%;">
+    	
+    </div>
+    <br/>
+    <span id="chars">100</span> characters remaining
+</aura:component>

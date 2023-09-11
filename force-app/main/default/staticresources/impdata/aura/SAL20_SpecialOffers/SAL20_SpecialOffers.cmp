@@ -1,0 +1,30 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="SAL20_DisbController">
+	
+	<!-- +-+-+-+-+-+-+-+- START: Attributes +-+-+-+-+-+-+-+-+ -->
+	<aura:attribute name="oppId" type="String"/>
+	<aura:attribute name="urlSpclOffer" type="String" />
+	<aura:handler name="init" value="{! this }"  action="{! c.onInit }" />
+    <aura:attribute name="groupType" type="String"/><!--Bug 22065: lightning component for special offer page -->
+    
+    <aura:registerEvent name="SAL20_DisbNavigator" type="c:SAl20_DisbDashboard_Navigator"/>
+	<!-- +-+-+-+-+-+-+-+- END : Attributes +-+-+-+-+-+-+-+-+ -->
+	
+	<!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+	<div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+		<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Other Loan Proposition</h1>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+
+	<!-- +-+-+-+-+-+-+ START: Links part +-+-+-+-+-+-+  -->
+	<div class="slds-page-body slds-p-around_large">
+		<div>
+            <!--Bug 22065: lightning component for special offer page ***Start*** -->			
+            <c:SAL20_OtherLoanProposition oppId ="{!v.oppId}" grouptype ="{!v.groupType}"/>
+            <!--Bug 22065: lightning component for special offer page ***End*** -->
+		</div>
+	</div>
+	<!-- +-+-+-+-+-+-+ END : Links part +-+-+-+-+-+-+  -->
+	<!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

@@ -1,0 +1,51 @@
+.THIS.outerScroller {
+    border-radius: 1px;
+    height: 600px;
+    width: 100%;
+}
+.THIS.innerScroller {
+    border-radius: 1px;
+    width: 100%;
+
+}
+.THIS .innerDivWrapper {
+    min-height: 100%;
+    padding-bottom: 20px;
+}
+
+.THIS.scrollerSize {
+    height: 300px !important;
+    width: 100%;
+    border-radius: 1px;
+}
+
+
+.THIS.slds-tabs--scoped__nav {
+    border-top: 0px solid rgb(221, 219, 218) !important;
+    /* border-bottom: 0px solid rgb(221, 219, 218) !important; */
+     border-right:0px solid rgb(221, 219, 218) !important; 
+    /* border-left: 1px solid rgb(221, 219, 218); */
+}
+
+
+.THIS.slds-tabs--scoped__link{
+    
+    border-top:#0041b6 solid 3px;
+    border-left: rgb(221, 219, 218) solid 1px !important;
+    border-right: rgb(221, 219, 218) solid 1px !important;
+    background-color : #ffffff !important;
+}
+
+.THIS .kyc-wrapper{
+    height: 91vh;
+    width: 100%;
+}
+
+.THIS .slds-active{
+    
+    border-top:#0041b6 solid 3px;
+    border-left: rgb(221, 219, 218) solid 1px !important;
+    border-right: rgb(221, 219, 218) solid 1px !important;
+    background-color : #ffffff !important;
+    
+}

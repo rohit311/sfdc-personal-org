@@ -1,0 +1,316 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL" controller="DataUploaderController">
+    <!-- +-+-+-+-+-+-+-+- START : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="selectedSourceChannel" type="string" />
+    <aura:attribute name="sourceChannelList" type="list" /> 
+    <aura:attribute name="custScripName" type="Scrip_Name__c" /> 
+    <aura:attribute name='successfulRecords' type="list"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false"/>
+    
+    <aura:attribute name="genderList" 			type="list" 	/>
+    <aura:attribute name="occupationList" 		type="list" 	/>
+    <aura:attribute name="maritalStatusList"	type="list" 	/>
+    <aura:attribute name="professionList" 		type="list" 	/>
+    <aura:attribute name="cityList" 			type="list" 	/>
+    <aura:attribute name="stateList" 			type="list" 	/>
+    <aura:attribute name="branchName"			type="String"	/>
+    <aura:attribute name="showInsurance" type="Boolean" default="false"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{! v.branchName }" action="{! c.assignBranchToScripName }" />
+    <!-- +-+-+-+-+-+-+-+- END : Handlers+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+ 
+	<!-- +-+-+-+-+-+-+-+-+-+- START : Spinner and Toast  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <aura:if isTrue="{! v.isProcessing }">
+		<lightning:spinner/>
+	</aura:if>
+    <c:Toast aura:id="toastCmp"/>
+	<!-- +-+-+-+-+-+-+-+-+-+- END   : Spinner and Toast +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <!-- Removed Policy Number,Policy Status,Policy Start Date,Maturity Date,Insurance Company Name,Policy Type
+	as part of Bug:27460 -->
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        
+        <lightning:card title="LAIP Insta Customer Creation Upload Utility " class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                          
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <lightning:input aura:id="product" type="text" label="Product" value="FAS" readonly="true"/> 
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            
+                            <lightning:select aura:id="selectNCSource" name="selectNCSource" label="Sourcing Channel" value="{! v.selectedSourceChannel}" required = "true" messageWhenValueMissing="Please Select Value">
+                                <aura:iteration items="{!v.sourceChannelList}" var="sChannel">
+                                    <option value = "{!sChannel.value}" 
+                                            label = "{!sChannel.label}" 
+                                            selected = "{! sChannel.value ==  v.selectedSourceChannel}"
+                                            />
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="firstName" label="First Name" name="firstName" value="{!v.custScripName.First_Name__c}" required="false"/>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">           
+                            
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="middleName" label="Middle Name" name="midName" value="{!v.custScripName.Middle_Name__c}" /> 
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                
+                                <lightning:input aura:id="lastName" label="Last Name" name="lastName" value="{!v.custScripName.Last_Name__c}" required="true" messageWhenValueMissing="Please Enter Value"/> 
+                            </div>                        
+                        </div>
+                        
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchAddress1" label="Address Line1"  name="addressLine1" value="{!v.custScripName.Address_Line1__c}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchAddress2" label="Address Line2" name="addressLine2" value="{!v.custScripName.Address_Line2__c}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchAddress3" label="Address Line3" name="addressLine3"  value="{!v.custScripName.Address_Line3__c}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchMobile" label="Mobile Number" name="mobileNo" value="{!v.custScripName.Mobile__c}" /> 
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchPan" label="PAN Number" name="panNo" value="{!v.custScripName.PAN_Number__c}" required="true" messageWhenValueMissing="Please Enter Value"/> 
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input type="email" aura:id="email" label="Email ID" name="email" value="{!v.custScripName.Email__c}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" messageWhenPatternMismatch="Please enter proper Email Id." /> 
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="searchPin" label="Pin Code" name="pinCode" value="{!v.custScripName.Pin_Code__c}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="DOB" label="Date Of Birth" name="DOB" type="Date" value="{!v.custScripName.Date_of_Birth__c}" /> 
+                                
+                            </div>
+                        </div>
+                        
+                        <!--/aura:set>
+                      </lightning:accordionSection-->
+                        
+                        
+                        <!--lightning:accordionSection name="B" label="Loan Details"-->  
+                        
+                        <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="branch" label="Branch Name" name="branch" value="{!v.custScripName.Branch_Name__c}" required="true" messageWhenValueMissing="Please Enter Value"/>  -->
+                                <sup><span class="required">*</span></sup>Branch Name
+                                <c:customLookup aura:id="branch" selectedRecord ="{! v.branchName }"	ObjectName="Branch_Master__c" ObjectLabel="Branch" FieldName ="Name" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="NavSum" label="NAV SUM" name="NavSum" value="{!v.custScripName.Nav_SUM__c}" required="true" messageWhenValueMissing="Please Enter Value"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="Units" label="No of Units" name="noOfUnits" value="{!v.custScripName.No_of_Units__c}" required="true" messageWhenValueMissing="Please Enter Value"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="LockInCompletion" label="Lock In Completion" name="LockInCompletion" value="{!v.custScripName.Lock_In_Completion__c}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="FundName" label="Fund Name" name="FundName" value="{!v.custScripName.Fund_Name__c}"  required="false"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="Sfin" label="Sfin" name="Sfin" value="{!v.custScripName.Sfin__c}"  required="false"/>  
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="AssignDate" label="Assignment Date" name="AssignDate" type="Date" value="{!v.custScripName.Assignment_Date__c}"  required="false"/>   
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="PremiumMode" label="Premium Mode" name="PremiumMode" value="{!v.custScripName.Premium_Mode__c}"  required="false"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="ProductCode" label="Product Code" name="ProductCode" value="{!v.custScripName.Product_Code__c}"  /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="AssigneeID" label="Assignee ID" name="AssigneeID" value="{!v.custScripName.Assignee_ID__c}" required="false"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="SumAssured" label="Sum Assured" name="SumAssured" value="{!v.custScripName.Sum_Assured__c}" />  
+                            </div>
+                        </div>
+                        
+                        <!-- START : #26645 Additional fields which will be updated on created loan application --> 
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="Gender" label="Gender" name="Gender" value="{!v.custScripName.Gender__c}" />  -->
+                                
+                                <lightning:select aura:id="Gender" name="Gender" label="Gender" value="{! v.custScripName.Gender__c}" >
+                                    <aura:iteration items="{!v.genderList}" var="sGender">
+                                        <option value = "{!sGender.value}" 
+                                                label = "{!sGender.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="MaritalStatus" label="Marital Status" name="MaritalStatus" value="{!v.custScripName.Marital_Status__c }" />   -->
+                                
+                                <lightning:select aura:id="MaritalStatus" name="MaritalStatus" label="Marital Status" value="{! v.custScripName.Marital_Status__c}" >
+                                    <aura:iteration items="{!v.maritalStatusList}" var="index">
+                                        <option value = "{!index.value}" 
+                                                label = "{!index.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="City" label="City" name="City" value="{!v.custScripName.City__c}" />  -->
+                                
+                                <lightning:select aura:id="City" name="City" label="City" value="{! v.custScripName.City__c}" >
+                                    <aura:iteration items="{!v.cityList}" var="index">
+                                        <option value = "{!index.value}" 
+                                                label = "{!index.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="State" label="State" name="State" value="{!v.custScripName.State__c}" /> -->
+                                
+                                <lightning:select aura:id="State" name="State" label="State" value="{! v.custScripName.State__c}" >
+                                    <aura:iteration items="{!v.stateList}" var="index">
+                                        <option value = "{!index.value}" 
+                                                label = "{!index.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="Occupation" label="Occupation" name="Occupation" value="{!v.custScripName.Occupation__c}" />  -->
+                                
+                                <lightning:select aura:id="Occupation" name="Occupation" label="Occupation" value="{! v.custScripName.Occupation__c}" >
+                                    <aura:iteration items="{!v.occupationList}" var="index">
+                                        <option value = "{!index.value}" 
+                                                label = "{!index.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!-- <lightning:input aura:id="Profession" label="Profession" name="Profession" value="{!v.custScripName.Profession__c}" />  -->
+                                
+                                <lightning:select aura:id="Profession" name="Profession" label="Profession" value="{! v.custScripName.Profession__c}" >
+                                    <aura:iteration items="{!v.professionList}" var="index">
+                                        <option value = "{!index.value}" 
+                                                label = "{!index.label}" 
+                                                />
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="RMName" label="RM Name" name="RMName" value="{!v.custScripName.RM_Name__c}" />  
+                            </div>
+                        </div>
+                        <!-- END   : #26645 Additional fields which will be updated on created loan application -->                         
+                    </div>
+                </div>
+                
+            </p>
+        </lightning:card>
+    </div>
+    
+    <div class="slds-p-top--x-small slds-align_absolute-center" >       
+        <lightning:button  name="buttonName" variant="brand" label="Reset" iconName="utility:refresh" iconPosition="left" onclick="{! c.doInit }"/>        
+        <lightning:button  name="buttonName" variant="brand" disabled="{! v.isProcessing }" label="Save" iconName="utility:save" iconPosition="left" onclick="{!c.saveCustomer}"/>
+    </div>
+    <aura:if isTrue="{!v.showInsurance}">
+        <div class="slds-p-top--small">
+            <c:InsuranceDetails flow="csvScreen" channel="{!v.selectedSourceChannel}" scripData="{!v.custScripName}"/>
+        </div>
+		<lightning:button class="slds-align_absolute-center" name="buttonName" variant="brand" disabled="{! v.isProcessing }" label="Submit for Loan Creation" iconName="utility:save" iconPosition="left" onclick="{!c.createLoan }"/>        
+    </aura:if>
+</aura:component>

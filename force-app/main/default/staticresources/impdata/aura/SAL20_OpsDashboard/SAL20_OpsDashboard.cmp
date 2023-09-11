@@ -1,0 +1,25 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global">
+	
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oId" 	type="String" default="006O000000AETsM" />
+    <aura:attribute name="loan" type="Opportunity" />
+    <aura:attribute name="showSALCmp" type="Boolean"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+     <c:LoaderForMobility />
+    <c:Custom_Toast_Mobility />
+    
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Ops Dashboard</h1>
+	</div>
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    
+    <aura:if isTrue="{! v.showSALCmp}">
+        	<c:PricingDashboard oppObj="{! v.loan }" oppId="{! v.oId }" opsDashboard = "true"/><!--added oppObj for 24673-->
+    </aura:if>
+    <aura:if isTrue="{!! v.showSALCmp}">
+        	<!--c:PricingDashboard/-->
+        <c:POS_DisbursalForVFPage oppId="{! v.oId }" />
+    </aura:if>
+	</aura:component>

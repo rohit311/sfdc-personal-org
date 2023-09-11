@@ -1,0 +1,266 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="conObj" type="Contact" default="{}"/> 
+	<aura:attribute name="applicantObj" type="Applicant__c"/>
+    <aura:attribute name="accObj" type="Account" default=""/>
+	<aura:attribute name="officeverification" type="Verification__c" default=""/>
+    <aura:attribute name="empCheckDashboardData" type="Object" default=""/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/> 
+	<aura:attribute name="approvedStage" type="integer" default="0"/> <!--Added for 928  -->
+    <aura:attribute name="rejectStage" type="integer" default="0"/> <!--Added for 928  -->
+    <aura:attribute name="movedToFinoneStage" type="integer" default="0"/> <!--Added for 928  -->
+    <aura:attribute name="contentId" type="String" default=""/>
+    <aura:attribute name="appType" type="String" default="Primary"/><!--24668 added for coApplicant dashboard-->
+     <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    
+    <c:GenericBackCmp/> <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card class="applyMarginToCard slds-box" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                        
+                        
+                         <table>
+                                    
+                                    <tbody> 
+									<aura:if isTrue="{! v.empCheckDashboardData != ''}">
+                                        <aura:if isTrue="{! v.empCheckDashboardData.employment_check == 'Successful'}" >
+                                            <tr class="green-color" style="height:30px;text-align :center"> 
+                                                <div style="padding-top:8px"> Employment Check:{!v.empCheckDashboardData.employment_check}   </div> </tr>
+                                            
+                                            <aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Employment Check: {!v.empCheckDashboardData.employment_check}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if>
+										<aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Employment Check: {!v.empCheckDashboardData.employment_check}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if> 										
+                                        <tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                                <div style="padding-top:8px"> Employment </div> </tr>
+                                        <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                             <!-- 24668 added appType-->
+															 <aura:if isTrue="{!v.appType == 'Primary'}">
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input label="Employer name" value="{!v.accObj.Employer__r.Name}" name="employer" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="category" label="Employer Category" value="{!v.accObj.Type_Of_Industry__c}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                             </aura:if>     
+															<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="officeEmail" label="Official Email ID" value="{!v.conObj.Office_Email_Id__c}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <!--Added for 928 Start -->
+                                                            <aura:if isTrue="{!(v.accObj.Type_Of_Industry__c == 'Others' || v.accObj.Type_Of_Industry__c=='BFL Un-Listed Company' || v.accObj.Type_Of_Industry__c=='Company not listed' || v.accObj.Type_Of_Industry__c=='De-listed')}" >
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="approved" label="Approved" value="{!v.approvedStage}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="reject" label="Rejected" value="{!v.rejectStage}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                             <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="movedToFinnone" label="Moved To Finnone" value="{!v.movedToFinoneStage}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            </aura:if>
+                                                            <!--Added for 928 stop -->
+                                                            
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                            </lightning:card>
+                                        </div>
+										<tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                                <div style="padding-top:8px"> EPFO Check : {!v.empCheckDashboardData.EPFO_check} </div> </tr>
+										                                        <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input label="EPFO test result" value="{!v.accObj.EPFO_Result__c}" name="epfo" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                             <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                	<label class="slds-form-element__label" for="select-01"> View EPFO check Report </label> <br/>
+                                                                    <aura:if isTrue="{!!empty(v.contentId)}">
+                                                                    <a onclick="{!c.previewAttchment}">
+                                                                            View Report
+                                                                     </a>
+                                                                     <aura:set attribute="else">
+                                                                            Link Not Available
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                          
+                                                                 </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                            </lightning:card>
+                                        </div>
+										<tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                                <div style="padding-top:8px"> Email Confirmation :  
+													<aura:if isTrue="{!and(v.conObj != '',v.applicantObj != '')}">
+													<aura:if isTrue="{!and(v.conObj.Office_Email_sent__c,v.applicantObj.Office_Email_Id_Verified__c)}">
+														Confirmed
+														<aura:set attribute="else">
+															<aura:if isTrue="{!and(v.conObj.Office_Email_sent__c ==true,v.applicantObj.Office_Email_Id_Verified__c == false)}">
+															 Not Confirmed
+															<aura:set attribute="else">
+																<aura:if isTrue="{!and(v.conObj.Office_Email_sent__c == false ,v.applicantObj.Office_Email_Id_Verified__c == false)}">
+																	Email Not Triggered
+																</aura:if>
+															</aura:set>
+															</aura:if>
+														</aura:set>
+													</aura:if>
+													</aura:if>
+												</div> 
+										</tr>
+										                                        <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input label="Email Triggered successfully" value="{!v.conObj.Office_Email_sent__c ? 'Yes':'No'}" name="emailsend" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="emailverify" label="Email Verified" value="{!v.applicantObj.Office_Email_Id_Verified__c ? 'Yes':'No'}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                            </lightning:card>
+                                        </div>
+
+
+									<tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                                <div style="padding-top:8px"> Domain Check : 
+													<aura:if isTrue="{!or(v.applicantObj.Domain_Check_Result__c == 'OK',v.applicantObj.Domain_Check_Result__c == 'Pass')}">
+														Successful
+														<aura:set attribute="else">
+															Not Confirmed
+														</aura:set>
+													</aura:if>
+												
+												</div> 
+								    </tr>
+								    <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input label="Email Domain Name" value="{!v.applicantObj.Company_Name_as_per_Domain_check__c}" name="cmpName" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:textarea name="remarks" label="Domain Remarks" value="{!v.applicantObj.Domain_Email_Remark__c}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                              <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control"><!-- 7736 -->
+                                                                    <lightning:input label="Domain Created Date" value="{!v.applicantObj.Domain_Created_Date__c}" name="epfo" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                            </lightning:card>
+                                        </div>
+                                        <aura:if isTrue="{!v.appType == 'Primary'}">
+										<tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                                <div style="padding-top:8px"> Office Verification : 
+													<aura:if isTrue="{!!empty(v.officeverification)}">
+														Yes
+														<aura:set attribute="else">
+															No
+														</aura:set>
+													</aura:if>
+												
+												</div> 
+								    </tr>
+								    <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input label="CPV / Geo tagging at Office applicability" value="{!v.officeverification.Geo_Tagging__c?'Yes':'No'}" name="geotag" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                            </lightning:card>
+                                        </div>
+										</aura:if>
+										</tbody>
+                                    
+                                </table>
+                                
+                           
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

@@ -1,0 +1,128 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" controller="SFDCMobilePOController">
+    
+    <aura:attribute name="poId" type="String" default=""/>
+    <aura:attribute name="IsCheckProcess" type="Boolean" default="false"/>
+    <!--change default to false-->
+    <aura:attribute name="isSubmitted" type="Boolean" default="false"/>
+	<aura:attribute name="SolPolicy" type="Object[]" default="{}"/>
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.enableDocAndDispos}"/>
+    <aura:handler event="c:GotoNextTab" action="{!c.gotoNextTab}"/>
+    <aura:registerEvent name="callStpDisposition" type="c:POS_CallSTPDisposition"/>
+     <!--8734:USERSTORY_Disposition to capture response for Partially filled starts-->
+    <aura:handler event="c:DispositionPicklistEvent" action="{!c.handleDispEvent}"/>
+    <aura:attribute name="DispDataModified" type="Boolean" default="false"/>
+    <!--8734:USERSTORY_Disposition to capture response for Partially filled ends-->
+     <!-- Bug 24927 S-->
+    <aura:attribute name="GCOCampaignList" type="String[]" default="[]"/>
+    <!-- Bug 24927 E-->
+    <!-- Priyanka -->
+    <!--<aura:handler event="c:POS_CallSTPDisposition" action="{!c.callSTPIntegration}"/>-->
+    <aura:registerEvent name="stpNonStpEvent" type="c:POS_StpNonStpFlow"/>
+    <aura:registerEvent name="STPCall" type="c:UpdateAlldata"/>
+   
+    
+    <!--POS YK-->
+    <aura:handler event="c:LoanConversionEvent" action="{!c.SetCheckProcessFlag}"/>
+    <aura:handler event="c:showCibilModal" action="{!c.displayCibil}"/>
+    <aura:handler event="c:showSTPModal" action="{!c.displaySTP}"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+       
+    
+    <div id="POS_PRO_POMainDIV">
+      <c:POS_Offer_Details aura:id="POS_Offer_Details_Child"/>
+    <div class="slds-tabs--scoped" id="mainDIV1">
+        <ul class="slds-tabs--scoped__nav" role="tablist">
+            <li aura:id="customerTab" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Customer" role="presentation">
+                <a id="customerTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="0" aria-selected="true" aria-controls="customerTabContent">
+                    Customer
+                </a>
+            </li>
+            <li aura:id="documentTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Documents" role="presentation">
+                <a id="documentTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-1" aria-selected="false" aria-controls="documentTabContent">
+                    CPV
+                </a>
+            </li>
+            <li aura:id="dispositionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Disposition" role="presentation">
+                <a id="dispositionTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-1" aria-selected="false" aria-controls="dispositionTabContent">
+                    Disposition
+                </a>
+            </li>
+        </ul>
+        
+       
+        <div aura:id="customerTabContent" class="slds-tabs--scoped__content" role="tabpanel" aria-labelledby="customerTab">
+             <!-- Bug 24927 S -->
+                <c:POS_PO_CustDetails_Cmp poId="{!v.poId}" GCOCampaignList = "{!v.GCOCampaignList}"/>
+        </div>
+        <div aura:id="documentTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="documentTab">
+            <c:POS_Document />
+        </div>
+        <div aura:id="dispositionTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="dispositionTab">
+            <!-- Bug 24927 S -->
+                <c:POS_ProductOffering  GCOCampaignList = "{!v.GCOCampaignList}"/>
+        </div>
+    </div>
+    </div>
+        
+      
+		<div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal" style ="width:100%;height:100%;padding:20px;">
+           <div class="slds-modal__container" style="height:unset, padding-top: 40%">
+               	<div class="slds-modal__header">
+                   
+                   <lightning:buttonIcon class="slds-button slds-modal__close slds-button--icon-inverse" iconName="utility:close" variant="bare" onclick="{!c.closeModal}" alternativeText="Info" size="large" />                                
+                   <h2 id="header43" class="slds-text-heading--small headerStyle">STP Failed Rules</h2>
+               	</div>
+               	<div class="slds-modal__content slds-p-around--medium slds-scrollable_y" >
+					<c:DisplayStpRules SolPolicy1="{!v.SolPolicy}"/>                   
+               	</div>
+               	<div class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Close" class="slds-align_absolute-center" onclick="{!c.closeModal}" />
+               	</div>
+           </div>
+		</div>
+		<div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+
+    
+            <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="ModalboxCibil" class="slds-modal slds-hide" style="width:100%;height:100%;padding:20px;">
+            <div class="slds-modal__container" style="height:100%;margin: 2rem 0">
+                <div class="slds-modal__header">
+                    
+                    <lightning:buttonIcon class="slds-button slds-modal__close slds-button--icon-inverse" iconName="utility:close" variant="bare" onclick="{!c.closeModalCibil}" alternativeText="Info" size="large" />                                
+                    <h2 id="header43" class="slds-text-heading--medium">Cibil Report</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium slds-scrollable" style="height:100%;">
+                    <div style="padding:10px;height:100%">
+                        <aura:if isTrue="{!v.isCommunityUsr == true}">
+                            <iframe src="{!'/Partner/apex/DetailedCibilReportPage?id=' + v.poId}"  width="100%" height="100%" frameBorder="0"/>
+                            <aura:set attribute="else">
+                        		<iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.poId}"  width="100%" height="100%" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                     </div>
+                </div>
+                <div class="slds-modal__footer">
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop " aura:id="ModalbackdropCibil"></div>
+		
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

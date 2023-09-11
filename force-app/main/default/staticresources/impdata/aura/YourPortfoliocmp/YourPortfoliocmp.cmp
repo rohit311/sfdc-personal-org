@@ -1,0 +1,140 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="yourPortfolioCtr" access="global" >
+    <aura:attribute name="secLst" type="List"/>
+    <aura:attribute name="invName" type="String"/>
+    <aura:attribute name="invType" type="String"/>
+    <aura:attribute name="recordId" type="String" default="0060k000008UWlgAAG"/>
+    <aura:attribute name="quantity" type="integer"/>
+    <aura:attribute name="inv" type="String"/>
+    <aura:attribute name="type" type="String"/>
+    <aura:attribute name="totalPortfolioValue" type="String" default="0"/>
+    <aura:attribute name="totalValue" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="newPropertyDetails" type="Property_Details__c[]"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <!-- CSV changes S -->
+    <aura:attribute name="isUploadCSV" type="boolean" default="false"/>
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="invNames" type="List"  />
+   	<!-- CSV changes E -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+- START : Spinner and Toast  +-+-+-+-+-+-+-+-+-+-+-+- -->
+    <aura:if isTrue="{! v.isProcessing }">
+        <lightning:spinner  size="large"/>
+    </aura:if>
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+- END   : Spinner and Toast +-+-+-+-+-+-+-+-+-+-+-+- -->
+    
+    
+    <div class="slds-box">
+        <div class="slds-grid slds-gutters">
+            <div class="slds-size_1-of-2">
+                <div id="Header" class="slds-box">
+                    <p>Investment Details</p>
+                </div>
+                <div class="slds-box" id="Body">
+                    <lightning:select name="select1" label=" Please Select your investment type: " required="true" aura:id="contactList" onchange="{!c.OnChange}">
+                        <option value="EQUITY">EQUITY</option>
+                        <option value="MUTUALFUND">MUTUALFUND</option>
+                    </lightning:select> <br/>
+                    
+                    <lightning:select label="Search Criteria" onchange = "{! c.OnChange }"   aura:id ="searchList" >
+                        <option value="SCRIP_NAME">Name</option>
+                        <option value="ISIN">ISIN</option>
+                        <option value="BSE_CODE">BSE Code</option>
+                        <option value="NSE_CODE">NSE Code</option>
+                    </lightning:select>
+                    
+                    <span aura:id="invSpan">{!v.inv}</span>
+                    
+                    <c:customLookup aura:id="child" selectedRecord="{!v.invName}"  ObjectName="Scrips__c"  FieldName="{!v.type}" ObjectLabel="Investment Name"/>
+                    
+                    <lightning:input type="number" aura:id="input2" name="input2" value="{!v.quantity}" label="Quantity of your shares" required="true" />
+                    <div class="slds-m-top--medium"></div>
+                    <center>
+                        <lightning:button  label="Add To Portfolio" class="bnt" onclick="{!c.addPortfolioOnList}" />
+                        <lightning:button label="Reset" onclick="{!c.reset}" class="bnt" />
+                        <lightning:button label="Close" onclick="{!c.onClose}" class="bnt" /><lightning:button label="Browse" onclick="{!c.uploadCSV}" class="bnt" />
+                    </center>
+                </div>
+            </div>
+            <div class="slds-size_1-of-2">
+                <div id="Header" class="slds-box">
+                    <p>Your Portfolio</p>
+                </div>
+                
+                <table id="table">
+                    <div  class="slds-box">                           
+                        <tr>
+                            <th class="coApplicantsectionHeader">Investment Name</th>
+                            <th class="coApplicantsectionHeader">Investment Type</th> 
+                            <th class="coApplicantsectionHeader">Quantity</th>
+                            <th class="coApplicantsectionHeader">Market Value</th>
+                            <th class="coApplicantsectionHeader">               </th>
+                        </tr>
+                        
+                        <div style="height:190px; overflow:auto !important;" >
+                            <aura:iteration items="{!v.secLst}" var="item"  indexVar= "invId"  >
+                                <tr style="{! if( empty( item.invName ) , 'background-color:red', 'background-color : xyz') }">
+                                        <td  class="coApplicantsection">{!item.invName}</td>
+                                        <td  class="coApplicantsection">{!item.invType}</td>
+                                        <td  class="coApplicantsection">{!item.quantity}</td>                                    
+                                        <td  class="coApplicantsection">{!item.marketValue}</td>
+                                        <td class="coApplicantsection ">
+                                            <span class="bnt">
+                                            <Button  id="{! invId }"  onclick="{!c.deleteRow}" >  X </Button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                            </aura:iteration>
+                           
+                       </div>
+                            <!-- <aura:if isTrue="{!v.count}">-->
+                        <div id="footer" class="slds-box">
+                            Total Portfolio Value = {!v.totalPortfolioValue} &nbsp;&nbsp;&nbsp;
+                            <lightning:button class="bnt" label="PROCEED" onclick="{!c.onProceed}" disabled="{!v.isProcessing}"/>
+                            <lightning:button label="Save Details" onclick="{!c.saveDetails}" class="bnt" disabled="{! or(v.isProcessing, v.totalPortfolioValue == 0) }"/>
+                        </div>
+                        <!--</aura:if>-->                          
+                    </div>                    
+                </table>
+            </div>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.isUploadCSV}">
+        
+        <!--###### MODAL/POP UP Start######--> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                
+                <!--###### MODAL/POP UP BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>File Upload</b></p>
+                    <lightning:input class="slds-align_absolute-center"
+                                     aura:id="file" 
+                                     onchange="{!c.handleFilesChange}" 
+                                     type="file" 
+                                     name="file" 
+                                     accept=".csv"
+                                     multiple="false"/>
+                    <span class="slds-align_absolute-center"> {!v.fileName} </span>
+                </div>
+                <!--###### MODAL/POP UP BOX FOOTER Part Start ######-->
+                <footer class="slds-modal__footer">
+                    
+                    <lightning:button variant="brand" 
+                                      label="Upload"
+                                      title="Upload"
+                                      onclick="{! c.readCSV }"/>
+                    <lightning:button variant="neutral" 
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        <!--###### MODAL/POP UP BOX Part END Here ######-->
+        
+    </aura:if>
+    
+</aura:component>

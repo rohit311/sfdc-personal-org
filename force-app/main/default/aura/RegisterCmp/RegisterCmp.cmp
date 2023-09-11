@@ -1,0 +1,41 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="LoginController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="newContact" type="Contact" default="{}"/>
+    <aura:attribute name="passwrd" type="String" default=""/>
+    
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            	<div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.title}</h2>
+                    </header>
+                    
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:input name="input1" label="First Name" placeholder="First Name" style="width: 255px !important;" value="{!v.newContact.FirstName}"/>
+                        
+                        <lightning:input name="input2" label="Last Name" placeholder="Last Name" style="width: 255px !important;" value="{!v.newContact.LastName}"/>
+                        
+                        <lightning:input name="input3" label="User Id" placeholder="someone@example.com" style="width: 255px !important;" value="{!v.newContact.Email}"/>
+                        
+                        <lightning:input type="password" name="input4" label="Password" placeholder="minimum of 6 characters" value="{!v.newContact.password__c}" style="width: 255px !important;"  pattern=".{6,}" required="true"/>
+                    	
+                        <lightning:input name="input3" label="Retype Password" placeholder="minimum of 6 characters" style="width: 255px !important;" value="{!v.passwrd}"/>
+                    </div>    
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" label="Create User" onclick="{!c.createUser}" />
+                	</footer>
+                </div>    
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>    
+    </div>    
+    
+</aura:component>

@@ -1,0 +1,1 @@
+<aura:event type="APPLICATION" description="Fire PANbre onload of demographic tab" />

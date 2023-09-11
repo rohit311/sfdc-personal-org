@@ -1,0 +1,11 @@
+<aura:component controller="ParentController1">
+    <aura:handler name="init" action="{!c.doInit1}" value="{!this}"/>
+    
+    <aura:attribute name="pList" type="Parent1__c[]"/>
+    <h1>Parent List</h1>
+   
+    <aura:iteration items="{!v.pList}" var="p">
+        <c:Parentdisp p1="{!p}"/>
+    </aura:iteration>
+    
+</aura:component>

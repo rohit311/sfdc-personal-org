@@ -1,0 +1,20 @@
+<apex:page >
+<script src="/soap/ajax/10.0/connection.js"> </script >
+
+<script src="/soap/ajax/10.0/apex.js"> </script >
+   <script>
+  sforce.connection.sessionId = '{!$Api.Session_ID}';
+     try{
+     var query="SELECT Id,name FROM Account LIMIT 2";
+     var records=sforce.connection.query(query);
+     var records1=records.getArray('records')[0];
+     alert(records1);   
+      }
+      catch(e){
+       alert(e);
+     }
+        
+  </script>
+
+   <h1> Javascript SOQL</h1>
+</apex:page>

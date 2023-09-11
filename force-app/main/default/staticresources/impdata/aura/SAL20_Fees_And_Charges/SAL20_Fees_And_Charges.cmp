@@ -1,0 +1,206 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="SAL20_DisbController">
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="oId" type="String" description="This will be the opportunity Id for processing data" />
+    <aura:attribute name="lFnC" type="Fees_and_Charge__c[]" description="This list will be for processing the fees and charges!" />
+    <aura:attribute name="lFnCFixed" type="Fees_and_Charge__c[]" description="List for fixed charges!" />
+    <aura:attribute name="lFnCCross" type="Fees_and_Charge__c[]" description="List for Cross sell and other charges!" />
+    <aura:attribute name="lFnCIns" type="Fees_and_Charge__c[]" description="List for insurance charges!" />
+    <aura:attribute name="dedFrmDisList" type="List" description="Deducted_from_Disbursement__c picklist values (Fees_and_Charge__c)" />
+    <aura:attribute name="bifurMap" type="Object" description="Map to maintain charges bifurcation details from static resource" />
+    <aura:attribute name="lFnCNew" type="Fees_and_Charge__c[]" description="List for new charges!" />
+    <aura:attribute name="opp" type="Opportunity" description="This will be the opportunity record coming from parent" />
+    <aura:attribute name="newFlag" type="Boolean" description="This will be flag to check new fees" default="false"/>
+    <aura:attribute name="chargesAPIIntegration" type="Boolean" description="Boolean flag to check whether API Integration is compatible" default = "false"/>
+	<aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:handler name="init" value="{! this }" action="{! c.onInit }" />
+    <aura:attribute name="chargeTypes" type="Map" default="{ Fixed_Charges: true, Cross_Sell_and_Other_Charges: true, Insurance_Charges: true }" /> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality -->
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+        <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Fees and Charges</h1>
+    </div>
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    
+    <!-- +-+-+-+-+-+-+ START: Body/Content part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{! v.isProcessing }">
+        <lightning:spinner size="large" />
+    </aura:if>
+    
+    <table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+        <thead>
+            <tr class="slds-text-heading_small">
+                <th scope="col" class="slds-cell-shrink">
+                    <div class="slds-truncate" title="Charge Id">Charge ID</div>
+                </th>
+                <th scope="col" class="slds-cell-shrink">
+                    <div class="slds-truncate" title="Charge Description">Charge Description</div>
+                </th>
+                <th scope="col" class="slds-cell-shrink">
+                    <div class="slds-truncate" title="Charge Amount">Charge Amount</div>
+                </th>
+                <th scope="col" class="slds-cell-shrink">
+                    <div class="slds-truncate" title="Status">Deducted from Disb</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Fixed Charges ::: Start -->
+            <tr> 
+                <td colspan="4" style="background:grey;color:white; cursor:pointer;" class="slds-text-title_caps slds-m-top_large" data-value="Fixed_Charges" onclick = "{!c.handleToggle}"   > <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added data value and onclick -->
+                    Fixed Charges 
+                    <lightning:icon iconName="{!v.chargeTypes.Fixed_Charges ? 'utility:dash' : 'utility:add'}" variant="inverse" size="xx-small" class="slds-p-left_medium" /> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggle icon -->
+                </td>
+            </tr>
+            <aura:if isTrue="{! and(v.lFnCFixed, v.chargeTypes.Fixed_Charges) }"> <!-- v.lFnCFixed --> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggele flag -->
+                <aura:iteration items="{! v.lFnCFixed }" var="oFnC">
+                    <tr class="fixed_Charges_ROW">
+                        <td><lightning:input label=" " type="number" name="chargeId" value="{! oFnC.Finnone_ChargeId__c}"/></td>
+                        <td><lightning:input label=" " type="text" name="chargeDes" value="{! oFnC.Charge_Desc__c }"/></td>
+                        <td><lightning:input label=" " type="Integer" name="chargeAmt" value="{! oFnC.Change_Amount__c}"/></td>
+                        <td><lightning:select label=" " aura:id="dfd" name="dfd" value="{!oFnC.Deducted_from_Disbursement__c}" >
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.dedFrmDisList}" var="dis">
+                                <option value="{!dis}" text="{!dis}"></option>
+                            </aura:iteration>
+                            </lightning:select></td>
+                    </tr>
+                </aura:iteration>
+            </aura:if>
+            <aura:if isTrue="{! empty(v.lFnCFixed) }">
+                <tr>
+                    <td colspan="4">
+                        There is no data present for Fixed Charges.
+                    </td>
+                </tr>
+            </aura:if>
+            <!-- Fixed Charges ::: End  -->
+            
+            <!-- Cross Sell and Other Charges::: Start  -->
+            <tr>
+                <td colspan="4" style="background:grey;color:white; cursor:pointer;" class="slds-text-title_caps slds-m-top_large" data-value="Cross_Sell_and_Other_Charges" onclick = "{!c.handleToggle}" > <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added data value and onclick -->
+                    Cross Sell and Other Charges
+                    <lightning:icon iconName="{!v.chargeTypes.Cross_Sell_and_Other_Charges ? 'utility:dash' : 'utility:add'}" variant="inverse" size="xx-small" class="slds-p-left_medium" /> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggle icon -->
+                </td>
+            </tr>
+            <aura:if isTrue="{! and(v.lFnCCross, v.chargeTypes.Cross_Sell_and_Other_Charges) }"> <!--  v.lFnCCross  --> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggele flag -->
+                <aura:iteration items="{! v.lFnCCross }" var="oFnC">
+                    <tr>
+                        <td><lightning:input label=" " type="number" name="chargeId" value="{! oFnC.Finnone_ChargeId__c}"/></td>
+                        <td><lightning:input label=" " type="text" name="chargeDes" value="{! oFnC.Charge_Desc__c }"/></td>
+                        <td><lightning:input label=" " type="number" name="chargeAmt" value="{! oFnC.Change_Amount__c}"/></td>
+                        <td><lightning:select label=" " aura:id="dfd" name="dfd" value="{!oFnC.Deducted_from_Disbursement__c}" >
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.dedFrmDisList}" var="dis">
+                                <option value="{!dis}" text="{!dis}"></option>
+                            </aura:iteration>
+                            </lightning:select></td>
+                    </tr>
+                </aura:iteration>
+            </aura:if>
+            <aura:if isTrue="{! empty(v.lFnCCross) }">
+                <tr>
+                    <td colspan="4">
+                        There is no data present for Cross Sell and Other charges.
+                    </td>
+                </tr>
+            </aura:if>
+            <!-- Cross Sell and Other Charges ::: End  -->
+            
+            <!-- Insurance Charges ::: Start  -->
+            <tr>
+                <td colspan="4" style="background:grey;color:white; cursor:pointer;" class="slds-text-title_caps slds-m-top_large" data-value="Insurance_Charges" onclick = "{!c.handleToggle}" > <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added data value and onclick -->
+                    Insurance Charges
+                    <lightning:icon iconName="{!v.chargeTypes.Insurance_Charges ? 'utility:dash' : 'utility:add'}" variant="inverse" size="xx-small" class="slds-p-left_medium" />  <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggle icon -->
+                </td>
+            </tr>
+            <aura:if isTrue="{! and(v.lFnCIns, v.chargeTypes.Insurance_Charges) }"> <!--  v.lFnCIns --> <!--  Bug 20391 : Bug 22065 : Expand and Collapse functionality : Added toggele flag -->
+                <aura:iteration items="{! v.lFnCIns }" var="oFnC">
+                    <tr>
+                        <td><lightning:input label=" " type="number" name="chargeId" value="{! oFnC.Finnone_ChargeId__c}"/></td>
+                        <td><lightning:input label=" " type="text" name="chargeDes" value="{! oFnC.Charge_Desc__c }"/></td>
+                        <td><lightning:input label=" " type="number" name="chargeAmt" value="{! oFnC.Change_Amount__c}"/></td>
+                        <td><lightning:select label=" " aura:id="dfd" name="dfd" value="{!oFnC.Deducted_from_Disbursement__c}" >
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.dedFrmDisList}" var="dis">
+                                <option value="{!dis}" text="{!dis}"></option>
+                            </aura:iteration>
+                            </lightning:select></td>
+                    </tr>
+                </aura:iteration>
+            </aura:if>
+            <aura:if isTrue="{! empty(v.lFnCIns) }">
+                <tr>
+                    <td colspan="4">
+                        There is no data present for Insurance Charges.
+                    </td>
+                </tr>
+            </aura:if>
+            <!-- Insurance Charges ::: END  -->
+            <aura:if isTrue="{! v.newFlag }">
+                <tr>
+                    
+                    <td colspan="4" style="background:grey;color:white;" class="slds-text-title_caps slds-m-top_large"  >
+                        New Charges
+                    </td>
+                    
+                </tr>
+                <aura:iteration items="{! v.lFnCNew }" var="oFnC">
+                    <tr>
+                        
+                        <td><lightning:input label=" " type="number" name="chargeId" value="{! oFnC.Finnone_ChargeId__c}"/></td>
+                        <td><lightning:input label=" " type="text" name="chargeDes" value="{! oFnC.Charge_Desc__c }"/></td>
+                        <td><lightning:input label=" " type="number" name="chargeAmt" value="{! oFnC.Change_Amount__c}"/></td>
+                        <td><lightning:select label="" aura:id="dfd" name="dfd" value="{!oFnC.Deducted_from_Disbursement__c}" >
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.dedFrmDisList}" var="dis">
+                                <option value="{!dis}" text="{!dis}"></option>
+                            </aura:iteration>
+                            </lightning:select></td>
+                    </tr>
+                </aura:iteration>
+            </aura:if>
+            <tr>
+                <td></td>
+                <td>
+                    <lightning:button 	variant="brand" 
+                                      label="Save Fees" 
+                                      title="Save Fees"
+                                      onclick="{!c.saveFeesAndCharges}"
+                                      />
+                </td>
+                <td>
+                    <aura:if isTrue="{!v.chargesAPIIntegration}">
+                        <lightning:button 	variant="brand" 
+                                          label="Fetch Charges" 
+                                          title="Fetch Charges"
+                                          onclick="{!c.fetchChargesAPI}"/>
+                        <aura:set attribute="else">
+                            <lightning:button 	variant="brand" 
+                                              label="Add Charges" 
+                                              title="Add Charges"
+                                              onclick="{!c.addCharges}"/>
+                            <aura:if isTrue="{!v.newFlag}">
+                            <lightning:button 	variant="brand" 
+                                              label="Cancel Charges" 
+                                              title="Cancel Charges"
+                                              onclick="{!c.cancelCharges}"/>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    
+    <!-- +-+-+-+-+-+-+ END : Body/Content part +-+-+-+-+-+-+  -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->	
+</aura:component>

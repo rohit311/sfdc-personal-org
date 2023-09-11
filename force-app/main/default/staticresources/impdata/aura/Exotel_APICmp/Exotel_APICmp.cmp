@@ -1,0 +1,9 @@
+<aura:component controller="CommonUtility"  implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    <aura:attribute name="frommobile" type="String"/>
+    <aura:attribute name="tomobile" type="String"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="objName" type="String"/>
+    <aura:attribute name="Product" type="String"/>
+	<lightning:button class="slds-theme_alt-inverse " iconName="action:call" variant="brand" label="Call"   onclick="{!c.makeacall}" />
+</aura:component>

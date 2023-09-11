@@ -1,0 +1,21 @@
+<template>
+    <lightning-tabset variant="vertical" active-tab-value="one">
+        <lightning-tab label="Issue fields" value="one" class="slds-theme_default" icon-name="standard:data_mapping">
+            <h2>Fields from Helpshift issue object are listed below which can be mapped to individual fields of Salesforce 'case' object. 
+                Please note that duplication mappings are not allowed. Once mapped, you can also define syncing preference (From Salesforce to Helpshift) for certain fields.</h2>
+        </lightning-tab>
+        <lightning-tab label="Status Mapping" value="two" class="slds-theme_default" icon-name="utility:data_mapping"> 
+            <div class="slds-text-heading_large">Status Mapping for Helpshift Messenger</div>
+            <br/>
+            <div class="slds-text-heading_small">Status mapping will allow agents to see the Helpshift Issue status in Salesforce Case.</div>
+            <br/>
+            <div><b>Status Field SetUp</b></div>
+        </lightning-tab>
+        <lightning-tab label="Settings" value="three" class="slds-theme_default" icon-name="standard:settings">
+            Settings here...
+        </lightning-tab>
+        <lightning-tab label="Knowledge Articles" value="four" class="slds-theme_default" icon-name="standard:knowledge">
+            Knowledge Articles here...
+        </lightning-tab>
+    </lightning-tabset>
+</template>

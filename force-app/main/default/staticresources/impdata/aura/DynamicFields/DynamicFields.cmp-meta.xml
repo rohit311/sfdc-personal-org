@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>40.0</apiVersion>
+    <description>This component is used to display a list of sObject record which can be edited. It takes an array of JSON object as input which is a list of fields stored as configuration.</description>
+</AuraDefinitionBundle>

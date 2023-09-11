@@ -1,0 +1,32 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="headers" type="List" default="['a','b']"/>
+    <aura:attribute name="dataRows" type="List" default="['x','y']"/>
+    <aura:attribute name="conId" type="String"/>
+    <aura:handler event="c:shareAPIResponse" action="{!c.fetchData}"/>
+    
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+    	<thead>
+            <tr class="slds-line-height_reset">
+            	<aura:iteration items="{!v.headers}" var="item">
+    				<th>{!item}</th>
+  				</aura:iteration>
+        	</tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.dataRows}" var="row">
+        		<tr>
+                    <aura:iteration items="{!row}" var="dataMap">        			
+                     	<td>{!dataMap.value}</td>	                        
+                    </aura:iteration>  
+                    <div data-index="{!row.index}" onclick="{! c.addEntity }">
+                        <lightning:button label="Add"/>
+                    </div>
+                    
+            	</tr>
+            </aura:iteration>
+        </tbody>
+        
+    </table>
+    <div aura:id="AddSecuritydiv"></div>
+</aura:component>

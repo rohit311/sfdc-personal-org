@@ -1,0 +1,71 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+                access="global" controller="SALMobilityCntrl_V2">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="productOffering" type="Product_Offerings__c" default="{'sobjectType': 'Product_Offerings__c'}"/>
+    <aura:attribute name="objLead" type="Lead" default="{'sobjectType': 'Lead'}"/>
+    <aura:attribute name="view" type="String" default=""/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{'sobjectType':'SurrogateCAM__c',Id:'',Special_Profile_Employer__c:''}"/><!-- Bug 18576 -->
+    <aura:attribute name="productOfferingId" type="Id"/>
+    <aura:attribute name="productList" type="String[]" default="SPL,SAL,SEL"/>
+    <aura:attribute name="customerTypeList" type="String[]" default="Individual,Corporate"/>
+    <aura:attribute name="companyCategoryList" type="String[]" default="Diamond,Platinum,Gold,Silver,Blue,Pvt Ltd Company,Others"/>
+    <aura:attribute name="mobilenumber" type="String" default=""/>
+    <aura:attribute name="teleCallingList" type="String[]"/>
+    <aura:attribute name="teleCallingSubList" type="String[]"/>
+    <aura:attribute name="leadSourceList" type="String[]"/>
+    <aura:attribute name="StateList" type="String[]"/> <!-- 5881 -->
+    <aura:attribute name="CityList" type="String[]"/><!--5881-->
+    <aura:attribute name="fieldDispositionList" type="String[]"/>
+    <aura:attribute name="fieldSubDispositionList" type="String[]"/>
+    <aura:attribute name="qualityDespositionList" type="String[]" default="Approved,Rejected,Follow Up,Pending"/>
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <aura:attribute name="isPOconverted" type="Boolean" default="false"/>
+    <aura:attribute name="nameTheme" type="string"/>
+    <aura:attribute name="iscommunityUser" type="string"/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="referralSearchKeyword" type="string" default=""/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:attribute name="isEmpDisableP" type="Boolean"/><!-- Bug 18448 -->
+    <aura:attribute name="isDesDisableP" type="Boolean"/><!-- Bug 18448 -->
+    <aura:attribute name="selectedEmployer" type="String"/><!-- Bug 18576 -->
+    <aura:attribute name="selectedCompCat" type="String"/><!-- Bug 18576 -->
+    <aura:attribute name="ifOther" type="Boolean"/><!-- Bug 18576 -->
+    <aura:registerEvent name="navigateToComponent" type="c.navigateToParent"/>
+    <aura:registerEvent name="DestroyChild1" type="c:DestroyChild"/>
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+        <div class="slds-align_absolute-center" style="height: 5rem;">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <div style="position:relative">
+            <div class="innerDivWrapper">
+                
+                <aura:if isTrue="{!and(v.view != 'tableview',v.view != 'viewoffer')}">
+                	<c:LoaderForMobility />
+                    <c:Custom_Toast_Mobility />
+                </aura:if>
+                <lightning:button variant="brand" label="Back" iconName="utility:back" class="slds-theme--alt-inverse backBottom" iconPosition="left" onclick="{!c.sendback}"/> <!--Added Function sendback for Bug 18566-->     
+                
+                        <c:SAL_POLandingScreen nameTheme="{!v.nameTheme}" aura:id="landingScreen" leadSourceList="{!v.leadSourceList}" qualityDespositionList="{!v.qualityDespositionList}" sourceSearchKeyword="{!v.sourceSearchKeyword}" referralSearchKeyword="{!v.referralSearchKeyword}" iscommunityUser="{!v.iscommunityUser}" isTeleCaller="{!v.isTeleCaller}" isFieldAgent="{!v.isFieldAgent}" productOffering="{!v.productOffering}" objLead="{!v.objLead}" productOfferingId="{!v.productOfferingId}"
+                                               productList="{!v.productList}" customerTypeList="{!v.customerTypeList}" companyCategoryList="{!v.companyCategoryList}"
+                                               mobilenumber="{!v.mobilenumber}"
+                                               isPOconverted="{!v.isPOconverted}" isEmpDisable="{!v.isEmpDisableP}" isDesDisable="{!v.isDesDisableP}" scam="{!v.scam}" employerSearchKeyword="{!v.selectedEmployer}" companyCategory="{!v.selectedCompCat}" ifOther="{!v.ifOther}" StateList="{!v.StateList}" CityList="{!v.CityList}"/><!--Parameters added for Bug 18448--><!--added scam for Bug 18576--><!-- parameters added for US 5881 -->
+               
+                <div aura:id = "childMainCmpbody"> {!v.body} </div> 
+            </div>
+        </div>
+    </ui:scrollerWrapper>
+    </aura:if>
+</aura:component>

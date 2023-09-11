@@ -1,0 +1,101 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="global" controller="SAL_PricingCtrlV2">
+   
+    <aura:attribute name="relationList" type="String[]" default="Father,Mother,Son,Daughter,Spouse"/>
+    <aura:attribute name="sol" type="SOL_Policy__c" />
+    <aura:attribute name="solId" type="String" />
+     <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+     <aura:attribute name="addOnSollist" type="List"/>
+    <aura:attribute name="chargeTypeLst" type="List"/>
+    <aura:attribute name="loanId" type="String"/>
+    <aura:attribute name="appId" type="String"/>
+    <aura:attribute name="loan" type="Opportunity"/>
+    <aura:attribute name="header" type="String"/>
+   <aura:attribute name="currentDate" type="String" default=""/> 
+    <aura:registerEvent name="updateAddOnSolList" type="c:AddOnCardEvent"/>
+	<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large slds-fade-in-open">
+     <div class="slds-modal__container">
+            <header class="slds-modal__header mobHeader">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <a onclick="{!c.goBack}" href="" style="text-decoration: none;">
+                        <lightning:icon iconName="utility:close" variant="inverse"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </a>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.header}</h2>
+            </header>
+         <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1"  >
+                <ui:scrollerWrapper class="wrapStyle">
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                          <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="chargetype" label="Charge Amount"  name="chargetype" value="{!v.sol.Charge_Type__c}" required="true" messageWhenValueMissing="Please Select Value">
+                                        <option value="" text="--None--" />  
+                                        <aura:iteration items="{!v.chargeTypeLst}" var="chargetypelst">
+                                        <option value="{!chargetypelst}" text="{!chargetypelst}" selected="{!v.sol.Charge_Type__c == chargetypelst}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                                </div>
+                            </div>  
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <lightning:input label="Add-on Holder First Name" value="{!v.sol.Add_on_Holder_First_Name__c}" aura:id="firstname" messageWhenValueMissing="Please Enter Value" required="true" />                                
+                            </div>
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Add-on Holder Middle Name" value="{!v.sol.Add_on_Holder_Middle_Name__c}" aura:id="midname" />
+                                </div>
+                            </div>
+                            <div class=" slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Add-on Holder Last Name " value="{!v.sol.Add_on_Holder_Last_Name__c}" aura:id="lastname" messageWhenValueMissing="Please Enter Value" required="true"  />
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="date" label="Add-on Holder DOB " name="dob" aura:id="dob" value="{!v.sol.Add_on_Holder_DOB__c}" messageWhenValueMissing="Please Enter Value" required="true" max="{!v.currentDate}"/>  
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Add-on Holder Mobile " value="{!v.sol.Add_on_holder_Mobile__c}" aura:id="mobile" messageWhenValueMissing="Please Enter Value" required="true" maxlength="10" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile Number"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input label="Add-on Holder Email " value="{!v.sol.Add_on_Holder_Email__c}" aura:id="email" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="Relation" label="Add-on Holder Relation"  name="relationname" value="{!v.sol.Add_on_Holder_Relation__c}" required="true" messageWhenValueMissing="Please Select Value">
+                                    <option value="" text="--None--" /> 
+                                        <aura:iteration items="{!v.relationList}" var="relations">
+                                        <option value="{!relations}" text="{!relations}" selected="{!v.sol.Add_on_Holder_Relation__c == relations}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                                </div>
+                            </div>
+                           
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    
+                                </div>
+                            </div>
+                           
+                            
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </div>
+            <footer class="slds-modal__footer mobFooter">
+                <div class="slds-align_absolute-center">
+                    <lightning:button class="slds-m-top_small  slds-theme--alt-inverse" iconName="utility:clear" variant="brand" label="Cancel" onclick="{! c.goBack }" />
+                    <lightning:button class="slds-m-top_small slds-theme--alt-inverse" iconName="utility:save" variant="brand" label="Save" onclick="{!c.saveAddOnDetails }" />
+                </div>
+            </footer>
+
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:component>

@@ -1,0 +1,22 @@
+<apex:page standardController="Account" >
+<apex:form >
+  <apex:pageBlock title="Accessing Salesforce Account object Via Visualforce code" mode="edit">
+        <apex:pageBlockButtons >
+        <apex:commandButton value="Save" action="{!save}"/>
+
+        </apex:pageBlockButtons>
+
+      <apex:pageBlockSection title="My content Section" columns="2">
+
+        <apex:inputField value="{!account.name}"/>
+        <apex:inputField value="{!account.Site}"/>
+        <apex:inputField value="{!account.Type}"/>
+        <apex:inputField value="{!account.AccountNumber}"/>
+        <apex:inputField value="{!account.AnnualRevenue}"/>
+        <!--<apex:inputField value="{!account.Sum_of_Opportunities__c}"/>-->
+
+      </apex:pageBlockSection>
+
+  </apex:pageBlock>
+  </apex:form>
+</apex:page>

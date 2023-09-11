@@ -1,0 +1,46 @@
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">	
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="mandatory" type="Boolean" default="true"/>
+     <aura:attribute name="Label" type="String" />
+    <ltng:require scripts="/resource/jQueryThree" />
+  <!--First Add jQuery and Select2 plugin library from static resource Using ltng:require tag-->  
+    <ltng:require styles="{! $Resource.MultiSelectPicklist + '/select2-4.0.3/dist/css/select2.min.css'}" 
+      scripts="{!join(',',  
+        $Resource.MultiSelectPicklist + '/select2-4.0.3/dist/js/select2.js')
+      }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+  <!--init handler event call "doInit" function on component load and fetch picklist values-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+  <!--Declare Attributes--> 
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:attribute name="mySelectedvalues" type="String"/>
+    <aura:method name="bindData" action="{!c.bindData}" access="PUBLIC"/> 
+    <aura:method name="setRejectReason" action="{!c.setRejectReason}" access="PUBLIC">
+         <aura:attribute name="reason" type="String" />
+    </aura:method>
+
+    
+  <!--create form-->
+ <div class="slds-m-around--medium slds-form--stacked">  
+ <!--for multi-select picklist [select2] -->    
+   <div class="slds-form-element">  
+       <aura:if isTrue="{!v.mandatory}">
+       <label class="slds-form-element__label slds-is-required" for="picklist"> <span class="requiredClass">*</span>{!v.Label}</label>
+      <aura:set attribute="else">
+                 <label class="slds-form-element__label" for="picklist">{!v.Label}</label>
+           </aura:set>
+       </aura:if>
+           <select style="width:100%;" id="picklist" class="select2Class" multiple="multiple" onchange="{!c.bindData}">
+       <!--<option value="" text="None"></option>
+         <aura:iteration items="{!v.options}" var="opts">
+         <option value="{!opts}" >  {!opts} </option>
+       </aura:iteration>   -->  
+     </select>
+   </div>
+     
+ 
+ </div>    
+</aura:component>

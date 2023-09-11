@@ -1,0 +1,31 @@
+<template>
+    <div class="mainCls">
+        <div class="slds-page-header headerCls">
+            <h2>My To do list</h2>
+        </div>
+        
+        <br/>
+        <div class="inputCls">
+            <lightning-input class="slds-size_1-of-2" type="text" name="listItem" placeholder="To do ..." onchange={handleInputChange} value={newItem}></lightning-input>
+            <lightning-button variant="brand" label="Add" title="Primary action" onclick={handleClick} class="slds-m-left_x-small buttonCls"></lightning-button>
+        </div>
+        <br/>
+        <br/>
+
+        <template if:true={showList}>
+            <lightning-card title="To do Lists" icon-name="custom:custom14">
+                <ul class="slds-m-around_medium">
+                    <template for:each={listOfTodo} for:item="item">
+                        <li key={item.id}>
+                            <div class="listItem">
+                                <b style="color:cornflowerblue">{item.Name}</b>
+                                <span class="itemRemove" onclick={handleRemove} data-target-id={item.id}>X</span>
+                            </div>
+                        </li>
+                    </template>    
+                </ul>    
+            </lightning-card>
+        </template>
+
+    </div>
+</template>

@@ -1,0 +1,182 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global"  controller="SAL20_DisbController">
+	<!-- +-+-+-+-+-+-+-+- START : Attributes +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="showSendBackComments" type="Boolean"	default="false" description="To enable the UI for sending back." />
+    <aura:attribute name="isProcessing" 		type="Boolean"	default="false" description="To make button disable and Spinner view." />
+    <aura:attribute name="isSentToFinnoneAllowed" type="Boolean" default = "true" description ="To make button disable, in case all predefined rules have not be completed." /> 
+    
+    <aura:attribute name="record" type="Object" />
+	<aura:attribute name="simpleRecord" type="Object" />
+   <!-- <aura:attribute name="baseUrl" type="String" default=""/>--><!--US_1409 -->
+    <aura:attribute name="isSendBack" type="Boolean" /><!--US_1409 -->
+    <aura:attribute name="nameTheme" type="string" default="Theme3"/><!--US_1409-->
+    <aura:attribute name="iscommunityUser" type="boolean" default="true" /> <!--US_1409-->
+    <aura:attribute name="sndfinone" type="Boolean" default="false"/>
+	<aura:attribute name="recordError" type="String" />
+	<aura:attribute name="oId" type="String" />
+    <aura:attribute name="rsaVeriDone" type="Boolean" default="true"/><!-- 20939 Enable/Disable Send to Finnone (Garima)-->
+    <aura:handler name="init" value="{! this }" action="{! c.onInit}" /> <!-- 20939 To Enable/Disable Send to Finnone on load(Garima) -->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <c:IdentifierForMobility /><!-- user story 978-->
+    <force:recordData 	aura:id="recordHandler" 
+						recordId="{!v.oId }" 
+						fields = "CreatedDate , Id, Sent_To_Finnone__c,  COO_Comments__c,Loan_Application_Number__c"
+						targetRecord="{!v.record}" 
+						targetFields="{! v.simpleRecord }"
+						targetError="{!v.recordError}" 
+						mode="EDIT" 
+						/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <!-- Bug 22065-S- Changed heading UI-->
+    <article class="slds-card slds-m-around_xx-small slds-m-top_none">
+        <div class="slds-page-header" role="banner">
+            <div class="slds-grid">
+                <div class="slds-media slds-media--center slds-no-space slds-grow">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle">Sent To Finnone</h1>
+                        <!--p class="slds-text-heading-label">SFDC LAN: </p-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--Bug 22065 -E -->
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+
+
+	<!-- +-+-+-+-+-+-+ START: Body/Content part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{! v.isProcessing }">
+		<lightning:spinner  size="large"/>
+	</aura:if>
+    
+	<table class="slds-table slds-truncate slds-table_bordered slds-table_cell-buffer slds-m-top_xx-small">
+		<thead>
+			<tr class="slds-text-title_caps">
+                <th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="SFDC LAN">
+						Loan Application Number
+					</div>
+				</th>
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Sent to FinnOne">
+						Send Back
+					</div>
+				</th>
+                <th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="SFDC LAN">
+						Send to Finnone
+					</div>
+				</th>
+                <th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="SFDC LAN">
+						Sent to Finnone
+					</div>
+				</th>
+				<th scope="col" class="slds-cell-shrink">
+					<div class="slds-truncate" title="Created Date">
+						Created Date
+					</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+            <tr>
+                <td>
+                    {!v.simpleRecord.Loan_Application_Number__c}
+                </td>
+                <aura:if isTrue="{!v.isSendBack }"><!--US_1409 -->
+                <td>
+                        <lightning:button variant="brand" 
+                                          label="Send Back"
+                                          title="Send Back"
+                                          onclick="{! c.onSendBack }"
+                                          disabled ="{! v.showSendBackComments}"
+                                          />
+                    </td>
+                </aura:if><!--US_1409 -->
+                  <!--US_1409 S-->
+              
+                <aura:if isTrue="{!!v.isSendBack }"> 
+                    <td>
+                        <lightning:button aura:id="newbutton" variant="brand" 
+                                          label="Send Back To Sales"
+                                          title="Send Back To sales"
+                                          onclick="{! c.onSendBack }"
+                                          disabled ="{! v.showSendBackComments}"
+                                          />
+                    </td>
+                </aura:if>
+                 <!--US_1409 E-->
+           		 <aura:if isTrue="{!v.sndfinone}">
+                    <td>
+                        <lightning:button variant="brand" 
+                                          label="Send to FinnOne"
+                                          title="Send to FinnOne"
+                                          onclick="{! c.onSendToFinone }"
+                                         
+                                         /> <!-- 20939 Added rsaVeriDone flag (Garima) -->
+                    </td>
+                </aura:if>
+				<td>
+                    <!--lightning:outputField fieldName="Sent_To_Finnone__c" /-->
+                    <!-- INFO ::: UI namespace is deprecated, however, there is no direct provision for showing checkbox values.
+								Hence using the UI Namespace, please replace with non-deprecated version, when it is availble. -->
+                    <ui:outputCheckbox aura:id="output" value="{! v.simpleRecord.Sent_To_Finnone__c }"/>
+				</td>
+				<td>                                        
+                    <lightning:formattedDateTime value="{! v.simpleRecord.CreatedDate }"  
+                                                 year="numeric" 
+                                                 month="numeric" 
+                                                 day="numeric" 
+                                                 hour="2-digit"
+                                                 minute="2-digit"                                                  
+                                                 hour12="false"/> 
+                    <!--lightning:outputField fieldName="CreatedDate" /-->
+				</td>
+			</tr>
+            
+            <aura:if isTrue="{! v.showSendBackComments }">
+                <tr>
+                    <td>
+                        Enter Send Back Comments 
+                    </td>
+                    <td>                        
+                            <lightning:input label=" " type="text"  value="{! v.simpleRecord.COO_Comments__c }" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <lightning:button variant="brand" 
+                                          label="Done"
+                                          title="Done"
+                                          disabled="{! v.isProcessing }"
+                                          onclick="{! c.onSendBackDone }"
+                                          />
+                    </td>
+                    <td>
+                        <lightning:button variant="brand" 
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.onSendBackCancel }"
+                                          />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </aura:if>            
+		</tbody>
+	</table>
+	<!-- +-+-+-+-+-+-+ END  : Body/Content part +-+-+-+-+-+-+  -->
+
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<c:Toast aura:id="toastCmp"/>
+    </article> <!-- Bug 22065 End of article tag -->
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+	<!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+</aura:component>

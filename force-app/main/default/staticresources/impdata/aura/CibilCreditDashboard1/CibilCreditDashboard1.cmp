@@ -1,0 +1,249 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="sourCateg" type="string" default=""/><!--CR 23820 22018-->
+
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="applicantObj" type="Applicant__c"/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/>    
+    <aura:attribute name="cibilDashboardData" type="Object" default=""/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="secondaryCibilRecs" type="CIBIL_secondary_match__c[]"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="isViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="showcibilpopup" type="boolean" default="false"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="dummyRec" type="CIBIL_secondary_match__c[]"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <c:GenericBackCmp/> <br/>
+    
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        
+        <lightning:card title="" class="applyMarginToCard slds-box " variant="header-hidden">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                   
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                       <table>
+                                    
+                                    <tbody> 
+										 <aura:if isTrue="{!v.cibilDashboardData != ''}">
+                                       <aura:if isTrue="{!and(v.cibilDashboardData.cibil_dashboard == 'Positive',empty(v.secondaryCibilRecs))}">
+                                            <tr class="green-color" style="height:30px;text-align :center"> 
+                                                <div style="padding-top:8px"> CIBIL: {!v.cibilDashboardData.cibil_dashboard}  </div> </tr>
+                                            
+                                            <aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> CIBIL: {!v.cibilDashboardData.cibil_dashboard}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if> 
+                                        <aura:set attribute="else">
+                                                <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> CIBIL: {!v.cibilDashboardData.cibil_dashboard}  </div> </tr>
+                                            </aura:set>
+                                        </aura:if> 
+                                       
+                                        <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                            <lightning:card title="" class="applyColor">
+                                                <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                    <div class="slds-p-horizontal--small">                
+                                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input aura:id="cIBILScoreId" label="Cibil Score" value="{!v.applicantObj.CIBIL_Score__c}" name="cIBILScoreName" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="dpd" label="DPD cluster segment" value="{!v.cibilTemp.DPD_cluster_Segment__c}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:textarea name="rules" label="Codified CIBIL rules" value="{!v.cibilDashboardData.codified_output_list}" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-form-element__label" for="select-01"> View CIBIL- link </label> <br/>
+                                                                    <aura:if isTrue="{!v.cibil}">
+                                                                        <a onclick="{!c.redirectToViewCibilReport}">
+                                                                            View CIBIL Report
+                                                                        </a>
+                                                                        <aura:set attribute="else">
+                                                                            Link Not Available
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <label class="slds-form-element__label" for="select-01"> View CIBIL Report- link </label> <br/>
+                                                                    <aura:if isTrue="{!v.cibilExt1}">
+                                                                        <a onclick="{!c.redirectToOneViewCibilReport}">
+                                                                            One View CIBIL Report
+                                                                        </a>
+                                                                        <aura:set attribute="else">
+                                                                            Link Not Available
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control"> <!-- {!v.cibilDashboardData.ews_rule_policy} -->
+                                                                    <aura:if isTrue="{!v.applicantObj.Product__c == 'RSL'}">
+                                                                        <lightning:input type="text" name="ews" value="{!v.sourCateg}" label="EWS Policy Norms Met" placeholder="" disabled="true"/>
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:input type="text" name="ews" value="{!v.applicantObj.RC_Deviation__c}" label="EWS Policy Norms Met" placeholder="" disabled="true"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div><!--22018-->
+                                                            <!--24997 s-->
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control"> <!-- {!v.cibilDashboardData.ews_rule_policy} -->
+                                                                    <lightning:input type="text" name="CIBIL Fired Time" value="{!v.cibil.CIBIL_Fired_time__c}" label="CIBIL Fired Time" placeholder="" disabled="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <!--24997 e-->
+                                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                                <div class="slds-form-element__control">
+                                                                    <aura:if isTrue="{!v.secondaryCibilRecs.length > 0}">
+                                                                        <lightning:input type="text" name="authFlag" value="YES" label="Secondary CIBIL" placeholder="" disabled="true"/>
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:input type="text" name="authFlag" value="No" label="Secondary CIBIL" placeholder="" disabled="true"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </p>
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-m-top--small slds-grid_align-center" align="center" style="float:centre">
+                                                    <div class="slds-p-around--x-medium" align="center">
+                                                        <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="View Secondary Cibil" onclick="{!c.opencibilpopup}" disabled="{!v.secondaryCibilRecs.length == 0 || v.displayReadOnly}"/> <!-- Edited for Bug 24130 -->
+                                                    </div>
+                                                </div>
+                                            </lightning:card>
+                                        </div></tbody>
+                                    
+                                </table>
+                           
+                    </div>
+                </div>
+            </p>
+            
+        </lightning:card>
+        
+    </div>
+    <aura:if isTrue="{!v.isViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isOneViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.showcibilpopup}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container slds-scrollable_y" style="overflow:auto;" >
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> CIBIL Secondary Match Details</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium slds-scrollable_y">
+                    <iframe src="{!'/apex/secondarycibil_mobility?priamryappid=' + v.applicantObj.Id+'&amp;oppid='+v.oppId}" frameBorder="0" height="300px" width="100%"/>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+	{!v.body}
+</aura:component>

@@ -1,0 +1,34 @@
+.THIS .borderColor {
+    border-top: 1px solid rgb(187, 188, 189);
+   
+}
+.THIS .slds-scope {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS .slds-theme_alt-inverse {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+.THIS .slds-icon-text-default-green .slds-icon{
+    fill:green !important;
+   
+}
+.THIS .slds-icon-text-default-red .slds-icon{
+    fill:red !important;
+}
+.THIS .backcolor{
+    background-color :rgb(103, 93, 93) !important;
+}

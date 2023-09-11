@@ -1,0 +1,400 @@
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="negativeAreastatus" type="String"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default=""/>
+    <aura:attribute name="bankVerifyDone" type="string" default=""/> 
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="bankVerObj" type="Verification__c" default=""/>
+    <aura:attribute name="OfcVerObj" type="Verification__c" default=""/>
+    <aura:attribute name="resPerVerObj" type="Verification__c" default=""/> 
+    <aura:attribute name="resCurVerObj" type="Verification__c" default=""/>
+    <aura:attribute name="creditStatusList" type="List"/>  
+    <aura:attribute name="isVerificationModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isGeotaggingModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="bankCheckDashboardData" type="Object" default=""/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/> 
+    <aura:attribute name="verType" type="String" default=""/>
+    <aura:attribute name="verifyList" type="Verification__c[]"/>
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{}"/>
+    <aura:attribute name="eKycAddress" type="String" default=""/> 
+    <aura:attribute name="poAddress" type="String" default=""/>
+    <aura:attribute name="inputAddress" type="String" default=""/>
+    <aura:attribute name="accObj" type="Account" default=""/>
+    <aura:attribute name="negativeAreaVal" type="Boolean" default="false"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:handler event="c:DestroyDashboardChild" action="{!c.DestroyChildCmp}"/>
+    <aura:attribute name="verComplete" type="boolean" default="false"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+	<aura:attribute name="showDGComp" type="boolean" default="false"/><!--24316-->
+    <aura:attribute name="tempVerRec" type="Verification__c" default="{'sobjectType':'Verification__c', 'Name':'Ver123'}"/> <!-- CR 22307 -->
+    <c:GenericBackCmp/>
+    <br/>
+    <div style="padding-right: 0px;padding-left: 0px;padding-top: 0px; padding-bottom: 0px;">
+        <lightning:accordion >
+            <lightning:accordionSection name="veriList" label="Verification">
+        <lightning:card class="applyMarginToCard slds-box" title="">
+            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">    
+                    
+                    
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                        
+                        <table>
+                            
+                            <tbody> 
+                                <aura:if isTrue="{!!v.verComplete}" >
+                                    
+                                    <tr class="orange-color" style="height:30px;text-align :center"> <div style="padding-top:8px"> Verifications: Not done  </div> </tr>
+                                    
+                                    <aura:set attribute="else">
+                                        <tr class="green-color" style="height:30px;text-align :center"> 
+                                            <div style="padding-top:8px"> Verifications: Done  </div> </tr>
+                                    </aura:set>
+                                </aura:if> 
+                                <aura:if isTrue="{!empty(v.poObj)}" >
+                                    <tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                        <div style="padding-top:8px"> <b>  Bank Verification (for non-preapproved cases) </b></div> </tr>
+                                    <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                        <lightning:card title="" class="applyColor">
+                                            <p class="slds-p-horizontal_small slds-theme_shade">  
+                                                <div class="slds-p-horizontal--small">                
+                                                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                        
+                                                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input label="Authenticity Score Flag" value="{!v.bankObj.Authenticity_Score_Flag__c}" name="flag" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input name="auacore" label="Authenticity Score" value="{!v.bankObj.Authenticity__c}" disabled="true"/>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input name="covert" label="Covert Applicability" value="{!v.bankVerifyDone}" disabled="true"/>
+                                                            </div>
+                                                        </div> 
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:input name="response" label="Covert Response" value="{!v.bankVerObj.Status__c}" disabled="true"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                            <div class="slds-form-element__control">
+                                                                <lightning:select name="bankingstatus" label="Credit Status" value="{!v.bankVerObj.Credit_Status__c}" disabled="{!empty(v.bankVerObj)?true:false}">
+                                                                    <option value="">-- None --</option>
+                                                                    <aura:iteration items="{!v.creditStatusList}" var="status">
+                                                                        <option value="{!status}" text="{!status}" selected="{!v.bankVerObj.Credit_Status__c == status}"></option>
+                                                                    </aura:iteration>
+                                                                </lightning:select>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        
+                                                    </div>
+                                                    <div  class="slds-p-top--x-small slds-align_absolute-center">
+                                                            <lightning:button variant="brand" label="External Verification" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.fireVerification}" disabled="{!or(not(empty(v.bankVerObj)),v.displayReadOnly)}" aura:id="Bank Statements"/>
+                                                        </div>
+                                                </div>
+                                            </p>
+                                        </lightning:card>
+                                    </div>
+                                </aura:if>
+                                <!-- 24668 s-->
+                                <aura:if isTrue = "{!v.appType != 'Financial Co-Applicant'}">
+                                <tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                    <div style="padding-top:8px"> <b>Residence Verification - Permanent </b></div> </tr>
+                                <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                    <lightning:card title="" class="applyColor">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Permanent Address FI Applicability" value="{!!empty(v.resPerVerObj)?'Yes':'No'}" name="peraadd" disabled="true"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Verification Response" value="{!v.resPerVerObj.Sales_Status__c}" name="verRes" disabled="true"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:select name="bankingstatus" label="Credit Status" value="{!v.resPerVerObj.Credit_Status__c}" disabled="{!empty(v.resPerVerObj)?true:false}">
+                                                                <option value="">-- None --</option>
+                                                                <aura:iteration items="{!v.creditStatusList}" var="status">
+                                                                    <option value="{!status}" text="{!status}" selected="{!v.resPerVerObj.Credit_Status__c == status}"></option>
+                                                                </aura:iteration>
+                                                            </lightning:select>
+                                                        </div>
+                                                    </div>
+                                                    <br/>
+                                                    <div  class="slds-p-top--x-small slds-align_absolute-center">
+                                                        <lightning:button variant="brand" label="External Verification" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.fireVerification}" disabled="{!or(not(empty(v.resPerVerObj)),v.displayReadOnly)}" aura:id="PERMANENT ADDRESS VERIFICATION"/>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </lightning:card>
+                                </div>
+                                <tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                    <div style="padding-top:8px"> <b>Residence Address – Current   </b>
+                                    </div> 
+                                </tr>
+                                <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                    <lightning:card title="" class="applyColor">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Residence Verification 
+                                                                                    Applicability
+                                                                                    " value="{!!empty(v.resCurVerObj)?'Yes':'No'}" name="emailsend" disabled="true"/>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="emailverify" label="Geo tagging Status" value="{!v.applicantObj.Office_Email_Id_Verified__c ? 'Yes':'No'}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div> -->
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input name="resResponse" label="Verification Response" value="{!v.resCurVerObj.Status__c}" disabled="true"/>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:select name="bankingstatus" label="Credit Status" value="{!v.resCurVerObj.Credit_Status__c}" disabled="{!empty(v.resCurVerObj)?true:false}">
+                                                                <option value="">-- None --</option>
+                                                                <aura:iteration items="{!v.creditStatusList}" var="status">
+                                                                    <option value="{!status}" text="{!status}" selected="{!v.resCurVerObj.Credit_Status__c == status}"></option>
+                                                                </aura:iteration>
+                                                            </lightning:select>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <br/>
+                                                    <div  class="slds-p-top--x-small slds-align_absolute-center">
+                                                        <lightning:button variant="brand" label="External Verification" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.fireVerification}" disabled="{!or(not(empty(v.resCurVerObj)),v.displayReadOnly)}" aura:id="Residence verification"/>
+                                                        
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </lightning:card>
+                                </div>
+                                </aura:if>
+                                <!--24668 e-->
+                                
+                                <tr style="height:30px;text-align :center;border-left:1px solid rgb(217, 219, 221);border-right:1px solid rgb(217, 219, 221)"> 
+                                    <div style="padding-top:8px"> <b>Office Verification </b></div> 
+                                </tr>
+                                <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                    <lightning:card title="" class="applyColor">
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Office Verification 
+                                                                                    Applicability
+                                                                                    " value="{!!empty(v.OfcVerObj)?'Yes':'No'}" name="cmpName" disabled="true"/>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="">
+                                                                <div class="slds-form-element__control">
+                                                                    <lightning:input name="emailverify" label="Geo tagging Status" value="{!v.applicantObj.Office_Email_Id_Verified__c ? 'Yes':'No'}" disabled="true"/>
+                                                                    
+                                                                </div>
+                                                            </div> -->
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input name="ofcResponse" label="Verification Response" value="{!v.OfcVerObj.Sales_Status__c}" disabled="true"/>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:select name="bankingstatus" label="Credit Status" value="{!v.OfcVerObj.Credit_Status__c}" disabled="{!empty(v.OfcVerObj)?true:false}">
+                                                                <option value="">-- None --</option>
+                                                                <aura:iteration items="{!v.creditStatusList}" var="status">
+                                                                    <option value="{!status}" text="{!status}" selected="{!v.OfcVerObj.Credit_Status__c == status}"></option>
+                                                                </aura:iteration>
+                                                            </lightning:select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <br/>
+                                                    <div  class="slds-p-top--x-small slds-align_absolute-center">
+                                                        <lightning:button variant="brand" label="External Verification" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.fireVerification}" disabled="{!or(not(empty(v.OfcVerObj)),v.displayReadOnly)}" aura:id="Office verification"/>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </lightning:card>
+                                </div>
+                                
+                            </tbody>
+                            
+                        </table>   
+                        <div  class="slds-p-top--x-small slds-align_absolute-center">
+                            <lightning:button variant="brand" label="Save" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.saveVerification}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <div>
+                                <a onclick="{!c.redirectToVericationReport}">
+                                    View Report
+                                </a>
+                            </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <div>
+                                <a onclick="{!c.redirectToGeoTaggingReport}">
+                                    View Geo tagging details
+                                </a>
+                            </div>
+                        </div>
+                        <br/> <br/>
+                        <table>
+                            <tbody>
+                                <tr> <b> Residence Address - Current </b></tr><tr>
+                                    <div class="slds-box slds-box_x-small slds-theme_shade" >
+                                        <p class="slds-p-horizontal_small slds-theme_shade">  
+                                            <div class="slds-p-horizontal--small">                
+                                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Residence in Negative Area" value="{!v.negativeAreaVal == true ? 'Yes' : 'No'}" name="negativeVal" disabled="true"/>
+                                                            <!--<label> Residence in Negative Area </label>
+                 <lightning:input type="toggle" name="perfiosAdd" label="" class="slds:input" checked="{!v.negativeAreaVal}" disabled="true"/>
+        -->
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                        <div class="slds-form-element__control">
+                                                            <lightning:input label="Residence Stability" value="{!v.bankCheckDashboardData.residence_stability}" name="stability" disabled="true"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    
+                                    
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+           
+           </lightning:accordionSection>
+           <!--24316-->
+			<!--24668 e-->
+      <aura:if isTrue="{!v.appType != 'Financial Co-Applicant'}">     
+     <aura:if isTrue="{!v.showDGComp}">
+        <lightning:accordionSection name="DigitalSampling" label="Digital Sampling" >
+            <c:DigitalSamplingLightningCmp recordId="{!v.oppId}" isMobility="true"/>
+           </lightning:accordionSection>
+          </aura:if>
+ 		  </aura:if><!--24668 e-->	
+           <!--24316-->
+        </lightning:accordion>
+    </div>
+    <aura:if isTrue="{!v.isVerificationModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeVerificationModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/COVerificationVF?id=' + v.oppId + '&amp;grouptype=salaried'}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/COVerificationVF?id=' + v.oppId + '&amp;grouptype=salaried'}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/COVerificationVF?id=' + v.oppId + '&amp;grouptype=salaried'}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/COVerificationVF?id=' + v.oppId + '&amp;grouptype=salaried'}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeVerificationModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isGeotaggingModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeGeoTaggingModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'Partner/apex/VerificationDetailsPage?id=' + v.oppId}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'Partner/apex/VerificationDetailsPage?id=' + v.oppId}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/VerificationDetailsPage?id=' + v.oppId}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/VerificationDetailsPage?id=' + v.oppId}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeGeoTaggingModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    
+</aura:component>

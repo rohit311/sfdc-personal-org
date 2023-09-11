@@ -1,0 +1,337 @@
+<aura:component controller="DedupeController">
+    
+    <aura:attribute name="isOpen" type="boolean" default="false" description="open flag"/>
+    <aura:attribute name="Dedupe" type="De_Dupe__c[]"/>
+    <aura:attribute name="loanId" type="ID"  />
+    <aura:attribute name="storeRadioValue" type="boolean"/>
+    <aura:attribute name="storeRadioText" type="String"/>
+    <aura:attribute name="LoanApplication" type="Opportunity"/>
+    <aura:attribute name="Applicants" type="Applicant__c[]"/>
+    <aura:attribute name="selectedApplicant" type="String" />
+    <aura:attribute name="selectedDedupeId" type="String" default="" />
+    <aura:attribute name="PageMsg" type="String" default="" />
+    <aura:attribute name="IsDedupeLinked" type="boolean" default="false" />
+    <aura:attribute name="TotalDedupes" type="Integer" default="0"/>
+    <aura:attribute name="saveBtnLabel" type="String" default="Save"/>
+    <aura:attribute name="resetBtnLabel" type="String" default="Reset"/>
+    <aura:attribute name="waitingFlag" type="boolean" default="true"/>
+    <aura:attribute name="showCorporate" type="boolean" default="false"/>
+    <aura:attribute name="disabled" type="boolean" default="false" /><!-- 15580 -->
+    <aura:attribute name="isSALMobility" type="String" default="false"/> <!-- 17139 -->
+    <aura:handler name="init" value="{!this}" action="{!c.getData}"/> 
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="isDisbDashboard" default="false"/> <!--Bug 20391 -->
+    
+    <!-- 20391 heading ***S*** -->
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{!v.isDisbDashboard == true}">
+		<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Dedupe Referral</h1>
+		</div>
+    </aura:if>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    <!-- 20391 heading ***E*** -->
+	<!-- 17139  Added aura:if-->
+    <aura:if isTrue="{!v.isSALMobility == false}"> 
+    <div style="border-radius:2px;color:white;width:100%;height:25px;background-color:#0072bc;display:Block;padding-top:4px;padding-left:4px;">
+        <span style="padding-left: 1%;">Dedupe Linking</span>
+    </div>
+	</aura:if>
+    <div class="slds-m-around--xx-large">
+        <div class="slds-align_absolute-center">
+            <span class="slds-align_absolute-center"> 
+                <div class=" slds-align_absolute-center">
+					<!-- 17139 added aura:if set -->
+                    <aura:if isTrue="{!v.isSALMobility == false}">
+                    <button class="slds-button slds-button--brand" onclick="{!c.openModel}">DeDupe Referral</button>
+                    <aura:set attribute="else">
+						<button class="slds-button slds-button--brand slds-theme--alt-inverse" onclick="{!c.openModel}" disabled="{!v.displayReadOnly}"> <!-- CR 22307 -->Dedupe Referral</button>                      
+                      </aura:set>
+                    </aura:if> 
+                    
+                </div> 
+            </span>
+        </div>     
+        
+        <aura:if isTrue="{!v.isOpen}">
+            <div id="modalid" role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-modal_large slds-fade-in-open ">
+                <div class="slds-modal__container">
+                    
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                            <!-- X --> <lightning:icon iconName="utility:close" size="x-small" alternativeText="Done" title="Close" variant="inverse"/>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h3 id="header99" class="slds-text-heading--large" style="font-weight: normal;">DedupeLink Details</h3>
+                    </div>
+                    
+                    <div class="slds-modal__content slds-p-around--large" style="overflow:auto;">
+                        <!--
+                        <aura:if isTrue="{!v.PageMsg!=''}">
+                        <div class="demo-only" style="height: 4rem;">
+                            <div class="slds-notify_container slds-is-relative">
+                                <div class="slds-notify slds-notify_toast slds-theme_info" >
+                                    <div class="slds-notify__content">
+                                        <h2 class="slds-text-heading_small ">{!v.PageMsg}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </aura:if>
+                        -->
+                        
+                        <div class="slds-truncate" style="font-weight: bold;">
+                            <!--<ui:inputSelect label="Select Applicant " value="{!v.Applicants}" />-->
+                            <div style="float:left; padding-right:1%;">
+                                <lightning:icon iconName="utility:user" size="x-small" alternativeText="Done" />
+                            </div>
+                            
+                            <lightning:select name="Select Applicant " label="Select Applicant " onchange="{!c.onApplicantSelect}" value="{!v.selectedApplicant}">
+                                <option value="" text=" --None-- "></option>
+                                <aura:iteration items="{!v.Applicants}" var="app">
+                                    <option value="{!app.Id}" text="{!app.Contact_Name__r.Name}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div> 
+                    </div>
+                    
+                    
+                    <aura:if isTrue="{!v.TotalDedupes>0}">
+                        
+                        <div class="slds-modal__content slds-p-around--large">
+                            <div class="slds" style="overflow:auto;">
+                                <table  class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr class="slds-text-title--caps">
+                                            <th>
+                                                <span class="slds-truncate" title="Select">Select</span>
+                                            </th>
+                                            <th>
+                                                <span class="slds-truncate" title="Customer ID">Customer ID</span>
+                                            </th>
+                                            <th>
+                                                <span class="slds-truncate" title="Customer Name">Customer Name</span>
+                                            </th>
+                                            <aura:if isTrue="{!!v.showCorporate}">
+                                            <th>
+                                                <span class="slds-truncate" title="Date Of Birth">Date Of Birth</span>
+                                            </th>
+                                            </aura:if>
+                                             <aura:if isTrue="{!v.showCorporate}">
+                                            <th>
+                                                <span class="slds-truncate" title="Incorporation Date">Incorporation Date</span>
+                                            </th>
+                                            </aura:if>
+                                            <th>
+                                                <div class="slds-truncate" title="Mailing Address">Mailing Address</div>
+                                            </th>
+                                            <th>
+                                                <div class="slds-truncate" title="City">City</div>
+                                            </th>
+                                            <th>
+                                                <div class="slds-truncate" title="Mobile Number">Mobile Number</div>
+                                            </th>
+                                            <th>
+                                                <div class="slds-truncate" title="PAN Number">PAN Number</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.Dedupe}" var="ded">
+                                            
+                                       <!-- REVERT KHUSBHU  SOURCE ISSUE   <aura:if isTrue="{!ded.Source_Or_Target__c=='Target'}"> -->
+                                                <tr class="{!v.selectedDedupeId==ded.Id 
+                                                       || and(ded.Customer_ID__c !=null,ded.Applicant__r.Contact_Name__r.CIF_Id__c==ded.Customer_ID__c)  
+                                                       ? ded.Source_Or_Target__c=='Source'?'sourceClass': 
+                                                       'backgroundchange':
+                                                       ded.Source_Or_Target__c=='Source'?'sourceClass':
+                                                       ded.Customer_ID__c==v.Dedupe[0].Customer_ID__c?'highlightClass':''}">  
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <!--<ui:inputRadio aura:id="r0" name="select" text="{!ded.Id}" change="{!c.onGroup}"  /> -->
+                                                        <!--<ui:inputCheckbox name="select" aura:id="r0" text="{!ded.Id}" change="{!c.onGroup}" />-->
+                                                        <aura:if isTrue="{!v.IsDedupeLinked}">
+                                                            <aura:if isTrue="{!v.selectedDedupeId==ded.Id 
+                                                                             || and(ded.Customer_ID__c !=null,ded.Applicant__r.Contact_Name__r.CIF_Id__c==ded.Customer_ID__c)  
+                                                                             }">
+                                                                <aura:if isTrue="{!ded.Source_Or_Target__c!='Source'}">
+                                                                    <lightning:icon iconName="utility:success" size="small" alternativeText="Done" title="Dedupe Linking Done"/>
+                                                                    <aura:set attribute="else">
+                                                                        <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                                                            <lightning:icon iconName="utility:info" size="small" alternativeText="Source" title="Source Dedupe Record" />
+                                                                        </aura:if>
+                                                                        
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                                                        <lightning:icon iconName="utility:info" size="small" alternativeText="Source" title="Source Dedupe Record"/>
+                                                                    </aura:if>
+                                                                    
+                                                                </aura:set>
+                                                            </aura:if>
+                                                            
+                                                            <aura:set attribute="else">
+                                                                <aura:if isTrue="{!ded.Source_Or_Target__c!='Source'}">
+                                                                    <ui:inputRadio aura:id="r0" name="select" text="{!ded.Id}" change="{!c.onGroup}"  />
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:icon iconName="utility:info" size="small" alternativeText="Source" title="Source Dedupe Record" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                                
+                                                                
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </div>
+                                                </td>
+                                                <td scope="row" >
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Customer_ID__c}" class="{!and(ded.Customer_ID__c==v.Dedupe[0].Customer_ID__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div>
+                                                </td>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Customer_First_Name__c +' '+ ded.Customer_Last_Name__c}" class="{!and(and(ded.Customer_First_Name__c==v.Dedupe[0].Customer_First_Name__c,ded.Customer_Last_Name__c==v.Dedupe[0].Customer_Last_Name__c),ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/><!-- {!ded.Customer_First_Name__c} -->
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Target'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Name}" class="{!and(ded.Name==v.Dedupe[0].Customer_First_Name__c+' '+v.Dedupe[0].Customer_Last_Name__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/><!-- {!ded.Customer_First_Name__c} -->
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!and(!v.showCorporate,ded.Source_Or_Target__c=='Source')}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Date_of_Birth__c}" class="{!and(ded.Date_of_Birth__c==v.Dedupe[0].Date_of_Birth__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!and(v.showCorporate,ded.Source_Or_Target__c=='Source')}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Company_Date_of_Incorporation__c}" class="{!and(ded.Company_Date_of_Incorporation__c==v.Dedupe[0].Company_Date_of_Incorporation__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!and(!v.showCorporate,ded.Source_Or_Target__c=='Target')}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.DOB__c}" class="{!and(ded.DOB__c==v.Dedupe[0].Date_of_Birth__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!and(v.showCorporate,ded.Source_Or_Target__c=='Target')}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Company_Date_of_Incorporation__c}" class="{!and(ded.Company_Date_of_Incorporation__c==v.Dedupe[0].Company_Date_of_Incorporation__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div>                                                        
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <!--15580 ded.Present_Address__c+' '+ded.Area_Locality__c+' '+ded.PIN_Code__c -->
+                                                        <ui:outputText value="{!ded.Present_Address__c+','+ded.Area_Locality__c+','+ded.PIN_Code__c}" class="{!and(ded.Present_Address__c==v.Dedupe[0].Present_Address__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Target'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <!--15580 ded.Present_Address__c+' '+ded.Area_Locality__c+' '+ded.PIN_Code__c -->
+                                                        <ui:outputText value="{!ded.Address1_Residence__c}" class="{!and(ded.Address1_Residence__c==v.Dedupe[0].Present_Address__c+','+v.Dedupe[0].Area_Locality__c+','+v.Dedupe[0].PIN_Code__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                </aura:if>
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.City_Residence__c}" class="{!and(ded.City_Residence__c==v.Dedupe[0].City_Residence__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Source'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Mobile__c}" class="{!and(ded.Mobile__c==v.Dedupe[0].Mobile__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!ded.Source_Or_Target__c=='Target'}">
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.Landline1_Residence__c}" class="{!and(ded.Landline1_Residence__c==v.Dedupe[0].Mobile__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                </aura:if>
+                                                <td scope="row">
+                                                    <div class="slds-truncate">
+                                                        <ui:outputText value="{!ded.PAN__c}" class="{!and(ded.PAN__c==v.Dedupe[0].PAN__c,ded.Source_Or_Target__c!='Source')?'highlightCustomerId':''}"/>
+                                                    </div> 
+                                                </td>
+                                                
+                                            </tr>
+                                          <!-- REVERT KHUSBHU  SOURCE ISSUE   </aura:if> -->
+                                            
+                                        </aura:iteration>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{! and(v.selectedApplicant!='' , v.TotalDedupes==0)}">
+                                <div class="slds-modal__content slds-p-around[RPLACE WITH DASH DASH]large">
+                                    <span class="slds-text-title_caps">No records to display!</span>
+                                </div>
+                            </aura:if>
+                        </aura:set>
+                       -->
+                    </aura:if>
+                    
+                    
+                    <div class="slds-modal__footer">
+                        <div class="overlayContainer"><!-- overlay conatiner -->
+                            <div class="slds-align_absolute-center">
+                                <span class="slds-align_absolute-center"> 
+                                    <div class=" slds-align_absolute-center">
+                                        <aura:if isTrue="{!v.selectedApplicant!=''}">
+                                            <aura:if isTrue="{!v.TotalDedupes==0 || v.TotalDedupes==1}">
+                                                <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.onSave}" aura:id="saveBtn" disabled="{!v.disabled}">{!v.saveBtnLabel}</button><!-- 15580 added disabled="{!v.disabled}" -->
+                                                <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.onReset}" aura:id="resetBtn" disabled="{!v.disabled}">{!v.resetBtnLabel}</button><!-- 15580 added disabled="{!v.disabled}" -->
+                                                <aura:set attribute="else">
+                                                    <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.onSave}" aura:id="saveBtn" disabled="{!v.disabled}">{!v.saveBtnLabel}</button><!-- 15580 added disabled="{!v.disabled}" -->
+                                                    <button class="slds-button slds-button_brand  slds-button__neutral" onclick="{!c.onReset}" aura:id="resetBtn" disabled="{!v.disabled}">{!v.resetBtnLabel}</button><!-- 15580 added disabled="{!v.disabled}" -->
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:if>
+                                    </div> 
+                                </span>
+                            </div>  
+                            
+                            <aura:if isTrue="{!v.waitingFlag}">
+                                <div class="overlay">
+                                    <div class="slds-spinner_container">
+                                        <div role="status" class="slds-spinner slds-spinner_medium">
+                                            <span class="slds-assistive-text">Loading</span>
+                                            <div class="slds-spinner__dot-a"></div>
+                                            <div class="slds-spinner__dot-b"></div>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </aura:if>
+                        </div>  
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </aura:if>
+    </div>
+</aura:component>

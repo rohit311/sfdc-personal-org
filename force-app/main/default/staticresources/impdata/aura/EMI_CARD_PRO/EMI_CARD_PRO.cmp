@@ -1,0 +1,63 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" 
+                access="global" controller="SFDCMobilePOController">
+    
+    <aura:attribute name="IdEMI" type="String" default="" />
+    <aura:attribute name="isPOFlag" type="Boolean" default="false" />
+    <aura:attribute name="checkprocess" type="Boolean" default="false" />
+    <aura:attribute name="isMobility" type="Boolean" default="false" />
+    <aura:attribute name="isLAFlag" type="Boolean" default="false" />
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="EMICardSelected" type="String" default=""/>
+    <aura:attribute name="EMICardpref" type="String" default=""/>
+    <aura:attribute name="PrefrenceList" type="String[]" />
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="OldVAl" type="String" default=""/>
+    <aura:registerEvent name="handleEmiCardFeesCharges" type="c:handleEmiCardFeesCharges"/>
+    <c:Custom_Toast_Mobility />
+    <c:LoaderForMobility />
+    <aura:if isTrue="{!v.isMobility}">
+        <lightning:button class="slds-button slds-button_brand slds-p-left_x-large slds-p-right_x-large slds-m-around_xxx-small" label="EMI Card" onclick="{!c.EMICARDOpenClose}" />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isOpen}">
+        <div id="modal-to-closeid" class="slds-m-around_xx-large">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open" style="width:100%;height:100%;padding:20px;">            
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header"  >
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            <span >
+                                EMI CARD DETAILS   
+                            </span>
+                        </h2>
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.CloseEverything}">
+                            X
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style=" background: rgb(243, 242, 242)"> 
+                        <lightning:select aura:id="prefrence" name="prefrence" label="Select EMI Card Preference of Customer" required="true" messageWhenValueMissing="Please Select Value" value="{!v.EMICardSelected}"  >
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.PrefrenceList}" var="Prefrence">
+                                <option value="{!Prefrence}" text="{!Prefrence}" selected="{!v.EMICardpref==Prefrence}" ></option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <footer class="slds-modal__footer">
+                           <lightning:button aura:id="CloseBtn" variant="brand" 
+                                              label="Save"
+                                              title="Save" onclick="{!c.saveEMICard}" disabled="{!v.checkprocess}"/>
+                      
+                        <lightning:button aura:id="CloseBtn" variant="neutral" 
+                                          label="Close"
+                                          title="Close" onclick="{!c.CloseEverything}"/>
+                        
+                    </footer>      
+                </div>
+                <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+                    <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+                </div>
+            </section>
+        </div>
+    </aura:if> 
+</aura:component>

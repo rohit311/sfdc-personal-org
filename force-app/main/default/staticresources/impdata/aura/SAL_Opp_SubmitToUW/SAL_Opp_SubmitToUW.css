@@ -1,0 +1,45 @@
+.THIS .lightningtoast{
+    padding-top: 130px !important;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    }
+
+.THIS .mySpinner { 
+   padding-top: 100px !important;
+    position: fixed;
+}
+/*
+.THIS .THIS .slds-scope .slds-checkbox [type=checkbox][disabled]+.slds-checkbox_faux:after, .THIS  .slds-scope .slds-checkbox [type=checkbox][disabled]+.slds-checkbox--faux:after,.THIS  .slds-scope .slds-checkbox [type=checkbox][disabled]~.slds-checkbox_faux:after, .THIS .slds-scope .slds-checkbox [type=checkbox][disabled]~.slds-checkbox--faux:after, .THIS  .slds-scope .slds-checkbox [type=checkbox][disabled]+.slds-checkbox__label .slds-checkbox_faux:after, .THIS  .slds-scope .slds-checkbox [type=checkbox][disabled]+.slds-checkbox__label .slds-checkbox--faux:after{
+    border-color: red !important;
+     color:red !important;
+}
+.THIS .red{
+     border-color: red !important;
+}
+.THIS input[type="checkbox"]:disabled {
+    color:red !important;
+}*/
+.THIS .applycolwidth{
+    width:90%;
+    top:0%;
+}
+.THIS #uploadedDocs >.slds-checkbox_faux{
+    background-color:red !important;
+}/*
+.THIS .slds-checkbox [type=checkbox][disabled]+.slds-checkbox_faux{
+    background-color:lightgrey !important;
+}*/
+.THIS #checkboxDiv >.slds-checkbox_faux{
+    background-color: white !important;
+}
+
+.THIS .slds-checkbox--faux{
+    background-color:lightgrey !important;
+}
+.THIS.creditcheckbox{
+    background-color:white !important;
+}
+.THIS .slds-scope .slds-checkbox [type=checkbox][disabled]+.slds-checkbox_faux:after{
+     background-color:red !important;
+}

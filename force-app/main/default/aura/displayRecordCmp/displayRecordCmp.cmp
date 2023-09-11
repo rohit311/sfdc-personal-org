@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="displayRecordCntrl">
+	<aura:attribute name="account" type="Account" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card title="Account Details">
+        <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+            
+        </div>
+    </lightning:card>
+</aura:component>

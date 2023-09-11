@@ -1,0 +1,28 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,force:appHostable" access="global"  >
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    
+    <aura:attribute name="homeFlag" type="Boolean" default="true"/>
+    <div class="slds-box slds-box_small">
+        <lightning:card title="" class="applyColor" >
+            <p>                
+                <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white; width:100%">
+                    <h3 class="font-size-heading-x-small slds-align-middle">LAIP Insta Customer Creation Upload Utility</h3>
+                </div>
+                
+                <div>                                           
+                    <div class="slds-p-top--x-small">
+                        <lightning:button class="slds-align_absolute-center" name="buttonName" label="Single Application"  onclick="{!c.navigateToSearchSingle}" />                        
+                    </div>
+                    <div class="slds-p-top--x-small">                        
+                        <lightning:button class="slds-align_absolute-center" name="buttonName1"  label="Bulk Upload" onclick="{!c.navigateToSearchBulk}"/>
+                    </div>
+                    
+                    <div>
+                    </div>                    
+                </div>
+            </p>
+        </lightning:card>
+        {!v.body}
+    </div>
+    
+</aura:component>

@@ -1,0 +1,14 @@
+.THIS .toastMessage.forceActionsText{
+     white-space : pre-line !important;
+    
+}
+.THIS .slds-form-element{
+    text-align: left;
+}
+.THIS.outerScroller2{
+    height:100% 
+}
+.THIS.outerScroller{
+    width:100%; 
+    height:100% 
+}

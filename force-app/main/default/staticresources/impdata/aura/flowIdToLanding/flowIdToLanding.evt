@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="Id" type="String"/>
+    <aura:attribute name="tabid" type="String"/>
+    <aura:attribute name="stageIsMyDetails" type="Boolean"/>
+    
+</aura:event>

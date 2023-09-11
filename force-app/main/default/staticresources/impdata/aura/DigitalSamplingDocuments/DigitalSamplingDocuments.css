@@ -1,0 +1,41 @@
+.THIS {
+}
+.THIS th{
+    background-color:rgb(22, 50, 92)!important;
+    color: #fff!important;
+    font-weight:bold;
+}
+.THIS .alignCenter{
+   text-align:center;
+}
+.THIS .WrapText
+{
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    -ms-hyphens: auto !important;
+   -moz-hyphens: auto !important;
+}
+.THIS .titleSize {
+    font-size:14px;
+    min-width:150px;
+    
+}
+.THIS .fleft{
+    float:left;
+}
+.THIS .floatLeft
+{
+padding-left: 0.5px;
+}
+
+.THIS .important-message {
+   font-weight: bold;
+        font-size: 150%;
+
+}
+
+.THIS .slds-card__header 
+{
+    padding: 0px;
+}

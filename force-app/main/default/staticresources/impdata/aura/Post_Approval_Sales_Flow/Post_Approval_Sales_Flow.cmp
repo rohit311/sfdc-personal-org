@@ -1,0 +1,272 @@
+<aura:component controller="SALMobilityController" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="pricingId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="DocSelected" type="String" default=""/>
+    <aura:attribute name="uploadedAttachments" type="SObject[]"/>
+    <aura:registerEvent name="showCustomToast" type="c:ShowCustomToast" />
+    <aura:attribute name="loanApplication" type="Opportunity" default="{'sobjectType': 'Opportunity'}"/>
+    <aura:attribute name="disbusment" type="Current_Disbursal_Details__c" default="{'sobjectType': 'Current_Disbursal_Details__c'}"/>
+    <aura:attribute name="EMI1stDate" type="String"/>
+    <aura:attribute name="EMILastDate" type="String"/>
+    <aura:attribute name="BPI" type="String"/>
+    <aura:attribute name="EMI" type="String"/>
+    <aura:attribute name="loanTypeList" type="List"/>
+    <aura:handler event="c:Sal_Pricing_Event" action="{!c.handleDisbusmentAttr}"/>
+    <aura:attribute name="isTextBoxEnabled" type="Boolean" default="false"/>
+    <aura:attribute name="isEmailSend" type="Boolean" default="false"/>
+    <aura:attribute name="nameTheme" type="string"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="activePath" type="String" default="docUploderTab"/>
+    <aura:attribute name="pathList" type="String[]" default="['docUploderTab','docUplodedTab']"/>
+    <aura:handler name="change" value="{!v.showspinnerflag}" action="{!c.showorhidespinner}"/>
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/>
+    <aura:attribute name="disablePrev" type="boolean" default="true" />
+    <aura:attribute name="disableNext" type="boolean" default="false" />
+    <aura:attribute name="StageNum" type="Integer" default="1" />
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />
+    <!--Submit to branch ops button functionality start... YK-->
+    <aura:attribute name="selectedCreditOfficer" type="String" default="-- None --"/>
+    <aura:attribute name="showCOSelectPanel" type="Boolean" default="false"/>
+    <aura:attribute name="creditOfficerList" type="List" default="no records"/>
+    <aura:attribute name="cmpLoadMsg" type="String" default="loadComponent"/>
+    <aura:attribute name="primaryapplicant" type="Applicant__c" default=""/> 
+    <aura:attribute name="documentToast" type="String" default="" />
+    <aura:handler name="change" value="{!v.documentToast}" action="{!c.showDocumentToast}"/>
+    <!--Submit to branch ops button functionality end... YK-->
+    
+    <!--check component loading YK start-->
+    <aura:if isTrue="{!(v.cmpLoadMsg != 'loadComponent')}">
+        <div class="slds-align_absolute-center" style="height: 5rem;">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title" title="{!v.cmpLoadMsg}">{!v.cmpLoadMsg}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--check component loading YK end-->
+    
+    <aura:if isTrue="{!(v.cmpLoadMsg == 'loadComponent')}">
+        <div>
+            <div class="slds-tabs--scoped">
+                <ul class="slds-tabs--scoped__nav" role="tablist">
+                    <li aura:id="pricingTab" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Pricing Details" role="presentation">
+                        <a id="pricingTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="0" aria-selected="true" aria-controls="pricingTabContent">
+                            Pricing
+                        </a>
+                    </li>
+                    <li aura:id="documentTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Documents" role="presentation">
+                        <a id="documentTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-2" aria-selected="false" aria-controls="documentTabContent">
+                            Documents
+                        </a>
+                    </li>
+                    <li aura:id="ActionsTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Actions" role="presentation">
+                        <a id="ActionsTab" class="slds-tabs--scoped__link" onclick="{!c.menuItemClick}" href="" role="tab" tabindex="-3" aria-selected="false" aria-controls="ActionsTabContent">
+                            Actions
+                        </a>
+                    </li>
+                </ul>
+                <div aura:id="pricingTabContent" class="slds-tabs--scoped__content" role="tabpanel" aria-labelledby="LoanTab">
+                    <c:Pricingcomponent pricingId="{!v.recordId}" loanTypeList="{!v.loanTypeList}" loanApplication="{!v.loanApplication}" disbusment="{!v.disbusment}" />
+                </div>
+                <div aura:id="documentTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="documentTab">
+                    <div>
+                        <div align="right">
+                            <h1><b>Current Stage : {!v.StageNum} out of 2</b> </h1>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="demo-only" style="position:static">
+                        <div class="slds-path">
+                            <div class="slds-grid slds-path__track slds-has-overflow">
+                                <div class="slds-grid slds-path__scroller-container">
+                                    
+                                    <div class="slds-path__scroller offer-pg-cont1" role="application">
+                                        <div class="slds-path__scroller_inner offer-pg1" aura:id="docDiv">
+                                            
+                                            <ul class="slds-path__nav" role="tablist">
+                                                <li aura:id="docUploderTab" class="slds-path__item slds-is-current slds-is-active testing" role="presentation">
+                                                    <a title="Document Upload Functionality" id="docUploderTab"  aria-controls="docUploderTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.stageItemClick}">
+                                                        
+                                                        <span class="slds-path__title" id="docUploderTab">Document Upload Functionality</span>
+                                                    </a>
+                                                </li>
+                                                <li aura:id="docUplodedTab" class="slds-path__item  slds-is-incomplete testing" role="presentation">
+                                                    <a title="Uploaded Document" id="docUplodedTab" aria-controls="docUplodedTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.stageItemClick}">
+                                                        <span class="slds-path__title" id="docUplodedTab">Uploaded Document<span style="visibility: hidden;"> testing disbursement section </span></span>
+                                                    </a>
+                                                </li>
+                                                
+                                            </ul>
+                                            
+                                        </div>
+                                        
+                                        <div class="slds-path__scroll-controls">
+                                            <lightning:button variant="brand" label="" iconName="utility:left" iconPosition="left" onclick="{!c.prevStage}" disabled="{!v.disablePrev}"/>
+                                            <lightning:button variant="brand" label="" iconName="utility:right" iconPosition="left" onclick="{!c.nextStage}" disabled="{!v.disableNext}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div aria-labelledby="docUploderTab" class="slds-path__content" aura:id="docUploderTabContent" role="tabpanel">
+                                <lightning:select aura:id="selectedDoc" name="Document" label="Select Document Type" value="{!v.DocSelected}" required="true" messageWhenValueMissing="Please Select Document Type">
+                                    <option value=""> --None-- </option>
+                                    <option value="Application_form"> Application form </option>
+                                    <option value="ID_Proof"> ID Proof </option>
+                                    <option value="Address_Proof"> Address Proof </option>
+                                    <option value="Salary_Slip"> Salary Slip </option>
+                                    <option value="Banking_statement"> Banking statement </option>
+                                    <option value="CPV_Photo"> Geotagging </option>
+                                    <option value="Cheque"> Cheque </option>
+                                    <option value="Other_Docs"> Other Docs </option>      
+                                </lightning:select>
+                                <c:DocumentUploader aura:id="file-uploader-1" parentId="{!v.recordId}" isMobilityDocument="false" salMobilityDocument="Mobility" documentToast="{!v.documentToast}" instance="1" fileName="{!v.DocSelected}" displayButtons="true" uploadType="{! v.DocSelected == 'Cheque' ? 'feed' : 'Attachment'}"/>
+                            </div>
+                            <div aria-labelledby="docUplodedTab" class="slds-path__content slds-hide" aura:id="docUplodedTabContent" role="tabpanel">
+                                <c:DocumentsList parentId="{!v.recordId}" documentToast="{!v.documentToast}"/>
+                            </div> 
+                        </div>
+                    </div>
+                    
+                    
+                </div> 
+                <div aura:id="ActionsTabContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="ActionsTab">
+                    <div>
+                        <br/>
+                        <div class="slds-p-horizontal--small">
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="ipaddress"  label="IP Address Timestamp" value="{!v.primaryapplicant.IP_Address_Timestamp__c}" aura:id="ipAddress" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <!-- E-agreement Received Flag -->
+                                    <label class="slds-form-element__label"> Send Commercial Confirmation Mail To Customer </label>
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="agreementRes" type="checkbox" class="checkedcolor" label="" checked="{!v.isEmailSend}" aura:id="perResId" disabled="true" />
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="left">
+                            <div class="slds-size_2-of-2">
+                                <aura:if isTrue="{!or(v.isTextBoxEnabled, v.showCOSelectPanel)}">
+                                    <div class="slds-box slds-box_x-small slds-text-align_left slds-m-around_x-small">
+                                        <!--send back to U/W starts AMAN-->
+                                        <aura:if isTrue="{!v.isTextBoxEnabled}">
+                                            
+                                            <div class="slds-form-element__control" style="margin-bottom:5px;">
+                                                <lightning:textarea value="{!v.loanApplication.COO_Comments__c}" label="Enter Send Back Comments :" name="nameSendBack"/>
+                                            </div>
+                                            
+                                            <lightning:button aura:id="doneButtonId" name="doneButton" variant="brand" label="Done" onclick="{!c.pricingDone}" />
+                                            <lightning:button aura:id="cancelButtonId" name="cancelButton" variant="brand" label="Cancel" onclick="{!c.pricingCancel}" />
+                                        </aura:if>
+                                        <!--send back to U/W ends AMAN-->
+                                        
+                                        <!--Submit to branch starts YK-->
+                                        <aura:if isTrue="{!v.showCOSelectPanel}" >
+                                            <lightning:select aura:id="coPicklistId" name="select" label="Select Credit Officer :" value="{!v.selectedCreditOfficer}" required="true" messageWhenValueMissing="Please select the Approver before submitting">
+                                                <option value="-- None --" text="-- None --"></option>
+                                                <aura:iteration items="{!v.creditOfficerList}" var="creditOfficer" indexVar="key">
+                                                    <option value="{!creditOfficer.value}" text="{!creditOfficer.value}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                            <div style="margin-top:5px;">
+                                                <lightning:button aura:id="finalSubmitBranchOpsButtonId" onclick="{!c.submitToBranchOps}" variant="brand" label="Submit" />
+                                            </div>
+                                        </aura:if>
+                                        <!--Submit to branch ends YK-->
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+                            <div class="slds-p-around--x-small">
+                                <lightning:button aura:id="submitButtonId" name="customerButton" variant="brand" label="Send Email to Customer" onclick="{!c.pricingEmailToCustomer}" />
+                            </div>
+                            <!--Submit to branch starts YK-->
+                            <div class="slds-p-around--x-small">
+                                <lightning:button aura:id="submitBranchOpsButtonId" variant="brand" label="Submit To branch Ops" onclick="{!c.selectOpsCreditOfficer}" />
+                            </div>
+                            <!--Submit to branch ends YK-->
+                            <!--send back to U/W starts AMAN-->
+                            <div class="slds-p-around--x-small">
+                                <lightning:button aura:id="sendBackButtonId" name="SendBackU/WButton" variant="brand" label="Send Back to U/W" onclick="{!c.pricingSendBackToUW}" />
+                            </div>
+                            <!--send back to U/W ends AMAN-->
+                        </div>                             
+                    </div>
+                </div>
+                <!--Submit to branch ops button functionality start... YK-->
+                <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="overrideModalbox" class="slds-modal">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__content slds-p-around--medium">
+                            Loan application will now submit to Ops team. Do you want to continue?
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button--neutral" onclick="{!c.callSubmitToBranchOps}">Yes</button>
+                            <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">No</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+                <!--Submit to branch ops button functionality end... YK-->
+                
+            </div>
+            <!--toast starts YK-->
+            <div id="parentSuccessToast" style="display:none; ">
+                <div class="slds-notify_container">
+                    <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                        <lightning:icon iconName="utility:success" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentSuccessToast}" alternativeText="Close alert." />
+                        <div class="slds-notify__content">
+                            <h2 id ="parentSuccessMsg"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            
+            <div id="parentErrorToast" style="display:none;">
+                <div class="slds-notify_container">
+                    <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                        <lightning:icon iconName="utility:error" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentErrorToast}" alternativeText="Close alert." />
+                        <div class="slds-notify__content">
+                            <h2 id ="parentErrorMsg"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="parentInfoToast" style="display:none;">
+                <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+                    <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--info" role="alert" >
+                        <lightning:icon iconName="utility:info" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentInfoToast}" alternativeText="Close alert." />
+                        <div class="slds-notify__content">
+                            <h2 id ="parentInfoMsg"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--toast ends YK-->
+            <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+                <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+                <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>       
+            </div>
+    	</div>
+    </aura:if>
+    
+</aura:component>

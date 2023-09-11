@@ -1,0 +1,26 @@
+<apex:page controller="Tassign1_Controller">
+    <apex:form >
+        <apex:pageBlock title="Account List" id="accountlist">
+        
+            <apex:pageBlockTable value="{!acclist}" var="a">
+               <apex:column headerValue="Name">
+                 <apex:inputField value="{!a.name}" label=""/>
+               </apex:column>
+               <apex:column headerValue="Phone">
+                 <apex:inputField value="{!a.Phone}" label=""/>
+               </apex:column>
+               <apex:column headerValue="AccountNumber">
+                 <apex:inputField value="{!a.AccountNumber}" label=""/>
+               </apex:column>
+               <apex:column >
+                    <apex:inputCheckbox value="{!mapid[a.id]}"/>
+               </apex:column>
+           </apex:pageBlockTable>
+           <!-- <apex:actionFunction name="doUnlink" action="{!clickme}" rerender="refresh" status="myStatus"/>
+            <input type="button" value="saveall" onclick="doUnlink();" /> -->
+            <apex:commandButton action="{!myfunc}" value="Save all" /> 
+            <apex:pageMessages ></apex:pageMessages>
+      
+       </apex:pageBlock>
+     </apex:form>
+</apex:page>

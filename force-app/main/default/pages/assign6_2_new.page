@@ -1,0 +1,32 @@
+<apex:page standardController="Speaker__c" extensions="myextension">
+
+    <apex:form >
+  <apex:pageBlock title="Speaker Information">
+
+  <apex:pageBlockButtons >
+  <apex:commandButton value="Save" action="{!addrecord}" />
+  <apex:commandButton value="Cancel" action="{!cancel}"/>
+  </apex:pageBlockButtons>
+  <apex:pageBlockSection >
+   <apex:inputText label="First Name" value="{!fname}"/><br/>
+   <apex:inputText label="Last Name" value="{!lname}"/> <br/> 
+   <apex:inputText label="Email ID" value="{!email}"/><br/>
+    
+   </apex:pageBlockSection>
+   <apex:pageblockSection >
+   <apex:inputField value="{!Speaker__c.Picture_Path__c}" rendered="{!if((photourl == ''),true,true)}"/><br/>
+   
+
+   <apex:inputFile title="Select Your Image " value="{!photo}"  rendered="{!if((photourl == ''),true,true)}">
+  
+   </apex:inputFile><br/>
+          
+                             
+   <apex:image value="{!photourl}" url="{!photourl}" rendered="{!if((photourl == ''),false,true)}">   </apex:image>
+   
+   <apex:inputText label="Bio" value="{!bio}"/><br/>
+   </apex:pageblockSection>
+
+   </apex:pageBlock>
+      </apex:form>
+</apex:page>

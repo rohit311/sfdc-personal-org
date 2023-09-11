@@ -1,0 +1,78 @@
+.THIS.uiInputDateTime .timePicker-openIcon {
+    position: absolute;
+    left: 92%;
+    top: 55%;
+}
+.THIS .PO-wrapper {
+
+}
+.THIS .applybackground{
+    background-color:rgb(233, 234, 236);
+}
+
+.THIS .offer-pg-cont{
+    width: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+.THIS .offer-pg > .slds-path__item{
+    overflow-x: auto;
+    background-color:blue;
+    margin-left:10px;
+    float:left;
+}
+.THIS .offer-pg{
+    
+    width: 1500px;
+}
+
+
+@media only screen and (max-width: 500px){
+   .THIS .offer-pg{
+        
+        width: 500px;
+}
+
+.THIS .offer-pg-cont{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+}
+.THIS .applyleft{
+left:50%;
+margin-top:5%;
+}
+.THIS.disabledPOPage{
+    pointer-events:none;
+    cursor: not-allowed;
+}
+.THIS .dataPickerStyle{
+    min-height: 0px !important;
+}
+
+/* 
+@media screen and (max-width: 699px) and (min-width: 520px) {
+   .THIS .offer-pg{
+        
+        width: 550px;
+}}
+        
+   
+ @media screen and (max-width: 400px) and (min-width: 300px)  {  .THIS .offer-pg{
+        
+        width: 280px;
+	}}       
+        
+@media screen and (max-width: 450px) and (min-width: 400px)  {  .THIS .offer-pg{
+        
+        width: 320px;
+	}}
+@media screen and (max-width: 600px) and (min-width: 450px)  { .THIS .offer-pg{
+        
+        width: 450px;
+	}}
+@media screen and (max-width: 800px) and (min-width: 600px)  { .THIS .offer-pg{
+        
+        width: 600px;
+	}}*/

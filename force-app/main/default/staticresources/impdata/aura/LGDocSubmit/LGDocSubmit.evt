@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Event template" >
+    <aura:attribute name= "selectedDocs" type="List" default="[]" />
+    <aura:attribute name="AppNo" type="String" />
+    <aura:attribute name="lgRegNo" type="String" />
+</aura:event>

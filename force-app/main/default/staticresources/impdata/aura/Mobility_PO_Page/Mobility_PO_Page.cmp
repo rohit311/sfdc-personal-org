@@ -1,0 +1,354 @@
+<aura:component controller="SALMobilityController" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <!--Rohit 16111 S-->
+    <aura:attribute name="isEkycMandatory" type="Boolean" default="false"/>
+    <aura:attribute name="isEkycdone" type="Boolean" default="false"/>
+    <!--Rohit 16111 E-->
+    <aura:attribute name="poID" type="String" default=""/>
+    <aura:attribute name="po" type="Product_Offerings__c" default="{'sobjectType':'Product_Offerings__c',Id:'',Alternate_Mobile_No__c:'',Lead__c:'',
+                                                                   Lead_Name__c:'',Tele_Calling_Sub_disposition__c:'',Field_Check_Status__c:'',Field_Disposition_1__c:'',Revised_Offer_Amount__c:'',Offer_Date__c:'',
+                                                                   Card_Disposition_Field__c:'',Field_Desposition_Status__c:'',Availed_Amount__c:'',Field_Remarks__c:'',Follow_Up_Date__c:'',Field_Followup_Date__c:'',Address_Line_1__c:'',Address_Line_2__c:'',Address_Line_3__c:''}"/>
+    <aura:attribute name="kyc" type="eKYC__c" default=""/>
+    <aura:attribute name="followUpDateTime" type="String"/>
+    <aura:attribute name="lead" type="Lead" default="{'sobjectType':'Lead',Id:'',FirstName:'',LastName:'',PAN__c:'',
+                                                     Resi_City__c:'',Email:'',MobilePhone:'',Resi_Pin_Code__c:'',Residential_type__c:'',SBS_Branch__c:'',State__c:'',
+                                                     Profession_Type__c:'',Residence_Address_Line1__c:'',Residence_Address_Line2__c:'',Residence_Address_Line3__c:'',Employer_Name__c:''}"/>
+    <aura:attribute name="isExistingOffer" type="Boolean" default="false"/>
+    <aura:attribute name="existingOffers" type="Product_Offerings__c[]" default="[]"/>
+    <aura:attribute name="oldLead" type="Lead" default="{'sobjectType':'Lead',FirstName:'',LastName:'',MobilePhone:''}"/>
+    <aura:attribute name="scam" type="SurrogateCAM__c" default="{'sobjectType':'SurrogateCAM__c',Id:'',Special_Profile_Employer__c:''}"/>
+    <aura:attribute name="offertenorValue" type="String[]" default="12,24,36,48,60"/>
+    <aura:attribute name="dispositionlist" type="List"/>
+    <aura:attribute name="subdispositionlist" type="List"/>
+    <aura:attribute name="leadsource" type="List"/>
+    <aura:attribute name="productList" type="List"/>
+    <aura:attribute name="genderList" type="List"/>
+    <aura:attribute name="residenceAddress" type="String" default=""/> 
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="mobilenumber" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="searching" type="Boolean" default="false"/>
+    <aura:attribute name="isdisabled" type="boolean" default="false" />
+    <aura:attribute name="ismcppass" type="boolean" default="false" />
+    <aura:attribute name="disableConvert" type="boolean" default="true" />
+    <aura:attribute name="isdisableURL" type="boolean" default="true" />
+    <aura:attribute name="requiredfollowup" type="boolean" default="false" />
+    <aura:attribute name="sectionContent2" type="Boolean" default="true"/>
+    <aura:attribute name="sectionContent3" type="Boolean" default="true"/>
+    <aura:attribute name="sectionContent4" type="Boolean" default="true"/>
+    <aura:attribute name="sectionContent5" type="Boolean" default="true"/>
+    <aura:attribute name="loanId" type="String" default=""/>
+    <aura:attribute name="theme" type="String" default=""/>
+    <aura:registerEvent name="LoanConversionEvent" type="c:LoanConversionEvent"/>
+    <aura:registerEvent name="DisplayOfferEvent" type="c:DisplayOfferEvent"/>
+    <aura:registerEvent name="CustomerSaveEvent" type="c:CustomerSaveEvent"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    <aura:handler name="SelectedRecordEvent" event="c:SelectedRecordEvent" action="{!c.updateLookup}" description="This event is fired when a record is selected from lookup records list"/>
+    <aura:dependency resource="markup://force:navigateToComponent" type="EVENT"/>   
+    <aura:dependency resource="markup://force:navigateToURL" type="EVENT"/> 
+    <ltng:require styles="{!$Resource.SLDS + '/assets/styles/salesforce-lightning-design-system.min.css'}"/>
+    <ltng:require scripts="/resource/jqueryformobility" />
+    <aura:attribute name="activePath" type="String" default="aadharTab"/>
+    <aura:attribute name="pathList" type="String[]" default="['aadharTab','poTab','dispositionTab','mcpTab']"/>
+    <aura:attribute name="disablePrev" type="boolean" default="true" />
+    <aura:attribute name="disableNext" type="boolean" default="false" />
+    <aura:attribute name="StageNum" type="Integer" default="1" />
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />
+    <aura:attribute name="isSourcingChannelAndApplicationRequired" type="boolean"/>
+    <aura:attribute name="employerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="followUpDateTimeForDis" type="DateTime" default=""/>
+    <!-- Adhoc 20275 s-->
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <aura:attribute name="teleCallingList" type="String[]"/>
+    <aura:attribute name="teleCallingSubList" type="String[]"/>
+    <!-- Adhoc 20275 e -->
+    <div>
+        <div align="right">
+            <!--<img src="/resource/bajajlogo1new"/>-->
+            <h1><b>Current Stage : {!v.StageNum} out of 4</b> </h1>
+        </div>
+    </div>
+    <br/>
+    <div class="demo-only" style="position:static" >
+        <div class="slds-path" id="POFields">
+            <div class="slds-grid slds-path__track slds-has-overflow">
+                <div class="slds-grid slds-path__scroller-container">
+                    
+                    <div class="slds-path__scroller offer-pg-cont " role="application" id="PathId">
+                        <div class="slds-path__scroller_inner offer-pg">
+                            
+                            <ul class="slds-path__nav" role="tablist">
+                                <li aura:id="aadharTab" class="slds-path__item slds-is-current slds-is-active" role="presentation">
+                                    <a title="Aadhaar" id="aadharTab"  aria-controls="aadharTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        
+                                        <span class="slds-path__title" id="aadharTab">Aadhaar</span>
+                                    </a>
+                                </li>
+                                <li aura:id="poTab" class="slds-path__item  slds-is-incomplete" role="presentation">
+                                    <a title="Product Offering Name" id="poTab" aria-controls="poTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        
+                                        <span class="slds-path__title" id="poTab">Product Offering</span>
+                                    </a>
+                                </li>
+                                <li aura:id="dispositionTab" class="slds-path__item  slds-is-incomplete" role="presentation">
+                                    <a title="Disposition" id="dispositionTab" aria-expanded="true" aria-controls="dispositionTabContent" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        
+                                        <span class="slds-path__title" id="dispositionTab">Disposition</span>
+                                    </a>
+                                </li>
+                                <li aura:id="mcpTab" class="slds-path__item  slds-is-incomplete" role="presentation">
+                                    <a title="MCP" id="mcpTab" aria-controls="mcpTabContent" aria-expanded="true" aria-selected="false" class="slds-path__link" href="javascript:void(0);" role="tab" tabindex="-1" onclick="{!c.menuItemClick}">
+                                        
+                                        <span class="slds-path__title" id="mcpTab">MCP<span style="visibility: hidden;"> testing </span></span>
+                                        
+                                    </a>
+                                </li>
+                            </ul>
+                            
+                        </div>
+                        
+                        <div class="slds-path__scroll-controls">
+                            <!-- <lightning:icon iconName="utility:left" size="large" alternativeText="sss"/>-->
+                            <lightning:button variant="brand" label="" iconName="utility:left" iconPosition="left" onclick="{!c.prevStage}" disabled="{!v.disablePrev}"/>
+                            <!--	<span class="slds-assistive-text">Scroll left</span>-->
+                            
+                            <!--<lightning:icon iconName="utility:right" size="large" alternativeText="sss"/>-->
+                            <lightning:button variant="brand" label="" iconName="utility:right" iconPosition="left" onclick="{!c.nextStage}" disabled="{!v.disableNext}"/>
+                            <!--<span class="slds-assistive-text slds-button slds-button_icon slds-button_icon-border-filled">Scroll right</span>-->
+                        </div>
+                    </div>
+                </div>
+                <!--   </div> -->
+                
+            </div>
+            
+            <div aria-labelledby="aadharTab" class="slds-path__content" aura:id="aadharTabContent" role="tabpanel">
+                <aura:if isTrue="{!!v.lead.eKYC_Processing__c}">
+                    <!--Rohit added parentId ,parentObj for linking -->                    
+                    <c:AadharVerification Product="{!v.po.Products__c}" isDSS="true" parentId="{!v.lead.Id}" isMobility="true" parentObj="Lead"/> 
+                    <aura:set attribute="else">
+                        <div id="aadharDone" style="margin-top:20px"> Aadhaar details have been received successfully! </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+            <div aria-labelledby="poTab" class="slds-path__content slds-hide" aura:id="poTabContent" role="tabpanel">
+                
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="firstName" name="firstName" value="{!v.lead.FirstName}" label="First Name" placeholder="First Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter First Name" messageWhenPatternMismatch="Please Enter valid First Name" disabled="true" />
+                            </div>
+                        </div>  
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="lastName" name="lastName" value="{!v.lead.LastName}" label="Last Name" placeholder="Last Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Last Name" messageWhenPatternMismatch="Please Enter valid Last Name" disabled="true"/>
+                            </div>
+                        </div>  
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!--<lightning:input type="tel" label="Mobile Number" aura:id="mobileNumber" name="mobileNumber" value="{!v.lead.Customer_Mobile__c}" placeholder="Mobile Number" maxlength="10" required="true" pattern="^[7-9]\d{9}" messageWhenValueMissing="Please Enter Mobile Number" messageWhenPatternMismatch="Please Enter valid Mobile Number" disabled="true"/>-->
+                                <label class="slds-form-element__label" for="mobileNumber">Mobile Number</label>
+                                <div class="slds-list--vertical slds-has-block-links">
+                                    <a style="color:black" href="{!v.mobilenumber}" target="_blank">{!v.lead.Customer_Mobile__c}</a>
+                                </div>
+                            </div>
+                        </div>               
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input type="number" aura:id="OfferAmount" name="OfferAmount" value="{!v.po.Offer_Amount__c}" label="Offer Amount" placeholder="Offer Amount" messageWhenValueMissing="Please Enter Offer Amount" messageWhenPatternMismatch="Please Enter valid Offer Amount"  disabled="true"/>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!--<label class="slds-form-element__label" for="offerAmount">Offer Tenor</label>
+        <ui:inputNumber aura:id="OfferTenor" class="slds-input" value="{!v.po.Availed_Tenor__c}" placeholder="Offer Tenor" change="{!c.onDataChange}" disabled="false"/>
+         -->
+                                <lightning:select aura:id="offerTenor" name="offerTenor" label="Offer Tenor" messageWhenValueMissing="Please Select Offfer Tenor"  value="{!v.po.Tenor__c}" disabled="true">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.offertenorValue}" var="tenorval">
+                                        <option value="{!tenorval}" text="{!tenorval}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:textarea name="cibilNotes" aura:id="cibilNotes" required="false" label="Cibil Notes" value="{!v.po.CIBIL_Notes__c}" messageWhenValueMissing="Enter Cibil Notes" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <div aria-labelledby="dispositionTab" class="slds-path__content slds-hide" aura:id="dispositionTabContent" role="tabpanel">
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                       <aura:if isTrue="{!v.isFieldAgent}"> 
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="disposition" name="disposition" label="Field Disposition" required="true"  messageWhenValueMissing="Select Disposition" value="{!v.po.Field_Disposition_1__c }" onchange="{!c.enableConvert}">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.dispositionlist}" var="dispovalue">
+                                        <option value="{!dispovalue}" text="{!dispovalue}" selected="{!v.po.Field_Disposition_1__c == dispovalue}" ></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>  
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="subDisposition" name="subDisposition" label="Field Disposition Status"  messageWhenValueMissing="Select sub Disposition" value="{!v.po.Field_Desposition_Status__c}">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.subdispositionlist}" var="subdispovalue">
+                                        <option value="{!subdispovalue}" text="{!subdispovalue}" selected="{!v.po.Field_Desposition_Status__c == subdispovalue}"></option>
+                                    </aura:iteration>
+                                </lightning:select>               
+                            </div>
+                        </div>
+						</aura:if>
+						<aura:if isTrue="{!v.isTeleCaller}">
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="teleCallingId" name="teleCallingId" label="Tele Calling Disposition" required="true" messageWhenValueMissing="Please Select Value"  value="{!v.po.TeleCalling_Desposition_Status__c}" onchange="{!c.enableConvert}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.teleCallingList}" var="teleCalling">
+                                        <option value="{!teleCalling}" text="{!teleCalling}" selected="{!v.po.TeleCalling_Desposition_Status__c == teleCalling.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="teleCallingSubId" name="teleCallingSubId" label="Tele Calling Sub Disposition" value="{!v.po.Tele_Calling_Sub_disposition__c}">
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.teleCallingSubList}" var="teleCallingSub">
+                                        <option value="{!teleCallingSub}" text="{!teleCallingSub}" selected="{!v.po.Tele_Calling_Sub_disposition__c == teleCallingSub.value}"></option>
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>
+                        </div>
+						</aura:if>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="dispoRemarks" name="dispoRemarks" value="{!v.po.Field_Remarks__c}" label="Disposition Remarks" placeholder="Enter Remarks" messageWhenValueMissing="Please Enter Remarks"/>
+                            </div>
+                        </div>
+                        <div aura:id="sourceSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isSourcingChannelAndApplicationRequired}">
+                                    <lightning:input aura:id="sourceName" label="Sourcing Channel" class="slds-lookup__search-input" onchange="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel" required="true" messageWhenValueMissing="Please Enter Sourcing Channel" disabled="{!v.isdisabled}"/>        
+                                    <aura:set attribute="else">
+                                        <lightning:input label="Sourcing Channel" aura:id="sourceName" class="slds-lookup__search-input" onchange="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel" disabled="{!v.isdisabled}"/> 
+                                    </aura:set>
+                                </aura:if>
+                                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="sourceList">
+                                    <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text" style="white-space: pre-line;"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.isSourcingChannelAndApplicationRequired}">
+                                    <lightning:select aura:id="applicationsource" name="applicationsource" label="Application Source" required="true" messageWhenValueMissing="Select Lead Source" value="{!v.po.Lead_Source__c }"  disabled="{!v.isdisabled}" >
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.leadsource}" var="srcvalue">
+                                            <option value="{!srcvalue}" text="{!srcvalue}" selected="{!v.po.Lead_Source__c == srcvalue}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                    <aura:set attribute="else">
+                                        <lightning:select name="applicationsource1" aura:id="applicationsource" label="Application Source" value="{!v.po.Lead_Source__c }" disabled="{!v.isdisabled}">
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.leadsource}" var="srcvalue">
+                                                <option value="{!srcvalue}" text="{!srcvalue}" selected="{!v.po.Lead_Source__c == srcvalue}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </aura:set>    
+                                </aura:if>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-is-required  slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label id ="followUpLbl" class="slds-form-element__label" for="followUpDate">Follow Up Date/Time</label> <!-- po.Follow_Up_Date__c -->
+                                <ui:inputDateTime click="{!c.hideicon}" class="dataPickerStyle" aura:id="followUpDate" value="{!v.followUpDateTimeForDis}" displayDatePicker="true"  blur="{!c.validateFollowupDate}"/>
+                                <div aura:id="followupdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please Select Follow Up Date</div> 
+                            </div> 
+                        </div>
+                    </div>
+                   <!-- <lightning:button class="applyleft" aura:id="dispSave" variant="brand" label="Save" onclick="{!c.dispSubmitDetails}" disabled="{!v.isdisabled}"/>-->
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-align_absolute-center" align="center">
+                    <div class="slds-p-around--x-small">
+                        <lightning:button aura:id="dispSave" variant="brand" label="Save" onclick="{!c.dispSubmitDetails}" disabled="{!v.isdisabled}"/>
+                    </div>
+                </div>
+            </div>
+            <div aria-labelledby="mcpTab" class="slds-path__content slds-hide" aura:id="mcpTabContent" role="tabpanel">
+                <c:PO_MCP po="{!v.po}" lead="{!v.lead}" scam="{!v.scam}" employerSearchKeyword="{!v.employerSearchKeyword}" aura:id="mcpComponent" productList="{!v.productList}" genderList="{!v.genderList}" residenceAddress="{!v.residenceAddress}" kyc="{!v.kyc}"/> 
+                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-align_absolute-center" align="center">
+                    <div class="slds-p-around--x-small">
+                        <lightning:button aura:id="saveButtonId" variant="brand" label="Save" onclick="{!c.submitDetails}" disabled="{!v.isdisabled}"/>
+                    </div>
+                    <div class="slds-p-around--x-small">
+                        <lightning:button aura:id="convertToLoanButtonId" variant="brand" label="Convert Loan Application" onclick="{!c.convertToLoanApplication}" disabled="{!v.disableConvert}"/>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    <div id="SuccessToast1" style="display:none; ">
+        <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsg1"></h2>
+                    <ui:outputURL aura:id="toastURL"  value="" click="{!c.navigateToOppComponent}" disabled="{!v.isdisableURL}"/>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="ErrorToast" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                <h2 id ="errormsg"></h2>
+            </div>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,9 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="primaryApp" type="Applicant__c"/>
+    <aura:attribute name="dedupe" type="De_Dupe__c"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="cam" type="CAM__c"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibilTempObj" type="Cibil_Temp__c"/>
+    <aura:attribute name="maxEligibleLoanAmtMCP" type="Integer"/>
+</aura:event>

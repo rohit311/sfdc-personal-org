@@ -1,0 +1,272 @@
+<aura:component controller="CreditCardController">
+    <aura:attribute name="Customer_Interest__c" type="Boolean" default="false"/>
+    <aura:attribute name="CC_Disposition__c" type="String" default=""/><!-- US : 2702 -->
+    <aura:attribute name="tempCCD" type="String" default=""/><!-- US : 2702 -->
+    <aura:attribute name="ccDisposition" type="String[]" default="[]"/><!-- US : 2702 -->
+    <aura:attribute name="motherNm" type="String" default=""/><!-- US : 2702 -->
+    <aura:attribute name="fatherNm" type="String" default=""/><!-- US : 2702 -->
+    <aura:attribute name="ckycResp" type="Object" default=""/><!-- US : 2702 -->
+    <aura:attribute name="conObj" type="sobject"/><!-- US : 2702 -->
+    <aura:registerEvent name="shareData" type="c:ShareParentalData"/> <!-- US : 2702 -->
+    <aura:registerEvent name="shareCCData" type="c:CC_Data"/> <!-- US : 2702 -->
+    <aura:handler event="c:shareCkycInfo" action="{!c.setCkycData}"/> <!-- US : 2702 -->
+    <aura:attribute name="CC_Variant__c" type="String" default=""/>
+    <aura:attribute name="variantOpions" type="String[]" default="[]"/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="isMCPDedupePassSTS" type="Boolean" default="true"/>
+    <aura:attribute name="flow" type="String" default="PO"/>
+    <aura:attribute name="headerMsg" type="String" default=""/>
+    <aura:attribute name="cibilValidationMsg" type="String" default="Standalone Card Cannot be Booked due to low CIBIL score"/> <!-- US_16142__CIBIL Validation for Credit Card-Standalone -->
+    <aura:attribute name="cibil_Score" type="String" default=""/> <!-- US_16142__CIBIL Validation for Credit Card-Standalone -->
+    <aura:attribute name="isValidCibil" type="Boolean" default="true"/> <!-- US_16142__CIBIL Validation for Credit Card-Standalone -->
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="record" type="sobject"/>
+    <aura:attribute name="ccSolRecord" type="SOL_Policy__c" default="{}"/>
+    <aura:attribute name="readOnlyMode" type="Boolean" default="false"/>
+    <aura:attribute name="showResend" type="Boolean" default="true"/>
+    <aura:attribute name="LoanNumber" type="String" default=""/>
+    <aura:attribute name = "isDSS" type = "String" default = "false"/>
+    <aura:attribute name = "Application_Number" type = "String" default = ""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- User Story 2357 Starts -->
+    <aura:handler name="CreditCard_Document" event="c:CreditCard_DocumentEvent" action="{!c.handleDocumentEvent}"/>
+    <!-- User Story 2357 Ends -->
+      <!-- US 17397-USERSTORY_Credit card E-application Standalone sourcing-->
+    <aura:attribute name = "AlreadyAccepted" type = "Boolean" default = "true"/>
+    <!-- User Story 2357 Ends -->
+      <!--US:24037 USERSTORY_Requirement for CA Cards start-->
+	 <aura:attribute name="maritalStatus" type="String" default=""/>
+	 <aura:attribute name="maritalStatusOpions" type="String[]" default="[]"/>
+      <!--US:24037 USERSTORY_Requirement for CA Cards end-->
+    <aura:attribute name="lstDocuments" type="CreditCardController.DocumentWrapper[]" default='[]'/>
+    <aura:attribute name="documentOpen" type="boolean" default="false"/>
+    <aura:attribute name="isConfirmOpen" type="boolean" default="false"/>
+    <aura:attribute name="isApplyWithoutLoan" type="boolean" default="false"/>
+    <aura:if isTrue="{!v.isDSS !='true'}"> 
+        <lightning:button class="slds-button slds-button_brand slds-p-left_x-large slds-p-right_x-large slds-m-around_xxx-small" label="Credit Card" onclick="{! c.creditCardClick}"  disabled = "{!and(v.LoanNumber!='' , v.loanNumber != null)}" />
+    </aura:if> 
+  
+          <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+            <div aura:id="customToast" class="slds-notify_container slds-hide" >
+                <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                    <span class="slds-assistive-text">Info</span>
+                    <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                    <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <div class="slds-notify__content ">
+                        <div class="slds-align-middle">
+                            <h2 class="slds-text-heading--x-small">  
+                                <lightning:icon iconName="utility:info" alternativeText="info" variant="inverse" size="x-small" class="slds-p-around_xxx-small"/> 
+                                <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                                <ui:outputText aura:id="toastText" value=""/>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ --> 
+        <aura:if isTrue="{!v.isOpen}">
+           <div class="slds-m-around_xx-large"> 
+            <!--###### MODAL BOX Start######--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="width:100%;height:100%;padding:20px;">
+                <div class="slds-modal__container">
+                  <ui:scrollerWrapper class="outerScroller2">   
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">CREDIT CARD DETAILS</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                       
+                        <aura:if isTrue="{!v.showSpinner}"> 
+                            <lightning:spinner variant="brand" size="large"/>
+                        </aura:if>
+                        <aura:if isTrue="{!!v.documentOpen}"> 
+                            <div class="slds-notify_container slds-is-relative"> 
+                                <div class="slds-notify__content slds-text-align_center">
+                                    <h2 class="{!v.isMCPDedupePassSTS ?'slds-text-heading_small slds-text-color_success' : 'slds-text-heading_small slds-text-color_error'}"> <aura:unescapedHtml value="{!v.headerMsg}" /></h2>
+                                    <!-- US_16142__CIBIL Validation for Credit Card-Standalone -->
+                                         <aura:if isTrue="{! and(!v.isValidCibil, v.flow == 'PO')}">
+                                             <aura:if isTrue="{! and(!v.readOnlyMode,v.isMCPDedupePassSTS)}">
+                                               <h4 class="slds-text-heading_small slds-text-color_error"> <aura:unescapedHtml value="{!v.cibilValidationMsg}" /></h4>
+                                             </aura:if>
+                                         </aura:if>
+                                     <!-- US_16142__CIBIL Validation for Credit Card-Standalone -->
+                                </div>
+                            </div>
+                        </aura:if> 
+                        <aura:if isTrue="{!v.isMCPDedupePassSTS}">
+                                <div class="slds-m-top_x-large" >
+                                    <!-- US : 2702 S -->
+                                    <lightning:select aura:id="inputCCDv" name="select1" label="CC Disposition" value="{!v.CC_Disposition__c}" required="true" disabled="{!v.readOnlyMode}" messageWhenValueMissing="Please select CC Disposition" onchange="{!c.CCDChange}">
+                                            <option value="">--NONE--</option>
+                                            <aura:iteration items="{!v.ccDisposition}" var="ccd">
+                                                <option text="{!ccd}" value="{!ccd}" selected="{!ccd == v.CC_Disposition__c}"></option>
+                                            </aura:iteration>
+                                    </lightning:select><!-- US : 2702 E -->
+                                    <!-- US : 2702 <lightning:input name="toggle"
+                                                     label="Is Customer Interested for Credit Card?"
+                                                     type="toggle"
+                                                     checked="{!v.Customer_Interest__c}"
+                                                     messageToggleActive="Yes"
+                                                     messageToggleInactive="No"
+                                                     disabled="{!v.readOnlyMode}"/> -->
+                                    
+                                    
+                                    <aura:if isTrue="{!v.Customer_Interest__c}">
+                                        <lightning:select aura:id="inputFieldv" name="select1" label="Credit Card Variant" value="{!v.CC_Variant__c}" required="true" disabled="{!v.readOnlyMode}" messageWhenValueMissing="Please select credit card variant">
+                                            <option value="">--NONE--</option>
+                                            <aura:iteration items="{!v.variantOpions}" var="variant">
+                                                <option text="{!variant}"></option>
+                                            </aura:iteration>
+                                            <!-- <option value="CC999">CC999</option>
+                                        <option value="CC2999">CC2999</option>-->
+                                        </lightning:select>
+
+                                        <!-- US : 2702 S -->
+                                        <lightning:input aura:id="mName" value="{!v.motherNm}" pattern="([a-zA-Z- ])*" name="motherName" required="true" disabled="{!v.readOnlyMode}" label="Mother's Name" placeholder="Mother's Name..." messageWhenValueMissing="Please enter Mother's Name"/>
+                                        <lightning:input aura:id="fName" value="{!v.fatherNm}" pattern="([a-zA-Z- ])*" name="fatherName" required="true" disabled="{!v.readOnlyMode}" label="Father's Name" placeholder="Father's Name" messageWhenValueMissing="Please enter Father's Name"/>
+                                        <!-- US : 2702 E -->
+  <!--US:24037 USERSTORY_Requirement for CA Cards start-->
+					<lightning:select aura:id="inputFieldvMarital" name="selectMarital" label="Marital Status" value="{!v.maritalStatus}" required="true" disabled="{!v.readOnlyMode}" messageWhenValueMissing="Please select Marital Status">
+															<option value="">--NONE--</option>
+															<aura:iteration items="{!v.maritalStatusOpions}" var="mrtlstatus">
+																<option text="{!mrtlstatus}"></option>
+															</aura:iteration>
+															
+														</lightning:select>
+  <!--US:24037 USERSTORY_Requirement for CA Cards end-->
+                                        <aura:if isTrue="{!and(v.isDSS =='true', v.CC_Disposition__c != 'Bundled')}"> <!-- US : 2702 -->
+                                            <div class="slds-m-around_x-large">
+                                                 <!-- User Story 2357 Starts -->
+											<c:DocumentUploadRevamp Flow="LA" parentId="{!v.recordId}"/> 
+                                                  <!-- User Story 2357 Ends -->
+                                            </div>
+                                        </aura:if>
+                                        <div class="slds-p-around_x-small slds-align_absolute-center">    
+                                            <aura:if isTrue="{!v.isConfirmOpen}">
+                                                
+                                                <!--###### MODAL BOX Start######--> 
+                                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open ">
+                                                    <div class="slds-modal__container">
+                                                        <!-- ###### MODAL BOX HEADER Start ######-->
+                                                        <header class="slds-modal__header">
+                                                            <lightning:buttonIcon iconName="utility:close"
+                                                                                  onclick="{! c.closeConfirmBox }"
+                                                                                  alternativeText="close"
+                                                                                  variant="bare-inverse"
+                                                                                  class="slds-modal__close"/>
+                                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"> <b>Please Confirm</b></h2>
+                                                        </header>
+                                                        <!--###### MODAL BOX BODY Part Start######-->
+                                                        <div class="slds-modal__content slds-p-around--small" id="modal-content-id-2">
+                                                            
+                                                            <p> This Application will be processed without Loan.Do you want to Proceed?</p>
+                                                            
+                                                        </div>
+                                                        <!--###### MODAL BOX FOOTER Part Start ######-->
+                                                        <footer class="slds-modal__footer">
+                                                            <lightning:button variant="neutral"  class="slds-m-around_xxx-small" label="Ok"  title="Ok" onclick="{! c.confirmOkTakeAction}"/>
+                                                            <lightning:button variant="brand" class="slds-m-around_xxx-small" label="Cancel" title="Cancel" onclick="{! c.closeConfirmBox}"/>
+                                                        </footer>
+                                                        
+                                                    </div>
+                                                </section>
+                                                <div class="slds-backdrop slds-backdrop_open"></div>    
+                                                
+                                            </aura:if>
+                                        </div>
+                                        <aura:if isTrue="{!(v.CC_Disposition__c == 'Only Credit Card')}"> <!-- US : 2702 -->
+                                        <h3 class="slds-section__title"> DOCUMENT SECTION</h3>
+                                        <ui:scrollerWrapper class="outerScroller">
+                                            <table class="slds-table slds-table_bordered slds-table_col-bordered" style="    border: 1px solid rgb(221, 219, 218);">
+                                                <thead>
+                                                    <tr class="slds-line-height_reset">
+                                                        
+                                                        <th class="slds-text-title_caps" scope="col">
+                                                            <div class="slds-truncate" title="Document Type">Document Type</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps" scope="col">
+                                                            <div class="slds-truncate" title="Upload Status">Upload Status</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps" scope="col">
+                                                            <div class="slds-truncate" title="Processed Status">Processed Status</div>
+                                                        </th>
+                                                        
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <aura:iteration items="{!v.lstDocuments}" var="doc" indexVar="index">
+                                                        <tr class="slds-hint-parent">
+                                                            <td data-label="Name">
+                                                                <div class="slds-truncate" title="{!doc.Document_Type}">{!doc.Name}</div>
+                                                            </td>
+                                                            <td data-label="Upload Status">
+                                                                <div class="slds-truncate" title="{!doc.Upload_Status}"><lightning:icon iconName="{!doc.Upload_Status ? 'action:approval':'action:close' }" size="x-small" /></div>
+                                                            </td>
+                                                            <td data-label="Processed Status">
+                                                                <div class="slds-truncate" title="{!doc.Process_Status}">
+                                                                    <aura:if isTrue="{!and(v.showResend,doc.Show_Resend)}">
+                                                                        
+                                                                        <lightning:button variant="brand" label="Resend"  iconPosition="right" value="{!doc}"  onclick="{! c.resendClick }" />
+                                                                        <!-- <lightning:icon iconName="action:recall" size="x-small" />-->
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:icon iconName="{!doc.Process_Status ? 'action:approval':'action:close' }" size="x-small" />
+                                                                            
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                                
+                                                            </td>
+                                                            
+                                                        </tr>
+                                                    </aura:iteration>
+                                                </tbody>
+                                            </table>
+                                        </ui:scrollerWrapper>
+                                        </aura:if> <!-- US : 2702 -->
+                                    </aura:if>
+                                          
+ </div>
+                        
+                        </aura:if>
+                    </div>
+                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                    <footer class="slds-modal__footer">
+                        <!-- US : 2702 -->
+                        <aura:if isTrue="{!and(!v.readOnlyMode,v.isMCPDedupePassSTS)}">
+                            <lightning:button class="slds-m-around_xxx-small" aura:id="applyButton" variant="brand" 
+                                              label="{!and(v.Customer_Interest__c, or(v.CC_Disposition__c == 'Bundled', v.CC_Disposition__c == 'Only Credit Card')) ? 'Apply for Credit Card' : 'Save'}"
+                                              onclick="{!c.saveData }"/>
+                        </aura:if>
+                        <!--US:17397 USERSTORY_Credit card E-application Standalone sourcing start-->
+					   <aura:if isTrue="{!and(!and(v.readOnlyMode,v.isMCPDedupePassSTS),v.CC_Disposition__c == 'Only Credit Card')}">
+                           <aura:if isTrue="{!v.AlreadyAccepted}">
+                        <lightning:button class="slds-m-around_xxx-small" aura:id="consentButton" variant="brand" 
+                                              label="Customer Consent"
+                                              onclick="{!c.SendConsentToCustomer }"/>
+                        </aura:if>
+                        </aura:if>
+                        <!--US:17397 USERSTORY_Credit card E-application Standalone sourcing end-->
+                        <lightning:button variant="neutral"  class="slds-m-around_xxx-small"
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.closeModel }"/>
+                        
+                    </footer>
+                    </ui:scrollerWrapper>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+            </div> 
+        </aura:if>
+</aura:component>

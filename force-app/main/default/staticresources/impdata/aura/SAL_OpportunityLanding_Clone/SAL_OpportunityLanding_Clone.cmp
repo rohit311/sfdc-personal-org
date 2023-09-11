@@ -1,0 +1,367 @@
+<!--SALOpportunityLanding_Page-->
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    <aura:attribute name="secondaryCibilRecs" type="CIBIL_secondary_match__c[]"/><!--10647 -->
+
+    <!--rohit added default-->
+  <aura:attribute name="preLangList" type="List"/><!--Bug 24675 -->
+    <aura:attribute name="cibDetails" type="Object" /><!--Bug 22624 Rohit -->
+   <!--Ckyc 23578 start-->
+    <aura:attribute name="dataSource" type="String" default=""/>
+    <aura:attribute name="isCkycDone" type="Boolean" default="false"/>
+    <aura:attribute name="isCkycReadOnly" type="Boolean" default="false"/><!--23578 -->
+     <aura:attribute name="attachments" type="List" default=""/><!--23578 -->
+     <aura:method name="setCKYCfieldsParent" action="{!c.setCKYCfieldsParent}" /><!--23578 -->
+    <aura:attribute name="ckycResp" type="Object" default=""/>
+    <aura:attribute name="Ckycaccount" type="Account"/>
+    <aura:attribute name="Ckyccontact" type="Contact"/>
+    <aura:attribute name="Ckycapplicant" type="Applicant__c"/><!--23578 -->
+    <aura:attribute name="currentDate" type="String" default=""/>
+    <aura:attribute name="ckycFlow" type="Object" default=""/> 
+    <aura:attribute name="ckycsmsLst" type="List" default=""/> 
+    <aura:handler event="c:callSaveAfterPANChk" action="{!c.callSaveAfterPANChk}"/>
+    <!--Ckyc 23578 stop-->
+    <aura:attribute name="userInfo" type="user"/>
+    <!--City CR s -->
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/> 
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+    <!--City CR e -->
+    <aura:attribute name="showMulti" type="Boolean" default="false"/>
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+    <aura:attribute name="salesRejectStage" type="Boolean" default="true"/>
+    <aura:attribute name="currentUser" type="String" default=""/>
+    <aura:attribute name="Customer_Type__c" type="String" default="Individual"/> 
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute type="boolean" name="conCreate" default="true"/>
+    <aura:attribute name="PrimaryPNCheckLst" type="SOL_Policy__c[]" />
+    <aura:attribute name="loan" type="Opportunity" />
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="contact" type="Contact"/>
+    <aura:attribute name="applicant" type="Applicant__c"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibilExt" type="CIBIL_Extension__c"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c"/>
+    <aura:attribute name="oppId" type="Id" />
+    <aura:attribute name="productList" type="String[]" default="SPL,SAL,SEL,RSL"/> <!-- 22018 RSL Added -->
+    <aura:attribute name="customerTypeList" type="String[]" default="Individual,Corporate"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>  
+    <aura:attribute name="isPOconverted" type="Boolean"/>
+    <aura:attribute name="isSpecialProfile" type="Boolean"/>
+    <aura:attribute type="boolean" name="officeflag" default="false"/>
+    <aura:attribute name="specialPro" type="Boolean" />
+    <!-- below 3 attributes added by hrushikesh, to enter valid lookup values -->
+    <aura:attribute name="ValidSourceChannel" type="Boolean" default="false"/>
+    <aura:attribute name="ValidReferral" type="Boolean" default="true"/>
+    <aura:attribute name="ValidAreaLocality" type="Boolean" default="false"/>
+    <aura:attribute name="ValidCompanyName" type="Boolean" default="false"/>
+    <aura:attribute name="rejectfordesktop" type="Boolean" default="false"/>
+    <aura:attribute type="boolean" name="epfoShow" default="false"/>
+    <aura:attribute name="isOther" type="Boolean"/>
+    
+    <aura:attribute name="Product" type="String"/>
+    <aura:attribute name="CustomerType" type="String"/>
+    <aura:attribute name="appSourceList" type="String[]" default="[]"/>
+    
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="kyc" type="eKYC__c" />
+    <aura:attribute name="poObj" type="Product_Offerings__c" default="{'sobjectType': 'Product_Offerings__c'}"/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="mcpRejFlag" type="Boolean" default="false"/>
+    <aura:attribute name="MCPRejectON" type="Boolean" default="true"/>
+    <aura:attribute name="disableAadhaar" type="Boolean" default="false"/>
+    <aura:attribute name="disablePO" type="Boolean" default="false"/>
+    <aura:attribute name="disablePAN" type="Boolean" default="true"/>
+	<aura:attribute name="fromcloneflag" type="Boolean" default="false"/> <!--Added for Bug 23577-->
+    <aura:attribute name="tabVisiblityclone" type="Boolean" default="false"/> <!--Added for Bug 23577-->
+    <aura:attribute type="Boolean" name="displayExotel" default="false"/><!-- Bug 23064 -->
+     <aura:attribute name="validExotelProd" type="String[]" default=""/><!-- Bug 23064 -->
+    <aura:attribute name="isMobileNumberReadOnly" type="boolean" default="false"/>
+    <aura:attribute name="mobileNumber" type="String"/>    
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="referralList" type="Referral__c[]" default="[]"/>
+    <aura:attribute name="selectedReferral" type="Referral__c" default="{}"/>
+    <aura:attribute name="referralSearchKeyword" type="string" default=""/>
+    <aura:attribute name="sourcesearching" type="Boolean" default="false"/>
+    <aura:attribute name="referralsearching" type="Boolean" default="false"/>
+    <aura:attribute name="oldReferralSearchKeyword" type="String" default=""/>
+    <aura:attribute name="rejectOption" type="List"/>
+    <aura:attribute name="myOptions" type="Object[]"/>
+    <aura:attribute name="mySelectedvalues" type="String"/>
+    <aura:attribute name="nameTheme" type="String" default=""/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />    
+    <!--Rohit added for MCP start-->
+    <aura:attribute name="solPolicySrc" type="String" default="Sales2.0"/>
+    <!--Rohit added for MCP stop-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="MCPRejectEvent" type="c:MCPRejectEvent"/>
+	<aura:handler event="c:shareCkycInfo" action="{!c.setCkyc}"/><!--Ckyc 23578 -->
+    <aura:handler event="c:newloansave" action="{!c.saveOpportunity}"/>
+    <aura:attribute type="boolean" name="callfrom" default="true"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+<aura:attribute name="CKYCDocumentType" type="String" default=""/><!-- US11371-->
+    <aura:attribute name="solPolicylist" type="SOL_Policy__c[]" default="[]"/><!-- prod adhoc address change-->
+    <aura:attribute name="addresschangepolicy" type="SOL_Policy__c" default="{}"/><!-- prod adhoc address change-->
+    <aura:attribute name="oldOfficeemail" type="String" default=""/><!-- prod new CR-->
+	<aura:attribute name="isCkycAttempted" type="boolean" default="false"/><!--added for US 21328-->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!--user story 978-->
+    <!--<c:SAL_SourcingChannelDetails aura:id="sourcedetails" Opp="{!v.loan}" isPOconverted="{!v.isPOconverted}"/>-->
+    
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        
+        <lightning:card title="Sourcing Details" class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                        
+                        <div aura:id="sourceSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="sourceName"><span class="requiredClass">*</span>Sourcing Channel</label>
+                                <ui:inputText aura:id="sourceName" required="true" class="slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="sourceList">
+                                    <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <!--24673 added disabled condition -->
+                                <lightning:select aura:id="ProductType" label="Product Type"  disabled="{!if(v.loan.Product__c == 'RDPL',true,false)}" name="ProductType" value="{!v.loan.Product__c}" required="true" messageWhenValueMissing="Please Select Value" onchange="{!c.onChangeProduct}">
+                                    <aura:iteration items="{!v.productList}" var="appsource">
+                                        <option value="{!appsource}" text="{!appsource}" selected="{!v.loan.Product__c == appsource}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div> 
+                        <div class="slds-form-element slds-hide slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select messageWhenValueMissing="Please Select Value" required="true" aura:id="CystomerType" label="Customer Type"  name="customerType" value="{!v.loan.Customer_Type__c}">
+                                    <option text="{!v.Customer_Type__c}" value="{!v.Customer_Type__c}"></option>  
+                                </lightning:select> 
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="AppSource" name="Appsource" label="Application Source" required="true" messageWhenValueMissing="Please Select Value"  value="{!v.loan.Application_Source__c}" >
+                                    <option value="" text="--None--"></option>
+                                    <aura:iteration items="{!v.appSourceList}" var="appsource">
+                                        <option value="{!appsource}" text="{!appsource}" selected="{!v.loan.Application_Source__c == appsource}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                        
+                        <div aura:id="referralSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="referralName">Referral</label>
+                                <ui:inputText aura:id="referralName" class="slds-input"  updateOn="keyup" keyup="{!c.referralKeyPressController}" value="{!v.referralSearchKeyword}" placeholder="Enter Referral"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="referralList">
+                                    <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.referralList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectReferral}">{!singleRec.Branch_Master__r.Name+' - '+singleRec.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            </p>
+            
+        </lightning:card>
+        
+    </div>
+	 <!--Rohit added for 23578 Ckyc start-->
+    <!--<aura:if isTrue="{!v.stageName == 'DSA/PSF Login'}">-->
+        <br/>
+        <ul class="slds-accordion">
+            <li class="slds-accordion__list-item">
+                <section class="slds-accordion__section">
+                    <div class="slds-accordion__summary">
+                        <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                            <!--changed expanded condition for us 21328-->
+							<!--aria-expanded="{!v.dataSource=='' ? 'true' : 'false'}" -->                            
+                            <div aria-controls="subsection4Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-theme_default" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection4">
+                                <b><span id="subicon4" class="slds-m-horizontal--x-small slds-text-heading--small">[-]</span></b><!--changed icon for us 21328-->
+                                <span id="subname4" class="slds-truncate slds-theme_default" title="Accordion summary">C-KYC Search and Download</span>
+                            </div>
+                        </h3>
+                    </div>
+                    <div aria-hidden="false" class="slds-show" aura:id="subsection4Content"><!--US11371 passed Product, datasource and CKYCDocumentType--><!--changed class for us 21328-->
+                        <div class="slds-box slds-box_x-small slds-theme_default slds-theme_shade" >                            
+							<c:CkycCmp Product="{!v.loan.Product__c}" dataSource="{!v.dataSource}" CKYCDocumentType="{!v.CKYCDocumentType}" isReadOnly="{!v.isCkycReadOnly}" ckycFlow="{!v.ckycFlow}" recordId="{!v.oppId}" currentDate="{!v.currentDate}" isCkycAttempted="{!v.isCkycAttempted}"/><!--added isCkycAttempted for US 21328-->
+                        </div>
+                    </div>
+                </section>    
+            </li>    
+        </ul>    
+   <!-- </aura:if>-->
+    <!--Rohit added for 23578 Ckyc stop-->
+    <!--City CR added validCity, citySearchKeyword and cityList -->
+	<!--Bug 22624 Rohit added cibDetails--><!--Bug 23578 Rohit added Ckycaccount,isCkycDone --><!-- 10647 added attribute --><!-- 24675 - added preLangList-->
+  <aura:if isTrue="{!or(or(or(and(and(and(v.oppId != '',v.oppId != null),v.loan.Product_Offerings__r == null),v.isCkycAttempted),v.dataSource=='Copy CKYC Data'),v.dataSource=='Edit CKYC Data'),v.dataSource=='CKYC Search')}"><!-- added if for us 21328-->
+    <c:SAL_NSDL_PANCheck  secondaryCibilRecs="{!v.secondaryCibilRecs}"   cibilTemp="{!v.cibilTemp}" isCkycReadOnly="{!v.isCkycReadOnly}"   preLangList="{!v.preLangList}" dataSource="{!v.dataSource}" Ckycaccount ="{!v.Ckycaccount}" isCkycDone="{!v.isCkycDone}" fromcloneflag ="{!v.fromcloneflag}" displayExotel="{!v.displayExotel}" cibDetails="{!v.cibDetails}" citySearchKeyword="{!v.citySearchKeyword}" validCity="{!v.validCity}" cityList="{!v.cityList}" stageName="{!v.stageName}" loan="{!v.loan}" tatMasterRecord="{!v.tatMasterRecord}" isCommunityUsr="{!v.iscommunityUser}" ValidCompanyName="{!v.ValidCompanyName}" ValidAreaLocality="{!v.ValidAreaLocality}" disableAadhaar="{!v.disableAadhaar}" disablePO="{!v.disablePO}" disablePAN="{!v.disablePAN}" 
+                         isUnderwriter="false" theme="{!v.nameTheme}" cibilExt1="{!v.cibilExt1}" cibil="{!v.cibilobj}" 
+                         currentUser="{!v.currentUser}" conCreate="{!v.conCreate}" EmployerSearchKeyword="{!v.account.Employer__r.Name}" 
+                         areaSearchKeyword="{!v.areaSearchKeyword}" applicantObj="{!v.applicant}" contObj="{!v.contact}" 
+                         account="{!v.account}" OppID="{!v.oppId}" PrimaryPNCheckLst="{!v.PrimaryPNCheckLst}" Product="{!v.loan.Product__c}" 
+                         aura:id="pancheck" isOther="{!v.isOther}" officeflag="{!v.officeflag}" isTeleCaller="{!v.isTeleCaller}" isFieldAgent="{!v.isFieldAgent}" userInfo="{!v.userInfo}" epfoShow="{!v.epfoShow}" callfrom="{!v.callfrom}"  isMobileNumberReadOnly="{!v.isMobileNumberReadOnly}" isSpecialProfile="{!v.isSpecialProfile}" specialPro="{!v.specialPro}" mobileNumber ="{!v.mobileNumber}"/><!--added mobileNumber for bug id 18906-->
+						
+    <aura:if isTrue="{!v.officeflag}">
+        <!-- on desktop button START -->
+        <aura:if isTrue="{!v.nameTheme!='Theme4t'}">
+            
+            <div class=" slds-align_absolute-center">
+                <aura:if isTrue="{!and(v.salesRejectStage,v.MCPRejectON) }">
+                    <div class="slds-p-top--x-small slds-p-bottom--x-small">
+                        <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveOpportunity}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                    </div>
+                    <aura:if isTrue="{!and(v.oppId,v.loan.Loan_Application_Number__c !=null)}"><!--Added and condition for Bug 23577-->
+                        <div class="slds-p-top--x-small slds-m-left_x-small slds-p-bottom--x-small">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="enableReject" iconName="utility:clear" variant="brand" label="Sales Reject" onclick="{!c.showSalesReject}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                        </div>
+                    </aura:if>
+                </aura:if>
+            </div>
+            
+            <aura:if isTrue="{!and(and(v.oppId, v.salesRejectStage),v.MCPRejectON)}">
+                
+                <div aura:id="salesRejectDiv" class="slds-box slds-box_x-small slds-theme_shade slds-hide">
+                    <!--  <lightning:card title="Sales Reject" class="applyColor ">-->              
+                    <div class="slds-text-heading_small"></div>
+                    <p class="slds-p-horizontal_small">
+                        <div class="slds-p-horizontal--small">                
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <aura:if isTrue="{!v.showMulti}">
+                                        <div aura:id="pickListDiv" class="slds-form-element__control slds-hide">
+                                            <c:MultiSelectPicklist aura:id="mymultiselect" options="{!v.rejectOption}" mySelectedvalues="{!v.mySelectedvalues}" Label="Reject Reason" />
+                                            <!-- <div aura:id="multiselectdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please select reject reason</div>--> 
+                                        </div>
+                                    </aura:if>
+                                </div>
+                                <!--Rohit added style to div -->
+                                <!-- <div class="slds-grid slds-wrap slds-grid-pull-padded slds-p-bottom-large slds-grid_align-center" align="center" style="float:centre">-->
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center" align="center" style="float:left;display:inline;margin-top:37px;margin-left:30px">
+                                    <div aura:id="rejectButtonDiv" class="slds-p-around--x-small slds-hide" align="center">
+                                        <lightning:button class="slds-theme_alt-inverse" aura:id="RejectButtonId" iconName="utility:clear" variant="brand" label="Reject" onclick="{!c.salesRejectcomp}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </p>
+                    <!-- </lightning:card> not used -->
+                </div>
+            </aura:if> 
+            <!-- on desktop button STOP-->
+            <!--hrushikesh Code start-->
+            <aura:set attribute="else">
+                <!--<aura:if isTrue="{!v.isCkycDone}">-->
+                <div class="slds-grid slds-wrap slds-grid_align-center slds-p-top--x-small slds-p-bottom--x-small ">
+                    <aura:if isTrue="{!and(v.salesRejectStage,v.MCPRejectON) }">
+                        <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12">
+                            <span>   
+                                <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.saveOpportunity}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                            </span>
+                        </div>
+                        <aura:if isTrue="{!v.oppId}">
+                            <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12 ">
+                                <span>           
+                                    <lightning:button class="slds-theme_alt-inverse" aura:id="enableReject" iconName="utility:clear" variant="brand" label="Sales Reject" onclick="{!c.showSalesReject}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                                </span>
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                    <aura:if isTrue="{!and(and(v.oppId, v.salesRejectStage),v.MCPRejectON)}">
+                        <div aura:id="salesRejectDiv" class="slds-box slds-box_x-small slds-theme_shade slds-hide">
+                            <div class="slds-text-heading_small"></div>
+                            <p class="slds-p-horizontal_small">
+                                <div class="slds-p-horizontal--small">                
+                                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                                        <div class="slds-col slds-text-align_center slds-p-top--x-small slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_6-of-6 slds-large-size_3-of-12 ">
+                                            <span> 
+                                                <aura:if isTrue="{!v.showMulti}">
+                                                    <div aura:id="pickListDiv" class="slds-form-element__control slds-hide">
+                                                        <c:MultiSelectPicklist aura:id="mymultiselect" options="{!v.rejectOption}" mySelectedvalues="{!v.mySelectedvalues}" Label="Reject Reason" />
+                                                        <!-- <div aura:id="multiselectdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please select reject reason</div>--> 
+                                                    </div>
+                                                </aura:if>
+                                            </span>
+                                        </div>  
+                                        <div class="slds-col slds-text-align_center slds-p-bottom--x-small slds-size_1-of-1 slds-medium-size_6-of-6 slds-large-size_3-of-12 ">
+                                            <span> 
+                                                <div aura:id="rejectButtonDiv" class="slds-form-element__control">
+                                                    <lightning:button class="slds-theme_alt-inverse" aura:id="RejectButtonId" iconName="utility:clear" variant="brand" label="Reject" onclick="{!c.salesRejectcomp}" disabled="{!v.stageName == 'DSA/PSF Login'?false :true}"/> <!-- CR 22307 -->
+                                                    
+                                                </div>
+                                                
+                                            </span>
+                                        </div>       
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </aura:if>  
+                </div>
+               <!-- </aura:if>-->
+            </aura:set>
+        </aura:if>
+        
+        <!--hrushikesh Code End-->
+    </aura:if>
+    </aura:if>
+    <aura:if isTrue="{!or(v.oppId == null,v.oppId == '')}">
+        
+        <aura:if isTrue="{!$Browser.isIOS == true}">
+            
+            <!--<div class="div2 div3" style="height:200px !important"></div>
+            <div class="div2 div3" style="height:200px !important"></div>
+            <div class="div2 div3" style="height:200px !important">
+            <div class="div2 div3" style="height:200px !important"></div>-->
+        </aura:if>
+    </aura:if>
+</aura:component>

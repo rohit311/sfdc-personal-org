@@ -1,0 +1,46 @@
+.THIS .borderColor {
+    border-top: 1px solid rgb(187, 188, 189);
+   
+}
+.THIS .slds-scope {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS .slds-theme_alt-inverse {
+    color: rgb(255, 255, 255);
+    background-color: rgb(22, 50, 92);
+    border-color: rgb(22, 50, 92);
+}
+.THIS.scrollerSize {
+    height: 100%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+.THIS .innerDivWrapper {
+    min-height: 101%;
+    padding-bottom: 20px;
+}
+.THIS .green-color{
+    background-color: lightgreen;
+
+}
+.THIS .red-color{
+    background-color: rgb(255,77,77);
+
+}
+.THIS .yellow-color{
+    background-color: rgb(255,255,51);
+
+}
+.THIS.black svg{
+    fill: black;
+}
+.THIS .borderblueColor{
+   border: 1px solid rgb(20, 50, 155);
+      border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+}

@@ -1,0 +1,136 @@
+<aura:component controller="BLMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+.slds-tabs--scoped__link {
+    background-color : #ffffff !important;
+}
+    .slds-active .slds-tabs_scoped__link, .slds-active .slds-tabs--scoped__link, .slds-is-active .slds-tabs_scoped__link, .slds-is-active .slds-tabs--scoped__link {
+    
+    border-top:#0041b6 solid 3px;
+    border-left: rgb(221, 219, 218) solid 1px !important;
+    border-right: rgb(221, 219, 218) solid 1px !important;
+    background-color : #ffffff !important;
+}
+    .slds-tabs_scoped, .slds-tabs--scoped {
+  
+    border: 1px solid rgb(221, 219, 218);
+    border-radius: .25rem;
+}
+.slds-tabs_scoped__nav, .slds-tabs--scoped__nav {
+    border-top: 0px solid rgb(221, 219, 218) !important;
+    /* border-bottom: 0px solid rgb(221, 219, 218) !important; */
+     border-right:0px solid rgb(221, 219, 218) !important; 
+    /* border-left: 1px solid rgb(221, 219, 218); */
+}
+  
+.slds-tabs_scoped__content, .slds-tabs--scoped__content {
+  
+   border:0px solid rgb(221, 219, 218); 
+   
+}
+</style>
+</head>
+	<aura:attribute name="hot" type="boolean" default="true" />
+	<aura:attribute name="fresh" type="boolean" default="false" />
+	<aura:attribute name="followUp" type="boolean" default="false" />
+	<aura:attribute name="docsRec" type="boolean" default="false" />
+	<aura:attribute name="others" type="boolean" default="false" />
+	<aura:attribute name="Interested" type="boolean" default="true" />
+	<aura:attribute name="NotContactable" type="boolean" default="false" />
+	<aura:attribute name="NotInterested" type="boolean" default="false" />
+	<aura:attribute name="Rejected" type="boolean" default="false" />
+	<aura:attribute name="other" type="boolean" default="false" />
+	<aura:attribute name="hotPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="freshPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="followUpPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="docsRecPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="InterestedPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="NotContactablePOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="NotInterestedPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="RejectedPOs" type="Product_Offerings__c[]" />
+	<aura:attribute name="otherPOs" type="Product_Offerings__c[]" />
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+    
+	<div class="slds" >
+	  <ui:scrollerWrapper class="outerScroller cBLMobiltyHomePagecomp">
+	    <div class="slds-tabs--scoped">
+	      <ui:scrollerWrapper class="innerScroller cBLMobiltyHomePagecomp">
+	      <ul class="slds-tabs--scoped__nav " role="tablist">
+	        <li aura:id="t1" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="hot" role="presentation" > <a class="slds-tabs--scoped__link" data-index="t1" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-scoped-1" id="tab-scoped-1__item" style="text-decoration:none;"> hot</a> </li>
+	        <li aura:id="t2" class="slds-tabs--scoped__item slds-text-title--caps" title="fresh" role="presentation" > <a class="slds-tabs--scoped__link" data-index="t2" onclick="{!c.tabAction}" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="true" aria-controls="tab-scoped-2" id="tab-scoped-2__item" style="text-decoration:none;"> fresh</a> </li>
+	        <li aura:id="t3" class="slds-tabs--scoped__item slds-text-title--caps" title="follow up" role="presentation" data-index="t3" onclick="{!c.tabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-3" id="tab-scoped-3__item" style="text-decoration:none;"> follow up</a> </li>
+	        <li aura:id="t4" class="slds-tabs--scoped__item slds-text-title--caps" title="Docs Rec" role="presentation" data-index="t4" onclick="{!c.tabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-4" id="tab-scoped-4__item" style="text-decoration:none;"> Docs Recieved</a> </li>
+	        <li aura:id="t5" class="slds-tabs--scoped__item slds-text-title--caps" title="others" role="presentation" data-index="t5" onclick="{!c.tabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-5" id="tab-scoped-5__item" style="text-decoration:none;"> others</a> </li>
+	      </ul>
+	      </ui:scrollerWrapper>	
+	      <div aura:id="t1detail" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item"> 
+	        <aura:if isTrue="{!v.hot}">
+	        	<c:CardListComp TotalRecords="{!v.hotPOs}" aura:id="hotPOsList"/>
+	        </aura:if>
+	      </div>
+	      <div aura:id="t2detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+			<aura:if isTrue="{!v.fresh}">
+	        	<c:CardListComp TotalRecords="{!v.freshPOs}"/>
+	        </aura:if>
+		  </div>
+	      <div aura:id="t3detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-3__item">
+			<aura:if isTrue="{!v.followUp}">
+	        	<c:CardListComp TotalRecords="{!v.followUpPOs}" />
+	        </aura:if>		  
+		  </div>
+	      <div aura:id="t4detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-4__item">
+			<aura:if isTrue="{!v.docsRec}">
+	        	<c:CardListComp TotalRecords="{!v.docsRecPOs}" />
+	        </aura:if>		  
+		  </div>
+	      <div aura:id="t5detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-5__item" style = "padding : 1px;">
+			<aura:if isTrue="{!v.others}">
+				<div class="slds-tabs--scoped">
+				<ui:scrollerWrapper class="innerScroller cBLMobiltyHomePagecomp">
+				  <ul class="slds-tabs--scoped__nav" role="tablist">
+					<li aura:id="t11" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Interested" role="presentation"  data-index="t11" onclick="{!c.innerTabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-scoped-11" id="tab-scoped-11__item" style="text-decoration:none;">Interested</a> </li>
+					<li aura:id="t22" class="slds-tabs--scoped__item slds-text-title--caps" title="Not Contactable" role="presentation"  data-index="t22" onclick="{!c.innerTabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="true" aria-controls="tab-scoped-22" id="tab-scoped-22__item" style="text-decoration:none;">Not Contactable</a> </li>
+					<li aura:id="t33" class="slds-tabs--scoped__item slds-text-title--caps" title="Not Interested" role="presentation" data-index="t33" onclick="{!c.innerTabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-33" id="tab-scoped-33__item" style="text-decoration:none;">Not Interested</a> </li>
+					<li aura:id="t44" class="slds-tabs--scoped__item slds-text-title--caps" title="Rejected" role="presentation" data-index="t44" onclick="{!c.innerTabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-44" id="tab-scoped-44__item" style="text-decoration:none;">Rejected</a> </li>
+					<li aura:id="t55" class="slds-tabs--scoped__item slds-text-title--caps" title="other" role="presentation" data-index="t55" onclick="{!c.innerTabAction}"> <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-55" id="tab-scoped-55__item" style="text-decoration:none;">others</a> </li>
+				  </ul>
+				</ui:scrollerWrapper>
+				  <div aura:id="t11detail" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-11__item"> 
+					<aura:if isTrue="{!v.Interested}">
+						<c:CardListComp TotalRecords="{!v.InterestedPOs}"/>
+					</aura:if>
+				  </div>
+				  <div aura:id="t22detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-22__item">
+					<aura:if isTrue="{!v.NotContactable}">
+						<c:CardListComp TotalRecords="{!v.NotContactablePOs}"/>
+					</aura:if>
+				  </div>
+				  <div aura:id="t33detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-33__item">
+					<aura:if isTrue="{!v.NotInterested}">
+						<c:CardListComp TotalRecords="{!v.NotInterestedPOs}"/>
+					</aura:if>		  
+				  </div>
+				  <div aura:id="t44detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-44__item">
+					<aura:if isTrue="{!v.Rejected}">
+						<c:CardListComp TotalRecords="{!v.RejectedPOs}"/>
+					</aura:if>		  
+				  </div>
+				  <div aura:id="t55detail" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-55__item">
+					<aura:if isTrue="{!v.other}">
+						<c:CardListComp TotalRecords="{!v.otherPOs}"/>
+					</aura:if>		  
+				  </div>
+				  
+				</div>
+	        </aura:if>		  
+		  </div>
+	    </div>
+	  </ui:scrollerWrapper>
+	</div>
+	<div aura:id="spinner" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we load Product Offerings"/>
+    </div>
+</aura:component>

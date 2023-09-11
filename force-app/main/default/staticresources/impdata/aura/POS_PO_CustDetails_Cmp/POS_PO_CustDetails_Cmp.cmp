@@ -1,0 +1,874 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobilePOController">
+    <ltng:require scripts="/resource/jqueryformobility1" />
+   <aura:attribute name="kyc" type="eKYC__c" default="{Id:'',Lead__c:'',Product_Offerings__c:'',eKYC_City__c:''}"/> 
+    <aura:attribute name="oldLead" type="Lead" default="{'sobjectType':'Lead',FirstName:'',LastName:'',MobilePhone:'',PAN__c:''}"/>
+    <!--8734:USERSTORY_Disposition to capture response for Partially filled starts -->
+   	<aura:attribute name = "isDispShow" type = "Boolean" default = "false"/>
+    <aura:attribute name = "dispSpinner" type = "Boolean" default = "false"/>
+   <!--8734:USERSTORY_Disposition to capture response for Partially filled ends --> 
+    <!--Bug 24927 S -->
+    <aura:attribute name="oldPO_GCO" type="Product_Offerings__c" default="{'sobjectType':'Product_Offerings__c',Specialisation__c:'',Degree__c:'',COP_Date__c:'',Practice_Type__c:'',Medical_registration_No__c:''}"/>
+	<!--Bug 24927 E -->
+    <!-- YK need to remove inner class and create new class and replace references in this class -->
+    <aura:attribute name="offer" type="OfferDetails" default="{}"/> 
+    <!--Rohit 16111 S-->
+    <aura:attribute name="isEkycMandatory" type="Boolean" default="false"/>
+    <aura:attribute name="isEkycdone" type="Boolean" default="false"/>
+    <!--Rohit 16111 E-->
+    <!--24237 S-->
+    <aura:attribute name="SourcingEmpId" type = "String"/>
+    <aura:attribute name="currentUserEmpId" type = "String"/>
+    <aura:attribute name="listOfBranch" type = "String[]" default ="[]"/>  
+    <aura:attribute name="sourcingVaildationFlag" type = "String" default ="false"/>  
+    <!--24237 E-->
+    <!--BugId- 22141 Mobile Validation S-->
+    <aura:attribute name = "MobileValidationResult" type ="String" default=""/>
+    <!--BugId- 22141 Mobile Validation E-->
+            <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start -->  
+				<aura:attribute name="displayExotel" type="boolean" default="false"/> 
+		    <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start added Products__c in PO -->
+    <aura:attribute name="po" type="Product_Offerings__c" default="{'sobjectType':'Product_Offerings__c',Id:'',Lead__c:'',Practice_Type__c:'',Products__c:'',
+                                                                   Specialisation__c:'test',Post_Graduate_Super_Specialist_Experienc__c:'',Office_Pin_Code__c:'',
+                                                                   Total_Employment_Vintage__c:'',Sourcing_Channel__c:'',Degree__c:'', Process_Master__c:'',eKYC_details_changed_flag__c :'',Product_Offering_Converted__c : ''}"/>  
+   
+    <!--Bug 24927 S added Resi_Address_Changed__c-->
+    <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start added CallRecodingURL__c,StartTime__c -->
+    <aura:attribute name="lead" type="Lead" default="{'sobjectType':'Lead',Id:'',FirstName:'',LastName:'',PAN__c:'',DOB__c:'',CC_Disposition__c:'',
+                                                     Resi_City__c:'',Email:'',MobilePhone:'',Resi_Pin_Code__c:'',Residential_type__c:'',Off_Pin_Code__c:'',SBS_Branch__c:'',State__c:'',
+                                                     Profession_Type__c:'',Residence_Address_Line1__c:'',Residence_Address_Line2__c:'',Residence_Address_Line3__c:'',CallRecodingURL__c:'',StartTime__c:'',
+                                                     Is_Permanent_Resi_Addr_Different__c:false,RSA_Flag__c:'', Medical_Council__c:'', Per_Pin_Code__c:'', Per_City__c:'',CheckINLocationAddress__c:'',Resi_Address_Changed__c:false}"/>
+    
+    <aura:attribute name="searching" type="Boolean" default="false"/>
+    <aura:attribute name="isExistingOffer" type="Boolean" default="false"/>
+    <aura:attribute name="smsCount" type="Integer" default='0'/>
+    <aura:attribute name="poId" type="String" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="cibilTempId" type="String" default=""/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="branchSearchKeyword" type="string" default=""/>
+    <aura:attribute name="collegeSearchKeyword" type="string" default=""/>
+    <aura:attribute name="residenceCitySearchKeyword" type="string" default=""/>
+    <aura:attribute name="collegeCitySearchKeyword" type="string" default=""/>
+    <aura:attribute name="residenceAddress" type="String" default=""/>
+    <aura:attribute name="monthlyObligation" type="Double"/> <!--  Bug 13675 - New attribute added by hemant keni -->
+    <aura:attribute name="productFlow" type="String" /> <!-- Bug 14509 -->
+    
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="selectedBranch" type="Branch_Master__c" default="{}"/>
+    <aura:attribute name="selectedCollege" type="Sector_Industry__c" default="{}"/>
+     <aura:attribute name="smsSentList" type="SObject[]" default="[]"/>
+    <aura:attribute name="branchList" type="Branch_Master__c[]" default="[]"/>
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="collegeList" type="Sector_Industry__c[]" default="[]"/>
+    <aura:attribute name="existingOffers" type="Product_Offerings__c[]" default="[]"/>
+        <!-- Bug 24927 S-->
+    <aura:attribute name="existingOfferswithGCO" type="list" default="[]"/>
+    <aura:attribute name="GCOCampaignList" type="String[]" default="[]"/>
+    <aura:attribute name = "isGCOCampaign" type = "String" default = ""/>
+    <aura:attribute name = "isResidenceAddressChanged" type = "Boolean" default = "false"/>
+    <aura:attribute name = "GCOImpactFieldsHistory" type = "String" default = ""/>
+    <aura:attribute name = "isGCOImpFieldsChanged" type = "Boolean" default = "false"/>
+    <!-- Bug 24927 E-->
+      <!--Bug 24927-24716 GCO-ckyc address change S-->
+    <aura:attribute name = "addrChangeToggleCKYC" type = "Boolean" default = "false"/>
+    <!--Bug 24927-24716 GCO-ckyc address change E-->
+    <aura:attribute name="residenceCities" type="String[]" default="[]"/>
+    <aura:attribute name="filteredResidenceCities" type="String[]" default="[]"/>
+    <aura:attribute name="collegeCities" type="String[]" default="[]"/>
+    <aura:attribute name="filteredCollegeCities" type="String[]" default="[]"/>
+    <aura:attribute name="degreeValues" type="String[]" default="[]"/>	<!-- Bug 14509 S -->
+    
+    <aura:attribute name="isRetriggerCIBIL" type="Boolean" default="false"/>	<!-- Bug 14716 -->
+    <aura:attribute name="isRetriggerDEDUPE" type="Boolean" default="false"/>
+    <aura:attribute name="isvalidmobile" type="Boolean" default="true"/>
+    <aura:attribute name="location" type="Boolean" default="true"/>
+    <!-- Bug 22425 CC Code changes SME S -->
+     <aura:attribute name="isFailedMCP" type="boolean" default="false" /> <!-- attribute line added for bug 18909 -->
+     <!-- Bug 22425 CC Code changes SME E -->
+    <!--POS YK s-->
+    <aura:attribute name="permanentAddress" type="String" default=""/>
+    <aura:attribute name="permanentCitySearchKeyword" type="string" default=""/>
+    <aura:attribute name="filteredPermanentCities" type="String[]" default="[]"/>
+    <aura:attribute name="showPermanentAddr" type="Boolean" default="false"/>
+    <aura:attribute name="rsaFlag" type="Boolean" default="false"/>
+    <!--POS YK e-->
+    
+    <aura:registerEvent name="GotoNextTab" type="c:GotoNextTab"/>
+    <aura:registerEvent name="CustomerSaveEvent" type="c:CustomerSaveEvent"/>
+    <!-- PSL changes : Nikhil Bugfix #11800 -->
+    
+    
+    <aura:attribute name="cibilScore" type="String" default=""/>
+    <aura:attribute name="offerAmount" type="String" default=""/>
+    <aura:attribute name="segmentation" type="String" default=""/>
+    <aura:attribute name="LAN" type="String" default=""/>
+    <aura:attribute name="oldPanNumber" type="String" default=""/>
+    <aura:attribute name="disablesms" type="Boolean" default=""/>
+    <!--23801 S--> 
+	<aura:attribute name="poRef" type="String" default=""/>
+ 	<!--23801 E--> 
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="geoIsFetch" type="Boolean" default="false"/>
+    
+    <aura:registerEvent name="POS_DisplayOfferEvent" type="c:POS_DisplayOfferEvent"/>
+    <aura:registerEvent name="DisplayOfferEvent" type="c:DisplayOfferEvent"/>
+    <aura:handler event="c:ShareParentalData" action="{!c.setParentalData}"/><!-- US : 2702 -->
+    <!--Added for Segementation V2 Bug 23971 by GC s-->
+	<aura:attribute name="DoctorFlag" type="Boolean" default="false"/>
+    <aura:attribute name="RunningHospitalFlag" type="Boolean" default="false"/>
+    <aura:attribute name="MandatoryFamilyRegistration" type="Boolean" default="false"/>
+    <aura:attribute name="hospitalSearchKeyword" type="string" default=""/>
+    <aura:attribute name="hospitalList" type="Sector_Industry__c[]" default="[]"/>
+    <aura:attribute name="collegeDoctorSearchKeyword" type="string" default=""/>
+    <aura:attribute name="collegeDoctorList" type="Sector_Industry__c[]" default="[]"/>
+    <!--Added for Segementation V2 Bug 23971 by GC e-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!--<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>-->
+    <!--<aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    <aura:handler event="c:LoanConversionEvent" action="{!c.disableForm}"/>
+    <aura:handler event="c:CC_Data" action="{!c.setccData}"/><!-- US : 2702 -->
+	 <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--  added for bug id 21851-->
+    
+     <!--Amar 22988  declared variable S-->
+    <aura:attribute name="DummyTat" type="TAT_Master__c" default="{'sobjectType':'Tat_Master__c ',Id:'',PAN_Number__c :'',Applicant__c : '',Lead__c:'',
+                                                                      Comment__c :'',Credit_Observation__c:'',NSDL_Response__c:'',Override_Flag__c:'',PAN_Source__c:'Input',
+                                                                   TypeP__c :'NSDL PAN Check',PAN_Check_Status__c:'Details could not be fetched'
+                                                                   }"/>  
+
+    <aura:attribute name="currentDate" type="Date" /> <!-- Bug Id : 24716 -->
+    <aura:attribute name="ckycFlow" type="Object" default=""/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="isShow" type="Boolean" default="false"/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="ckycResp" type="Object" default=""/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="CkycPO" type="Product_Offerings__c"/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="CkycLead" type="Lead"/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="POADocName" type="String" default=""/><!-- Bug Id : 24716 -->
+<!--     <aura:attribute name="currentDate" type="String" default=""/> Bug Id : 24716 -->
+    <aura:attribute name="isReadOnlyCKYC" type="Boolean" default = "false"/> <!-- Bug Id : 24716 -->
+    <aura:attribute name="ckycDisable" type="Boolean" default = "false"/> <!-- Bug Id : 24716 -->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/> <!-- Bug Id : 24716 -->
+    <!-- <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>  Bug Id : 24716 -->
+    <aura:handler event="c:shareCkycInfo" action="{!c.setCkyc}"/> <!-- Bug Id : 24716 -->
+    <aura:handler event="c:CkycSearchInfo" action="{!c.setSearch}"/> <!-- US : 13265-->
+    <aura:attribute name="CKYCDocumentType" type="String" default=""/> <!-- US : 13265-->
+    <aura:attribute name="ckycSearch" type="Object" default=""/> <!-- US : 13265-->
+    <aura:attribute name="dataSource" type="String" default=""/><!-- US : 13265-->
+    <aura:attribute name="downResponse" type="Object" default=""/> <!-- US : 13265-->
+    <aura:attribute name="CkycMandate" type="Boolean" default="true"/><!-- US : 13265-->
+	<aura:attribute name="incFieldVisibility" type="Boolean" default="true"/><!-- US : 19995-->
+
+    <div class="kyc-container">
+        <ui:scrollerWrapper class="{!(v.offer.cibilScore == null?'kyc-wrapper':'kyc-wrapper1')}">
+          <!--<c:POS_Offer_Details />-->
+            <!--rohit 16111 added isPro-->
+            <div class="slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" >
+			<div class="slds-form-element__control">
+                	<label class="slds-form-element__label mobilelabel" for="mobileNumber">Mobile Number<span style="color:red">*</span></label>
+             	    <ui:inputText aura:id="mobileNumber"  class="slds-input mobilecolour" value="{!v.lead.MobilePhone}" placeholder="Mobile Number" maxlength="10" required="true" updateOn="keyup" keyup="{!c.validateMobileNumber}"/>
+                	<!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start -->	
+                    <aura:if isTrue="{! and(v.displayExotel == true, !v.po.Product_Offering_Converted__c) }">
+                            &nbsp;
+                        <c:Exotel_APICmp frommobile="none" tomobile="{!v.lead.MobilePhone}"  recordId="{!v.lead.Id}" objName="Lead"  Product="{!v.po.Products__c}"/>
+                          &nbsp;
+                          <!--8734:USERSTORY_Disposition to capture response for Partially filled starts -->
+    						<lightning:icon iconName="action:log_event" size="xx-small" alternativeText="Disposition" onclick="{!c.openDispositionModal}"/>
+                         <!--8734:USERSTORY_Disposition to capture response for Partially filled ends -->  
+                        	<aura:if isTrue="{! and(v.lead.CallRecodingURL__c != null, v.lead.CallRecodingURL__c != '') }">
+                                  &nbsp;
+                                  <lightning:icon iconName="standard:call_history" alternativeText="Call History" onclick="{!c.openActionWindow}" />
+                                  <!--<lightning:button class="slds-button_brand slds-icon-standard-call_history" iconName="standard:call_history" onclick="{!c.openActionWindow}" />-->
+                              </aura:if> 
+                    </aura:if> 
+                    <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement end -->
+                    
+                    <aura:if isTrue="{!v.MobileValidationResult == 'MATCH'}">
+                    	<div class="slds-form-element__help" style="color:#04844b">Matched with CIBIL</div>                  
+                	</aura:if>
+                    <aura:if isTrue="{!v.MobileValidationResult == 'NO-MATCH'}">
+                    	<div class="slds-form-element__help" style="color:#ffb75d">Not Matched with CIBIL</div>                  
+                    </aura:if>
+                    <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start -->
+               
+                     <aura:if isTrue="{! and(v.displayExotel == true, !v.po.Product_Offering_Converted__c) }">
+                              <label class="slds-form-element__help" for="mobileNumber">Last Call Timing</label>
+                              <aura:if isTrue="{! and(v.displayExotel == true, !v.po.Product_Offering_Converted__c) }">
+                                 <ui:outputDateTime class="slds-form-element__help" aura:id="DateField" value="{!v.lead.StartTime__c}" />
+								 <!-- <label class="slds-form-element__label mobilelabel" for="mobileNumber">{!v.lead.StartTime__c}</label>  -->
+                              </aura:if> 
+                      </aura:if>   
+                
+                     <!-- May-2019 Enhancement 2275: USERSTORY_Calling through Exotel  Enhancement start -->
+                </div>
+                
+                <!--<aura:if isTrue="true"> //{!v.lead.MobilePhone.validateMobileNumber== true}-->
+                <div class="slds-p-top--large">
+                   <lightning:button aura:id="smsSendId" class="slds-button slds-button_brand" label="Send Consent SMS" onclick="{!c.sendSms}" disabled = "{!(v.lead.MobilePhone == '' || (!v.isvalidmobile) || (v.disablesms)) ? 'true':'false'}"/>
+                   <!-- Bug Id : 24716 -->
+                    <lightning:button aura:id="ckycId" class="slds-button slds-button_brand" label="CKYC" onclick="{!c.openCkycModel}" disabled = "{!(v.lead.MobilePhone == '' || (!v.isvalidmobile)) ? 'true':'false'}"/>
+                </div>                
+                <!--//</aura:if>-->
+            </div>
+            <aura:if isTrue ="{!(v.hideAadhaarSection == false)}"><!--added if for bug id 21851-->
+            <div aura:id="aadharSection">
+                <c:AadharVerification Product='PRO' isPro='true' aadharValue ='Aadhaar OTP' isPOS = 'true'/>
+            </div>
+            </aura:if>    
+            <fieldset aura:id="customerDetails" class="slds-form--stacked slds-p-bottom--medium">
+                <!-- <div aura:id="demog" class="slds-show" style="margin-top:1%">-->
+                <h3 class="slds-section-title--divider">DEMOGRAPHIC DETAILS</h3>
+                
+                
+                <!--<p class="slds-p-horizontal_small">-->
+                <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                        <!--POS YK s-->
+                         
+       						<div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="residentialType">Salutation<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="Salutation" class="slds-input" value="{!v.lead.Salutation}" required="true" change="{!c.setDefaultValues}"/>
+                                </div>
+                            </div> 
+                 
+                            
+                        <!--POS YK e-->
+                        
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                             <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="firstName">First Name<span style="color:red">*</span></label>
+                            <ui:inputText aura:id="firstName" class="slds-input" value="{!v.lead.FirstName}" placeholder="First Name" required="true" updateOn="keyup" keyup="{!c.validateFirstName}"/>
+                            </div>         
+                        </div>   
+                        
+                        
+                        <div class="slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                             <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="lastName">Last Name<span style="color:red">*</span></label>
+                            <ui:inputText aura:id="lastName" class="slds-input" value="{!v.lead.LastName}" placeholder="Last Name" required="true" updateOn="keyup" keyup="{!c.validateLastName}"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                             <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="dateOfBirth">Date of Birth<span style="color:red">*</span></label>
+                            <!--<input id="dateofbirth" type="date" class="slds-input"/>-->
+                            <div class="slds-size--1-of-1 dateFieldContainer">
+                                <aura:if isTrue="{!v.ckycDisable}">                        
+                            		<aura:set attribute="else"> 
+                                		<ui:inputDate aura:id="dateOfBirth" class="slds-input" value="{!v.lead.DOB__c}" displayDatePicker="true" />
+                            		</aura:set>
+                                		<ui:inputDate aura:id="dateOfBirthRead" class="avoidClick" value="{!v.lead.DOB__c}" disabled="true"/>
+                        		</aura:if>                      
+                            </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                         <div class="slds-form-element__control">   
+                            <label class="slds-form-element__label" for="email">Email<span style="color:red">*</span></label>
+                            <ui:inputEmail aura:id="email" class="slds-input" value="{!v.lead.Email}" placeholder="abc@email.com" updateOn="keyup" keyup="{!c.validateEmail}"/>
+                    	</div>
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                             <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="pannumber">PAN<span style="color:red">*</span></label>
+                            <ui:inputText aura:id="pannumber" class="slds-input" updateOn="keyup" keyup="{!c.validatePAN}" value="{!v.lead.PAN__c }" placeholder="PAN" maxlength="10" />
+                            </div>
+                        </div>
+                        
+                           
+                        
+                    </div>
+                </div>
+                <!-- </p>-->
+                <!--</div>-->
+                <!--  </div> -->
+                <br/>
+                    
+                    <h3 class="slds-section-title--divider">ADDRESS DETAILS</h3>
+                <!-- Bug 24927 S -->        
+                <aura:if isTrue="{!or(v.addrChangeToggleCKYC == true, v.isGCOCampaign == 'true')}">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding-top:1%; padding-bottom: 1%;">
+                        <div class="slds-form-element__control"> 
+                            <div class="slds-form-element__control">
+                                <lightning:input type="toggle" aura:id="isResiAddrChanged" name="isResiAddrChanged" label="Change Residence Address" value="{!if(v.lead.Resi_Address_Changed__c)}" checked="{!v.lead.Resi_Address_Changed__c}" onchange="{!c.EnableAddressFields}" messageToggleActive="Yes" messageToggleInactive="No"/>
+                            </div>
+                        </div> 
+                    </div>                    
+                </aura:if>
+                
+                <!-- Bug 24927 E -->
+                    <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" style="padding-bottom:1%;">
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="residenceAddress">Residence Address<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="residenceAddress" class="slds-input" value="{!v.residenceAddress}" placeholder="Residence Address" updateOn="keyup" keyup="{!c.validateAddress}"/>
+                                </div>
+                            </div>    
+                            
+                            <div aura:id="residenceCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="residenceCity">Residence City<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="residenceCity" class="slds-input" updateOn="keyup" keyup="{!c.residenceCityKeyPressController}" value="{!v.residenceCitySearchKeyword}" placeholder="Select Residence City"/>                               
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="residenceCityList">
+                                    <div aura:id="residenceCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.filteredResidenceCities}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectResidenceCity}">{!singleRec}</a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="pincode">Pin Code<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="pincode" class="slds-input" maxlength="6" value="{!v.lead.Resi_Pin_Code__c}" placeholder="Pin Code" updateOn="keyup" keyup="{!c.validatePIN}"/>
+                                </div>
+                            </div> 
+                            
+                            <!--POS YK s-->
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12" style="padding-top:1%; padding-bottom: 1%;">
+                               <div class="slds-form-element__control"> 
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="toggle" aura:id="isPermAddrDiff" name="isPermAddrDiff" label="Is Permanent Address Different?" value="{!if(v.lead.Is_Permanent_Resi_Addr_Different__c)}" checked="{!v.lead.Is_Permanent_Resi_Addr_Different__c}" onchange="{!c.copyPermaAddr}" messageToggleActive="Yes" messageToggleInactive="No"/>
+                                </div>
+                               </div> 
+                            </div>
+                            
+                            <aura:if isTrue="{!v.lead.Is_Permanent_Resi_Addr_Different__c == true}">
+                           
+                                <div id="permanentAddress" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="permanentAddress">Permanent Address<span style="color:red">*</span></label>
+                                    <ui:inputText aura:id="permanentAddress" class="slds-input" value="{!v.permanentAddress}" placeholder="Permanent Address" updateOn="keyup" keyup="{!c.validatePermanentAddress}"/>
+                                    </div>
+                                </div> 
+                                
+                                <div id="permanentCity" aura:id="permanentCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="permanentCity">Permanent City<span style="color:red">*</span></label>
+                                    <ui:inputText aura:id="permanentCity" class="slds-input" updateOn="keyup" keyup="{!c.permanentCityKeyPressController}" value="{!v.permanentCitySearchKeyword}" placeholder="Select Permanent City"/>                               
+                                    <!--This part is for Display typehead lookup result List-->  
+                                    <div class="slds-lookup__menu slds" id="permanentCityList">
+                                        <div aura:id="permanentCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.filteredPermanentCities}" var="singleRec" indexVar="idx">
+                                                <li role="presentation">
+                                                    <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectPermanentCity}">{!singleRec}</a></div>
+                                                            </div>
+                                                        </div>    
+                                                    </span>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="permPincode" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="permPincode">Pin Code<span style="color:red">*</span></label>
+                                    <ui:inputText aura:id="permPincode" class="slds-input" maxlength="6" value="{!v.lead.Per_Pin_Code__c}" placeholder="Pin Code" updateOn="keyup" keyup="{!c.validatePermanentPIN}"/>
+                                    </div>
+                                </div>
+                                
+                            </aura:if>
+                            
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="residentialType">Residential Type<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="residentialType" class="slds-input" value="{!v.lead.Residential_type__c}" required="true"/>
+                                </div>
+                            </div>
+                            
+                            <div aura:id="sourceSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="sourceName">Sourcing Channel<span style="color:red">*</span></label>
+                                <ui:inputText aura:id="sourceName" class="slds-input" updateOn="keyup" keyup="{!c.sourceKeyPressController}" value="{!v.sourceSearchKeyword}" placeholder="Enter Sourcing Channel"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="sourceList">
+                                    <div aura:id="sourceMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.sourceList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectSource}">{!singleRec.Name + ' - ' + singleRec.Branch__r.Name + ' - ' + singleRec.Reporting_Manager__r.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                                </div>
+                            </div>
+                            <!--POS YK e-->  
+                        </div>
+                    </div>
+                <br/>
+                
+                    <h3 class="slds-section-title--divider">QUALIFICATION</h3>                    
+                    <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" style="padding-bottom:1%;">
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="profession">Segment Type<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="profession" class="slds-input" change="{!c.UpdateForm}" value="{!v.lead.Profession_Type__c}" required="true"/>
+                                </div>
+                            </div>
+                            
+                            <!--Added for Segementation V2 Bug 23971-->
+							<aura:if isTrue="{!v.lead.Profession_Type__c == 'Doctor'}">
+							 <div aura:id="collegeDoctorSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                              <div aura:id="collegeNameDiv1"  >
+							  <label class="slds-form-element__label" for="CollegeName">College Name<span style="color:red">*</span></label>
+							  <ui:inputText aura:id="collegeName1" class="slds-input" updateOn="keyup" keyup="{!c.collegeDoctorKeyPressController}" value="{!v.collegeDoctorSearchKeyword}" placeholder="Enter College Name"/>        
+                                       <div class="slds-lookup__menu slds" id="sourceList">
+                                            <div aura:id="collegeMessage1" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.collegeDoctorList}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCollegeDoctor}">{!singleRec.Name}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+							   </div>
+							</div>
+                            </aura:if>
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="membershipNo">Registration\Membership Number</label>
+                                <ui:inputText aura:id="membershipNo" class="slds-input" maxlength="15" value="{!v.po.Medical_registration_No__c}" placeholder="Enter Registration\Membership Number"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <ui:outputText aura:id="specializationLabel" class="slds-form-element__label"  value="Specialization"/><span style="color:red;margin-left: -10px;">*</span>
+                                <!--<label aura:id="specializationLabel" class="slds-form-element__label" for="specialization">Specialization*</label>-->
+                                <ui:inputSelect aura:id="specialization" class="slds-input" value="{!v.po.Specialisation__c}" required="true" change="{!c.onChangeOFSpecialisation}"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="practiceType">Practice Type<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="practiceType" class="slds-input" value="{!v.po.Practice_Type__c}" required="true"/>
+                                </div>
+                            </div> 
+                            
+							
+							
+							<aura:if isTrue="{!v.lead.Profession_Type__c == 'Engineers'}">
+								
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                     
+                                <label aura:id="practiceExperienceLabel" class="slds-form-element__label" for="practiceExperience">Practice Experience<span style="color:red;">*</span></label>
+								 <ui:inputSelect aura:id="practiceExperience" class="slds-input" value="{!v.po.Total_Employment_Vintage__c}" required="true"/>
+                              </div>
+                            </div>
+							
+						
+							<aura:set attribute="else">
+							<div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control dateFieldContainer">
+                                <label aura:id="dateOfRegistrationlabel" class="slds-form-element__label" for="dateOfRegistration">Date Of Registration<span style="color:red">*</span></label>
+								<ui:inputDate aura:id="dateOfRegistration" class="slds-input"  value="{!v.po.COP_Date__c}" change="{!c.calculateVintage}" blur="{!c.validateDORWithDOB}" required="true" displayDatePicker="true"/> <!-- select ="{!c.validateWithDOB}"-->
+                              </div>
+                            </div>
+							</aura:set>
+							</aura:if>
+
+							
+						
+							
+							
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <ui:outputText aura:id="postGradExperienceLabel" class="slds-form-element__label"  value="Post Graduate Experience"/><span style="color:red;margin-left: -10px;">*</span>
+                                <!--<label aura:id="postGradExperienceLabel" class="slds-form-element__label" for="postGradExperience">Post Graduate Experience*</label>-->
+                                <!--<ui:inputSelect aura:id="postGradExperience" class="slds-input" value="{!v.po.Post_Graduate_Super_Specialist_Experienc__c}" required="true"/>-->
+                                <ui:inputSelect aura:id="postGradExperience" class="slds-input" value="{!v.po.Post_Graduate_Super_Specialist_Experienc__c}" required="true"/>
+                                </div>
+                            </div>          
+                            
+                            <!-- Bug 13675 S - Added new field Monthly Obligation (In Rs.) By Hemant Keni-->
+                            
+                            <!-- Bug 13675 E - Added new field Monthly Obligation (In Rs.) By Hemant Keni-->
+                            
+                            <aura:if isTrue="{!v.lead.Profession_Type__c == 'Doctor'}">
+                                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="medicalCouncil">Medical Council<span style="color:red">*</span></label>
+                                    <ui:inputText aura:id="medicalCouncil" class="slds-input" value="{!v.lead.Medical_Council__c}" placeholder="Enter Medical Council"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            
+                            
+                            <!-- Bug 14509 S -->
+                            <aura:if isTrue="{!and (v.productFlow == 'RDL',v.degreeValues.length>0)}">
+
+                                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="degree">Degree<span style="color:red">*</span></label>
+                                    <ui:inputSelect aura:id="degree" class="slds-input" value="{!v.po.Degree__c}" multiple="false" required="true"/>
+                                    </div>
+                                </div>                 
+                            </aura:if>
+                            <!-- Bug 14509 S -->
+                            
+                            <aura:if isTrue="{!v.lead.Profession_Type__c == 'Engineers'}"> 
+                                <div aura:id="collegeSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div aura:id="collegeNameDiv"  >
+                                        <label class="slds-form-element__label" for="branchName">College Name<span style="color:red">*</span></label>
+                                        <ui:inputText aura:id="collegeName" class="slds-input" updateOn="keyup" keyup="{!c.collegeKeyPressController}" value="{!v.collegeSearchKeyword}" placeholder="Enter College Name"/>        
+                                        <!--This part is for Display typehead lookup result List-->  
+                                        <div class="slds-lookup__menu slds" id="sourceList">
+                                            <div aura:id="collegeMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.collegeList}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCollege}">{!singleRec.Name}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div aura:id="collegeCitySearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div aura:id="collegeCityDiv" class="slds-form-element__control">
+                                        <label class="slds-form-element__label" for="collegeCity">College City<span style="color:red">*</span></label>
+                                        <ui:inputText aura:id="collegeCity" class="slds-input" updateOn="keyup" keyup="{!c.collegeCityKeyPressController}" value="{!v.collegeCitySearchKeyword}" placeholder="Select College City"/>                               
+                                        <!--This part is for Display typehead lookup result List-->  
+                                        <div class="slds-lookup__menu slds" id="collegeCityList">
+                                            <div aura:id="collegeCityMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.filteredCollegeCities}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCollegeCity}">{!singleRec}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div  aura:id="highestDegreeTypeDiv" class="slds-form-element slds-hide slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                     <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="residentialType">Highest Degree Type<span style="color:red">*</span></label>
+                                    <ui:inputSelect aura:id="highestDegreeType" class="slds-input " value="{!v.po.TypeOfDegreeforCA_Architect__c}" required="true"/>
+                                    </div>
+                                </div>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!and(v.lead.Profession_Type__c != 'CA', v.degreeValues.length >0 )}"> 
+                                    <div  aura:id="degreeDiv" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                         <div class="slds-form-element__control">
+                                        <label class="slds-form-element__label" for="degree">Degree<span style="color:red">*</span></label>
+                                             <ui:inputSelect aura:id="degreeProspect" class="slds-input " value="{!v.po.Degree__c}" multiple="false" required="true"/>
+                                        </div>
+                                    </div>
+                                    </aura:if>
+                                   
+                                </aura:set>
+                            </aura:if>
+                            
+                             
+                            
+                            <!-- modified  slds-size1 etc to make it commented -->
+                          <!--  <div class="slds-form-element slds-p-horizontalsmall slds-size1-of-1 slds-medium-size3-of-6 slds-large-size4-of-12"> 
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="obligations">Monthly Obligation (In Rs.)<span style="color:red !important">*</span></label>
+                                <ui:inputText aura:id="obligations" class="slds-input" updateOn="keyup" keyup="{!c.validateObligation}" value="{!v.monthlyObligation }" placeholder="Monthly Obligations" maxlength="8" /> 
+                                </div>
+                            </div> -->
+                            <!--POS YK s-->
+                            
+                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            	<div class="slds-form-element__control">
+                                	<label class="slds-form-element__label" for="residentialType">Check RSA<span style="color:red">*</span></label>
+                                </div>
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="rsaFlag" type="toggle" name="checkRsa" label="" value="{!if(v.lead.RSA_Flag__c)}" checked="{!v.rsaFlag}" onchange="{!c.setRSAValue}" messageToggleActive="Yes" messageToggleInactive="No"/>
+                                </div>
+                            </div>
+                            <!--POS YK e-->
+                        </div>
+                    </div>
+                
+                 <!--Added for Segementation V2 Bug 23971 by GC s-->
+                <br/> 
+					<aura:if isTrue="{!v.lead.Profession_Type__c == 'Doctor'}">
+			        <h3 class="slds-section-title--divider">Income Variable</h3>
+			          <div class="slds-p-horizontal--small slds-p-bottom_x-small" style="background: rgb(243, 242, 242)">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded" style="padding-bottom:1%;">
+                        
+						  <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            	<div class="slds-form-element__control">
+                                	<label class="slds-form-element__label" for="DoctorFamily">Doctor's Family<span style="color:red">*</span></label>
+                                </div>
+                                <div class="slds-form-element__control">
+                                 <div class="slds-form-element__control">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <ui:inputCheckbox aura:id="DoctorFamilyFlag" change="{!c.setDoctorFamilyFlag}" value="{!v.DoctorFlag}"/>
+                                        <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                            <span class="slds-checkbox_on">Yes</span>
+                                            <span class="slds-checkbox_off">No</span>
+                                        </span>
+                                    </label>
+                                </div>
+                              </div>
+                            </div>
+							
+							<div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            	<div class="slds-form-element__control">
+                                	<label class="slds-form-element__label" for="RunningHospFlag">Running Hospital<span style="color:red">*</span></label>
+                                </div>
+                                <div class="slds-form-element__control">
+							<div class="slds-form-element__control">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <ui:inputCheckbox aura:id="RunningHospFlag" change="{!c.setRunningHospitalFlag}" value="{!v.RunningHospitalFlag}"/>
+                                        <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                            <span class="slds-checkbox_on">Yes</span>
+                                            <span class="slds-checkbox_off">No</span>
+                                        </span>
+                                    </label>
+                                </div>                                
+                              </div>
+                            </div>
+							
+							<div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                     <label class="slds-form-element__label" for="membershipNoFamily">Family Member Reg. No<aura:if isTrue="{!v.MandatoryFamilyRegistration }"><span style="color:red">*</span></aura:if></label>
+                                <ui:inputText aura:id="membershipNoFamily" class="slds-input" maxlength="15" value="{!v.lead.Family_Member_Reg_No__c}" placeholder="Enter Registration\Membership Number"/>
+                                </div>
+                            </div>
+							<aura:if isTrue="{!(!v.incFieldVisibility)}"> <!-- US : 19995 -->
+							<div aura:id="hospitalSearchResult" class="slds-form-element slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                              <div aura:id="HospitalDiv1"  >
+							  <label class="slds-form-element__label" for="CollegeName">Hospital of Consultancy<span style="color:red">*</span></label>
+							  <ui:inputText aura:id="hospitalOfconst" class="slds-input" updateOn="keyup" keyup="{!c.hospitalOfConsultancyKeyPress}" value="{!v.hospitalSearchKeyword}" placeholder="Enter Hospital Name"/>        
+                                        <!--This part is for Display typehead lookup result List-->  
+                                        <div class="slds-lookup__menu slds" id="sourceList">
+                                            <div aura:id="collegeMessage1" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.hospitalList}" var="singleRec" indexVar="idx">
+                                                    <li role="presentation">
+                                                        <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                            <div class="slds-media__body">
+                                                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                                    <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectHospitalOfconsultancy}">{!singleRec.Name}</a></div>
+                                                                </div>
+                                                            </div>    
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+							   </div>
+							</div>
+							 </aura:if>
+							
+							<aura:if isTrue="{!(!v.incFieldVisibility)}"> <!-- US : 19995 -->
+							  <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                 <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="AnnualIncome">Annual Individual Income (in Lacs)<span style="color:red">*</span></label>
+                                <ui:inputText required="true" aura:id="annualincome" class="slds-input" value="{!v.lead.Annual_Individual_Income_in_Lacs__c}" placeholder="Enter Income" maxlength="16"/>
+                                </div>
+                            </div>
+                            </aura:if>
+						
+						</div>
+						</div>
+						</aura:if>
+             <!--Added for Segementation V2 Bug 23971 by GC e-->   
+            </fieldset>
+            
+           <!--Added for Segementation V2 Bug 23971 by GC-->
+              <div class="slds-p-bottom--xx-large" >
+                <button aura:id="submitButtonId" class="slds-button slds-button--brand" onclick="{!c.submitDetails}">Submit Details</button>
+                <button aura:id="nextButtonId" class="slds-button slds-button--brand slds-hide" onclick="{!c.gotoNextTab}">Next</button>
+            </div>   
+            
+        </ui:scrollerWrapper>
+    </div>
+    
+    <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div aura:id="alertDialog" class="slds-hide"> 
+        <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+                    <h2 class="slds-text-heading--medium" id="prompt-heading-id">Alert</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <p><h2 class="slds-text-heading--medium" id="prompt-heading-id">CIBIL response not yet received.</h2></p>
+                </div>
+                <div class="slds-modal__footer slds-theme--default">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.wait}">Wait</button>
+                    <button class="slds-button slds-button--neutral" onclick="{!c.abort}">Abort</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>  
+    
+    <div aura:id="grabOffers" class="slds-hide">
+        <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal--large" aria-labelledby="header43">
+            <div class="slds-modal__container">
+                
+                <div class="slds-modal__header">
+                    <h2 id="header43" class="slds-text-heading--medium">Existing Offers</h2>
+                </div>
+                	<ui:scrollerWrapper class="kyc-modal-wrapper">
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <article class="slds-card">
+                            <div class="slds-card__body">
+                                <div class="slds-card__body--inner slds-grid slds-wrap slds-grid--pull-padded">
+                                    <aura:iteration items="{!v.existingOfferswithGCO}" var="offer">
+                                        <div class="slds-tile slds-media slds-card__tile slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-3 slds-hint-parent">
+                                            <div class="slds-media__body">
+                                                <div class="slds-grid slds-grid--align-spread slds-has-flexi-truncate">
+                                                    <h3 class="slds-truncate" title="Related Record Title 1"><b>{!offer.value.Ref__c}</b></h3>
+                                                </div>
+                                                <div class="slds-tile__detail slds-text-body--small">
+                                                    <dl class="slds-list--horizontal slds-wrap">
+                                                        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="First Label">Product:</dt>
+                                                        <dd class="slds-item--detail slds-truncate">{!offer.value.Products__c}</dd>
+                                                        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="First Label">Offer Date:</dt>
+                                                        <dd class="slds-item--detail slds-truncate">{!offer.value.Offer_Date__c}</dd>
+                                                        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="First Label">Offer Amount:</dt>
+                                                        <dd class="slds-item--detail slds-truncate">{!offer.value.Offer_Amount__c}</dd>
+                                                        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="First Label">Data Mart Status:</dt>
+                                                        <dd class="slds-item--detail slds-truncate">{!offer.value.Data_Mart_Status__c}</dd>
+ 														
+                                                        <!--Bug 24927 Start -->
+                                                        <aura:if isTrue="{!offer.key == 'GCO'}">
+                                                        <dt class="slds-item--label slds-text-color--weak "  style="color:#04844b" title="First Label">GCO</dt>
+                                                        
+                                                            <dd class = "slds-item--detail slds-truncate" style="color:#04844b">
+                                                                <lightning:icon iconName="standard:task2" size="XX-small" alternativeText="Indicates Approval"/>
+                                                            </dd>                                                
+
+                                                        </aura:if>
+                                                        <!--Bug 24927 End -->
+                                                    </dl>
+                                                </div>
+                                                <div class="slds-p-vertical--small">
+                                                    <button id="{!offer.value.Id}" class="slds-button slds-button--brand" onclick="{!c.grabOffer}">Grab</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aura:iteration>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </ui:scrollerWrapper>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModalPopup}">Close</button>
+                </div>
+                    
+            </div>
+        </div>
+         <div class="slds-backdrop slds-backdrop--open"></div> 
+    </div>
+         <!--8734:USERSTORY_Disposition to capture response for Partially filled starts -->
+    <aura:if isTrue="{!v.isDispShow}">
+    	<c:DispositionDataComponent spinnerFlag = "{!v.dispSpinner}" isOpen = "{!v.isDispShow}" poId = "{!v.po.Id}"/>
+    </aura:if>
+   <!--8734:USERSTORY_Disposition to capture response for Partially filled ends -->
+    <!-- cibil view report modal starts here -->
+    
+    <!-- Bug Id : 24716 - CKYC model popup start -->
+    
+    <aura:if isTrue="{!v.isShow}">
+    <div aura:id="ckycModel" class="slds-m-around_xx-large" > 
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="width:100%;height:100%;padding:20px;">
+            <div aura:id="ckycModelInner" class="slds-modal__container">
+                
+                <c:LoaderForMobility />
+                <ui:scrollerWrapper class="outerScroller2">   
+                    <header class="slds-modal__header">C-KYC Search and Download</header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <c:CkycCmp CKYCDocumentType="{!v.CKYCDocumentType}" dataSource="{!v.dataSource}" ckycFlow="{!v.ckycFlow}" recordId="{!v.poId}" currentDate="{!v.currentDate}"  isReadOnly="{!v.isReadOnlyCKYC}"/><!-- US : 13265-->
+                    </div>
+                    <footer class="slds-modal__footer">                    
+                        <lightning:button variant="neutral"  class="slds-m-around_xxx-small" label="Close" title="Close" onclick="{! c.closeCkycModel}"/>
+                    </footer>
+                </ui:scrollerWrapper>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+        </aura:if>
+    <!-- Bug Id : 24716 - CKYC model popup end -->
+</aura:component>

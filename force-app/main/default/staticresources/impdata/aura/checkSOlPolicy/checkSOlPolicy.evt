@@ -1,0 +1,1 @@
+<aura:event type="APPLICATION" description="Check SOL policy on click of Sales Document Tab" />

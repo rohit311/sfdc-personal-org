@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="By this event we are passing the selected record to the child component">
+    <!-- Declare attributes -->
+    <aura:attribute name="record" type="sObject" description="This stores reference to the sObject passed"/>
+</aura:event>

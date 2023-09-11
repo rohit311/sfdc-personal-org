@@ -1,0 +1,79 @@
+<!--cmp Name = DigitalSamplingLightningCmp-->
+<aura:component controller="DigitalSamplingCntrl" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" >
+    <aura:attribute name="pageReference" type="Object"/>
+    <lightning:navigation aura:id="navService"/>
+    <aura:attribute name="currentTheme" type="String" />
+    <aura:attribute name="isbypassselected" type="boolean" />
+    <aura:attribute name="isRegisterselected" type="boolean" />
+    <aura:attribute name="storeRadioValue" type="string" />
+    <aura:attribute name="showBypass" type="boolean"/>
+    <aura:attribute name="showDgSection" type="boolean" default="true" />
+    <aura:attribute name="showSaveButton" type="boolean" />
+    <aura:attribute name="showIniDGSamplingButton" type="boolean" />
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="recordId" type="Id" default='0060k0000065WDi' />
+    <aura:attribute name="loanValue" type="Id" />
+    <aura:attribute name="Applicants" type="Applicant__c[]" default="[{sobjectType:'Applicant__c'}]"/>
+    <aura:attribute name="primeryApplicant" type="Applicant__c" />
+    <aura:attribute name="isMobility" type="Boolean" default="false"/><!--added  for 24316-->
+     <aura:attribute name="showDGPanel" type="Boolean" default="true"/><!--added  for 24316-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <!-- <c:Custom_Toast_Mobility /> -->
+    <c:LoaderForMobility />
+    <aura:if isTrue="{!v.showDgSection}" >
+    <div class="slds-box" style="{! v.isMobility ? 'border-radius:2px;color:white;width:100%;height:30px;background-color:#16325c;padding-top:4px;padding-left:4px;text-align:center; margin: 5px 0px;' : 'border-radius:2px;color:white;width:100%;height:30px;background-color:#0072bc;padding-top:4px;padding-left:4px;text-align:center; margin: 5px 0px;'}"><!--24316-->
+        <p style="font-size:15px">Digital Sampling</p>
+        <p></p>
+	</div>
+    <div class="slds-box" style="width: 95%; margin-left: 2%; padding: 6px; 6px; border: 1px solid gray;border-radius: 5px; font-size:13px; font-weight: bold;text-align:center">
+        <aura:if isTrue="{!v.showBypass}" >
+            <span class="slds-radio">
+              <aura:if isTrue="{!v.isbypassselected}">
+              	<input type="radio" id="bypass" name="options" value="Bypass" onchange="{!c.onGroup}" checked="true" />
+                <aura:set attribute="else">
+					<input type="radio" id="bypass" name="options" value="Bypass" onchange="{!c.onGroup}" />
+                </aura:set>
+              </aura:if>
+              <label class="slds-radio__label" for="bypass">
+                <span class="slds-radio_faux"></span>
+                <span class="slds-form-element__label">Bypass Digital Sampling</span>
+              </label>
+            </span>
+        </aura:if>
+        <span class="slds-radio" style="margin-left:10%">
+          <aura:if isTrue="{!v.isbypassselected}">
+              <input type="radio" id="register" name="options" value="Register Application and Applicants for digital sampling" onchange="{!c.onGroup}" />
+              <aura:set attribute="else">
+                  <input type="radio" id="register" name="options" value="Register Application and Applicants for digital sampling" checked="true" onchange="{!c.onGroup}" />
+              </aura:set>
+          </aura:if>
+              <label class="slds-radio__label" for="register">
+            <span class="slds-radio_faux"></span>
+            <span class="slds-form-element__label">Register Application and Applicants for digital sampling</span>
+          </label>
+        </span><br />
+    </div>
+    <div style="text-align:center;padding-top:4px;">
+        <aura:if isTrue="{!v.showSaveButton}" >
+             <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+            <lightning:button variant="brand" label="Save" onclick="{!c.save}" ></lightning:button>
+            <aura:set attribute="else">
+                 <lightning:button variant="brand" class="slds-theme--alt-inverse" label="Save" onclick="{!c.save}" ></lightning:button>
+             </aura:set>
+            </aura:if>
+        </aura:if>
+        <aura:if isTrue="{!v.showIniDGSamplingButton}">
+           <aura:if isTrue="{!!v.isMobility}"><!--added if else for 24316-->
+            	<lightning:button variant="brand" label="Initialize Digital Sampling" onclick="{!c.gotoURL}" ></lightning:button>
+             <aura:set attribute="else">
+               <lightning:button  variant="brand" class="slds-theme--alt-inverse" label="Initialize Digital Sampling" onclick="{!c.gotoApp}" ></lightning:button><!--24316-->
+              </aura:set>
+            </aura:if>
+            </aura:if>
+    </div>
+    </aura:if>
+    {!v.body}
+</aura:component>

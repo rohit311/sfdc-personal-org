@@ -1,0 +1,134 @@
+<aura:component controller="SalariedInsuranceCntrl" implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="customer" type="Object" default=""/>
+    <aura:attribute name="mobileNo" type="String" default=""/>
+    <aura:attribute name="panStr" type="String" default=""/>
+    <aura:attribute name="currentDate" type="String" default=""/>
+    <aura:attribute name="leadObj" type="Object" default=""/>
+    <aura:attribute name="insObj" type="Object" default=""/>
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="cityLst" type="List" default=""/>
+    <aura:attribute name="finalCity" type="List"/>
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+    <aura:attribute name="isNew" type="boolean"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="isPayLinkSend" type="Boolean" default="false"/><!-- CR 24406 -->
+    <aura:attribute name="gender" type="List" default="['Male','Female']"/>   
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="shareLeadInfo" type="c:shareLeadInfo"/>
+    <aura:method name="setCustfields" action="{!c.checkCustomer}" description="Sample method with parameters">
+        <aura:attribute name="isNew" type="boolean" /> 
+    </aura:method>
+    <aura:method name="cibilDoneHandler" action="{!c.handleCibilDone}" description="Sample method with parameters" access="public"/><!-- CR not given -->
+    
+    <c:Custom_Toast_Mobility />
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="Search" class="applyColor">
+            <p class="slds-p-horizontal_small"><!-- add "slds-theme_shade" if necessary -->
+                <div class="slds-p-horizontal--small"> 
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" label="Customer ID" value="{!v.customer.Customer_ID__c}" disabled="true"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" aura:id="firstName" label="First Name" value="{!v.customer.First_Name__c}"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="lastName" aura:id="lastName" messageWhenValueMissing="Please Enter Value" label="Last Name" value="{!v.customer.Last_Name__c}" required="true" disabled="false" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custmob" aura:id="mobNum" label="Mobile Number" value="{!v.customer.Mobile__c}" required="true" messageWhenValueMissing="Please Enter Value" disabled="false" messageWhenPatternMismatch="Please Enter Valid Mobile Number" maxlength="10"  pattern="^([6789]\d{9})$" />
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custem" label="Email ID" value="{!v.customer.Customer_Email__c}" aura:id="emailinp" required="true" disabled="false" messageWhenValueMissing="Please Enter Value" messageWhenPatternMismatch="Please Enter Valid Email Address" pattern="[a-zA-Z0-9._-]+@[a-zA-Z]+.[a-zA-Z]{2,4}"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custdob" aura:id="Custdob" type="date" messageWhenBadInput="Invalid DOB" label="Date of Birth" value="{!v.customer.DOB__c}" max="{!v.currentDate}" required="true" messageWhenValueMissing="Please Enter Value"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="Custgender" name="custgen" label="Gender" value="{!v.customer.GENDER__c}" required="true" messageWhenValueMissing="Please Enter Value">
+                                    <option value="">-- None --</option>
+                                    <aura:iteration items="{!v.gender}" var="level">
+                                        <option value="{!level}" text="{!level}" selected="{!v.customer.GENDER__c == level}"></option>
+                                    </aura:iteration>   
+                                </lightning:select> 
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custpan" aura:id="CustPAN" label="PAN" value="{!v.customer.PAN__c}" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please Enter Valid PAN" required="true" disabled="false" messageWhenValueMissing="Please Enter Value" />
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custaddr1" label="Address Line 1" value="{!v.customer.Address1_New__c}"  required="true" messageWhenValueMissing="Please Enter Value"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custaddr2" label="Address Line 2" value="{!v.customer.Address2_New__c}" required="true" messageWhenValueMissing="Please Enter Value"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custaddr3" label="Address Line 3" value="{!v.customer.Address3_New__c}" />
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custaddr4" label="Area" value="{!v.customer.Address4_New__c}" />
+                            </div> 
+                        </div>
+                        
+						<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" aura:id="custPin" label="PinCode" value="{!v.customer.Pin_Code_New__c}" pattern="^([0-9]{6})" messageWhenPatternMismatch="Please Enter Valid Pin code" required="true" messageWhenValueMissing="Please Enter Value" onchange="{!c.fetchDemogData}"/>
+                            </div> 
+                        </div>
+						
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" label="City" value="{!v.customer.City_New__c}" required="true" messageWhenValueMissing="Please Enter Value"/>
+                            </div> 
+                        </div>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" label="State" value="{!v.customer.State_New__c}" required="true" messageWhenValueMissing="Please Enter Value"/>
+                            </div> 
+                        </div>		
+                        <div class="slds-p-around--x-small slds-align_absolute-center" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.handleSave}" disabled="{!v.isPayLinkSend}"/> 
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    
+    
+</aura:component>

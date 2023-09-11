@@ -1,0 +1,188 @@
+<aura:component controller="SalariedInsuranceCntrl" implements="flexipage:availableForAllPageTypes,force:appHostable,flexipage:availableForRecordHome" access="global">
+    <aura:attribute name="merMap" type="Object" default=""/>
+    <aura:attribute name="payRequest" type="String" default=""/>
+    <aura:attribute name="payRecord" type="String" default=""/>
+    <aura:attribute name="products" type="List" default="['CPP','FFR','Combo(CPP+FFR)']"/>
+    <aura:attribute name="premLst" type="List" default=""/>
+    <aura:attribute name="sumAsrLst" type="List" default="['100000']"/>
+    <aura:attribute name="selectedProd" type="String" default="Combo(CPP+FFR)"/>
+    <aura:attribute name="FFRAmt" type="String" default=""/>
+    <aura:attribute name="InsuranceCmp" type="String" default="CPP"/>
+    <aura:attribute name="tenure" type="String" default="1"/>
+    <aura:attribute name="SumAssured" type="String" default="100000"/>
+    <aura:attribute name="premium" type="String" default="1"/>
+    <aura:attribute name="totalAmt" type="String" default=""/>
+    <aura:attribute name="Product" type="String" default="Wallet Protect"/>
+    <aura:attribute name="tenorList" type="List" default=""/>
+    <aura:attribute name="leadObj" type="Object" default=""/>
+    <aura:attribute name="insWalletObj" type="Object" default=""/>
+    <aura:attribute name="SerToSalesObj" type="Object" default=""/>
+    <aura:attribute name="deDupeObj" type="Object" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="isCibildone" type="boolean" default="false"/>
+    <aura:attribute name="ispayBtnPressed" type="boolean" default="false"/>
+    <aura:attribute name="userConsent" type="boolean" default="false"/>
+    <aura:attribute name="isdataChanged" type="boolean" default="false"/><!-- CR 24406 -->
+    <aura:attribute name="otpStr" type="String" default=""/>
+    <aura:attribute name="intervalId" type="String" default=""/>
+    <aura:attribute name="pollCnt" type="Integer" default="0"/>
+    <aura:attribute name="showThankyou" type="boolean" default="false"/>
+    <aura:registerEvent name="sharePaymentInfo" type="c:sharePaymentInfo"/><!-- CR 24406 -->
+    <aura:registerEvent name="shareCibilInfo" type="c:shareCibilInfo"/><!-- CR not given -->
+    <aura:method name="callcibilReset" action="{!c.callcibilReset}" description="to reset cibil initiation" access="public"/><!-- CR 24406 -->
+    <aura:method name="resetComp" action="{!c.resetCmp}" description="to reset component" access="public"/><!-- CR 24447 -->
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    
+    <c:Custom_Toast_Mobility/>
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-scrollable_y " >
+        <lightning:card title="Product Details" class="applyColor">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small"> 
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <span class="slds-checkbox"> 
+                                    Select Product :&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <aura:iteration items="{!v.products}" var="prod">
+                                        <!--<ui:inputRadio label="" name="prodBtn" change="{!c.handleRadioGroupChange}"/>{!prod}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                                        <div style="display:inline-block;">
+                                            <lightning:input disabled="{!prod.status}" type="radio" name="select" value="{!prod.product}" label="{!prod.product}" onchange="{!c.handleRadioGroupChange}" checked="{!or(prod.product == v.selectedProd,and(v.selectedProd == 'Combo(CPP+FFR)',!v.ispayBtnPressed))}"/>
+                                        </div>
+                                    </aura:iteration>
+                                </span>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+        <div>
+            <aura:if isTrue="{!or(v.selectedProd == 'CPP',v.selectedProd == 'Combo(CPP+FFR)')}">
+                <lightning:card title="CPP - Wallet Protect" class="applyColor" aura:id="CPPCard">
+                    <p class="slds-p-horizontal_small">
+                        <div class="slds-p-horizontal--small"> 
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="insComp" disabled="true" label="Insurance Company" value="{!v.InsuranceCmp}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="insProd" disabled="true" label="Product Name" value="{!v.Product}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="display:none;">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="SumAssuredId" name="SumAssured" label="Sum Assured" value="{!v.SumAssured}" >                                  
+                                            <aura:iteration items="{!v.sumAsrLst}" var="level">
+                                                <option value="{!level}" text="{!level}" selected="{!v.SumAssured == level}"></option>
+                                            </aura:iteration>   
+                                        </lightning:select> 
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <!--<lightning:input name="insTenure" disabled="true" label="Tenure" value="{!v.tenure}"/>-->
+                                        <lightning:select aura:id="tenureId" name="prem" label="Tenure(in Years)" value="{!v.tenure}" >                                  
+                                            <aura:iteration items="{!v.tenorList}" var="level">
+                                                <option value="{!level}" text="{!level}" selected="{!v.tenure == level}"></option>
+                                            </aura:iteration>   
+                                        </lightning:select>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="PremId" name="prem" label="Premium Amount" value="{!v.premium}" onchange="{!c.handleRadioGroupChange}">                                  
+                                            <aura:iteration items="{!v.premLst}" var="level">
+                                                <option value="{!level}" text="{!level}" selected="{!v.premium == level}"></option>
+                                            </aura:iteration>   
+                                        </lightning:select> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </lightning:card>
+            </aura:if>
+            <aura:if isTrue="{!or(v.selectedProd == 'FFR',v.selectedProd == 'Combo(CPP+FFR)')}" >
+                <lightning:card title="Financial Fitness Report (FFR)" class="applyColor" aura:id="FFRCard">
+                    <p class="slds-p-horizontal_small">
+                        <div class="slds-p-horizontal--small">
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="insPAN" disabled="true" label="PAN" value="{!v.leadObj.PAN__c}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    
+                                    <ul class="slds-list_horizontal">
+                                        <li style="padding-top: 5%;"><a href="javascript:void(0)" onclick="{!c.generateOTP}" id="otpLink">Generate OTP</a></li>
+                                        <li style="width: 50%;padding-left: 5%;padding-right: 5%;padding-top: 2%;"><lightning:input name="insOTP" placeholder="OTP" maxlength="5" value="{!v.otpStr}"/></li>
+                                        <li style="padding-top: 4% !important;"><lightning:button class="slds-theme_alt-inverse" disabled="true" aura:id="CibilBtnId"  variant="brand" label="Initiate Cibil" onclick="{!c.initCibil}" /></li> 
+                                    </ul>
+                                    
+                                    
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="insCibil" disabled="true" label="CIBIL Score" value="{!v.leadObj.CIBIL_Score__c}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input name="insAmt" disabled="true" label="FFR Amount" value="{!v.FFRAmt}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </lightning:card>          
+            </aura:if> 
+            <lightning:card title="Payment Details" class="applyColor">
+                <p class="slds-p-horizontal_small">
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input name="instotalAmt" disabled="true" label="Total Amount" value="{!v.totalAmt}"/>
+                                </div>
+                            </div>                      
+                        </div>
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="paymentButtonId"  variant="brand" label="Submit and Send Payment Link" onclick="{!c.submitAndMakePaymt}" disabled= "{!or(and(v.selectedProd != 'CPP',!v.isCibildone),v.ispayBtnPressed,or(v.selectedProd != 'CPP',v.isdataChanged))}"/>  <!-- Added isdataChanged for  CR 24406-->
+                        </div>
+                    </div>
+                </p>
+            </lightning:card>
+            <aura:if isTrue="{!v.showThankyou}">
+                <lightning:card title="" class="applyColor">
+                    <div class="slds-text-heading_medium"><strong>Thank you for your interest in Bajaj Finserv. Please find below reference number(s).</strong></div>
+                    <div>
+                        <aura:if isTrue="{!or(v.selectedProd == 'FFR',v.selectedProd == 'Combo(CPP+FFR)')}">
+                            <strong>FFR : {!v.leadObj.Id}</strong>
+                        </aura:if>    
+                    </div>
+                    <br/>
+                    <div>
+                        <aura:if isTrue="{!or(v.selectedProd == 'CPP',v.selectedProd == 'Combo(CPP+FFR)')}">
+                            <strong>CPP : {!v.insWalletObj.Name}</strong>
+                        </aura:if>
+                    </div>
+                </lightning:card>
+            </aura:if>
+            
+        </div>
+    </div>
+</aura:component>

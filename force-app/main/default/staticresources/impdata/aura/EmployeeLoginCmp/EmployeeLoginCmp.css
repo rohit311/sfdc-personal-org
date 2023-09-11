@@ -1,0 +1,20 @@
+.THIS .extraTopMargin{
+        margin-top: 180px;
+    border-style: outset;
+    border-width: 5px;
+ width: 342px;
+    border-color:  rgb(22, 50, 92);
+    height: 226px;
+}
+.THIS .bigCard{
+    height: 326px;
+}
+.THIS .sizeOfDiv{
+        height: 98px;
+    width: 238px;
+}
+.THIS .tabsetColors
+{
+      color: #99CCFF;
+  background-color: #99CCFF;
+}

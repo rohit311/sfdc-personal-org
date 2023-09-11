@@ -1,0 +1,67 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" controller="SFDCMobileLoanController">
+	<aura:attribute name="DiscrepancyObj" type="Object[]" default="{}"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="loanId" type="String" default="0060l000003vucH"/>
+    
+    <aura:iteration items="{!v.DiscrepancyObj}" var="obj">
+
+     <article class="slds-card">
+      
+            <div class="slds-border_top slds-border_right slds-border_bottom slds-border_left slds-card__body slds-p-horizontal--large slds-p-top--small slds-p-bottom--small slds-form_horizontal">
+            <!--    <aura:if isTrue=""> -->
+                    <div class="slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Category: </label>
+                        </div>
+                        
+                       <div class = "slds-col slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputText value="{!obj.Category__c}"/>
+                        </div>
+
+                    </div> 
+            <!--    </aura:if>-->
+              
+                    <div class="slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Description: </label>
+                        </div>
+                        <div class = "slds-col slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <ui:outputText value="{!obj.Description__c}"/>
+                        </div>
+                    </div>
+                
+                
+                    <div class="slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12 slds-grid slds-gutters">
+                        <div class = "slds-col  slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">
+                            <label class="slds-form-element__label slds-text-body_regular">Resolution: </label>
+                        </div>
+                        <div class = "slds-col slds-size_2-of-4 slds-text-align_left" style="padding-right:0;padding-left: 0;">   
+                         <ui:inputText class="slds-input" value="{!obj.Resolution_Remarks__c}"/>                           
+                        </div>
+                    </div>                    
+                              
+                </div>
+
+    </article>
+   </aura:iteration>
+     <lightning:button label="Save" onclick="{!c.saveDiscrepancy}"/>
+     
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

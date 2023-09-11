@@ -1,0 +1,132 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="SAL20_LineDetailsController">
+    
+    <!-- +-+-+-+-+-+-+-+- START : Attributes and Handlers  +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="loanTargetRecord" type="Object"/>
+    <aura:attribute name="loanRecord" type="Opportunity"/>
+    <aura:attribute name="loanRecordError" type="String"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="lineDetailTargetRecord" type="SurrogateCAM__c" default="{'sObjectType':'SurrogateCAM__c'}"/>
+    <aura:attribute name="lineDetailRecord" type="SurrogateCAM__c" default="{'sObjectType':'SurrogateCAM__c'}"/>
+    <aura:attribute name="lineDetailRecordError" type="String"/>
+    <aura:attribute name="lineDetailRecordId" type="String"/>
+    <aura:attribute name="mortgageFlag" type="Boolean" default="false"/>
+    <aura:attribute name="optionsLineOpted" type="List"/>
+    <aura:attribute name="optionsFeesPaid" type="List"/>
+    <aura:attribute name="optionsLineFlag" type="List"/>
+    <aura:attribute name="isDisabled" type="Boolean" default="false"/>
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name="profileName" type="String"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+- END   : Attributes and Handlers +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <force:recordData aura:id="loanRecordHandler"
+                      recordId="{!v.oppId}"
+                      layoutType="FULL"
+                      targetRecord="{!v.loanTargetRecord}"
+                      targetFields="{!v.loanRecord}"
+                      targetError="{!v.loanRecordError}"
+                      mode="EDIT"
+                      />
+    <force:recordData aura:id="lineDetailRecordHandler"
+                      recordId="{!v.lineDetailRecordId}"
+                      layoutType="FULL"                
+                      targetRecord="{!v.lineDetailTargetRecord}"
+                      targetFields="{!v.lineDetailRecord}"
+                      targetError="{!v.lineDetailRecordError}"
+                      mode="EDIT"
+                      />
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+        <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Line Detail</h1>
+    </div>
+    <!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    
+    <!-- +-+-+-+-+-+-+-+- START : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->	
+    <aura:if isTrue="{! !and(mortgageFlag == false,(and(v.loanRecord.Product__c == 'FAS',(or( v.profileName=='OPs Officer',v.profileName=='CPA Login Partner',v.profileName=='Area Credit Manager')))))}">
+        <table class="slds-table ">
+            <tr class="slds-hint-parent"> 
+                <td>Line Opted</td>
+                <td style="width: 130px;">  
+                    <lightning:select name="selectLineOpted" label="" value="{! v.lineDetailRecord.Line_opted__c }" disabled="{!v.isDisabled}">
+                        <aura:iteration items="{!v.optionsLineOpted}" var="oLO">
+                            <option value = "{!oLO.value}" 
+                                    label = "{!oLO.label}" 
+                                    selected = "{! oLO.value ==  v.lineDetailRecord.Line_opted__c}"
+                                    />
+                        </aura:iteration>
+                    </lightning:select>
+                </td>
+                <td>Line Eligibility</td>
+                <td>                        
+                    <lightning:input label=" " value="{!v.lineDetailRecord.Line_assigned_basis_Credit_Assessment__c}" disabled="true" style="width: 130px;"/>
+                </td>
+                <td>Line Expiry Date</td>
+                <td>                        
+                    <lightning:input label=" " type="date" value="{!v.lineDetailRecord.Expiry_Date_without_BT__c}" disabled="true" style="width: 130px;"/>
+                </td>
+            </tr>
+            <tr class="slds-hint-parent"> 
+                <td>Line Assigned Date</td>
+                <td>                        
+                    <lightning:input label=" " type="date" value="{!v.lineDetailRecord.Line_Assigned_Date__c}" disabled="true" style="width: 130px;"/>
+                </td>
+                <td>Customer Acceptance Flag</td>
+                <td>
+                    <lightning:input  label=" " value="{!v.lineDetailRecord.Customer_Acceptance_Flag__c}" disabled="true" style="width: 130px;"/>
+                </td>				 
+                <td >Customer Accepted Date</td>
+                <td>                        
+                    <lightning:input label=" " type="date" value="{!v.lineDetailRecord.Customer_Accepted_Date__c}" disabled="true" style="width: 130px;"/>
+                </td>
+            </tr>
+            <tr class="slds-hint-parent"> 
+                <td>Line Active Flag</td>
+                <td>
+                    <lightning:input label=" " value="{!v.lineDetailRecord.Line_Active_Flag__c}" disabled="true" style="width: 130px;"/>
+                </td>
+                
+                <td>Fee Amount</td>
+                <td>                        
+                    <lightning:input label=" " value="{!v.lineDetailRecord.Fee_Amount__c}" style="width: 130px;"/>
+                </td>
+                <td>Fees Paid</td>
+                <td style="width: 130px;">  
+                    <lightning:select name="selectFeesPaid" label="" value="{!v.lineDetailRecord.Fees_Paid__c}">
+                        <aura:iteration items="{!v.optionsFeesPaid}" var="oFP">
+                            <option value = "{!oFP.value}" 
+                                    label = "{!oFP.label}" 
+                                    selected = "{! oFP.value ==  v.lineDetailRecord.Fees_Paid__c}"
+                                    />
+                        </aura:iteration>
+                    </lightning:select>
+                </td>
+            </tr>
+            <tr class="slds-hint-parent"> 
+                <td>Fees Paid Date</td>
+                <td>                        
+                    <lightning:input label=" " type="date" value="{!v.lineDetailRecord.Fees_Paid_Date__c}" style="width: 130px;"/>
+                </td>
+                <td>Line Flag</td>
+                <td style="width: 130px;">  
+                    <lightning:select name="selectLineFlag" label="" value="{!v.lineDetailRecord.Line_flag__c}">
+                        <aura:iteration items="{!v.optionsLineFlag}" var="oLF">
+                            <option value = "{!oLF.value}" 
+                                    label = "{!oLF.label}" 
+                                    selected = "{! oLF.value ==  v.lineDetailRecord.Line_flag__c}"
+                                    />
+                        </aura:iteration>
+                    </lightning:select>
+                </td>
+            </tr>
+        </table>
+        <div style="margin-left:50%;" >
+            <lightning:button variant="brand" label="Save" title="Save" disabled="{! v.isProcessing }" onclick="{!c.onSave}" />
+        </div>
+    </aura:if>
+    <!-- +-+-+-+-+-+-+-+- END : BODY +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

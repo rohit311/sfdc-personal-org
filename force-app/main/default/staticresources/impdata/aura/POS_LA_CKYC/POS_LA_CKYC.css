@@ -1,0 +1,13 @@
+.THIS .OppWrapScroller{
+    height: 52vh;
+    width: 100%;
+}
+
+.THIS .kyc-container{
+    position:fixed;
+}
+
+.THIS.slds-spinner_container{  
+  z-index: 10000;
+  position: fixed;   
+}

@@ -1,0 +1,1 @@
+<aura:event type="COMPONENT" description="fired when obligation record is savedt to reload the records having status live" />

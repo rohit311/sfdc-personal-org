@@ -1,0 +1,25 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="hideDiv" type="Boolean" default="false"/>
+    <aura:attribute name="isIphone" type="Boolean" default="false"/>
+    <aura:handler event="c:ShowCustomToast" action="{!c.showToast}" />
+    <aura:attribute name="fadeTimeout" type="Integer" default="3000" description="This stores fade out time in millisecond"/>
+      <div class="slds-grid slds-wrap ">
+        <div class="slds-col slds-size_12-of-12 " style="width: 20rem;"><!-- Style tage added for Bug 17697-->    
+            <div aura:id="customToast" class="slds-hide ">
+                <div class="slds-notify_container" >
+                    <div aura:id ="toastTheme" class="slds-notify slds-notify--toast " style="min-width: 22rem !important;padding-right: 0.5rem !important;padding-left: 0.5rem !important;font-size: 14px !important;" role="alert" ><!-- Style tage added for Bug 17697-->    
+                        <!--<lightning:icon aura:id="messageicon" iconName="utility:error" variant="success" size="medium" class="iconContainer"/>&nbsp;-->
+						<lightning:icon aura:id="messageicon" iconName="" variant="success" size="small" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToastN}" alternativeText="Close alert." />
+                        <div class="slds-align-middle">
+                            <h2 class="slds-text-heading--x-small">
+                                <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                                <h2><ui:outputText aura:id="toastText" value=""/></h2>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      	</div>
+    </div>
+</aura:component>

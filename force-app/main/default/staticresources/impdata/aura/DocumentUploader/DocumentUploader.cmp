@@ -1,0 +1,171 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" controller="SFDCMobilePOController">
+    
+    <ltng:require scripts="{!$Resource.PO_APP_EXIF}"/>
+    <aura:handler event="c:checklistInsertEvent" action="{!c.setCheckId}"/> <!--Bug 17138 -->
+    <!-- bug 17556 s --><aura:attribute name="stage" type="String" default="" /><!-- bug 17556 e -->
+    <!-- bug 17556 s --><aura:attribute name="isDeleteInsert" type="Boolean" default="false" /><!-- bug 17556 e -->
+    <!--bug 17556 s--><aura:attribute name="forPricingDashboard" type="string" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/><!--bug 17556 e-->
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="poId" type="Id"/> 
+    <aura:attribute name="flow" type="string"/>
+    <aura:attribute name="isFromCPV" type="Boolean" default="false" />
+    <aura:attribute name="imageUpload" type="Boolean"/>
+    <aura:attribute name="instance" type="Integer"/>
+    <aura:attribute name="fileName" type="String"/>
+    <aura:attribute name="uploadType" type="String"/>
+    <aura:attribute name="documentToast" type="String" default="" />
+    <aura:attribute name="salMobilityDocument" type="String" default="" />
+    <aura:attribute name="longitude" type="Double"/>
+    <aura:attribute name="latitude" type="Double"/>
+    <aura:attribute name="forPOSDocument" type="String"/>
+    <!--Digital Sampling-->
+    <aura:attribute name="IsDigitalSampling" type="String" default=""/>
+    <aura:attribute name="DocType" type="String" default=""/>
+    <aura:attribute name="DocName" type="String" default=""/>
+    <aura:attribute name="AppIDs" type="Id[]" />
+    <!--YK Attributes added for CPV enhancement-->
+    <aura:attribute name="displayUpload" type="Boolean" default="true"/>
+    <aura:attribute name="refreshPage" type="Boolean" default="false"/>
+    <aura:attribute name="uploadImageFilesOnly" type="Boolean" default="false"/>
+    <!--YK Attributes added for CPV enhancement-->
+    <aura:attribute name="showUploadButton" type="Boolean" default="true"/><!-- Bug 15855 - Hemant Keni-->
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:registerEvent name="documentUpload" type="c:DocumentUploadEvent"/>
+    
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.disableForm}"/>
+    <aura:handler event="c:LoanConversionEvent" action="{!c.disableForm1}"/>
+    
+    <!--    YK event listener to set parentId on verification record insert       -->
+    <aura:handler event="c:VerificationInsertEvent" action="{!c.setVerificationId}"/>
+    <aura:registerEvent name="FileBrowseEvent" type="c:FileBrowseEvent"/>
+    <aura:attribute name="selectFileErrorFlag" type="Boolean" default="true"/><!--added default true for bug 17556 -->
+    <!-- YK reload after upload -->
+    <aura:registerEvent name="reloadImage" type="c:reloadImage" />
+    <!-- YK reload after upload -->
+    <!-- Enable submit button after files are uploaded sucessfully...-->
+    <aura:attribute name="displayButtons" type="Boolean" default="true" />        <!-- SAL Mobility - Hemant -->
+    <aura:attribute name="isMobilityDocument" type="Boolean" default="true"/>
+    <aura:registerEvent name="enableSubmitButtonEvent" type="c:EnableSubmitButtonEvent"/>
+    <aura:attribute name="disablepage" type="Boolean" default="false"/>
+    <aura:registerEvent name="show_Hide_Spinner" type="c:Show_Hide_Spinner"/>
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <!-- SAL Mobility - Hemant Keni -->
+    <!--Sales compliance added by swapnil  bug 22485 s -->
+    <aura:attribute name="geoCoordintes" type="String" default="" />	
+    <aura:attribute name="fileNumber" type="String" default="" />
+    <aura:attribute name="uploaderName" type="String" default="" />
+    <aura:attribute name="salesCompliance" type="boolean" default="false"/>
+    <aura:attribute name="isSubmitTrue" type="boolean" default="true"/>
+    
+    <aura:registerEvent name="shareLatLong" type="c:shareLatLongEvt"/>
+      <!--25333 Neha Changes -->
+    <aura:attribute name="isDisbDashboard" type="boolean" default="false"/>
+    <!-- 25333 end -->
+    <!-- Bug id : 22425 --><aura:attribute name="ccDocData" type="Object" default=""/>
+    
+    <!--Sales compliance added by swapnil e bug 22485 e-->
+    <!--Bug 22485 -->
+    <aura:method name="callSave" action="{!c.setVerificationId}"/>
+    <aura:method name="uploadDoc" action="{!c.save}" description="This method is used to upload the document" /> 
+    <aura:method name="resetDoc" action="{!c.reset}" description="This method is used to reset the selected document" /> 
+    <!-- SAL Mobility - Hemant Keni-->
+     <aura:attribute name="oppId" type="string" default=""/><!--user story 978 -->
+     <aura:attribute name="isPricingcmp" type="boolean" default="false"/><!--user story 978 -->
+     <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <!--bug 17556 s--><ui:scrollerWrapper class="scrollerSize">
+    <div class="slds-scrollable_y " style=" overflow:auto;">
+        <div style="position:relative;overflow:auto;height:auto">
+            <div class="innerDivWrapper">    <!--bug 17556 e-->
+                <div>
+                    <div class="slds-form-element" >
+                        <div class="slds-form-element__control">                  
+                            <div class="slds-file-selector slds-file-selector--files">
+                                <!--bug 17556 s-->                  <div class="{!if(v.flow == 'Mobility2','avoidScroll slds-file-selector__dropzone','slds-file-selector__dropzone')}" > <!--bug 17556 e-->
+                                <input type="file"  aura:id="file-upload-input" id="{!'file-upload_'+v.instance}" class="slds-file-selector__input slds-assistive-text" aria-describedby="file-selector-id" onchange="{!c.fileSelected}"/>
+                                <label class="slds-file-selector__body" for="{!'file-upload_'+v.instance}">
+                                    <span class="slds-file-selector__button slds-button slds-button--neutral inputSelector" >
+                                        <lightning:icon iconName="utility:upload" size="xx-small" alternativeText="Upload File" class="slds-p-right--small uploader"/>
+                                        Choose File
+                                    </span>
+                                    <!--bug 17556 s--><ui:outputText aura:id="file-name" class="{!if(or(v.flow == 'Mobility2','v.salesCompliance'),'slds-truncate WrapText','slds-file-selector__tex slds-truncate docNameLong')}" value="No file chosen"/> <!-- flag salesCompliance added by swapnil bug id   --><!--bug 17556 e-->
+                                </label>
+                                 <div class="slds-form-element__control">
+                                <!--bug 17556 s--><ui:outputText aura:id="file-name2" class="slds-hide" value="No file chosen"/><!--bug 17556 e-->
+                                </div>
+                                </div>
+                            </div>
+                            
+                            <aura:if isTrue="{!v.displayButtons}">
+                                <div class="slds-p-top--small">
+                                    <aura:if isTrue="{!v.showUploadButton}">
+                                        <!--Bug 17138 added class -->
+                                        <lightning:button class="{!if(or(v.flow == 'Mobility2','v.salesCompliance'),'slds-theme--alt-inverse','')}" aura:id="saveButtonId" variant="brand" label="Upload" onclick="{!c.save}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --> <!-- flag salesCompliance added by swapnil bug id 22485-->
+                                    </aura:if>
+                                    <!--Bug 17557 added class -->
+                                    <lightning:button class="{!if(or(v.flow == 'Mobility2','v.salesCompliance'),'slds-theme--alt-inverse','')}" aura:id="cancelButtonId" variant="brand" label="Cancel" onclick="{!c.reset}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 --><!-- flag salesCompliance added by swapnil bug id 22485 -->
+                                </div>
+                            </aura:if>
+                        </div>
+                        <aura:if isTrue="{!v.displayButtons}">
+                            <p/>
+                        </aura:if>
+                        
+                        
+                        <ui:outputText aura:id="latitude" class="slds-file-selector__text" value=""/>
+                        <ui:outputText aura:id="longitude" class="slds-file-selector__text" value=""/>
+                        <div class="{!if(v.flow == 'Mobility2','slds-hide','')}">    
+                            <ui:inputText aura:id="Declattitude" class="slds-hide"/>
+                            <ui:inputText aura:id="Declongitude" class="slds-hide"/>
+                            <ui:inputText aura:id="Binarystring" class="slds-hide"/>
+                        </div>
+                        
+                        <!--<div class="{!if(v.isMobilityDocument == true,'slds-show','slds-hide')}">-->
+                        <!--            <ui:outputText aura:id="latitude" class="slds-file-selector__text" value=""/>
+                <ui:outputText aura:id="longitude" class="slds-file-selector__text" value=""/>
+             <div class="{!if(v.flow == 'Mobility2','slds-hide','')}">    
+                <ui:inputText aura:id="Declattitude" class="slds-hide"/>
+                <ui:inputText aura:id="Declongitude" class="slds-hide"/>
+                <ui:inputText aura:id="Binarystring" class="slds-hide"/>
+            </div>  -->  
+                        <!--</div> -->
+                        
+                        
+                        <div aura:id="previewBlock">
+                            <div >
+                                <!--bug 17556 s-->           <img  aura:id="imagePreview" src="" class="{!if(v.forPricingDashboard=='yes','slds-hide','image slds-p-top--medium')}" />  <!--bug 17556 e-->
+                            </div>   
+                        </div>    
+                    </div>
+                    <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+                        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                    <div aura:id="customToast" class="slds-notify_container slds-hide">
+                        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                            <span class="slds-assistive-text">Info</span>
+                            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <div class="slds-notify__content ">
+                                <div class="slds-align-middle">
+                                    <h2 class="slds-text-heading--x-small">
+                                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                                        <ui:outputText aura:id="toastText" value=""/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </ui:scrollerWrapper>
+</aura:component>

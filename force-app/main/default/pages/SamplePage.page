@@ -1,0 +1,25 @@
+<apex:page controller="SampleCntrl">
+<apex:form >
+<apex:actionFunction name="changeBoolCall" action="{!changeBool}"/>
+    <apex:pageblock id="pg">
+        <apex:pageblockSection >
+            <apex:pageblockSectionItem >
+                Select currency :
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+               <apex:selectList value="{!curency}" size="1" multiselect="false">
+                   <apex:selectOption itemLabel="--- None ---" itemValue="none"/>
+                   <apex:selectOption itemLabel="Indian Rupee" itemValue="inr"/>
+                   <apex:actionSupport event="onchange" action="{!changeBool}" reRender="pg"/>
+               </apex:selectList>
+            </apex:pageblockSectionItem>            
+            <apex:pageblockSectionItem >
+                Enter the amount:
+            </apex:pageblockSectionItem>      
+            <apex:pageblockSectionItem >
+               <apex:inputtext value="{!amount}" disabled="{!curencyBool}"/>
+            </apex:pageblockSectionItem>                   
+        </apex:pageblockSection>
+    </apex:pageblock>
+</apex:form>    
+</apex:page>

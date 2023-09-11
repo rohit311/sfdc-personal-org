@@ -1,0 +1,10 @@
+<apex:page controller="ContactInsertController" docType="html-5.0" >
+    <apex:form >
+    Last Name=<apex:input type="text" value="{!lastname}"/>
+    
+       Contact Title: <apex:input type="text" value="{!title1}"/>
+       
+        <apex:commandButton action="{!saveContact}" title="Save"/>
+    </apex:form>
+    
+</apex:page>

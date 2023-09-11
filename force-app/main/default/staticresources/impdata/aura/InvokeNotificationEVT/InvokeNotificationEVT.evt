@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="toastid" type="String"/>
+    <aura:attribute name="messageid" type="String"/>
+    <aura:attribute name="message" type="String"/>
+</aura:event>

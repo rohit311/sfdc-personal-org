@@ -1,0 +1,55 @@
+<apex:page >
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js">
+   </script>
+   
+   <link rel="stylesheet"  href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+
+   <script>
+   
+       var app=angular.module("myApp",[]);
+       app.controller("MyController",['$scope',function($scope){
+       
+              $scope.ContactData =[
+                                {Id:'1',Name:'Anoop',Phone:'4963578',Birthdate:'1.2.1997'},
+                                {Id:'2',Name:'Jacob',Phone:'5465445546',Birthdate:'15.12.1988'},
+                                {Id:'3',Name:'Sachin',Phone:'49637567578',Birthdate:'5.5.1898'},
+                                {Id:'4',Name:'Sewagh',Phone:'4978763578',Birthdate:'5.72.1998'}
+                            ];
+       
+       }]);
+   </script>
+   <div ng-app="myApp">
+        
+        <h1> My First Angular JS Appliaction</h1><br/><br/><br/>
+        
+        <div ng-controller="MyController">
+        
+            <div class="container">
+      <h2>Contacts</h2>    
+      <div class="table-responsive">          
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Birthdate </th>         
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="conatctVar in ContactData">
+            <td>{{conatctVar.Id}}</td>
+            <td>{{conatctVar.Name}}</td>
+            <td>{{conatctVar.Phone}}</td>
+            <td>{{conatctVar.Birthdate }}</td>
+          </tr>                 
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        </div>
+   </div>
+</apex:page>

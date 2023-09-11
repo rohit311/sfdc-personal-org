@@ -1,0 +1,93 @@
+<aura:component controller="SFDCMobileLoanController">
+    <aura:attribute name="OppObj" type="Opportunity" default="{}"/>
+    <aura:attribute name="productOffering" type="Product_Offerings__c"/>
+    <aura:attribute name="oppError" type="String"/>
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="childAccount" type="Account"/>
+    <aura:attribute name="applicant" type="Applicant__c"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="accountError" type="Account"/>
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="shouldBeDisable" type="Boolean" />
+    <!--14213 S-->
+    <aura:attribute name="stpNonStp" type="String" />
+    <!--14213 E-->
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    <aura:registerEvent name="POSNavigateToTab" type="c:POSNavigateToTab"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:handler event="c:POSDisableTabs" action="{!c.disableFrom}"/>
+
+    <aura:handler event="c:DisableFormEvent" action="{!c.disableCommercialForm}"/>
+
+<!-- 	<force:recordData aura:id="AccRecordLoader"
+                      recordId="{!v.accountId}"
+                      layoutType="FULL"
+                      mode="EDIT"
+                      targetFields="{!v.account}"
+                      targetError="{!v.accountError}"
+                      recordUpdated="{!c.onRecordUpdated}"
+                      /> -->
+    
+    <div class="commercial-container">
+    <ui:scrollerWrapper class="commercial-wrapper">
+        
+        <fieldset aura:id="commercialDetails" class="slds-form--stacked slds-p-bottom--medium">
+            <h3 class="slds-section-title--divider">COMMERCIAL Details</h3>
+            
+          
+            <!--<p class="slds-p-horizontal_small">-->
+            <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242)">                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">                   
+                    
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="firstName">Approved PF(%) <span style="color:red">*</span><span style="margin-left: 30px;">(Base Rate : {!v.productOffering.Bonds_Value__c+'%'})</span></label>
+                            <ui:inputText aura:id="approvedPf" class="slds-input" value="{!v.OppObj.Processing_Fees__c}" placeholder="Enter Approved PF" required="true" updateOn="keyup" keyup="{!c.validatePF}"/>
+                        </div>         
+                    </div>   
+                    
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="firstName">Approved ROI(%)<span style="color:red">*</span><span style="margin-left: 30px;">(Base Rate : {!v.productOffering.Revised_Offer_ROI__c+'%'})</span></label>
+                            <ui:inputText aura:id="approvedRoi" class="slds-input" value="{!v.OppObj.Approved_Rate__c}"   placeholder="Enter Approved ROI" required="true" updateOn="keyup" keyup="{!c.validateROI}"/>
+                        </div>         
+                    </div>  
+                    
+                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="firstName">Approved Insurance(%)<span style="color:red">*</span><span style="margin-left: 30px;">(Base Rate : {!v.productOffering.Shares_value__c+'%'})</span></label>
+                            <ui:inputText aura:id="approvedInsurance" value="{!v.account.Approved_Insurance__c}" class="slds-input" placeholder="Enter Approved Insurance" required="true" updateOn="keyup" keyup="{!c.validateInsurance}"/>
+                        </div>
+                    </div>  
+                    
+                    <!--<div class="slds_form_element slds_is_required slds_p_top__x_small slds_p_horizontal__small slds_size__1_of_1 slds_medium_size__3_of_6 slds_large_size__4_of_12">__>
+                        <div class="slds_form_element__control">
+                            <label class="slds_form_element__label" for="firstName">VAS<span style="color:red">*</span></label>
+                            <c:MultiSelectPicklist aura:id="vas" class="slds_input" Object="Account" Field="VAS__c" Value="{!v.account.VAS__c}"/>
+                            <ul aura:id="vasErrormsg" class="has_error uiInputDefaultError uiInput uiInputText uiInput__default uiInput__input slds_hide" id="540:0" data_aura_rendered_by="543:0" data_aura_class="uiInputDefaultError uiInput uiInputText uiInput__default uiInput__input"><li class="form_element__help" data_aura_rendered_by="546:0">Please Select VAS</li></ul>
+                         </div>         
+                    </div> -->
+                    
+                    
+                </div>
+                <br></br>
+            </div>
+        </fieldset>
+        
+        <div class="slds-p-top--large">
+           <div class="slds-p-horizontal_medium">
+            <lightning:button aura:id="submitcommercialId" label="Save Details" class="slds-button slds-button--brand" onclick="{!c.saveDetails}"/>
+           </div>
+        </div>  
+        
+        
+    </ui:scrollerWrapper>
+    </div>
+     <!-- commented by Sachin -->
+    <!--
+      <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    -->
+</aura:component>

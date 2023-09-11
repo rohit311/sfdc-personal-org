@@ -1,0 +1,53 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="OppListViewCntrl">
+    <aura:attribute name="oppId" type="String" default="00628000007FOVR"/>
+	<aura:attribute name = "oppProducts" type="List" default=""/>
+    <aura:attribute name="priceBookId" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.priceBookId != ''}">
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+    	<thead>
+        	<tr class="slds-line-height_reset">
+            	<!--<th class="" scope="col">
+        			<div class="slds-truncate" title="Name">Name</div>
+      			</th>-->
+            	<th class="" scope="col">
+        			<div class="slds-truncate" title="Name">List Price</div>
+      			</th>
+                <th class="" scope="col">
+        			<div class="slds-truncate" title="Name">Quantity</div>
+      			</th>
+            </tr>
+        </thead>
+    	<tbody>
+        	<aura:iteration items="{!v.oppProducts}" var="prod">
+                <tr class="slds-hint-parent">
+                	 <!--<th data-label="Name" scope="row">
+        				<div class="slds-truncate" title="Cloudhub">
+                            <lightning:input name="input1" label="" value="{!prod.Name}" />
+        				</div>
+      				</th>-->
+                	 <th data-label="LIst Price" scope="row">
+        				<div class="slds-truncate" title="Cloudhub">
+                            <lightning:input type="number" label="" value="{!prod.ListPrice}" />
+        				</div>
+      				</th>
+                   
+                    <th data-label="LIst Price" scope="row">
+        				<div class="slds-truncate" title="Cloudhub">
+                            <lightning:input type="number" label="" value="{!prod.Quantity}" />
+        				</div>
+      				</th>
+                </tr>
+            </aura:iteration>
+        	<center>
+            	<lightning:button variant="brand" label="Add New Product" title="Brand action" onclick="{! c.addProd }" />
+                <lightning:button variant="brand" label="Save" title="Brand action" onclick="{! c.saveProds }" disabled="{!v.oppProducts.length == 0}"/>
+            </center>
+        </tbody>
+    </table>
+        <aura:set attribute="else">
+      <h1>Please select pricebook before adding products.</h1>
+    </aura:set>
+        </aura:if>
+</aura:component>

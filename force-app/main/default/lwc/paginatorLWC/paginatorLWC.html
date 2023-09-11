@@ -1,0 +1,43 @@
+<template>
+  <div class="slds-m-bottom_small">
+    <lightning-combobox
+      name="records-per-page"
+      variant="label-hidden"
+      value={recordsPerPage}
+      placeholder="Select Page Size"
+      options={recordsPerPageOptions}
+      onchange={handlePageSizeChange}
+    ></lightning-combobox>
+
+    <lightning-button
+      variant="brand"
+      label="First"
+      name="first"
+      onclick={handleNavigation}
+    ></lightning-button>
+    <lightning-button
+      variant="brand"
+      class="slds-m-left_small"
+      label="Previous"
+      name="previous"
+      onclick={handleNavigation}
+    ></lightning-button>
+    <lightning-button
+      variant="brand"
+      class="slds-m-left_small"
+      label="Next"
+      name="next"
+      onclick={handleNavigation}
+    ></lightning-button>
+    <lightning-button
+      variant="brand"
+      class="slds-m-left_small"
+      label="Last"
+      name="last"
+      onclick={handleNavigation}
+    ></lightning-button>
+  </div>
+
+  <lightning-datatable key-field="id" data={recordsToDisplay} columns={columns}>
+  </lightning-datatable>
+</template>

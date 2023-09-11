@@ -1,0 +1,23 @@
+.THIS {
+}
+.THIS .applyColor{
+    background-color:rgb(249, 249, 250) !important;
+}
+.THIS .WrapText
+{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+}
+.THIS .slds-form-element__label{
+    white-space: nowrap;
+}
+/*.THIS .slds-input{
+    margin-left: 3%;
+}*/
+.THIS .alignment{
+    margin-left: 12% !important;
+    
+}

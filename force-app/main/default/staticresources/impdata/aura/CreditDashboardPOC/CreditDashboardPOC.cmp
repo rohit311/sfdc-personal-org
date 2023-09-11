@@ -1,0 +1,429 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" controller="SALMobilityCntrl_V2">
+    <aura:attribute name="appTypeLst" type="List" default="['Primary']"/><!--24668 -->
+    <aura:attribute name="appType" type="String" default="Primary"/><!--24668 added for coApplicant dashboard-->
+    <aura:attribute name="curAppId" type="String" default=""/><!--Bug 24668 -->
+    <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 -->
+    <aura:attribute name="allVeriList" type="Verification__c[]"/> <!--Bug 20939 RCU -->
+    <aura:attribute name="isValidIM_Products" type="Boolean" default="false"/> <!-- 22018 RSL Mobility -->
+    <aura:attribute name="dedupeObj" type="De_Dupe__c"/>
+    <!-- Bug 20939 RCU start -->
+    <aura:attribute type="Boolean" name="isCriticalChange" default="false"/>
+    <aura:attribute name="DemogChange" type="String" default=""/>
+    <aura:attribute name="DemogAction" type="String" default=""/>
+    <aura:attribute name="sourCateg" type="string" default=""/><!--CR 22018-->
+    <!-- Bug 20939 RCU end -->
+     <!-- 24315 start -->
+    <aura:attribute name="disbObj" type="Current_Disbursal_Details__c"/>
+    <aura:attribute name="repayObj" type="RePayment_mode_detail__c"/>
+    <!-- 24315 stop -->
+    <aura:attribute name="Status__c" type="List"/>
+    <aura:attribute name="existingDisList" type="Discrepancy__c[]"/>
+    <aura:attribute name="downSizeList" type="List"/>
+    <ltng:require styles="/resource/SLDS/assets/styles/lightning-design-system-ltng.css'}"/>
+    <aura:attribute name="panDetailsList" type="Object" />
+    <aura:attribute name="showPanCheckSection" type="Boolean" default="true"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="secName" type="String"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="final_foir" type="Decimal" />
+    <aura:attribute name="tatObj" type="Object" />
+    <aura:attribute name="creditObsList" type="String[]" default="['Relevant','Irrelevant']"/>  
+    <aura:attribute name="solpolicyList" type="SOL_Policy__c[]"/>
+    <aura:attribute name="salsolpolicy" type="SOL_Policy__c" default=""/>
+    <aura:attribute name="agesolpolicy" type="SOL_Policy__c" default=""/>
+    <aura:attribute name="expsolpolicy" type="SOL_Policy__c" default=""/> 
+    <aura:attribute name="netsalary" type="Object" default=""/>
+    <aura:attribute name="age" type="Object" default="0"/>
+    <aura:attribute name="account" type="Account" default=""/>
+    <aura:attribute name="srcamObj" type="SurrogateCAM__c" default="" />
+    <aura:attribute name="conObj" type="Contact" default="{}"/> 
+    <aura:attribute name="bankObj" type="Bank_Account__c" default="{}"/>
+    <aura:attribute name="bankVerifyDone" type="String" default="No"/>
+    <aura:attribute name="camObj" type="CAM__c" default="{}"/>
+    <aura:attribute name="isCommunityUsr" type="Boolean" default="false"/>
+    <aura:attribute name="theme" type="String" default=""/> 
+    <aura:attribute name="panDashboardData" type="Object" default=""/>  
+    <aura:attribute name="cibilDashboardData" type="Object" default=""/>
+    <aura:attribute name="dedupeDashboardData" type="Object" default=""/>
+    <aura:attribute name="empCheckDashboardData" type="Object" default=""/>
+    <aura:attribute name="bankCheckDashboardData" type="Object" default=""/>
+    <aura:attribute name="applicantObj" type="Applicant__c"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="secondaryCibilRecs" type="CIBIL_secondary_match__c[]"/>
+    <aura:attribute name="officeverification" type="Verification__c" default=""/>
+    <aura:attribute name="bankverification" type="Verification__c" default=""/>
+    <aura:attribute name="resPerverification" type="Verification__c" default=""/>
+    <aura:attribute name="resCurverification" type="Verification__c" default=""/>
+    <aura:attribute name="verifyList" type="Verification__c[]"/>
+    <aura:attribute name="dedupeList" type="De_Dupe__c[]"/>
+    <aura:attribute name="customerList" type="CUSTOMER_INFO__c[]"/>
+    <aura:attribute name="poObj" type="Product_Offerings__c" default=""/>
+    <aura:attribute name="pdObj" type="Personal_Discussion__c" default="{'sobjectType':'Personal_Discussion__c'}"/>
+    <aura:attribute name="pddone" type="String" default="No"/>
+    <aura:attribute name="eKycObj" type="eKYC__c" default="{}"/>
+    <aura:attribute name="eKycAddress" type="String"/>
+    <aura:attribute name="negativeAreaVal" type="Boolean" default="false"/>
+    <aura:attribute name="negativeAreastatus" type="String"/>
+    <aura:attribute name="loan" type="Opportunity"/> 
+    <aura:attribute name="displayreferral" type="boolean" default="false"/>
+    <aura:attribute name="displayPANSave" type="boolean" default="false"/>
+    <aura:attribute name="verComplete" type="boolean" default="false"/>
+    <aura:attribute name="contentId" type="String" default=""/>
+    <aura:attribute name="sanctionList" type="Discrepancy__c[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="quesdetailslist" type="Object" />
+    <aura:attribute name="SanctionFinalOutput" type="String" default="Done"/>
+    <aura:attribute name="telepdstatusdashboard" type="String" />
+    <aura:attribute name="homeFlag" type="Boolean" default="true"/>
+    <aura:handler event="c:navigateToDashboard" action="{!c.setDisplay}"/>
+    <aura:handler event="c:SetParentAttributes" action="{!c.setParentAttributVar}"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="creditofficerList" type="SALMobilityCntrl_V2.SelectOption"/>
+    <aura:attribute type="Boolean" name="isdisablePricingbutton" default="true"/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />
+    <aura:attribute type="Boolean" name="isdiablebutton" default="true"/>
+    <aura:attribute name="rejectOption" type="List"/>
+    <aura:attribute name="rejectOption1" type="List"/>
+	<aura:attribute name="sendbackoption" type="List"/> <!-- User Story 985-->
+    <aura:attribute name="HoldOption" type="List"/>
+    <aura:attribute name="nameTheme" type="String" default=""/>
+    <aura:attribute type="Boolean" name="isdiablesendback" default="true"/>
+   <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307/23064 -->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+	<aura:attribute name="showDGComp" type="boolean" default="false"/><!--24316-->
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute type="Personal_Discussion__c" name="rules" default=""/> <!--11806 s -->
+    <aura:attribute type="List" name="obligLst" default=""/> <!--11806 s -->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <ui:scrollerWrapper class="scrollerSize">
+        <div style="position:relative">
+            <div class="innerDivWrapper" style="overflow:hidden">
+               
+                <aura:if isTrue="{!v.homeFlag}">
+                     <!-- 24668 start-->
+                    <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <lightning:select aura:id="appType"  label="Applicant" name="appType" value="{!v.appType}" onchange="{!c.onAppChange}">
+                            <aura:iteration items="{!v.appTypeLst}" var="pl">
+                                <option value="{!pl}" text="{!pl}" selected="{!pl == 'Primary'}"></option>
+                            </aura:iteration>
+                        </lightning:select> 
+                    </div>
+                    <!-- 24668 stop-->
+                    <div class="slds-grid slds-wrap slds-grid_pull-padded borderColor">
+                        
+                        
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3" >
+                            <a id="search" onclick="{!c.navigateToPAN}" href="" style="text-decoration: none;">
+                                <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor" >
+                                    <aura:if isTrue="{! v.panDashboardData != ''}">
+                                        <aura:if isTrue="{!v.panDashboardData.pan_check_dashboard == 'SUCCESSFUL'}"> <!--  isTrue="{!and(!empty(v.panDashboardData) ,v.panDashboardData.pan_check_dashboard == 'Successful')} -->
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                            </aura:set>
+                                        </aura:if>   
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if>  
+                                    <p>
+                                        PAN Check
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                </lightning:card>
+                            </a>
+                        </div>
+                        
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToMCP}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{!and(and(!empty(v.agesolpolicy),!empty(v.salsolpolicy)),or(!empty(v.expsolpolicy),v.appType == 'Financial Co-Applicant'))}"><!-- 24668 added apptype -->
+                                        <aura:if isTrue="{!and(and(v.agesolpolicy.Policy_Status__c  == 'OK',v.salsolpolicy.Policy_Status__c  == 'OK'),or(v.expsolpolicy.Policy_Status__c  == 'OK',v.appType == 'Financial Co-Applicant'))}" ><!-- 24668 added apptype -->
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                            </aura:set>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                    <p>
+                                        MCP Check 
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a  onclick="{!c.navigateToDedupe}"  href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{! v.dedupeDashboardData != ''}">
+                                        <aura:if isTrue="{! v.dedupeDashboardData.codified_dedupe_output == 'POSITIVE'}"> <!-- {!and(dedupeDashboardData != null,v.dedupeDashboardData.codified_dedupe_output == 'POSITIVE')}  -->
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>                                            
+                                            </aura:set>
+                                        </aura:if> 
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>                                            
+                                        </aura:set>
+                                    </aura:if> 
+                                    <p>
+                                        Dedupe
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        
+                        
+                       
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                           
+                            <a  onclick="{!c.navigateToCibil}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                  
+                                    <aura:if isTrue="{!v.cibilDashboardData != ''}">
+                                       <!--  <aura:if isTrue="{!v.cibilDashboardData != ''}">-->
+                                    
+                                       <aura:if isTrue="{!and(v.cibilDashboardData.cibil_dashboard == 'Positive',empty(v.secondaryCibilRecs))}">
+                                        
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                 
+                                               <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                            </aura:set>
+                                        </aura:if> 
+                                       <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>  
+                                          
+                                        </aura:set>
+                                    </aura:if> 
+                                    <p>
+                                        Cibil
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a  onclick="{!c.navigateToEmp}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{! v.empCheckDashboardData != ''}">
+                                        <aura:if isTrue="{! v.empCheckDashboardData.employment_check == 'Successful'}"> 
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/> 
+                                            </aura:set>
+                                        </aura:if> 
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/> 
+                                        </aura:set>
+                                    </aura:if> 					
+                                    <p>
+                                        Employment
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a  onclick="{!c.navigateToBank}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{!!empty(v.bankCheckDashboardData)}">
+                                        <aura:if isTrue="{!v.bankCheckDashboardData.banking_output == 'SUCCESSFUL'}" >
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/> 
+                                            </aura:set>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/> 
+                                        </aura:set>
+                                    </aura:if>
+                                    <p>
+                                        Banking
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToVerification}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    
+                                    <aura:if isTrue="{!!v.verComplete}" >
+                                        
+                                        <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        </aura:set>
+                                    </aura:if> 
+                                    
+                                    
+                                    <p>
+                                        Verifications
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a  onclick="{!c.navigateToPD}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{!v.telepdstatusdashboard != ''}">
+                                        <aura:if isTrue="{!or(v.telepdstatusdashboard == 'Positive',v.telepdstatusdashboard == 'Waived')}">
+                                            <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                            </aura:set>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    <p>
+                                        Tele PD
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToEligibility}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="true">
+                                        <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if> 
+                                    <p>
+                                        Eligibility
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a  onclick="{!c.navigateToSanction}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{!v.SanctionFinalOutput == 'Done'}">
+                                        <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    <p>
+                                        Sanction Condition
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToFinalApproval}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="true">
+                                        <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if> 
+                                    <p>
+                                        Final Approval
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        </aura:if>
+						<!-- IM product condtion removed by swapnil Stroy id #899 s -->
+                       <!--  <aura:if isTrue="{!v.isValidIM_Products}">    22018 added IF for RSL Mobility-->
+                        <!--Bug 20939 RCU s-->
+                        <aura:if isTrue="{!v.appType == 'Primary'}"><!--24668 added aura:if-->
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToDemographicsChange}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    <aura:if isTrue="{!v.isCriticalChange==false}">
+                                        <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:clear" size="large" class="slds-icon-text-default-red"/>
+                                        </aura:set>
+                                    </aura:if> 
+                                    <p>
+                                        Demog Change
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        </aura:if>
+                       <!-- </aura:if> --> <!-- IM product condtion removed by swapnil Stroy id #899 e -->
+					   <!-- 22018 added IF for RSL Mobility-->
+                        <!--Bug 20939 RCU e--> 
+                        
+                        <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a onclick="{!c.navigateToDocumentsPreview}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                    
+                                    <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                    
+                                    <p>
+                                        Documents
+                                        <div class="slds-hidden">hi</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>
+                        </div>
+                        
+                        <!-- 7689 -->
+                        <aura:if isTrue="{!v.appType == 'Primary'}">
+                            <div class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                                <a onclick="{!c.navigateToUnderwriterView}" href="" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small backcolor">
+                                        <lightning:icon iconName="utility:success" size="large" class="slds-icon-text-default-green"/>
+                                        
+                                        <p>
+                                            Reco note
+                                            <div class="slds-hidden">hi</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>
+                            </div>
+                        </aura:if>
+                                                <!-- 7689 -->
+                    </div>
+                </aura:if>
+                {!v.body}
+            </div>
+        </div>
+    </ui:scrollerWrapper>
+</aura:component>

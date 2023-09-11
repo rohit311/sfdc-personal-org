@@ -1,0 +1,267 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CaptureGSTDataCntrl">
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:attribute name="whatId" type="Id" default=""/>
+    <aura:attribute name="whoId" type="Id" default=""/>
+    <aura:attribute name="applicantAbsentFlag" type="Boolean" default="false"/>
+    <aura:attribute name="cityList" type="String[]" default="No Records Found"/>
+    <aura:attribute name="yesNoList" type="String[]" default="No,Yes"/>
+    <aura:attribute name="excemptionList" type="String[]" default="No"/>
+    <aura:attribute name="addressDetailsObj" type="Address_Details__c" access="global"/>
+    <aura:attribute name="addressDetailsObjList" type="Address_Details__c[]" access="global"/>
+    <aura:attribute name="cityToStateMap" type="Map" default="{}"/>
+	
+	<!--POS LA mobile flow changes start-->
+    <aura:attribute name="isDSSFlow" type="Boolean" default="true"/>
+    <aura:attribute name="isMobileFlow" type="Boolean" default="false"/>
+    <!--POS LA mobile flow changes end-->
+	
+    <div>
+        <div class="slds-page-header" style=" background-color: #0072bc" role="banner">
+          <div class="slds-grid">
+            <div class="slds-col">
+          		<p id="gstDetailsHeading" class="slds-text-heading--label" style="color:white">GST Details</p>
+            </div>
+          </div>
+    	</div>
+        
+        <aura:if isTrue="{!v.applicantAbsentFlag == true}" >
+            <div style="padding-top: 30px; padding-left: 450px;">
+            	<b>Applicant not linked</b>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.applicantAbsentFlag == false}" >
+            <br/>
+            <br/>
+            	<ui:scrollerWrapper class="GSTScroller">
+			<aura:if isTrue="{!v.isDSSFlow == true}">
+            <table>
+                 <tr>
+                    <td> 
+                        <b>GST IN Number*</b> 
+                    </td>
+                    
+                   <td>
+                    <ui:inputText aura:id="gstNumber_Text" class="required" label="" value="{!v.addressDetailsObj.GST_IN_Number__c}" required="true" maxlength="15" keyup="{!c.enableDisableSubmitButton}" updateOn="keyup"/>
+                  </td>
+            </tr>   
+            <tr> <td>&nbsp;</td> </tr>
+            <tr>
+                 <td>
+                    <b>Address Line1*</b> 
+                </td>
+                <td>
+                     <ui:inputText aura:id="addressLine1_Text" class="required" label="" value="{!v.addressDetailsObj.Address_Line_1__c}" required="true" maxlength="35"/>
+                </td>
+                <td>
+                     <b>Address Line2</b> 
+                </td>
+                <td>
+                    <ui:inputText aura:id="addressLine2_Text" label="" value="{!v.addressDetailsObj.Address_Line_2__c}" maxlength="35"/>
+                </td>
+                <td>
+                    <b>Address Line3</b>
+                </td>
+                <td>
+                    <ui:inputText aura:id="addressLine3_Text" label="" value="{!v.addressDetailsObj.Adderss_Line_3__c}" maxlength="35"/>
+                </td>
+            </tr>
+            <tr> <td>&nbsp;</td> </tr>
+            <tr>
+                <td>
+                    <b>Pincode*</b>
+               </td>
+               <td>
+                   <ui:inputText aura:id="pincode_Text" class="required" label="" value="{!v.addressDetailsObj.Pin_Code__c}" required="true" maxlength="6"/>
+              </td>
+              <td>
+                  <b>City*</b>
+               </td>
+               <td>
+                   <ui:inputSelect class="requiredCity" aura:id="city_Select"  change="{!c.onCityChange}">
+                            <ui:inputSelectOption aura:id="city_SelectOption" text="--Select--" label="--Select--"/>
+                            <aura:iteration items="{!v.cityList}" var="cityName">
+                                <aura:if isTrue="{!v.addressDetailsObj.City__c == cityName}" >
+                                    <ui:inputSelectOption aura:id="city_SelectOption" text="{!cityName}" label="{!cityName}" value="true"/>
+                                    <aura:set attribute="else">
+                                        <ui:inputSelectOption aura:id="city_SelectOption" text="{!cityName}" label="{!cityName}"/>
+                                    </aura:set>
+                                </aura:if>
+                            
+                            </aura:iteration>
+                        </ui:inputSelect>
+                 </td>
+                 <td>
+                     <b>State </b>
+                </td>
+               <td>
+                   <ui:inputText aura:id="state_Text" label="" value="{!v.addressDetailsObj.State__c}" required="true" maxlength="35" disabled="true"/>
+               </td>
+            </tr>
+            <tr> <td>&nbsp;</td> </tr>
+            <tr>
+                <td>
+                    <b>Exemption (Y/N) </b>   
+                </td>
+                <td>
+                        <ui:inputSelect aura:id="exemptionApplicable_Select" change="{!c.exemptionApplicableChange}">
+                            <aura:iteration items="{!v.excemptionList}" var="yesNoOption">
+                                <aura:if isTrue="{!v.addressDetailsObj.Exemption_Applicable__c == yesNoOption}" >
+                                    <ui:inputSelectOption aura:id="exemptionApplicable_SelectOption" text="{!yesNoOption}" label="{!yesNoOption}" value="true"/>
+                                    <aura:set attribute="else">
+                                        <ui:inputSelectOption aura:id="exemptionApplicable_SelectOption" text="{!yesNoOption}" label="{!yesNoOption}"/>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                </td>
+                <td>
+                    <b>Consider for Loan </b>
+                </td>
+                <td>
+                        <ui:inputSelect aura:id="considerForLoan_Select" change="{!c.considerForLoanChange}">
+                            <aura:iteration items="{!v.yesNoList}" var="yesNoOption">
+                                <aura:if isTrue="{!v.addressDetailsObj.Consider_for_Loan__c == yesNoOption}" >
+                                    <ui:inputSelectOption aura:id="considerForLoan_SelectOption" text="{!yesNoOption}" label="{!yesNoOption}" value="true"/>
+                                    <aura:set attribute="else">  
+                                        <ui:inputSelectOption aura:id="considerForLoan_SelectOption" text="{!yesNoOption}" label="{!yesNoOption}"/>
+                                    </aura:set>
+                                </aura:if>
+                            
+                            </aura:iteration>
+                        </ui:inputSelect>
+                </td>
+            </tr>
+            </table>
+			</aura:if>
+			
+			<!--POS LA changes done for mobile compatibility start-->
+            <aura:if isTrue="{!v.isMobileFlow == true}">
+            
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="gstNumber_Text" label="GST IN Number" value="{!v.addressDetailsObj.GST_IN_Number__c}" required="true" name="gstNumber_Text" placeholder="GST IN Number" maxlength="15" onblur="{!c.enableDisableSubmitButton}"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="addressLine1_Text" label="Address Line1" value="{!v.addressDetailsObj.Address_Line_1__c}" required="true" name="addressLine1_Text" placeholder="Address Line1" maxlength="35" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="addressLine2_Text" label="Address Line2" value="{!v.addressDetailsObj.Address_Line_2__c}" name="addressLine2_Text" placeholder="Address Line2" maxlength="35" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="addressLine3_Text" label="Address Line3" value="{!v.addressDetailsObj.Adderss_Line_3__c}" name="addressLine3_Text" placeholder="Address Line3" maxlength="35" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="pincode_Text" label="Pincode" value="{!v.addressDetailsObj.Pin_Code__c}" required="true" name="pincode_Text" placeholder="Pincode" maxlength="6" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="city_Select" name="city_Select" label="City" messageWhenValueMissing="Please Select Value" onchange="{!c.onCityChange}" required="true" >
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.cityList}" var="cityName">
+                                            <option value="{!cityName}" text="{!cityName}" selected="{!v.addressDetailsObj.City__c == cityName}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="state_Text" label="State" value="{!v.addressDetailsObj.State__c}" required="true" name="state_Text" maxlength="35" disabled="true" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="exemptionApplicable_Select" class="optionClass" name="exemptionApplicable_Select" label="Exemption (Y/N)" value="{!v.addressDetailsObj.Exemption_Applicable__c}" onchange="{!c.exemptionApplicableChange}">
+                                        <aura:iteration items="{!v.excemptionList}" var="yesNoOption">
+                                            <option value="{!yesNoOption}" text="{!yesNoOption}" selected="{!v.addressDetailsObj.Exemption_Applicable__c == yesNoOption}"></option>
+                                        </aura:iteration>    
+                                    </lightning:select>                   
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="considerForLoan_Select" class="optionClass" name="considerForLoan_Select" label="Consider for Loan" value="{!v.addressDetailsObj.Consider_for_Loan__c}" onchange="{!c.considerForLoanChange}">
+                                        <aura:iteration items="{!v.yesNoList}" var="yesNoOption">
+                                            <option value="{!yesNoOption}" text="{!yesNoOption}" selected="{!v.addressDetailsObj.Consider_for_Loan__c == yesNoOption}"></option>
+                                        </aura:iteration>    
+                                    </lightning:select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+               
+            </aura:if>
+            <!--POS LA changes done for mobile compatibility end-->
+			
+            <br/>
+            <div align = "center" style="padding-top: 60px; padding-left: 20px;padding-bottom: 100px" >
+                <lightning:button class="submitButtonClass" aura:id="submitButtonId" variant="brand" label="Save" onclick="{!c.saveGSTData}" disabled="true"/>
+            </div>
+             </ui:scrollerWrapper>
+            <div aura:id="customToast" class="slds-notify_container slds-hide">
+                <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+                    <span class="slds-assistive-text">Info</span>
+                    <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+                    <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <div class="slds-notify__content ">
+                        <div class="slds-align-middle">
+                            <h2 class="slds-text-heading--x-small">
+                                <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                                <ui:outputText aura:id="toastText" value=""/>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!--Modal to ask user if he wants to override other gst records-->
+            <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="overrideModalbox" class="slds-modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around--medium">
+                        Consider for Loan field having value as 'Yes' is already captured, want to override?
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.overrideSave}">Yes</button>
+                        <button class="slds-button slds-button--neutral" onclick="{!c.closeOverrideModal}">No</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+            
+            <!--Modal to ask user to select YES in Consider For Loan field-->
+            <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="selectYesModalbox" class="slds-modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around--medium">
+                        Select 'Yes' in 'Consider For Loan' field in order to save this record as there is no other record present which has this field set to 'Yes'.
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.closeSelectYesModal}">Close</button>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+	</div>
+</aura:component>

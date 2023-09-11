@@ -1,0 +1,158 @@
+<aura:component access="global"  implements="flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,force:hasRecordId" controller="SFDCMobileLoanController">
+    <!-- 22141 S -->
+    <aura:attribute name = "mobileValidationResult" type = "String" default ="" />
+    <!-- 22141 E-->
+    <!-- User Story 2357 Starts -->
+    <aura:attribute name ="docDisableFlag" type = "Boolean" default = "false"/>
+    <!-- User Story 2357 Ends -->
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="oppObj" type="Opportunity" default="{}"/>
+    <aura:attribute name="oppObject" type="Opportunity" default="{}"/>
+    <aura:attribute name="account" type="Object"/>
+    <aura:attribute name="simpleOpp" type="Object"/>
+    <aura:attribute name="oppError" type="String"/>
+    <aura:attribute name="loanId" type="String" default=""/>
+    <aura:attribute name="DiscrepancyObj" type="Object[]" default=""/>
+    <aura:registerEvent name="POS_LA_PassParam" type="c:POS_LA_PassParam"/>
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+        <aura:attribute name = "isCreditDoneAtPO" type="String" default = "false"/> <!-- Bug 22425 CC Code changes SME  -->
+     <aura:method name="DisableLANCard" action="{!c.disableLoanCard}" access="PUBLIC">
+        <aura:attribute name="loanStage" type="String" />  
+    </aura:method>
+     <aura:registerEvent name="ShowToastEvent" type="c:ShowToastEvent"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler event="c:DisableFormEvent" action="{!c.disableLoanCard}"/>
+    <aura:registerEvent name="EnableFormEventOnSendBack" type="c:EnableFormEventOnSendBack"/>
+
+    <div class="" style="background: rgb(243, 242, 242)">         
+	<div aura:id="boxBorder" >
+        <br/>
+            <p class="slds-p-horizontal_small">
+                <div class="slds-grid slds-wrap">
+
+                    <div class="slds-col slds-size_11-of-12 slds-medium-size_11-of-12 slds-large-size_11-of-12 slds-grid slds-wrap">
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                           <label class="slds-form-element__label" for="favouring">Customer Name</label>
+                       </div>
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_regular" style="font-weight: bold">
+                            <label class="slds-form-element__label" for="favouring">: {!v.oppObj.Name}</label>
+                        </div>
+ 						<div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                            <label class="slds-form-element__label" for="favouring">Loan Number</label>
+                       </div>
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_regular" style="font-weight: bold">
+                            <label class="slds-form-element__label" for="favouring">: {!v.oppObj.Loan_Application_Number__c}</label>
+                        </div>
+                        <aura:if isTrue="{!v.mobileValidationResult == 'MATCH' || v.mobileValidationResult == 'NO-MATCH' }">
+                        	<div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_1-of-4 slds-text-body_regular">
+                            <label class="slds-form-element__label" for="favouring">Fraud Check</label>
+                       		</div>
+                        </aura:if>
+                        <div class="slds-size_1-of-2 slds-medium-size_2-of-4 slds-large-size_3-of-4 slds-text-body_regular" style="font-weight: bold">
+                            <aura:if isTrue="{!v.mobileValidationResult == 'MATCH'}">
+                            	<label class="slds-form-element__label" for="favouring" style="color:#04844b">: Mobile Matched with CIBIL </label>
+                            </aura:if>
+                             <aura:if isTrue="{!v.mobileValidationResult == 'NO-MATCH'}">
+                            	<label class="slds-form-element__label" for="favouring" style="color:#ffb75d">: Mobile Not Matched with CIBIL</label>
+                            </aura:if>
+                        </div>
+                    </div>
+                    
+                </div>
+               
+                <br/>
+              
+                
+				<div class="slds-col slds-size_11-of-12 slds-medium-size_11-of-12 slds-large-size_11-of-12 slds-grid slds-wrap cFont">
+                    <!-- User Story 2357 Starts -->
+                    <c:DocumentUploadRevamp Flow="LA" parentId="{!v.oppObj.Id}" docDisableFlag = "{!v.docDisableFlag}"/>
+                    <!-- User Story 2357 Ends -->
+                    <aura:if isTrue="{!v.oppObj.StageName != 'DSA/PSF Login'}">
+                    	<lightning:button aura:id="sendBackId" class="slds-button slds-button_brand" label="Send Back" onclick="{!c.openSendBack}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.DiscrepancyObj.length>0}">
+                    	<lightning:button aura:id="discrepancyId" class="slds-button slds-button_brand" label="Discrepancy" onclick="{!c.openDiscrepancy}" />
+                    </aura:if>
+                    </div>
+                <!--Added for Bug 24487 EMI Card-->
+                <aura:if isTrue="{!and(v.oppObj.StageName == 'Post Approval Sales',v.oppObj.Id)}">
+                    <c:EMI_CARD_PRO IdEMI="{!v.oppObj.Id}" isLAFlag="true" isMobility="true"/>
+                </aura:if>
+                <!-- Bug 22425 CC Code changes SME S {!v.oppObj.StageName }{!v.isCreditDoneAtPO}-->
+                <aura:if isTrue="{!and(v.oppObj.Card_Limit__c != null,v.oppObj.Card_Limit__c >0)}"><!-- US : 2702 -->
+                <aura:if isTrue="{!and(v.oppObj.StageName == 'Post Approval Sales', v.isCreditDoneAtPO == 'false')}">
+                    <c:POS_Credit_Card recordId="{!v.oppObj.Id}" flow="Opp"/>
+                </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!and(v.oppObj.Card_Limit__c != null,v.oppObj.Card_Limit__c >0)}"><!-- US : 2702 -->
+                <aura:if isTrue="{!and(v.oppObj.StageName == 'Post Approval Sales', v.isCreditDoneAtPO == 'true')}">
+                    <c:POS_Credit_Card recordId="{!v.oppObj.Id}" flow="Opp" readOnlyMode = "{!v.isCreditDoneAtPO == 'true'}"/>
+                </aura:if>
+                </aura:if>
+                <!-- Bug 22425 CC Code changes SME E -->
+                 <div class="slds-progress-bar slds-progress-bar_medium slds-progress-bar_circular slds-m-top--medium" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25" role="progressbar">
+                     <span class="{!(v.oppObj.StageName == 'Moved To Finnone')?'slds-progress-bar__value slds-progress-bar__value_success' : 'slds-progress-bar__value'}"  style="{!'width:'+if(v.oppObj.StageName == 'DSA/PSF Login','20%',if(v.oppObj.StageName == 'Post Approval Sales','60%',if(v.oppObj.StageName == 'Branch Ops','80%',if(v.oppObj.StageName == 'Moved To Finnone','100%','0%'))))}"  aura:id="progressSpan"/>
+                </div>
+                
+               
+        </p><br/>
+    </div>
+    </div>
+
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="DiscrepancyModal" class="slds-modal slds-hide" style="width:100%;height:100%;padding:20px;">
+            <div class="slds-modal__container" style="height:100%;margin: 0 0">
+                <div class="slds-modal__header">
+                    
+                    <lightning:buttonIcon class="slds-button slds-modal__close slds-button--icon-inverse" iconName="utility:close" variant="bare" onclick="{!c.closeDiscrepancyModal}" alternativeText="Info" size="large" />                                
+                    <h2 id="header43" class="slds-text-heading--medium"> <strong>Discrepancies</strong></h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium slds-scrollable" style="height:100%;">
+                    <div style="padding:10px;height:100%">
+                        
+                        <c:POS_LADiscrepancy DiscrepancyObj="{!v.DiscrepancyObj}" loanId="{!v.loanId}"/>
+                     </div>
+                </div>
+                <div class="slds-modal__footer">
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop " aura:id="ModalbackdropDiscrepancy"></div>
+
+        <!-- Send Back text box to accept to enter reason -->
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="sendBackReasonModal" class="slds-modal slds-hide" style="width:100%;height:100%;padding:20px;">
+            <div class="slds-modal__container" style="height:100%;margin: 0 0">
+                <div class="slds-modal__header">
+                    <lightning:buttonIcon class="slds-button slds-modal__close slds-button--icon-inverse" iconName="utility:close" variant="bare" onclick="{!c.closeModal}" alternativeText="Info" size="large" />                                
+                    <h2 id="header43" class="slds-text-heading--medium"> <strong>Enter Send Back Comment</strong></h2>
+                </div>
+                <div class="slds-modal__content slds-is-required slds-p-around--medium slds-scrollable" style="height:100%;">
+                    <div class="slds-form-element__control" style="padding:10px;height:100%">
+                        <label class="slds-form-element__label" for="sendBackReasonLabel">Comment<span style="color:red">*</span></label>
+                        <ui:inputTextArea class="slds-input" aura:id="sendBackReason" value="{!v.oppObj.COO_Comments__c}" />
+                     </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button aura:id="sendBackReasonSave" class="slds-button slds-button--brand slds-align_absolute-center" onclick="{!c.saveReasonCall}">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop " aura:id="sendBackModalbackdrop"></div>
+        <!-- End of Send back text box -->
+
+     <aura:if isTrue="{!not(empty(v.oppError))}">
+        <div class="recordError">
+            <ui:message title="Error" severity="error" closable="true">
+                {!v.oppError}
+            </ui:message>
+        </div>
+    </aura:if>
+    
+        
+     <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>
+    
+</aura:component>

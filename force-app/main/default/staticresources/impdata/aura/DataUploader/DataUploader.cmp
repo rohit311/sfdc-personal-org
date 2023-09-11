@@ -1,0 +1,83 @@
+<aura:component implements="force:appHostable" controller="DataUploaderController">
+    
+    <aura:attribute name="selectedSourceChannel" type="string" />
+    <aura:attribute name="sourceChannelList" type="list" />
+    <!--aura:attribute name="responseList" type="sObject" /-->  
+    <aura:attribute name="srcingValue" type="String" />
+    <!--aura:attribute name="errorMsg" type="String" /-->
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <!--aura:attribute name="objInfo" type="CCLeadSalaried__c" default="{sobjectType : 'CCLeadSalaried__c'}" /-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--aura:attribute name="showLoadingSpinner" type="boolean" default="false" /-->
+    <aura:attribute name="isProcessing" type="Boolean" default="false" />
+    <aura:attribute name='successfulRecords' type="list"/>
+    
+    
+    <aura:if isTrue="{! v.isProcessing }">
+        <lightning:spinner  size="large"/>
+    </aura:if>
+    <!--div class="slds-grid slds-gutters">
+<div class="slds-grid slds-grid_vertical">
+  <div class="slds-col">
+      <span>
+              LAIP Insta Customer Creation Upload Utility
+          </span>
+            </div>
+        </div>
+        </div-->
+    
+    <div  class="slds-var-m-around_xx-large">
+        <table class="slds-table_col-bordered" frame="box">
+            <tr class="slds-line-height_reset">
+                <th colspan="2">
+                    <div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white; width:100%">
+                        <h3 class="font-size-heading-x-small slds-align-middle">LAIP Insta Customer Creation Upload Utility</h3>
+                    </div>
+                </th>
+            </tr>
+            
+            <tr class="slds-line-height_reset" >
+                <td>
+                    <lightning:input type="text" label="Product" value="FAS" readonly="true"/>
+                </td> 
+                <td> 
+                    <lightning:select name="selectNCSource" label="Sourcing Channel" value="{! v.selectedSourceChannel}">
+                        <aura:iteration items="{!v.sourceChannelList}" var="sChannel">
+                            <option value = "{!sChannel.value}" 
+                                    label = "{!sChannel.label}" 
+                                    selected = "{! sChannel.value ==  v.selectedSourceChannel}"
+                                    />
+                        </aura:iteration>
+                        </lightning:select>
+                </td>
+            </tr>    
+           
+            <tr class="slds-line-height_reset">
+                <td colspan="2">
+                    
+                    <lightning:input class="slds-align_absolute-center"
+                                     aura:id="file" 
+                                     onchange="{!c.handleFilesChange}" 
+                                     type="file" 
+                                     name="file" 
+                                     accept=".csv"
+                                     multiple="false"/>
+                    <span class="slds-align_absolute-center"> {!v.fileName} </span>
+                    
+                </td>
+                
+             
+                
+            </tr>
+            <tr class="slds-line-height_reset">
+                <td colspan="2">
+                    <button class="slds-button slds-button_brand slds-align_absolute-center" onclick="{!c.onInsert}"> OK </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->    
+    <c:Toast aura:id="toastCmp"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

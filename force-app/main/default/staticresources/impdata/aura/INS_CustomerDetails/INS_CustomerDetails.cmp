@@ -1,0 +1,802 @@
+<aura:component  controller="InsCustDetailsCtrl" implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--Attributes-->
+    <!--<aura:attribute name="tabId" type="String" />-->
+    <aura:attribute name="customerRec" type="CUSTOMER_INFO__c" default="{'sobjectType' : 'CUSTOMER_INFO__c'}"/>
+    <aura:attribute name="objParam" type="Object" />
+    <aura:attribute name="lstTitle" type="String[]" />
+    <aura:attribute name="lstOccupation" type="String[]" />
+    <aura:attribute name="lstMaritalStatus" type="String[]" />
+    <aura:attribute name="lstCityRes" type="String[]" />
+    <aura:attribute name="lstCityOff" type="String[]" />
+    <aura:attribute name="lstCountryRes" type="String[]" />
+    <aura:attribute name="lstCountryOff" type="String[]" />
+	<aura:attribute name="lstPrefLang" type="String[]" />
+    <aura:attribute name="isBureauApiCalled" type="Boolean" default="false"/>
+    <!--Interaction Details-->
+    <aura:attribute name="brDispPickVals" type="Object" />
+    <aura:attribute name="selectedDisp" type="String" default="" />
+	<aura:attribute name="selectedSubDisp" type="String" default="" />
+	<aura:attribute name="selectedChannel" type="String" default="" />
+	<aura:attribute name="lstAllDisposition" type="String[]" />
+    <aura:attribute name="lstDisposition" type="String[]" />
+
+    <aura:attribute name="lstAllSubDisposition" type="String[]" />
+	<aura:attribute name="lstSubDisposition" type="String[]" />
+	<aura:attribute name="lstChannel" type="String[]" />
+    <aura:attribute name="comments" type="String" default="" />
+    <aura:attribute name="shwMeetInp" type="Boolean" default="false"/>
+    <aura:attribute name="location" type="String" default="" />
+    <aura:attribute name="appStartTime" type="DateTime" default="" />
+    <aura:attribute name="appEndTime" type="DateTime" default="" />
+    <aura:attribute name="subject" type="String" default="" />
+	<aura:attribute name="interactionLst" type="Call_Memo__c[]" default="" />
+    <aura:attribute name="prefAddr" type="String" />
+	
+    <!--Product Details-->
+    <aura:attribute name="insWalletList" type="Insurance__c[]" default="" />
+    <aura:attribute name="isModalOpen" type="Boolean" default="false"/>
+	<aura:attribute name="insProductName" type="String" default=""/>
+	<aura:attribute name="mapProdNameIPM" type="Object"/>
+	<aura:attribute name="productBenefits" type="String" default=""/>
+    
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="InsCustDetailFlag" type="Boolean" default="true"/>
+	<aura:attribute name="selTabId" type="String" default="1" />
+    <aura:attribute name="tabIndex" type="String" default="" />
+	<aura:attribute name="OtherLoanLst" type="Loan__c[]" default="" />
+	<aura:attribute name="BajajLoanLst" type="Loan__c[]" default="" />
+	<aura:attribute name="profDisableFlag" type="Boolean" default="false"/>
+    <aura:attribute name="isSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="customerWrp" type="Object"/>
+	
+	<!--Product Details Pagination Attributes-->
+	<aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="3"/>
+    <aura:attribute name="PaginationList" type="Object[]" default=""/>
+	<!--<aura:attribute name="pageReference" type="Object"/>-->
+    
+    <!--Handlers-->
+    <aura:handler name="init" action="{!c.initCustDetails}" value="{!this}"/>
+    <aura:registerEvent name="INSMainCmpvent" type="c:INS_GoToMainCMP"/>
+    <aura:registerEvent name="INSHomePgEvent" type="c:INS_GoToHomePgEvent"/>
+    
+    <aura:registerEvent name="notficationEvent" type="c:InvokeNotificationEVT"/>
+    
+    <!--<lightning:navigation aura:id="navService"/>-->
+    <!--methods-->
+    <aura:method name="initMethod" action="{!c.initCustDetails}"> 
+       
+    </aura:method>
+	
+		
+	
+    <aura:if isTrue="{!v.isModalOpen}">     
+        <!--###### MODAL BOX Start From Here ######--> 
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                <div class="slds-modal__header" aura:id="auraid-modal-container" tabIndex="0">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"><b>FEATURES for {!v.insProductName}</b></h2>
+                </div>
+                <!--###### MODAL BOX BODY Part Start From Here ######-->
+                <div class="slds-modal__content slds-p-around--medium  slds-scrollable">
+                    <aura:if isTrue="{!v.insProductName == 'BAGIC- Family Health Care Gold'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BAGIC-FAMILY-HEALTH-CARE-GOLD/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- eTouch'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BALIC-eTouch/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- POS Goal Suraksha'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BALIC-POS-GOAL-SURAKSHA/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Health Care Goal'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BALIC-Health-Care-Gold/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'HDFC Life- Super Income'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/HDFCLifeSuperIncome/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Future Gain'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-Future-Gain/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Elite Assure'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-Elite-Assure/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Invest Assure'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-Invest-Assure/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- I-Secure'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-I-Secure/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!(v.insProductName == 'BALIC- LifeLong Assure' ||  v.insProductName == 'BALIC- LifeLong Assure Pension Plan')}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-LifeLong-Assure/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Retire Rich'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-Retire-Rich/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BALIC- Young Assure'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Allianz-Young-Assure/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'Max Bupa- Health Companion'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Max-Bupa-Health-Companion/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'Bajaj Finserv- FD'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/Bajaj-Finserv-FD/index.html')}"/>
+                    </aura:if>
+					<aura:if isTrue="{!v.insProductName == 'BAGIC- Age Agnostic'}">
+                    	<iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/AgeAgnostic/index.html')}"/>
+						<aura:set attribute="else">
+							{!v.productBenefits}
+						</aura:set>
+                    </aura:if>
+                </div>
+                <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--brand" onclick="{!c.closeModel}">Got it!</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        <!--###### MODAL BOX Part END Here ######-->	
+    </aura:if>
+    <ui:scrollerWrapper class="scrollerSize">
+         <aura:if isTrue="{!v.isSpinner}">
+            <lightning:spinner variant="brand"  size="large" class="slds-align_absolute-center"/>
+        </aura:if>
+         <aura:if isTrue="{!v.InsCustDetailFlag}">
+        <div style="margin-left: 20px; margin-top:10px;margin-right: 20px">
+            <!--<div style="background-color:white">
+                <img src="{!$Resource.BajajLogoIns}" class="slds-align_absolute-right "/>
+            </div>-->
+			
+           
+                <lightning:card class="slds-box slds-box_x-small" title="">
+						
+							<lightning:button variant="brand"  label="Back" aura:id="back_btn" onclick="{!c.backToMainCmp}" class="slds-theme--alt-inverse slds-float_right btnClass" title="Back" > 
+							<lightning:icon iconName="utility:back" title="Back" size="x-small" variant="inverse" />
+							</lightning:button>
+					
+						<div class="slds-grid slds-wrap slds-size--1-of-1 slds-medium-size--2-of-6 slds-large-size--12-of-12" >
+							<h1><span class="slds-page-header__title" title="" style="margin-top:-20px">	<lightning:icon iconName="action:new_lead" 	alternativeText="Customer" />&nbsp;{!v.customerRec.First_Name__c + ' ' + v.customerRec.Last_Name__c}</span></h1>
+						</div>
+						
+						<div class="slds-grid slds-wrap">
+						<div class="slds-col slds-size_1-of-2 slds-medium-size--3-of-6 slds-large-size_4-of-12">
+							<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Customer ID"><b>Customer ID:</b></dt>
+						</div>
+						<div class="slds-col slds-size_1-of-2  slds-medium-size--3-of-6 slds-large-size_8-of-12">
+							<dd class="slds-item_detail slds " title="{!v.customerRec.Name}">{!v.customerRec.Name}</dd>
+						</div>
+						<div class="slds-col slds-size_1-of-2 slds-medium-size--3-of-6 slds-large-size_4-of-12">
+							<dt class="slds-item_label slds-text-color_weak slds-p-left_x-small" title="Mobile"><b>Mobile:</b></dt>
+						</div>
+						<div class="slds-col slds-size_1-of-2  slds-medium-size--3-of-6 slds-large-size_8-of-12">
+							<dd class="slds-item_detail " title="{!v.customerRec.Mobile__c}">{!v.customerRec.Mobile__c}</dd>
+						</div>
+						</div>
+						
+				</lightning:card>
+			
+               
+			<lightning:tabset class="slds-border_top" selectedTabId="{!v.selTabId}">
+				<lightning:tab onactive="{!c.setTabData}" label="Profile" class="" id="1" aura:id="1">
+				
+				<ul class="slds-accordion">
+					<!--Customer Details -->
+					<li class="slds-accordion__list-item">
+						<section class="slds-accordion__section">
+							<div class="slds-accordion__summary ">
+								<h3 class="slds-text-heading_small slds-accordion__summary-heading ">
+									<div aria-controls="subsection1Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider slds-theme--alt-inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection1">
+										<b><span id="subicon1" class="slds-m-horizontal--x-small slds-text-heading--small slds-theme--alt-inverse">[+]</span>
+										</b>
+										<span id="subname1" class="slds-truncate" title="Accordion summary">Demographic Details</span>
+									</div>
+								</h3>
+							</div>
+							<div aria-hidden="true"  class="slds-hide" id="subsection1Content">
+								<div class="slds-p-horizontal--small">
+									<div class="slds-grid slds-wrap slds-grid--pull-padded">
+										
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="custDetailForm" name="title" label="Title" value="{!v.customerRec.Title__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstTitle}" var="strTitle">
+														<option value="{!strTitle}" text="{!strTitle}" selected="{!v.customerRec.Title__c == strTitle}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="firstName" value="{!v.customerRec.First_Name__c}" label="First Name" placeholder="First Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter First Name" messageWhenPatternMismatch="Please Enter valid First Name" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="MiddleName" value="{!v.customerRec.Middle_Name__c}" label="Middle Name" placeholder="Middle Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Middle Name" messageWhenPatternMismatch="Please Enter valid Middle Name" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="LastName" value="{!v.customerRec.Last_Name__c}" label="Last Name" placeholder="Last Name" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Last Name" messageWhenPatternMismatch="Please Enter valid Last Name" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control"> 
+												<lightning:input aura:id="custDetailForm" type="date" name="DOB" value="{!v.customerRec.DOB__c}" label="DOB" placeholder="DOB" required="true" pattern=""  messageWhenValueMissing="Please Enter DOB" messageWhenPatternMismatch="Please Enter valid DOB" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="PlaceOfBirth" value="{!v.customerRec.Place_of_Birth__c}" label="PlaceOfBirth" placeholder="Place Of Birth" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Place Of Birth" messageWhenPatternMismatch="Please Enter valid Place Of Birth" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="Gender" value="{!v.customerRec.GENDER__c}" label="Gender" placeholder="Gender" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter Gender" messageWhenPatternMismatch="Please Enter Gender" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="custDetailForm" name="Marital Status" label="Marital Status" value="{!v.customerRec.Marital_Status__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstMaritalStatus}" var="strMstatus">
+														<option value="{!strMstatus}" text="{!strMstatus}" selected="{!v.customerRec.Marital_Status__c == strMstatus}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+                                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="Email" value="{!v.customerRec.Customer_Email__c}" label="Email" placeholder="Email" required="true" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"   messageWhenPatternMismatch="Please Enter valid Email ID" messageWhenValueMissing="Please Enter Email ID" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:input aura:id="custDetailForm" name="Mobile" value="{!v.customerRec.Mobile__c}" label="Mobile" placeholder="Mobile" required="true" pattern="^[6-9]\d{9}" messageWhenPatternMismatch="Please Enter valid Mobile No" messageWhenValueMissing="Please Enter Mobile No" maxlength="10" disabled="{!v.profDisableFlag}"/>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="custDetailForm" name="Occupation" label="Occupation" value="{!v.customerRec.Occupation__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstOccupation}" var="strOcc">
+														<option value="{!strOcc}" text="{!strOcc}" selected="{!v.customerRec.Occupation__c == strOcc}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="custDetailForm" name="Preferred Language" label="Preferred Language" value="{!v.customerRec.Preferred_Language__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstPrefLang}" var="strPrefLang">
+														<option value="{!strPrefLang}" text="{!strPrefLang}" selected="{!v.customerRec.Preferred_Language__c == strPrefLang}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+                                      
+									</div>
+								</div>
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+							<div class="slds-p-around--x-small slds-align_absolute-center">
+								<lightning:button aura:id="personalDetailsId" class="slds-theme--alt-inverse" variant="brand" label="Save" onclick="{!c.submitDetails}" disabled="{!v.profDisableFlag}"/>
+							</div>
+						</div>
+							</div>
+						</section>
+					</li>
+					<!--Address Details-->
+					<li class="slds-accordion__list-item">
+						<section class="slds-accordion__section">
+							<div class="slds-accordion__summary ">
+								<h3 class="slds-text-heading_small slds-accordion__summary-heading ">
+									<div aria-controls="subsection2Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider slds-theme--alt-inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection2">
+										<b><span id="subicon2" class="slds-m-horizontal--x-small slds-text-heading--small slds-theme--alt-inverse">[+]</span>
+										</b>
+										<span id="subname2" class="slds-truncate" title="Accordion summary">Address Details</span>
+									</div>
+								</h3>
+							</div>
+							<div aria-hidden="true"  class="slds-hide" id="subsection2Content">
+								<div class="slds-p-horizontal--small">
+								<div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-p-top--x-small"><b>Residence Address</b></div>
+									<div class="slds-grid slds-wrap slds-grid--pull-padded">
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address1_New__c}" label="Address Line 1" placeholder="Address Line 1" required="true"   messageWhenValueMissing="Please Enter Address 1"  disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+								
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address2_New__c}" label="Address Line 2" placeholder="Address Line 2" required="true"   messageWhenValueMissing="Please Enter Address 2" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address3_New__c}" label="Address Line 3" placeholder="Address Line 3" required="true"   messageWhenValueMissing="Please Enter Address 3"  disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="Landmark" value="{!v.customerRec.Landmark__c}" label="Landmark" placeholder="Landmark" required="true"  messageWhenValueMissing="Please Enter Landmark" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="AddrDetailForm" name="City" label="City" value="{!v.customerRec.City_New__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstCityRes}" var="strCity">
+														<option value="{!strCity}" text="{!strCity}" selected="{!v.customerRec.City_New__c == strCity}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="State" value="{!v.customerRec.State_New__c}" label="State" placeholder="State" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter State" messageWhenPatternMismatch="Please Enter valid State" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:select aura:id="AddrDetailForm" name="Country" label="Country" value="{!v.customerRec.Country_of_residence__c}" required="true" disabled="{!v.profDisableFlag}">
+												<option value="">-- None --</option>
+												<aura:iteration items="{!v.lstCountryRes}" var="strCountry">
+													<option value="{!strCountry}" text="{!strCountry}" selected="{!v.customerRec.Country_of_residence__c == strCountry}"></option>
+												</aura:iteration>
+											</lightning:select>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="Pincode" value="{!v.customerRec.Pin_Code_New__c}" label="Pincode" placeholder="Pincode" required="true" pattern="^[1-9][0-9]{5}$"  messageWhenValueMissing="Please Enter Pincode" messageWhenPatternMismatch="Please Enter valid Pincode" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-top: 30px;">
+										<div class="slds-form-element__control">
+											<ui:inputRadio aura:id="idResRadio" name="prefRadio" label="Is Preferred Communication Address " change="{!c.setPrefAddr}" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+									</div>
+									<div class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-p-top--x-small"><b>Office Address</b></div>
+									<div class="slds-grid slds-wrap slds-grid--pull-padded">
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address_Line_1_ofc__c}" label="Address Line 1" placeholder="Address Line 1" required="true"  messageWhenValueMissing="Please Enter Address 1" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+								
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address_Line_2_ofc__c}" label="Address Line 2" placeholder="Address Line 2" required="true" messageWhenValueMissing="Please Enter Address 2" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+									
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="" value="{!v.customerRec.Address_Line_3_ofc__c}" label="Address Line 3" placeholder="Address Line 3" required="true" messageWhenValueMissing="Please Enter Address 3" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="Landmark" value="{!v.customerRec.Landmark_ofc__c}" label="Landmark" placeholder="Landmark" required="true" Missing="Please Enter Landmark" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="AddrDetailForm" name="City" label="City" value="{!v.customerRec.City_Office__c}" required="true" disabled="{!v.profDisableFlag}">
+													<option value="">-- None --</option>
+													<aura:iteration items="{!v.lstCityOff}" var="strCityOff">
+														<option value="{!strCityOff}" text="{!strCityOff}" selected="{!v.customerRec.City_Office__c == strCityOff}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="State" value="{!v.customerRec.State_ofc__c}" label="State" placeholder="State" required="true" pattern="^[a-zA-Z ]*$"  messageWhenValueMissing="Please Enter State" messageWhenPatternMismatch="Please Enter valid State" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:select aura:id="AddrDetailForm" name="Country" label="Country" value="{!v.customerRec.Country_of_Workplace__c}" required="true" disabled="{!v.profDisableFlag}">
+												<option value="">-- None --</option>
+												<aura:iteration items="{!v.lstCountryOff}" var="strCountry">
+													<option value="{!strCountry}" text="{!strCountry}" selected="{!v.customerRec.Country_of_Workplace__c == strCountry}"></option>
+												</aura:iteration>
+											</lightning:select>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+										<div class="slds-form-element__control">
+											<lightning:input aura:id="AddrDetailForm" name="Pincode" value="{!v.customerRec.Office_Pin_Code__c}" label="Pincode" placeholder="Pincode" required="true" pattern="^[1-9][0-9]{5}$"  messageWhenValueMissing="Please Enter Pincode" messageWhenPatternMismatch="Please Enter valid Pincode" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="margin-top: 30px;">
+										<div class="slds-form-element__control">
+											<ui:inputRadio aura:id="idOffRadio" name="prefRadio" label="Is Preferred Communication Address " change="{!c.setPrefAddr}" disabled="{!v.profDisableFlag}"/>
+										</div>
+										</div>
+									</div>
+								</div><br/>
+								<div class="" align="center">
+									<div class="">
+										<lightning:button aura:id="addressDetailsId" class="slds-theme--alt-inverse" variant="brand" label="Save" onclick="{!c.submitDetails}" disabled="{!v.profDisableFlag}"/>
+									</div>
+								</div>
+							</div>
+						</section>
+					</li>
+					<!--Loan Details-->
+					<li class="slds-accordion__list-item">
+						<section class="slds-accordion__section">
+							<div class="slds-accordion__summary ">
+								<h3 class="slds-text-heading_small slds-accordion__summary-heading ">
+									<div aria-controls="subsection3Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider slds-theme--alt-inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection3">
+										<b><span id="subicon3" class="slds-m-horizontal--x-small slds-text-heading--small slds-theme--alt-inverse">[+]</span>
+										</b>
+										<span id="subname3" class="slds-truncate" title="Accordion summary">Loans Information</span>
+									</div>
+								</h3>
+							</div>
+							<div aria-hidden="true"  class="slds-hide" id="subsection3Content">
+								
+								<div class="slds-grid slds-wrap slds-grid--pull-padded">
+									<div class="slds-p-around--x-small slds-align_absolute-center" ><b>Bureau Score: {!v.customerRec.Cibil_Score__c} </b></div> <br/>
+									
+									<aura:if isTrue="{!v.BajajLoanLst.length > 0}">
+									<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+									<div class="slds-p-around--x-small slds-align_absolute-center" ><b>Bajaj Loans</b></div> 
+								    </div>
+								
+									<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+										
+											<div style="-webkit-overflow-scrolling: touch;">
+        									<ui:scrollerWrapper class="sWrapTest">
+											
+											<table class="slds-table slds-table--bordered slds-table_col-bordered" style="border: 1px solid rgb(221, 219, 218);">
+												<thead>
+													<tr class="slds-text-title--caps">
+														<th scope="col"><div class="slds-truncate" title="Loan Category">Loan Category</div></th>
+														<th><span class="slds-truncate" title="Asset Description">Asset Description</span></th>
+														<th><span class="slds-truncate" title="Sectioned Amt">Sactioned Amt</span></th>
+														<th><span class="slds-truncate" title="Current Balance">Current Balance</span></th>
+														<th><div class="slds-truncate" title="Status">Status</div></th>
+													</tr>
+												</thead>
+												<tbody>
+													<aura:iteration items="{!v.BajajLoanLst}" var="loan">
+													<tr>
+														<td><div class="slds-truncate" title="{!loan.Sub_Category2_Loan__c}">{!loan.Sub_Category2_Loan__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Other_Loan_Details__c}">{!loan.Other_Loan_Details__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Loan_Amount__c}">{!loan.Loan_Amount__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Outstanding_Amount__c}">{!loan.Outstanding_Amount__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Status__c}">{!loan.Status__c}</div></td>
+														
+													</tr>
+													</aura:iteration>
+												</tbody>
+												
+											</table>
+											
+											</ui:scrollerWrapper>
+    </div>
+										
+									</div>
+							 <br/>
+									</aura:if>
+									
+									<aura:if isTrue="{!v.OtherLoanLst.length > 0}">
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+										<div class="slds-p-around--x-small slds-align_absolute-center" ><b>Other Loans</b></div> 
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+											<div class="slds-p-horizontal--small slds-scrollable" style="height: auto; width: auto;">
+												
+											<table  class="slds-table slds-table--bordered slds-table--cell-buffer slds-scrollable_x slds-border_right slds-border_left" style="table-layout: auto;width:100%">
+												<thead>
+													<tr class="slds-text-title--caps">
+														<th scope="col"><div class="slds-truncate" title="Loan Category">Loan Category</div></th>
+														
+														<th><span class="slds-truncate" title="Asset Description">Asset Description</span></th>
+														<th><span class="slds-truncate" title="Sectioned Amt">Sactioned Amt</span></th>
+														<th><span class="slds-truncate" title="Current Balance">Current Balance</span></th>
+														<th><div class="slds-truncate" title="Status">Status</div></th>
+													</tr>
+												</thead>
+												<tbody>
+													<aura:iteration items="{!v.OtherLoanLst}" var="loan">
+													<tr>
+														<td><div class="slds-truncate" title="{!loan.Sub_Category2_Loan__c}">{!loan.Sub_Category2_Loan__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Other_Loan_Details__c}">{!loan.Other_Loan_Details__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Loan_Amount__c}">{!loan.Loan_Amount__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Outstanding_Amount__c}">{!loan.Outstanding_Amount__c}</div></td>
+														<td><div class="slds-truncate" title="{!loan.Status__c}">{!loan.Status__c}</div></td>
+														
+													</tr>
+													</aura:iteration>
+												</tbody>
+											</table>
+											</div>
+										</div>
+									</aura:if>
+								</div>
+							
+								<aura:if isTrue="{!and(v.OtherLoanLst.length ==0,v.BajajLoanLst.length ==0)}">
+								<ui:message severity="warning" closable="false">
+									<lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+									<ui:outputText class="slds-text-heading--label" value="No records found currently"/>
+								</ui:message>
+								</aura:if>
+							</div>
+						</section>
+					</li>
+					<!--Income Details-->
+				</ul>
+				</lightning:tab>
+				
+				<!--Interaction Details -->
+                 <lightning:tab onactive="{!c.setTabData}" label="Interaction" class="" title="Interaction" id="2" aura:id ="2" >
+				<ul class="slds-accordion">
+					<!--Customer Details -->
+					<li class="slds-accordion__list-item">
+						<section class="slds-accordion__section">
+							<div class="slds-accordion__summary ">
+								<h3 class="slds-text-heading_small slds-accordion__summary-heading ">
+									<div aria-controls="subsection1Content_int" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider slds-theme--alt-inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection1_int">
+										<b><span id="subicon1_int" class="slds-m-horizontal--x-small slds-text-heading--small slds-theme--alt-inverse">[+]</span>
+										</b>
+										<span id="subname1_int" class="slds-truncate" title="Accordion summary">Add Interaction</span>
+									</div>
+								</h3>
+							</div>
+							<div aria-hidden="true"  class="slds-hide" id="subsection1Content_int">
+								<div class="slds-p-horizontal--small">
+									<div class="slds-grid slds-wrap slds-grid--pull-padded">
+										
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="intDetailForm" name="disposition" label="Disposition" value="{!v.selectedDisp}" required="true" onchange="{!c.getDpndntPkl}" >
+													<option value="">-- Select Disposition --</option>
+													<aura:iteration items="{!v.lstDisposition}" var="strDisp">
+														<option value="{!strDisp}" text="{!strDisp}" selected="{!v.selectedDisp == strDisp}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="intDetailForm" name="subdisposition" label="Sub Disposition" value="{!v.selectedSubDisp}" required="true" onchange="{!c.chSubDisp}" >
+													<option value="">-- Select Sub-Disposition --</option>
+													<aura:iteration items="{!v.lstSubDisposition}" var="strSubDisp">
+														<option value="{!strSubDisp}" text="{!strSubDisp}" selected="{!v.selectedSubDisp == strSubDisp}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:select aura:id="intDetailForm" name="channel" label="Channel" value="{!v.selectedChannel}" >
+													<option value="">-- Select Channel --</option>
+													<aura:iteration items="{!v.lstChannel}" var="strChannel">
+														<option value="{!strChannel}" text="{!strChannel}" selected="{!v.selectedChannel == strChannel}"></option>
+													</aura:iteration>
+												</lightning:select>
+											</div>
+										</div>
+                                        <aura:if isTrue="{!v.shwMeetInp}">
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input aura:id="intDetailForm" name="Location" value="{!v.location}" label="Appointment Location" placeholder="Appointment Location" required="{!v.shwMeetInp}" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="datetime" aura:id="intDetailForm" name="appointmentStart" value="{!v.appStartTime}" label="Appointment Start" placeholder="Appointment Start" messageWhenPatternMismatch="Please select post dated appointment start time" required="{!v.shwMeetInp}" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="datetime" aura:id="intDetailForm" name="appointmentEnd" value="{!v.appEndTime}" label="Appointment End" placeholder="Appointment End" messageWhenPatternMismatch="Please select post dated or post start appointment end time" required="{!v.shwMeetInp}" />
+                                                </div>
+                                            </div>
+                                            <!--EndDateTime-->
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input aura:id="intDetailForm" name="subject" value="{!v.subject}" label="Appointment Subject" placeholder="Appointment Subject" required="{!v.shwMeetInp}" />
+                                                </div>
+                                            </div>
+                                            <!--Description-->
+                                        </aura:if>
+										<div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+											<div class="slds-form-element__control">
+												<lightning:textarea aura:id="intDetailForm" name="Comments" value="{!v.comments}" label="Comments" placeholder="Enter Comments" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+									<div class="slds-p-around--x-small slds-align_absolute-center">
+										<lightning:button aura:id="intDetailsId" class="slds-theme--alt-inverse" variant="brand" label="Save" onclick="{!c.saveInteraction}" />
+									</div>
+								</div>
+							</div>
+						</section>
+					</li>
+					<li class="slds-accordion__list-item">
+						<section class="slds-accordion__section">
+							<div class="slds-accordion__summary ">
+								<h3 class="slds-text-heading_small slds-accordion__summary-heading ">
+									<div aria-controls="subsection1Content_int" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider slds-theme--alt-inverse" onclick="{!c.toggletab}" style="height:35px;width:100%" id="subsection2_int">
+										<b><span id="subicon2_int" class="slds-m-horizontal--x-small slds-text-heading--small slds-theme--alt-inverse">[+]</span>
+										</b>
+										<span id="subname2_int" class="slds-truncate" title="Accordion summary">Previous Interaction</span>
+									</div>
+								</h3>
+							</div>
+							<div aria-hidden="true"  class="slds-hide" id="subsection2Content_int">
+									<aura:if isTrue="{!v.interactionLst.length > 0}">
+										<aura:iteration items="{!v.interactionLst}" var="int">
+													<div class=" slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+														<lightning:card>
+														<div class="slds-box" >
+															<!-- <dl class="slds-list_horizontal slds-wrap"> -->
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Date"><b>Date:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.CreatedDate}">{!int.CreatedDate}</dd>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Disposition"><b>Disposition:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.FOS_Disposition__c}">{!int.FOS_Disposition__c}</dd>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Sub Disposition"><b>Sub Disposition:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.FOS_Subdisposition__c}">{!int.FOS_Subdisposition__c}</dd>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Channel"><b>Channel:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.Meeting_Type__c}">{!int.Meeting_Type__c}</dd>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Summary"><b>Summary:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.Summary__c}">{!int.Summary__c}</dd>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                                        <dt class="slds-item_label slds-text-color_weak " title="Calendar"><b>Calendar:</b></dt>
+																	</div>
+                                                                    <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                                        <dd class="slds-item_detail " title="{!int.calendarData}">{!int.calendarData}</dd>
+																	</div>
+																</div>
+														</div>
+														</lightning:card>
+													</div>
+										</aura:iteration><br/>
+										<aura:set attribute="else">
+											<ui:message severity="warning" closable="false">
+												<lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+												<ui:outputText class="slds-text-heading--label" value="No records found currently"/>
+											</ui:message>
+										</aura:set>
+									</aura:if>
+							</div>
+						</section>
+					</li>
+				</ul>
+				</lightning:tab>
+				<!-- Product Details -->
+				<lightning:tab onactive="{!c.setTabData}" label="Products" class="" title="Products" id="3">
+					<!-- <lightning:overlayLibrary aura:id="overlayLib"/>
+    				<lightning:button name="modal" label="Show Modal" onclick="{!c.handleShowModal}"/> -->
+					<!--Product Details -->
+					<!-- <aura:if isTrue="{!v.isModalOpen}">     
+                    	<lightning:container src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BALIC-eTouch/index.html')}" />
+                    </aura:if> -->
+					<div id="subsection1Content_prod">
+                        
+						<aura:if isTrue="{!v.PaginationList.length > 0}">
+                            <aura:iteration items="{!v.PaginationList}" var="prod">
+                        <!-- <aura:if isTrue="{!v.insWalletList.length > 0}">
+                            <aura:iteration items="{!v.insWalletList}" var="prod"> -->
+                                <div class=" slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                                    <lightning:card>
+                                        <div class="slds-box" >
+                                            <!-- <dl class="slds-list_horizontal slds-wrap"> -->
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak " title="Insurance Category"><b>Insurance Category:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!prod.Insurance_Category__c}">{!prod.Insurance_Category__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak " title="Insurance Product"><b>Insurance Product:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!prod.Recommended_Product_1__c}">{!prod.Recommended_Product_1__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak " title="Pre-Approved Sum Assured"><b>Pre-Approved Sum Assured:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!prod.Existing_Sum_Assured_Grp__c}">{!prod.Existing_Sum_Assured_Grp__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak " title="Pre-Approved Premium"><b>Pre-Approved Premium:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!prod.Premium_1Amount__c}">{!prod.Premium_1Amount__c}</dd>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_4-of-12">
+                                                    <dt class="slds-item_label slds-text-color_weak " title="Pre-Approved Term"><b>Pre-Approved Term:</b></dt>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2 slds-large-size_8-of-12">
+                                                    <dd class="slds-item_detail " title="{!prod.Policy_Term_in_Yrs__c}">{!prod.Policy_Term_in_Yrs__c}</dd>
+                                                </div>
+												<div class="slds-p-top--xx-small">
+													<lightning:button variant="brand" label="Product Features" aura:id="prodDetailsId" value = "{!(prod.Recommended_Product_1__c+'|'+prod.Id)}" onclick="{!c.getProdFeatures}" class="slds-theme--alt-inverse " title="Product Features" >
+														<lightning:icon iconName="utility:description" title="Product Features" size="small" variant="inverse"/>
+													</lightning:button>
+													
+													<lightning:button variant="brand" label="Email Product" aura:id="prodDetailsId" value = "{!(prod.Recommended_Product_1__c+'|'+prod.Id)}" onclick="{!c.sendInsProductDetails}" class="slds-theme--alt-inverse " title="Email Product" >
+														<lightning:icon iconName="utility:email" title="Email Product" size="small" variant="inverse"/>
+													</lightning:button>
+												</div>
+                                            </div>
+                                        </div>
+                                    </lightning:card>
+                                </div>
+                            </aura:iteration><br/>
+                            <aura:set attribute="else">
+                                <ui:message severity="warning" closable="false">
+                                    <lightning:icon iconName="utility:info" variant="warning"/>&nbsp;
+                                    <ui:outputText class="slds-text-heading--label" value="No records found currently"/>
+                                </ui:message>
+                            </aura:set>
+							<lightning:buttonGroup class="slds-align_absolute-center">
+								<lightning:button class="slds-theme--alt-inverse" label="Previous" disabled="{!v.startPage == 0}"  
+												  onclick="{!c.previous}" variant="brand" iconName='utility:back'/> &nbsp; &nbsp; &nbsp;
+								<lightning:button class="slds-theme--alt-inverse" label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+												  onclick="{!c.next}" variant="brand" iconName='utility:forward' iconPosition='right' />
+								
+							</lightning:buttonGroup>
+							
+							<div class="slds-align_absolute-center slds-text-body_regular">
+								Page {!v.currentPage} of {!v.totalPages}
+							</div>
+                        </aura:if>
+                    </div>
+				</lightning:tab>
+			</lightning:tabset>
+           		</div>
+        </aura:if>
+	</ui:scrollerWrapper>
+    
+</aura:component>

@@ -1,0 +1,360 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" 
+                access="global" controller="PropertyMCPController" >
+    
+    <ltng:require scripts="{!$Resource.jquery224}"  />
+    
+    <aura:attribute name="LoanId" type="ID" />
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="PDObj" type="ID" />
+    <aura:attribute name="isReadOnly" type="Boolean" default="" />
+    <aura:attribute name="spinnerFlag" type="Boolean" default="false"/>
+    <aura:attribute name="PDDList" type="Personal_Discussion_Details__c[]" />
+    <aura:attribute name="PDDListtest" type="Personal_Discussion_Details__c[]" /> <!--added by amar for mcp msg -->
+    <aura:attribute name="PDD" type="Personal_Discussion_Details__c" default="{'sobjectType':'Personal_Discussion_Details__c',Acquisition__c:'',Approach_Road_in_ft__c:'',
+                                                                              Area_of_Property_Commercial_in_sqft__c:'',Area_of_Property_Resi_MixedUsage_sqft__c:'',Jurisdiction__c:'',
+                                                                              No_of_Tenants_rental_income__c:'',Property_MCP_Result__c:'',Property_Name__c:'',Title_Deed__c:'',
+                                                                              Value_of_Property_in_Lakhs__c:'',Loan_Application__c:'',BLSE_property_remarks__c:'',Type_Of_Property_MCP__c:''}"/>
+    <c:Custom_Toast_Mobility />
+    <c:LoaderForMobility />
+    <aura:attribute name="PDDoldChange" type="Personal_Discussion_Details__c" default="{'sobjectType':'Personal_Discussion_Details__c',Acquisition__c:'',Approach_Road_in_ft__c:'',
+                                                                                       Area_of_Property_Commercial_in_sqft__c:'',Area_of_Property_Resi_MixedUsage_sqft__c:'',Jurisdiction__c:'',
+                                                                                       No_of_Tenants_rental_income__c:'',Property_MCP_Result__c:'',Property_Name__c:'',Title_Deed__c:'',
+                                                                                       Value_of_Property_in_Lakhs__c:'',Type_Of_Property_MCP__c:''}"/>
+    
+    
+    <aura:attribute name="isChangedPDD" type="Boolean" default="false"/>
+    <aura:attribute name="StageName" type="String" />
+    <aura:attribute name="TypeOfpropertyList" type="List"/>
+    <aura:attribute name="AreaOfpropCommList" type="List"/>
+    <aura:attribute name="AquisitionList" type="List"/>
+    <aura:attribute name="NoTenantList" type="List"/>
+    <aura:attribute name="ValueOfPropList" type="List"/>
+    <aura:attribute name="AreaOfPropResiList" type="List"/>
+    <aura:attribute name="TitleDeedList" type="List"/>
+    <aura:attribute name="ApproachRdList" type="List"/>
+    <aura:attribute name="JurisdictnList" type="List"/>
+    <aura:attribute name="MCPResultList" type="List"/>
+    <aura:attribute name="EditableFlag" type="Boolean" default="true"/>
+    <aura:attribute name="showExtraValue" type="String" default=" "/>
+    <aura:attribute name="flag" type="boolean" default="true"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:if isTrue="{!v.flag}">
+        <div id="modal-to-closeid">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large slds-backdrop slds-backdrop_open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header" style="background:rgb(0, 112, 210)">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            <span style="color:white">
+                                Property Details Section  
+                            </span>
+                        </h2>
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.CloseEverything}">
+                            X
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+                    
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">      
+                        <article class="slds-card slds-m-left_xx-small slds-m-right_xx-small slds-m-top_xx-small slds-m-bottom_medium">
+                            <div id="id-property-edit" tabindex="0" aura:id="id-property-edit">
+                                <h1 class="slds-section-title--divider" style="background:rgb(0, 112, 210)">
+                                    <span style="color:white">
+                                        Property Details 
+                                    </span>
+                                </h1>
+                            </div>
+                            <aura:if isTrue ="{!v.EditableFlag == false}">				
+                                <div  class="slds-grid slds-wrap" style=" background: rgb(243, 242, 242)">
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:select aura:id="degree" name="degree" label="Type Of Property" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Type_Of_Property_MCP__c}" onchange = "{!c.areaOfPropertyVisibility}" >
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.TypeOfpropertyList}" var="TypeOfproperty">
+                                                <option value="{!TypeOfproperty}" text="{!TypeOfproperty}" selected="{!v.PDD.Type_Of_Property_MCP__c == degree}" ></option>
+                                            </aura:iteration>
+                                        </lightning:select>  
+                                    </div>
+                                    <div aura:id = "DivAreaOfComm" class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12" >
+                                        <lightning:select aura:id="AreaCommercial" name="AreaCommercial" label="Area of Property Commercial (in sqft)" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Area_of_Property_Commercial_in_sqft__c}">
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.AreaOfpropCommList}" var="AreaOfpropComm">
+                                                <option value="{!AreaOfpropComm}" text="{!AreaOfpropComm}" selected="{!v.PDD.Area_of_Property_Commercial_in_sqft__c == AreaCommercial}" ></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="Aquisition" name="Aquisition" label="Acquisition" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Acquisition__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.AquisitionList}" var="AquisitionLst">
+                                                    <option value="{!AquisitionLst}" text="{!AquisitionLst}" selected="{!v.PDD.Acquisition__c == Aquisition}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="NoTenant" name="NoTenant" label="No of Tenants-rental income" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.No_of_Tenants_rental_income__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.NoTenantList}" var="NoTenantLst">
+                                                    <option value="{!NoTenantLst}" text="{!NoTenantLst}" selected="{!v.PDD.No_of_Tenants_rental_income__c == NoTenant}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input type="Number" label="Value of Property (in Lakhs)" aura:id="ValofProp" name="ValofProp" pattern="[0-9-,]*" required = "true" value="{!v.PDD.Value_of_Property_in_Lakhs__c}"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-m-around_xx-small"></div>
+                                        <div class="slds-form-element__control" aura:id = "DivAreaOfPropResi">
+                                            <lightning:select aura:id="AreaOfPropResi" name="ValueOfProp" label="Area of Property -Residential/Mixed Usage(in sq ft)" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Area_of_Property_Resi_MixedUsage_sqft__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.AreaOfPropResiList}" var="AreaOfPropResilst">
+                                                    <option value="{!AreaOfPropResilst}" text="{!AreaOfPropResilst}" selected="{!v.PDD.Area_of_Property_Resi_MixedUsage_sqft__c == AreaOfPropResi}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="TitleDeed" name="TitleDeed" label="Title Deed" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Title_Deed__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.TitleDeedList}" var="TitleDeedLst">
+                                                    <option value="{!TitleDeedLst}" text="{!TitleDeedLst}" selected="{!v.PDD.Title_Deed__c == TitleDeed}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="ApproachRd" name="ApproachRd" label="Approach Road (in ft)" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Approach_Road_in_ft__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.ApproachRdList}" var="ApproachRdlst">
+                                                    <option value="{!ApproachRdlst}" text="{!ApproachRdlst}" selected="{!v.PDD.Approach_Road_in_ft__c == ApproachRd}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="Jurisdictn" name="Jurisdictn" label="Jurisdiction" required="true" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Jurisdiction__c}">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.JurisdictnList}" var="Jurisdictnlst">
+                                                    <option value="{!Jurisdictnlst}" text="{!Jurisdictnlst}" selected="{!v.PDD.Jurisdiction__c == Jurisdictn}"  ></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div> 
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:textarea label="BLSE Property Remarks" aura:id="PropRemarks" name="PropRemarks" value="{!v.PDD.BLSE_property_remarks__c}" />
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <aura:if isTrue = "{!v.showExtraValue == 'true'}">
+                                                <lightning:select aura:id="PropMCP" name="PropMCP" label="Property MCP Result" messageWhenValueMissing="Please Select Value" value="{!v.PDD.Property_MCP_Result__c}">
+                                                    <option value="">-- None --</option>
+                                                    <aura:iteration items="{!v.MCPResultList}" var="MCPResultLst">
+                                                        <option value="{!MCPResultLst}" text="{!MCPResultLst}" selected="{!v.PDD.Property_MCP_Result__c == PropMCP}"  ></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </aura:if>
+                                            <aura:if isTrue = "{!v.showExtraValue == 'false'}">
+                                                <lightning:input label="Property MCP Result" aura:id="PropMCP1" name="PropMCP1" value="{!v.PDD.Property_MCP_Result__c	}" disabled="true" />
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-form-element slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <aura:if isTrue = "{!or(v.PDD.Property_MCP_Result__c == 'MCP FAIL',v.PDD.Property_MCP_Result__c == 'Error')}">
+                                                <lightning:textarea label="Reason For Failure" aura:id="ReasonForFAil" name="ReasonForFAil" value="{!v.PDD.Property_MCP_fail_reason__c}" disabled="true" />
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-align_absolute-center slds-col slds-form-element slds-is-required slds-m-horizontal--medium slds-size--1-of-1 ">
+                                        <lightning:button aura:id="submitButtonId" class="slds-m-around_x-small slds-button slds-button--brand" onclick="{!c.submitDetails}" label="Submit Details" title="Submit data">
+                                        </lightning:button>
+                                        <lightning:button aura:id="cancelbtn" class="slds-m-around_x-small slds-button slds-button--brand" onclick="{!c.cancelDetails}" label="Cancel" title="Add new property"></lightning:button>
+                                    </div>
+                                </div> 
+                            </aura:if>
+                            
+                            
+                            <aura:if isTrue ="{!v.EditableFlag}">				
+                                <div class="slds-grid slds-wrap" style=" background: rgb(243, 242, 242)">
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Type Of Property"  value="{!v.PDD.Type_Of_Property_MCP__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Area of Property Commercial (in sqft)"  value="{!v.PDD.Area_of_Property_Commercial_in_sqft__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Acquisition"  value="{!v.PDD.Acquisition__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="No of Tenants-rental income"  value="{!v.PDD.No_of_Tenants_rental_income__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Value of Property (in Lakhs)"  value="{!v.PDD.Value_of_Property_in_Lakhs__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Area of Property -Residential/Mixed Usage(in sq ft)"  value="{!v.PDD.Area_of_Property_Resi_MixedUsage_sqft__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Title Deed"  value="{!v.PDD.Title_Deed__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Approach Road (in ft)"  value="{!v.PDD.Approach_Road_in_ft__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Jurisdiction"  value="{!v.PDD.Jurisdiction__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="Property MCP Result"  value="{!v.PDD.Property_MCP_Result__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:input  label="BLSE Property Remarks"  value="{!v.PDD.BLSE_property_remarks__c}" disabled="true"/>
+                                    </div>
+                                    
+                                    <div class="slds-col slds-form-element slds-col slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <aura:if isTrue = "{!v.PDD.Property_MCP_Result__c == 'MCP FAIL'}">
+                                            <lightning:textarea label="Reason For Failure" aura:id="ReasonForFAil" name="ReasonForFAil" value="{!v.PDD.Property_MCP_fail_reason__c}" disabled="true" />
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </aura:if> 
+                        </article>
+                        
+                        
+                        <article class="slds-card slds-m-around_xx-small">
+                            <h1 class="slds-section-title--divider" style="background:rgb(0, 112, 210)">
+                                <span style="color:white">
+                                    Added Property Details
+                                </span>
+                            </h1>
+                            
+                            
+                            <div class="slds-grid slds-wrap" style=" background: rgb(213, 204, 204)">  
+                                <div class="slds-scrollable" style="width: 100%;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" >
+                                        <thead >
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-top_xxx-small .slds-align_absolute-center slds-p-left_xx-large" title="Property Name">Property Name</div>
+                                                </th>
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-left_large" title="Type of Property">Type of Property</div>
+                                                </th>
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-left_large wrap-class" title="Area of Property-Residential/Mixed Usage">Area of Property - Residential/Mixed Usage</div>
+                                                </th> 
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-left_large wrap-class" title="Area of Property-Commercial">Area of Property-Commercial</div>
+                                                </th>     
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-left_large wrap-class" title="Value of Property">Value of Property(in Lakhs)</div>
+                                                </th> 
+                                                <th class="" scope="col" style=" background: rgb(236, 230, 230)">
+                                                    <div class="slds-truncate slds-p-left_large" title="Property MCP Result">Property MCP Result</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        
+                                        
+                                        <tbody>
+                                            <aura:if isTrue="{!and(v.PDDList!=NULL,v.PDDList.length>0)}">
+                                                <aura:iteration items="{!v.PDDList}" var="PDDlst">
+                                                    <tr class="slds-hint-parent datarow">
+                                                        <th data-label="Property Name" scope="row" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                            <div class="slds-truncate slds-p-top_xxx-small .slds-align_absolute-center slds-p-left_xx-large " >
+                                                                <a href="javascript:void(0)" onclick="{!c.showOnUpdateSection}" id='{!PDDlst.Id}'>  
+                                                                    {!PDDlst.Name}
+                                                                </a> 
+                                                            </div>
+                                                        </th>
+                                                        <td data-label="Type of Property" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                            <div class="slds-truncate slds-p-left_large " >{!PDDlst.Type_Of_Property_MCP__c}</div>
+                                                        </td>
+                                                        <td data-label="Area of Property-Residential/Mixed Usage" style=" background: rgb(243, 242, 242)" class="dataCell"> 
+                                                            <div class="slds-truncate slds-p-left_large" >{!PDDlst.Area_of_Property_Resi_MixedUsage_sqft__c}</div>
+                                                        </td>
+                                                        <td data-label="Area of Property-Commercial" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                            <div class="slds-truncate slds-p-left_large " >{!PDDlst.Area_of_Property_Commercial_in_sqft__c}</div>
+                                                        </td>
+                                                        <td data-label="Value of Property" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                            <div class="slds-truncate slds-p-left_large"  >{!PDDlst.Value_of_Property_in_Lakhs__c}</div>
+                                                        </td>
+                                                        <aura:if isTrue = "{!PDDlst.Property_MCP_Result__c == 'PASS'}">
+                                                            <td data-label="Property MCP Result" style=" background: rgb(103, 181, 91)" >
+                                                                <div class="slds-truncate slds-p-left_large" >{!PDDlst.Property_MCP_Result__c}</div>
+                                                            </td>
+                                                        </aura:if>
+                                                        <aura:if isTrue = "{!PDDlst.Property_MCP_Result__c == 'FAIL'}">
+                                                            <td data-label="Property MCP Result" style=" background: rgb(198, 88, 88)">
+                                                                <div class="slds-truncate slds-p-left_large" >{!PDDlst.Property_MCP_Result__c}</div>
+                                                            </td>
+                                                        </aura:if>
+                                                        <aura:if isTrue = "{!PDDlst.Property_MCP_Result__c == 'Pending'}">
+                                                            <td data-label="Property MCP Result" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                                <div class="slds-truncate slds-p-left_large" >{!PDDlst.Property_MCP_Result__c}</div>
+                                                            </td>
+                                                        </aura:if>
+                                                        <aura:if isTrue = "{!PDDlst.Property_MCP_Result__c == 'Error'}" >
+                                                            <td data-label="Property MCP Result" style=" background: rgb(243, 242, 242)" class="dataCell">
+                                                                <div class="slds-truncate slds-p-left_large" >{!PDDlst.Property_MCP_Result__c}</div>
+                                                            </td>
+                                                        </aura:if>
+                                                    </tr>
+                                                </aura:iteration>
+                                                
+                                                <aura:set attribute="else">
+                                                    <tr>
+                                                        <td colspan="6">
+                                                            <div class="slds-align_absolute-center slds-text-align_center " >
+                                                                <div class="slds-text-heading_small slds-text-align_center" >
+                                                                    No Records Found!
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>    
+                                                </aura:set>
+                                            </aura:if>
+                                        </tbody>
+                                        
+                                    </table>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <div class="slds-align_absolute-center slds-col slds-m-horizontal--medium slds-size--1-of-1 ">
+                            <aura:if isTrue ="{!v.EditableFlag == false}">
+                                <aura:if isTrue="{!and(v.PDDList!=NULL,v.PDDList.length>0)}">
+                                <lightning:button aura:id="MCPCheckBtn" class="slds-m-around_x-small slds-button slds-button--brand" onclick="{!c.PropertyMCPController}" title="MCP check for properties with Property MCP Result as pending or error">MCP Check
+                                </lightning:button>
+                                </aura:if>
+                            </aura:if>
+                            <lightning:button aura:id="CloseBtn" class="slds-m-around_x-small slds-button slds-button--brand slds-size_xx-small" onclick="{!c.CloseEverything}">Close</lightning:button>
+                        </div>
+                        
+                        <div aura:id="waiting" class="{!v.spinnerFlag == 'true'?'slds-shows':'slds-hide'}">
+                            <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>  
+    </aura:if>
+</aura:component>

@@ -1,0 +1,17 @@
+.THIS.applyMarginToCard {
+    
+}
+
+.THIS.slds-section-title_divider{
+    text-transform: unset;
+    letter-spacing: .0rem;
+}
+
+.THIS .requiredClass {
+    color: #c23934;
+    margin: 0 0.125rem;
+}
+
+/*.THIS input[type="text"]:disabled{
+    background-color:rgb(230, 230, 230);
+}*/

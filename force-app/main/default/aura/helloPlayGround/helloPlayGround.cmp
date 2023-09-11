@@ -1,0 +1,12 @@
+<aura:component >
+    <aura:attribute name="messages" type="List" default="['a','b','c']"/>
+    
+    <h2>List attributes</h2>
+    <p><c:HelloMessage message="{!v.messages[0]}"/></p>
+    <p><c:HelloMessage message="{!v.messages[1]}"/></p>
+    <p><c:HelloMessage message="{!v.messages[2]}"/></p>
+    
+    <aura:iteration items="{!v.messages}" var="msg">
+        <p><c:HelloMessage message="{!msg}"/></p>
+    </aura:iteration>
+</aura:component>

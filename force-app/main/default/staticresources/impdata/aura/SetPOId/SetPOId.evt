@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="productOfferingId" type="String"/>
+    <aura:attribute name="graboffer" type="Boolean"/>
+     <aura:attribute name="assigntotelecaller" type="Boolean"/>
+</aura:event>

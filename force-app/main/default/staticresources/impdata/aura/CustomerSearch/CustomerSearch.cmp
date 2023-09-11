@@ -1,0 +1,90 @@
+<aura:component  controller="SalariedInsuranceCntrl" implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="firstName" type="String"/>
+    <aura:attribute name="LastName" type="String"/>
+    <aura:attribute name="mobileNo" type="String" default=""/>
+    <aura:attribute name="panStr" type="String" default=""/>
+    <aura:attribute name="customerList" type="CUSTOMER_INFO__c[]" default="[]"/>
+    <aura:attribute name="customer" type="CUSTOMER_INFO__c" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="isSearched" type="boolean" default="false"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:registerEvent name="shareSearchInfo" type="c:shareSearchInfo"/>
+    <aura:attribute name="PaginationList" type="List"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    <aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="5"/> 
+    <aura:handler name="shareCustomerInfo" event="c:shareCustomerInfo" action="{!c.handleShareEvent}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    
+    <c:Custom_Toast_Mobility />
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+     <ui:scrollerWrapper >
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="Search" class="applyColor">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small"> 
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">                      
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" aura:id="mobInput" label="Mobile Number" value="{!v.mobileNo}" messageWhenPatternMismatch="Please Enter Valid Mobile Number" maxlength="10"  pattern="^([6789]\d{9})$" messageWhenValueMissing="Please Enter Value" required="true"/>
+                            </div> 
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="custid" label="PAN" aura:id="panInput"  value="{!v.panStr}" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please Enter Valid PAN" messageWhenValueMissing="Please Enter Value" required="true"/>
+                            </div> 
+                        </div>
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center slds-size--1-of-1" align="center" style="float:centre">
+                            <div class="slds-p-around--x-small" align="center">
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="searchButtonId"  variant="brand" label="Search" onclick="{!c.search}"/> 
+                            </div>
+                            <div class="slds-p-around--x-small">
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="clrSearchButtonId"  variant="brand" label="Clear Search" onclick="{!c.clearSearch}" /> 
+                            </div>
+                        </div>                        
+                    </div>    
+                </div>    
+            </p>    
+        </lightning:card>  
+        <!-- <ui:scrollerWrapper > -->         
+       <aura:if isTrue="{!not(empty(v.customerList))}">
+           <lightning:card title="Results" class="applyColor">
+               <c:CustomerSearchResultCmp customerList="{!v.customerList}" PaginationList="{!v.PaginationList}" pageSize="{!v.pageSize}" totalPages="{!v.totalPages}" totalRecords="{!v.totalRecords}" startPage="{!v.startPage}" endPage="{!v.endPage}" currentPage="{!v.currentPage}"/>  
+               <!-- <c:CustomerSearchResultCmp customerList="{!v.customerList}" /> -->
+            </lightning:card>           
+        </aura:if>
+        <aura:if isTrue="{!and(empty(v.customerList),v.isSearched)}" >
+               <div class="slds-text-heading_medium">No records found !!</div> 		
+           </aura:if>
+        <!--</ui:scrollerWrapper>-->
+        <aura:if isTrue="{!v.isSearched}">
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large slds-grid_align-center slds-size--1-of-1" align="center" style="float:centre">
+                        <div class="slds-p-around--x-small" align="center">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="submitButtonId"  variant="brand" label="Submit" onclick="{!c.handleSubmit}" disabled="{!or((empty(v.customerList)),!v.customer.Customer_ID__c)}"/> 
+                        </div>
+                        <div class="slds-p-around--x-small">
+                            <lightning:button class="slds-theme_alt-inverse" aura:id="newCustButtonId"  variant="brand" label="New Customer" onclick="{!c.handleNewCust}" /> 
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </aura:if>
+    </div>    
+    </ui:scrollerWrapper>
+    
+</aura:component>

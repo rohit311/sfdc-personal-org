@@ -1,0 +1,38 @@
+.THIS {
+}
+.THIS .header{
+         background:#1C86EE !important;
+         color:#ffffff !important;
+         font-weight:bold !important;
+         font-size:12px !important;
+}
+.THIS .Redclr{
+    background-color:#e50000;
+    
+}
+.THIS .greenclr{
+    background-color:#149414 !important;
+    
+}
+
+.THIS .inlineDisp{
+    float:left;
+    clear:both;    
+}
+
+.THIS .fontsize{
+     font-size: 120%;
+}
+
+.THIS .WrapText
+{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+}
+
+.THIS a {
+text-decoration: none !important;
+}

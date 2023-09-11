@@ -1,0 +1,213 @@
+<!--
+Cmomponent Name: EmployeeOfferPage.cmp
+-->
+
+<aura:component controller="EmployeeLoanAutomationCtrl" implements="flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="performance_report" type="Performance_reports__c"/>
+    <aura:attribute name="isValid" type="Boolean" default="true"/>
+    <aura:attribute name="availedAmount" type="String"/>
+    <aura:attribute name="EmployeeId" type="String"/>
+    <aura:attribute name="loanTenorList" type="String[]"/>  
+    <aura:attribute name="loanTenor" type="String"/>
+    <aura:attribute name="EMITypeValue" type="String"/>
+     <aura:attribute name="EMILabel" type="String"/>
+     <aura:attribute name="TenorLabel" type="String"/>
+    <aura:attribute name="loanTypeList" type="String[]"/>
+    <aura:attribute name="loanType" type="String[]"/>
+    <aura:attribute name="InitialAmount"  type="String"/>
+        <aura:attribute name="hybridFullTenor"  type="String"/>
+    <aura:attribute name="InitialTenor"  type="String" />
+    <aura:attribute name="InitialTenorHybrid"  type="String" default="0"/>
+    <aura:attribute name="ApprovedEMI"  type="String"/>
+    <aura:attribute name="isDetailsAvailable" type="Boolean" default="true"/>
+    <aura:attribute name="Fees"  type="String"/>
+    <aura:attribute name="InitialEMI" type="String"/> 
+    <aura:attribute name="subsequentEMI" type="String"/>
+    <aura:attribute name="pureFlexiTenor" type="String"/>
+    <aura:attribute name="isExit" type="boolean" default="false"/> 
+    <aura:attribute name="isHybrid" type="boolean" default="false"/>
+    <aura:attribute name="schemeObj" type="Scheme_Master__c" default=""/>
+    <aura:attribute name="schemeObjList" type="Scheme_Master__c[]" default=""/>
+    <aura:attribute name="selTabId" type="String"/>
+    <aura:attribute name="rejectReasons" type="List" default=""/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="OppId" type="String"/>
+    <aura:attribute name="laterFlag" type="boolean" default="false"/>
+    <aura:attribute name="mySelectedvalues" type="String" default=" "/>
+    <aura:attribute name="isOfferAvailabel" type="boolean" default="true"/>
+    <aura:attribute name="availedTenor"  type="String"/>
+    
+    <aura:registerEvent name="flowIdToLanding" type="c:flowIdToLanding"/>
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-size--1-of-1">
+        <!-- contact search -->
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+            <div class="slds-text-heading_large Selector slds-align_absolute-center"> Congratulations!! </div>
+            <div class="slds-text-heading_small Selector	slds-align_absolute-center"><ui:outputText value="You are eligible for a Pre-Aproved Loan of RS. "/><ui:outputText class="slds-m-left_x-small" value="{!v.InitialAmount}"/>. </div>
+            
+            
+            <div class="slds-m-top_xx-large">
+                
+                <div class="slds-box" style="background: #f4f6f9;">
+                    <div class="innerDivWrapper">        
+                        <div class="slds-p-horizontal--small">
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded">    
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <Lightning:input  label="Amount" name="Amount" aura:id="Amount" value="{!v.availedAmount}" required="true" disabled="{!!v.isOfferAvailabel}" messageWhenPatternMismatch="Please Enter Valid Amount" pattern="[0-9]*" min="100000" onchange="{!c.resetTenor}"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--8-of-12 slds-medium-size--3-of-6 slds-large-size--4-of-12" style="display:inline-block">
+                                   
+                                    <div class="slds-size--10-of-12" style="display:inline-block">
+                                        <lightning:select aura:id="loanType" label="Loan Type " name="loanType"   messageWhenValueMissing="Please Select Value"  value="{!v.performance_report.Loan_Type__c}" required="true" onchange="{!c.fetchSchemes}" disabled="{!!v.isOfferAvailabel}" >
+                                            <option value="">-- None --</option>
+                                            <aura:iteration items="{!v.loanTypeList}" var="loanType" >
+                                                <option value="{!loanType}" text="{!loanType}"  selected="{!loanType == v.performance_report.Loan_Type__c}"> </option>
+                                            </aura:iteration>
+                                            
+                                        </lightning:select>
+                                        
+                                    </div>
+                                    <div style="display:inline-block">
+                                        <a  style="padding-left:10px;padding-right:5px;  font: bold; color: orange ; font-size: 200%;" class="  " onclick="{!c.showInfoMessage}"  id="search" href="" >
+                                            ?
+                                        </a>
+                                    </div>
+                                </div>
+                                <div style="float:right">
+                                </div>
+                                
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <Lightning:input  label="Rate (%)" name="Rate" aura:id="Rate" value="{!v.performance_report.Rate__c}" required="true" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <Lightning:input  label="Fees (%)" name="Fees" aura:id="Fees" value="{!v.Fees}" required="true" disabled="true"/>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!!v.isHybrid}">
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="loanTenor" name="loanTenor" label="{!v.TenorLabel}" onchange="{!c.tenorChanged}"  messageWhenValueMissing="Please Select Value"  value="{!v.loanTenor}" required="true" disabled="{!!v.isOfferAvailabel}">
+                                                <option value="" text="--None--"></option>
+                                                <aura:iteration items="{!v.loanTenorList}" var="loanTenor">
+                                                    <option value="{!loanTenor}" text="{!loanTenor}" selected="{!v.loanTenor == v.loanTenor}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <Lightning:input  label="{!v.EMILabel}" name="EMI" aura:id="EMI" value="{!v.EMITypeValue}" required="true" disabled="true"/>
+                                            
+                                        </div>
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!v.isHybrid}">
+                                                                        <!--added later-->
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="hybridloanTenor" name="loanTenor" label="Total Tenor" onchange="{!c.tenorChanged}"   messageWhenValueMissing="Please Select Value"  value="{!v.hybridFullTenor}" required="true" disabled="{!!v.isOfferAvailabel}">
+                                              
+										    <aura:iteration items="{!v.loanTenorList}" var="loanTenor">
+                                                    <option value="{!loanTenor}" text="{!loanTenor}" selected="{!loanTenor == v.hybridFullTenor}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    <!--added later-->
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            
+                                            <lightning:input aura:id="loanTenorSub" name="loanTenor" label="Subsequent Tenor"   messageWhenValueMissing="Please Select Value"  value="{!v.loanTenor}"  required="true" disabled="true">
+                                              
+                                            </lightning:input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="InitialTenorHybrid" name="InitialTenorHybrid" label="Pure Flexi Tenor"   onchange="{!c.initialTenorChanged}" messageWhenValueMissing="Please Select Value"  value="{!v.InitialTenorHybrid}" required="true" disabled="{!!v.isOfferAvailabel}">
+                                                <option value="--None--" text="--None--"></option>
+                                                    <option value="12" text="12" ></option>
+                                                    <option value="18" text="18" ></option>
+                                                    <option value="24" text="24" ></option>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <Lightning:input  label="Sub sequent EMI" name="Fees" aura:id="Fees" value="{!v.subsequentEMI}" required="true" disabled="true"/>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <Lightning:input  label="EMI for Pure Flexi Duration" name="Fees" aura:id="EMIloanTenor" value="{!v.InitialEMI}" required="true" disabled="true" />
+                                            
+                                        </div>
+                                    </div>
+                                    
+                                </aura:if>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning:card>
+        
+        <lightning:card title="" class="applyMarginToCard slds-section-title--divider applyColor " >
+            <aura:if isTrue="{!!(v.performance_report.Offer_converted__c)}">   
+                <aura:if isTrue ="{!!(v.laterFlag)}">
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="AvailButtonId" iconName="utility:search" variant="brand" label="Avail Offer"  onclick="{!c.navigateToDetailsTab}" disabled="{!!v.isOfferAvailabel}"/>
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="AvailLaterButtonId" iconName="utility:search" variant="brand" label="Avail Later"  onclick="{!c.SetLaterFlag}" disabled="{!!v.isOfferAvailabel}"/>
+                    <!--<lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId" iconName="utility:search" variant="brand" label="Save details"  onclick="{!c.saveLoanDetails}" />-->
+                </aura:if>
+            </aura:if>
+            <aura:if isTrue="{!!v.performance_report.Offer_converted__c}">
+                <aura:if isTrue="{!(v.laterFlag)}">
+                    
+                    <div class="slds-size_1-of-2">
+                  <c:MultiSelectPicklist aura:id="mymultiselect" options="{!v.rejectReasons}" mySelectedvalues="{!v.mySelectedvalues}" Label="Decline Reason" />
+                    </div>
+                    
+                    
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="Save" iconName="utility:search" variant="brand" label="Save"  onclick="{!c.Save}" />
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="Cancel" iconName="utility:search" variant="brand" label="Cancel"  onclick="{!c.Cancel}" />    
+                </aura:if>
+            </aura:if>
+        </lightning:card>
+        
+    </div>
+    
+    <div aura:id="overrideModalbox1" class="slds-hide slds-align_absolute-center slds-p-around--small borderColor" id="dummyId">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="{!$Browser.isIOS == true ? 'slds-modal slds-fade-in-open slds-modal_large  slds-align_absolute-center slds-border_bottom slds-border_top slds-border_left slds-border_right align-dashboard borderColor':'slds-modal slds-fade-in-open slds-modal_large slds-is-absolute slds-align_absolute-center slds-border_top slds-border_left slds-border_right borderColor'}" style="position: fixed;">
+            <div class="slds-modal__container borderColor">
+                <div style="position:relative">
+                    <div class="innerDivWrapper">  
+                        <div class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12 alignModal':' slds-align_absolute-center slds-modal__content slds-p-around--medium slds-is-relative xcs-fix-max-height slds-size--8-of-12'}" style="margin-bottom: 0px;margin-top: 0px; height: 230px; ">
+                            <div class="slds-p-around--medium slds-m-top_large">
+                                <span class="WrapText"> <b>Term Loan</b> is a simple Personal Loan product offered to salaried individuals where interest is calculated on reducing balance years. It also allows pre-payment &amp; foreclosure post first EMI clearance.<br/></span>
+                                <span class="WrapText">	<b>Flexi Term</b> Loan gives you the flexibility to pre-pay with surplus funds and save interest. You can withdraw the eligible amount at any time within the loan tenure without any additional documentation/charges <br/></span>
+                                <span class="WrapText">	<b>Flexi Hybrid</b> Loan is a unique lending facility where you only pay interest for the initial tenure of the loan and interest + principle   for the subsequent tenure. This loan also gives you the flexibility to pre-pay with surplus funds and save interest" <br/></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="{!$Browser.isIOS == true ? 'slds-modal__footer slds-size--8-of-12 slds-align_absolute-center alignModal':' slds-modal__footer slds-size--8-of-12 slds-align_absolute-center'}" style="margin-bottom: 0px;margin-top: 0px; height: 50px">
+                    
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeMessage}">Ok</button>
+                    
+                </div>
+            </div>
+            
+        </div>
+        <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+    </div>
+</aura:component>

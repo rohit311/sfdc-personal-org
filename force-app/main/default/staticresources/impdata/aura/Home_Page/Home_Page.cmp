@@ -1,0 +1,202 @@
+<aura:component extends="forceCommunity:navigationMenuBase" implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="SALMobilityCntrl_V2">
+    <ltng:require styles="/resource/SLDS/assets/styles/lightning-design-system-ltng.css'}"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+    <aura:attribute name="theme" type="String"/>
+    <aura:attribute name="profileName" type="String"/>
+    <!--1649-->
+    <aura:attribute name="showPsf" type="Boolean" default=""/>
+    <!--<aura:attribute name="searchFlag" type="String"/>
+<aura:attribute name="myPOFlag" type="String"/>
+<aura:attribute name="myAppFlag" type="String"/>
+<aura:attribute name="newLAFlag" type="String"/>-->
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="homeFlag" type="Boolean" default="true"/>
+    <aura:handler event="c:navigateToParent" action="{!c.setDisplay}"/>
+    <aura:handler event="c:changeDiaryColor" action="{!c.getDiaryColor}"/><!--added for bug id 19263 -->
+    <ui:scrollerWrapper class="scrollerSize">
+        <div style="position:relative">
+            <div class="innerDivWrapper">
+                <c:LoaderForMobility />
+                <c:Custom_Toast_Mobility />
+                <aura:if isTrue="{!v.homeFlag}">
+                    <div >
+                        <div style="background-color:white">
+                            <img src="{!$Resource.BajajLogoIns}" class="slds-align_absolute-center "/>
+                        </div>
+                        <div class="slds-grid slds-align_absolute-center borderColor">
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a id="search" onclick="{!c.navigateToSearch}" href="" style="text-decoration: none;">
+                                    <lightning:card aura:id="seachTile" title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small " >
+                                        <lightning:icon iconName="utility:search" size="large" variant="inverse"/>
+                                        <p>
+                                            Search
+                                            <div class="slds-hidden">hi</div>
+                                        </p>
+                                    </lightning:card>
+                                </a>
+                            </div>
+                            
+                            <div class="slds-col slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a onclick="{!c.navigateToMyPO}" href="" style="text-decoration: none;">
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small ">
+                                        <lightning:icon iconName="utility:favorite" size="large" variant="inverse"/>
+                                        <p>
+                                            My Product 
+                                            <div>Offerings</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-align_absolute-center">
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a onclick="{!c.myApps}" href="" style="text-decoration: none;">
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon iconName="utility:description" size="large" variant="inverse"/>
+                                        <p>
+                                            My Applications
+                                            <div class="slds-hidden">hi</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>
+                            </div>
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a  onclick="{!c.navigatetoClonePage}" style="text-decoration: none;"><!--Changed onclickfunction for Bug 23577-->  
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon iconName="utility:edit_form" size="large" variant="inverse"/>
+                                        <p>
+                                            New Loan 
+                                            <div>Application</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>
+                            </div>
+                            
+                        </div>
+                        <div class="slds-grid slds-align_absolute-center">
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a  onclick="{!c.goToBOT}" style="text-decoration: none;">
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon iconName="standard:bot" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                        <p>
+                                            Learning &amp; Development
+                                            <div>BOT</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>	
+                            </div>
+                            <!--Bug 22624 Start - Hrushikesh Sprint 5C -->
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a  onclick="{!c.goToServiceBOT}" style="text-decoration: none;">
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon iconName="standard:bot" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                        <p>
+                                            Service 
+                                            <div>BOT</div>
+                                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                                <div class="slds-hidden">hi</div>
+                                            </aura:if>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>	
+                            </div>
+                            <!--Bug 22624 Stop - Hrushikesh Sprint 5C -->
+                        </div>
+                        <!--Tile added by swapnil Bug id 19263 -->
+                        <div class="slds-grid slds-align_absolute-center">  
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12" >
+                                <a  onclick="{!c.navigateToReferral}" style="text-decoration: none;">
+                                    <lightning:card title="" aura:id='diary' class="borderblueColor slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon class="" iconName="utility:description" size="large" variant=""/>
+                                        <p>
+                                            
+                                            Diary
+                                            <div class="slds-hidden">hi</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>
+                            </div>                
+                        
+                        <!--Bug 23064 Start-->
+                        
+                        <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                            <a  onclick="{!c.SOLDashboard}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                    <lightning:icon iconName="utility:user" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                    <p>
+                                        Business 
+                                        <div>Dashboard</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>	
+                        </div>
+                           
+                    </div>
+                    <!--Bug 23064 Stop--> 
+                    <div class="slds-grid slds-align_absolute-center">  
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                            <a  onclick="{!c.navigateToHelpline}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                    <lightning:icon iconName="utility:help" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                    <p>
+                                        Sales 
+                                        <div>Helpline</div>
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>	
+                        </div>
+                         <!-- 23062 start -->
+                            <div class="slds-col  slds-size_1-of-2 slds-large-size--3-of-12">
+                                <a  onclick="{!c.CreateCrossSellCmp}" style="text-decoration: none;">
+                                    <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                        <lightning:icon iconName="standard:account" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                        <p>
+                                            StandAlone CrossSell
+                                            <div>for SAL/PL</div>
+                                        </p>
+                                        
+                                    </lightning:card>
+                                </a>	
+                            </div>
+                            <!-- 23062 stop -->
+
+                                            
+                        
+                        </div>
+                        
+                        <div class="slds-grid slds-align_absolute-center"> 
+                        <!-- US    1649 GAURAV -->
+                     <aura:if isTrue="{!v.showPsf}">
+                        
+                            <div class="slds-size_1-of-2 slds-large-size--3-of-12">
+                            <a onclick="{!c.toPsfData}" style="text-decoration: none;">
+                                <lightning:card title="" class="slds-theme--alt-inverse slds-text-align_center slds-m-around_x-small">
+                                    <lightning:icon iconName="utility:user" size="large" class="slds-theme--alt-inverse" variant="inverse"/>
+                                    <p>
+                                        PSF Loan Data
+                                    </p>
+                                    
+                                </lightning:card>
+                            </a>	
+                        </div>
+                            
+                         </aura:if>  
+                <!--  1649 GAURAV --> 
+                        </div>
+                    </div>
+                </aura:if>
+                {!v.body}
+            </div>
+            
+        </div>
+    </ui:scrollerWrapper>
+</aura:component>

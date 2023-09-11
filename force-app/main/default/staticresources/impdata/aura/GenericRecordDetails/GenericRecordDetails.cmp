@@ -1,0 +1,64 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="GenericRecordDetailsCntrl">
+    
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+      <!-- 23556 S -->
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+    <!-- 23556 E -->
+    <aura:attribute name="isProgressVisible" type="Boolean" default="true"/> <!--bug 17556 -->
+    <!--Changes for POS LA 17664-->
+    <aura:attribute name="insuranceObjList" type="DPLinsurance__c[]" access="global"/>
+    <aura:attribute name="apprInsuranceAmount" type="Decimal" access="global"/>
+    <aura:attribute name="isPosLaFlow" type="Boolean" default="false"/>
+    <aura:handler event="c:PassInsuranceListEvent" action="{!c.assignInsuranceList}"/>
+    <aura:registerEvent name="calculateDisburseAmount" type="c:CalculateDisburseAmountEvent"/>
+        <aura:attribute name="displayReadOnly" type="boolean"/><!-- 20934 added by hrushikesh-->    
+    <aura:attribute name="loanAppID" type="String" default="" description="String holding id of loan application"/>
+    <aura:attribute name="poID" type="String" description="String holding id of PO"/>
+    <aura:attribute name="flow" type="String" description="String holding type of flow" default="OPP"/>
+    <aura:attribute name="showDetailsComponent" type="Boolean" default="false"/>
+<!--Bug 17556 s--> <aura:attribute name="isSalMobilityFlow" type="Boolean" default="true"/> <!-- Bug 17556 e -->
+    <aura:attribute name="FieldList" type="Object[]" description="This contains a list of field configuration"/>
+    <aura:attribute name="IdList" type="String[]" description="This contains a list of id which are used to get records"/>
+	<!--20985 S-->
+    <aura:attribute name="trancheNumberList" type="String[]" description="This contains a list of tranche numbers associated with the opportunity"/>
+	<!--20985 E-->
+    <aura:attribute name="product" type="String"/>
+    
+    <aura:handler event="c:DisableFormEvent" action="{!c.disableInsuranceForm}"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false"/>
+    <aura:attribute name="shouldBeDisable" type="Boolean" />
+    <aura:attribute name="loanStage" type="String" default="nothing"/>
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="PicklistValuesMapping" type="Object"/> <!-- Added for 22181 -->
+    
+    <aura:attribute type="Boolean" name="isDisbDashboard" default="false"/> <!--Bug 20391 -->
+    
+    <!-- 20391 heading ***S*** -->
+    <!-- +-+-+-+-+-+-+ START: Heading part +-+-+-+-+-+-+  -->
+    <aura:if isTrue="{!v.isDisbDashboard == true}">
+		<div class="slds-grid slds-page-header" style="background: rgb(0,114,188);color:white">
+			<h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">Insurance Details</h1>
+		</div>
+    </aura:if>
+	<!-- +-+-+-+-+-+-+ END : Heading part +-+-+-+-+-+-+  -->
+    <!-- 20391 heading ***E*** -->
+    
+    <!-- Start of changes for 22181 -->
+    
+    <aura:if isTrue="{!v.flow != 'ELA'}">
+        <h3 class="slds-section-title--divider">Insurance Details</h3>
+        <div class="slds-p-horizontal--small" style="background: rgb(243, 242, 242);">
+        	<div class="slds-grid slds-wrap slds-grid--pull-padded"></div>                 
+            <aura:if isTrue="{!v.showDetailsComponent == true}" > 
+                
+                <c:DynamicFields  isDisbDashboard = "{!v.isDisbDashboard}" PicklistValuesMapping="{!v.PicklistValuesMapping}" stageName="{!v.stageName}" page="pricing" flow="{!v.flow}" ObjectName="DPLinsurance__c" IdList="{!v.IdList}" FieldList="{!v.FieldList}" isSalMobilityFlow="{!v.isSalMobilityFlow}" isInsurancePosLaFlow="{!v.isPosLaFlow}" posLaApprInsurance="{!v.apprInsuranceAmount}" isReadOnlyPOSLA="{!v.isReadOnly}" product="{!v.product}" recordId="{!v.loanAppID}"/> 
+            </aura:if>
+        </div>
+        <aura:set attribute="else">
+        	<aura:if isTrue="{!v.showDetailsComponent == true}" > 
+                <c:DynamicFields  isDisbDashboard = "{!v.isDisbDashboard}" isCommunityUsr = "{!v.isCommunityUsr}" displayReadOnlyEmployeeLoan="{!v.displayReadOnly}"  PicklistValuesMapping="{!v.PicklistValuesMapping}" stageName="{!v.stageName}" page="pricing" flow="{!v.flow}" ObjectName="DPLinsurance__c" IdList="{!v.IdList}" FieldList="{!v.FieldList}" isSalMobilityFlow="{!v.isSalMobilityFlow}" isInsurancePosLaFlow="{!v.isPosLaFlow}" posLaApprInsurance="{!v.apprInsuranceAmount}" isReadOnlyPOSLA="{!v.isReadOnly}" product="{!v.product}" recordId="{!v.loanAppID}"/> 
+            </aura:if>
+        </aura:set>
+    </aura:if>
+    <!-- End of changes for 22181 -->
+</aura:component>

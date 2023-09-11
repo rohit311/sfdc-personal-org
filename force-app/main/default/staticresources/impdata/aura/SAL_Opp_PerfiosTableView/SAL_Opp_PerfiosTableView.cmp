@@ -1,0 +1,136 @@
+<!-- SAL_Opp_PerfiosTableView -->
+<aura:component controller="SALMobilityCntrl_V2" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+    <aura:attribute name="loan" type="Opportunity" default="{}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="bankAccount" type="Bank_Account__c" default="{'sobjectType': 'Bank_Account__c'}"/>
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:registerEvent name="AddRowEvt" type="c:SAL_Opp_PerfiosEvent"/> 
+    <aura:attribute name="applicantNameList" type="List"/>
+    <aura:attribute name="nameTheme" type="String"/>
+    <aura:attribute name="applicantObj" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="bankNameList" type="List"/>
+    <aura:attribute name="bankAccountList" type="Bank_Account__c[]"/>
+    <aura:attribute name="applicantList" type="Applicant__c[]"/>
+    <aura:attribute name="applicantName" type="String"/>
+    <aura:attribute name="applicantType" type="String"/>
+    <aura:attribute name="datevalidationmsg1" type="String"/>
+    <aura:attribute name="datevalidationmsg2" type="String"/>
+    <aura:attribute name="dateValidationError1" type="Boolean" default="false"/>
+    <aura:attribute name="dateValidationError2" type="Boolean" default="false"/>
+    
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="isFinancialApplicant" type="boolean" default="false"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:handler event="c:UpdatePerfiosList" action="{!c.updateNameList}"/>
+    <aura:method name="validatebank" action="{!c.validatebank}" access="PUBLIC"/> 
+     <aura:method name="isvaliddate" action="{!c.dateUpdate}" access="PUBLIC"/>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_small" >
+    <lightning:card class="applyColor ">
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-horizontal--small">                
+                <a onclick="{!c.toggleAssVersion}" id="{!v.bankAccount.Id }" style="text-decoration: none;">
+                    <aura:if isTrue="{!v.class =='hideCls'}">
+                        <span class="font-weight-bold important-message" id="{!v.bankAccount.Id }">+ </span>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.myid == v.bankAccount.Id}">
+                                <span class=" important-message" id="{!v.bankAccount.Id }">-</span> 
+                                <aura:set attribute="else">
+                                    <span class="floatLeft important-message">+
+                                    </span>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </a>
+                <aura:if isTrue="{!or(v.bankAccount.Id == null,v.bankAccount.Id == '')}">
+                	<button value="" class="slds-m-left_x-small slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!v.displayReadOnly}"> <!-- CR 22307 --> <lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                </aura:if>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">           
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control"> 
+                            <lightning:select aura:id="applicantNameId" class="optionClass" name="applicantName" label="Applicant Name" required="true" messageWhenValueMissing="Please Select Value" value="{!v.bankAccount.Applicant__r.ContactName__c}" onchange="{!c.onApplicantListChange}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.applicantNameList}" var="appName">
+                                    <option value="{!appName}" text="{!appName}" selected="{!v.applicantObj.ContactName__c == appName}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:select aura:id="bankNameList" class="optionClass" name="bankNameList" label="Bank Name" required="true" messageWhenValueMissing="Please Select Value" value="{!v.bankAccount.Bank_Name_List__c}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.bankNameList}" var="bankName">
+                                    <option value="{!bankName}" text="{!bankName}" selected="{!v.bankAccount.Bank_Name_List__c == bankName}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>  
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <label class="slds-form-element__label"> Perfios Flag </label>
+                        <div class="slds-form-element__control">
+                            <lightning:input name="sendEmailName" type="checkbox" label="" checked="{!v.bankAccount.Perfios_Flag__c}" aura:id="sendEmailId" disabled="true"/>
+                        </div>
+                    </div> 
+                    
+                    <div class="{!if(v.myid == v.bankAccount.Id,'slds-show slds-size--12-of-12','slds-hide')}" >
+                        <div class="{!if(v.class == 'showCls','slds-show','slds-hide')}" >
+                            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-horizontal--small">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="bankAccountNameId" label="Applicant Type" value="{!v.bankAccount.Applicant__r.Applicant_Type__c}" name="bankAccountName" disabled="true"/>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="bankAccNo" label="Bank Account Number" value="{!v.bankAccount.Bank_Acct_Number__c}" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid account number" name="bankAccountName" placeholder="Bank Account Number"/>
+                                </div>
+                            </div> 
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <label class="slds-form-element__label"> Send Email for Perfios </label>
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="toggle" aura:id="bankAccountNameId" label="" checked="{!v.bankAccount.Send_Email_For_Perfios__c}" disabled="{!if(and(v.bankAccount.Id != null,v.bankAccount.Send_Email_For_Perfios__c),true,false)}" name="bankAccountName"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input name="startName" type="date" class="{! v.dateValidationError1 ? 'slds-has-error' : ''}" onchange="{!c.dateUpdate}" label="Start Date" value="{!v.bankAccount.Perfios_Start_date__c}" aura:id="startDateId"/>
+                                </div>
+								<aura:if isTrue="{!v.dateValidationError1}">
+									<div class="slds-text-color_error slds-p-left_x-small">
+									{!v.datevalidationmsg1}
+									</div>
+							    </aura:if>  
+                            </div> 
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input name="endName" type="date" class="{! v.dateValidationError2 ? 'slds-has-error' : ''}" onchange="{!c.dateUpdate}" label="End Date" value="{!v.bankAccount.Perfios_end_date__c}" aura:id="endDateId"/>
+                                </div>
+								<aura:if isTrue="{!v.dateValidationError2}">
+									<div class="slds-text-color_error slds-p-left_x-small">
+									{!v.datevalidationmsg2}
+									</div>
+							    </aura:if>  
+                            </div> 
+							<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <lightning:button variant="brand" label="Upload" class="slds-theme--alt-inverse" iconName="" iconPosition="left" onclick="{!c.uploadStatement}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->  
+               				</div> 
+                            <aura:if isTrue="{!and(v.bankAccount.Id != null,v.bankAccount.Id != '')}"> 
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <a href="" onclick="{!c.viewDetails}">View Details</a>
+                            </div> 
+                                </aura:if>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p>
+    </lightning:card>
+    </div>
+</aura:component>

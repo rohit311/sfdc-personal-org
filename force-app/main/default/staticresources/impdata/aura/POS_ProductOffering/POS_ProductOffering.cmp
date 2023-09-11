@@ -1,0 +1,205 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobilePOController">
+    <!--8734:USERSTORY_Disposition to capture response for Partially filled starts -->
+    <aura:attribute name="fieldDisposition1" type="String" default=""/>
+    <aura:attribute name="fieldDispositionStatus" type="String" default=""/>
+    <aura:attribute name="fieldCheckStatus" type="String" default=""/>
+   <!--8734:USERSTORY_Disposition to capture response for Partially filled ends -->
+    <aura:attribute name="poId" type="String" default=""/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="loanId" type="String" default=""/>
+      <!--Bug 24237 S-->
+    <aura:attribute name ="oppStageName" type = "String" default =""/>
+     <!--Bug 24237 E-->  
+     <!-- Bug 24927 S -->
+    <aura:attribute name = "iscpvMandatory" type = "Boolean" default = "true"/>
+    <aura:attribute name="GCOCampaignList" type="String[]" default="[]"/>
+    <!-- Bug 24927 E -->
+    <aura:attribute name="po" type="Product_Offerings__c" default="{'sobjectType':'Product_Offerings__c',Id:'',Alternate_Mobile_No__c:'',Lead__c:'',
+              Lead_Name__c:'',Field_Desposition_Status__c:'',Field_Check_Status__c:'',Field_Disposition_1__c:'',Revised_Offer_Amount__c:'',Offer_Date__c:'',
+              Card_Disposition_Field__c:'',Availed_Amount__c:'',Field_Remarks__c:'',Follow_Up_Date__c:'',Field_Followup_Date__c:'',Lead__r:{}, eKYC_details_changed_flag__c :''}"/>  
+    
+  <!--  <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/> -->
+    <aura:attribute name="spinnerFlag1" type="Boolean" default="false"/>
+    <aura:attribute name="isconvertedPO" type="Boolean" default="false"/>
+    <aura:handler event="c:CustomerSaveEvent" action="{!c.getDetails}"/>
+    
+    <aura:registerEvent name="LoanConversionEvent" type="c:LoanConversionEvent"/>
+    <!-- Bug 22425 CC Code changes SME S -->
+    <aura:attribute name="ccAlert" type="Boolean" default="false"/>
+     <!-- Bug 22425 CC Code changes SME E -->
+    
+    <!--POS YK 16621-->
+    <aura:attribute name="stpNonStp" type="String" default=""/>
+    
+    <!--POS YK 16621-->
+    <aura:handler event="c:POS_StpNonStpFlow" action="{!c.setStpNonStpData}"/>
+    <aura:handler event="c:CC_Data" action="{!c.setccData}"/><!-- US : 2702 -->
+    <aura:attribute name="CkycMandate" type="Boolean" default="true"/><!-- US : 13265-->
+    
+    <div class="disp-container">
+        <ui:scrollerWrapper class="disp-wrapper">
+              <!--<c:POS_Offer_Details />-->
+            <fieldset aura:id="productOfferingDetails" class="slds-form--stacked slds-p-bottom--large"  style="background:rgb(243, 242, 242);">
+                <h3 class="slds-section-title--divider">PRODUCT OFFERING NAME</h3>
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="customerName">Customer Name</label>
+                                <ui:inputText aura:id="customerName" class="slds-input" value="{!v.po.Lead_Name__c}" disabled="true"/>
+                            </div>
+                        </div>                
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="address">Address</label>
+                                <ui:inputText aura:id="address" class="slds-input" disabled="true"
+                                              value="{!v.po.Lead__r.Residence_Address_Line1__c + 
+                                                     v.po.Lead__r.Residence_Address_Line2__c +
+                                                     v.po.Lead__r.Residence_Address_Line3__c}"/>
+                            </div>
+                        </div>                
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="city">City</label>
+                                <ui:inputText aura:id="city" class="slds-input" value="{!v.po.Lead__r.Resi_City__c}" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="city">Customer Mobile Number</label>
+                                <ui:inputPhone aura:id="customerMobileNumber" class="slds-input" value="{!v.po.Lead__r.MobilePhone}" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="city">Alternate Mobile Number</label>
+                                <ui:inputPhone aura:id="alternateMobileNumber" class="slds-input" value="{!v.po.Alternate_Mobile_No__c}" maxlength="10" updateOn="keyup" keyup="{!c.validateMobileNumber}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="pincode">Pincode</label>
+                                <ui:inputNumber aura:id="pincode" class="slds-input" format="######" value="{!v.po.Lead__r.Resi_Pin_Code__c}" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <br/>
+            <fieldset aura:id="customerDispositionStatus" class="slds-form--stacked slds-p-bottom--large"  style="background:rgb(243, 242, 242);">
+                <h3 class="slds-section-title--divider">CUSTOMER DISPOSITION STATUS</h3>
+                
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="fieldDisposition">Field Disposition<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="fieldDisposition" class="slds-input" value="{!v.po.Field_Disposition_1__c}" required="true" change="{!c.onfieldDispoChange}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="disposition">Disposition<span style="color:red">*</span></label>
+                                <ui:inputSelect aura:id="disposition" class="slds-input" value="{!v.po.Field_Desposition_Status__c}" required="true" change="{!c.onDispoChange}" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="fieldCheckStatus">Field Check Status</label>
+                                <ui:inputSelect aura:id="fieldCheckStatus" class="slds-input" value="{!v.po.Field_Check_Status__c}" required="true" disabled="true" change="{!c.onDataChange}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="fieldRemarks">Field Remarks</label>
+                                <ui:inputText aura:id="fieldRemarks" class="slds-input" value="{!v.po.Field_Remarks__c}" placeholder="Field Remarks" change="{!c.onDataChange}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div aura:id="followup" class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="followUpDate">Followup Date</label>
+                                <ui:inputDateTime aura:id="followUpDate" class="slds-input" value="{!v.po.Field_Followup_Date__c}" displayDatePicker="true" change="{!c.onDataChange}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <br/>
+            <fieldset aura:id="offerDetails" class="slds-form--stacked slds-p-bottom--large"  style="background:rgb(243, 242, 242);">
+                <h3 class="slds-section-title--divider">OFFER DETAILS</h3>
+                
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="offerAmount">Offer Amount<span style="color:red">*</span></label>
+                                <!-- PSL changes : Nikhil Bugfix #11889 -->
+                                <ui:inputNumber aura:id="offerAmount" class="slds-input" value="{!v.po.Revised_Offer_Amount__c}" placeholder="Offer Amount" change="{!c.onDataChange}" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="offerDate">Offer Date</label>
+                                <!--<ui:inputDate aura:id="offerDate" class="slds-input" value="{!v.po.Offer_Date__c}" displayDatePicker="true" disabled="true"/>-->
+                                <ui:outputDate aura:id="offerDate" class="slds-input" value="{!v.po.Offer_Date__c}"/>
+                            </div>
+                        </div>
+                        <!-- PSL changes : Nikhil Bugfix #11804 moved Credit Officer field at the bottom -->
+                        <div aura:id="creditOfficerDiv" class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12 slds-hide">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="creditOfficer">Credit Officer</label>
+                                <ui:inputSelect aura:id="creditOfficer" class="slds-input" value="" change="{!c.onCreditOfficerChange}" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--medium">
+                <div aura:id="saveButtonIdDiv" class="slds-p-around--x-small">
+                    <lightning:button aura:id="saveButtonId" variant="brand" label="Save" onclick="{!c.saveDispositionData}" disabled="true"/>
+                </div>
+                <div aura:id="convertToLoanButtonIdDiv" class="slds-p-around--x-small slds-hide">
+                    <lightning:button aura:id="convertToLoanButtonId" variant="brand" label="Convert to Loan Application" onclick="{!c.convertToLoanApplication}" disabled="true"/>
+                </div>
+
+                <div aura:id="populateCreditSelectListButtonIdDiv" class="slds-p-around--x-small slds-hide">
+                    <lightning:button aura:id="populateCreditSelectListButtonId" variant="brand" label="Submit to Credit" onclick="{!c.populateCreditSelectList}" disabled="true"/>
+                </div>
+
+                <div aura:id="submitToCreditApproverButtonIdDiv" class="slds-p-around--x-small slds-hide">
+                    <lightning:button aura:id="submitToCreditApproverButtonId" variant="brand" label="Submit to Credit Approver" onclick="{!c.submitCreditApprover}" disabled="true"/>
+                </div>
+                <div aura:id="goToLoanApplicationBtnIdDiv" class="slds-p-around--x-small slds-hide">
+                    <lightning:button aura:id="goToLoanApplicationBtn" variant="brand" label="Go To Loan Application" onclick="{!c.gotoLoanApplication}"/>
+                </div>
+            </div>
+            
+        </ui:scrollerWrapper>
+        <div aura:id="waiting" class="{!v.spinnerFlag1 == 'true'?'slds-shows':'slds-hide'}">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+       </div>
+    </div>
+    
+    <!--<div aura:id="waiting" class="slds-hide">
+        <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>
+    </div>-->
+    
+    <div aura:id="customToast" class="slds-notify_container slds-hide">
+        <div aura:id="toastTheme" class="slds-notify slds-notify--toast" role="alert">
+            <span class="slds-assistive-text">Info</span>
+            <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeCustomToast}" alternativeText="Close alert." />
+            <button class="slds-button slds-notify__close slds-button--icon-inverse" title="Close">
+                <span class="slds-assistive-text">Close</span>
+            </button>
+            <div class="slds-notify__content ">
+                <div class="slds-align-middle">
+                    <h2 class="slds-text-heading--x-small">
+                        <strong><ui:outputText aura:id="toastTtitle" value=""/></strong>
+                        <ui:outputText aura:id="toastText" value=""/>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

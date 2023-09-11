@@ -1,0 +1,113 @@
+{
+	"EmployeeLoan": {
+		"DefaultOTPMessage": "Greeting! OTP to view your employee personal loan offer is XXXXXX. Please donot share it with anyone for security reasons. Regards, Bajaj Finserv"
+	},
+    "EmployeeLoanDocuments":"KYC;Post-Dated Cheque 1;Post-Dated Cheque 2;Post-Dated Cheque 3;Physical Mandate",
+    "ProcessingFee":"2.5",
+	"Rate":"12.5",
+	"WelcomeMessage1":"Congratulations!!",
+	"WelcomeMessage2":"YOU ARE ELIGIBLE FOR A PRE-APROVED LOAN OF #***#.!!",
+	"MandatoryCharges_SkipFromUI":"500671;500735;28025;6270;",
+        "DocumentationFee_ChargeCode":"601933",
+"SendMailToHierarchy": {
+		"1-8": {
+			"ROI": {
+				"REGULAR": {
+					"Zonal Sales Manager": "0;0.75;",
+					"Business head": "0.76;1.75;"
+				},
+				"FLEXI": {
+					"Zonal Sales Manager": "0;0.75;",
+					"Business head": "0.76;1.75;"
+				}
+			},
+			"PF": {
+				"REGULAR": {
+					"Zonal Sales Manager": "1;1.49;"
+				},
+				"FLEXI": {
+					"Zonal Sales Manager": "0.00;0.99;"
+				}
+			},
+			"Insurance": {
+					"Zonal Sales Manager": "0.0;2.99;"					
+			}
+		},
+		"9-25": {
+			"ROI": {
+				"REGULAR": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;2.25;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;2.25;"
+				}
+			},
+			"PF": {
+				"REGULAR": {
+					"National Sales Manager": "1.90;1.99;",
+					"Business Head": "0;1.89;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "1.90;1.99;",
+					"Business Head": "0;1.89;"
+				}
+			},
+			"Insurance": {
+					"Business head": "0;1.99;"
+			}
+		},
+		"26-90": {
+			"ROI": {
+				"REGULAR": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;2.5;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;2.5;"
+				}
+			},
+			"PF": {
+				"REGULAR": {
+					"National Sales Manager": "2.15;99;",
+					"Business Head": "0;2.14;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "2.15;99;",
+					"Business Head": "0;2.14;"
+				}
+			},
+			"Insurance": {
+					"Business head": "0;1.99;"
+			}
+		},
+		"Beyond 90": {
+			"ROI": {
+				"REGULAR": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;3.50;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "0;0.25;",
+					"Business head": "0.26;3.50;"
+				}
+			},
+			"PF": {
+				"REGULAR": {
+					"National Sales Manager": "2.90;99;",
+					"Business Head": "0;2.89;"
+				},
+				"FLEXI": {
+					"National Sales Manager": "2.90;99;",
+					"Business Head": "0;2.89;"
+				}
+			},
+			"Insurance": {
+					"Business head": "0;1.74;"
+			}
+		}
+	}
+
+}

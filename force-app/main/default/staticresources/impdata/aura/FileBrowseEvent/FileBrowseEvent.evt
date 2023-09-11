@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="image browse event" >
+    <aura:attribute name="isImageSelected" type="Boolean"/>
+</aura:event>

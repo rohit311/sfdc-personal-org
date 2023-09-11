@@ -1,0 +1,9 @@
+.THIS {
+        text-transform: none !important;
+    font-family: 'Salesforce Sans',Arial,sans-serif;
+    color: rgb(107, 109, 112);
+    font-size: .75rem;
+    line-height: 1.5;
+    margin-right: .75rem;
+    margin-bottom: .125rem;
+}

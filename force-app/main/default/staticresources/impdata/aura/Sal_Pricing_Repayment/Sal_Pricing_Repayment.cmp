@@ -1,0 +1,87 @@
+<aura:component controller="SAL_PricingCtrlV2" implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="repayList" type="RePayment_mode_detail__c[]"/>
+    <aura:attribute name="disbList" type="Current_Disbursal_Details__c[]"/>
+    <aura:attribute name="showUMRNBtn" type="Boolean" default="false" /><!-- US 5374 -->
+    <aura:attribute type="Id" name="loanId"/>
+    <aura:attribute type="Opportunity" name="loan"/>
+    <aura:attribute type="Boolean" name="rerenderEmandate" default="true"/>
+    <aura:handler event="c:updateRepayList" action="{!c.handleUpdateRepay}"/>
+    <aura:handler event="c:CloneEvent" action="{!c.handleUpdateRepay}"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+	<aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+	<aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+     <!--Bug:20391 Start(to handle visibility of Initiate Open ECS) -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="isValidProduct" type="Boolean"/>
+    <!--Bug:20391 End -->
+    <aura:attribute type="Id" name="primaryAppId"/><!-- added for 22017-->
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/><!--22017-->
+    <aura:attribute type="boolean" name="micrActive" default="false"/><!--US 5431-->
+    <aura:attribute type="Boolean" name="isDisbDashboard" default="false" /> <!-- Bug 20391 : Bug 22065 : Added for point 10 -->
+	<!--22501**S** these 2 components were missing for toast and spinner -->
+        <!--22501**E** -->
+        <aura:iteration items="{!v.repayList}" var="repayObj">
+
+        <div class="slds-box slds-box_x-large slds-theme_default slds-m-top_medium slds-theme_shade" >
+            <div class="applyColor">
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-bottom--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--5-of-6">
+                        <div class="" role="">
+                            <!--US 5431 ISFC code passed on edit button in ID attribute to get IFSC code-->
+                            <button id="{!repayObj.IFSC_Code__c}" value="{!repayObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse " aura:id="edit_btn" onclick="{!c.editRecord}" title="Edit" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:edit" size="x-small" variant="inverse"/></button>
+                            <button value="{!repayObj.Id}" class="slds-button slds-button--brand slds-theme--alt-inverse" aura:id="delete_btn" onclick="{!c.deleteRecord}" title="Delete" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:delete" size="x-small" variant="inverse"/></button>
+                            
+                        </div>
+                    </div>
+                    <div class="slds-p-horizontal--small">
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Repayment Mode:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!repayObj.Repayment_Mode__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Account No:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!repayObj.A_C_NO__c}"/></strong>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-size--2-of-5 slds-col slds-form-element__label" for="custID">Bank Name:</label>
+                                    <strong><ui:outputText class="slds-size--3-of-5 slds-col" aura:id="custID" value="{!repayObj.Bank_Name__c}"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </aura:iteration>
+    <div class="slds-align--absolute-center" style="margin-top: 10px;" >
+        <lightning:button class="slds-button slds-theme--alt-inverse slds-button--brand" aura:id="add_btn" onclick="{!c.addNewRecord}" title="Add New" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"> <!-- CR 22307 --><lightning:icon iconName="utility:add" size="small" variant="inverse"/></lightning:button>
+    </div>
+    <div class="slds-align--absolute-center" style="margin-top: 10px;" >
+        <aura:if isTrue="{!v.rerenderEmandate}">
+            <!-- <c:OpportunityDetails id="{!v.loanId}" mobilityFlag="true"/> -->
+            <!-- Added updated Emandate component  -->
+            <c:E_Mandate id="{!v.loanId}" mobilityFlag="true"/>
+        </aura:if>
+    </div>
+    <!-- Bug:20391 (Added aura:if to handle visibility of Initiate Open ECS -->
+      <div class="slds-align--absolute-center" style="margin-top: 10px;">
+           <!-- US 5374 start -->
+         <aura:if isTrue="{!v.showUMRNBtn}">
+            <c:ExperiaCmp oppId="{!v.loanId}" repayList="{!v.repayList}"/>
+        </aura:if>
+        <!-- US 5374 stop -->
+    <aura:if isTrue="{! (and(v.repayList!=null,v.repayList.length==0,v.loan.Sent_To_Finnone__c==false,v.isValidProduct==true))}">
+  
+        <lightning:button class="slds-button slds-theme--alt-inverse slds-button--brand" iconName="utility:trending" variant="brand" label="Initiate Open ECS"  onclick="{!c.callECS}" disabled="{!and(v.page == 'pricing',v.stageName != 'Post Approval Sales')}"/> <!-- CR 22307 -->
+  
+    </aura:if><!-- Bug #20391 end -->
+            </div>
+    <div class="div2"></div><!--fix for 19861-->
+    {!v.body}
+</aura:component>

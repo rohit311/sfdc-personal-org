@@ -1,0 +1,18 @@
+<template>
+    <template if:true={fieldApiNames}></template>
+        <lightning-record-edit-form object-api-name={objectName} record-id={recordId} onsuccess={handleSuccess}>    
+            <template for:each={fieldApiNames} for:item="apiName">
+                <lightning-input-field key={apiName} field-name={apiName}>
+                </lightning-input-field>
+            </template>
+            
+            <lightning-button
+                class="slds-m-top_small"
+                variant="brand"
+                type="submit"
+                name="Save"
+                label="Save">
+            </lightning-button>
+        </lightning-record-edit-form>
+    </template>
+</template>

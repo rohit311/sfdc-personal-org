@@ -1,0 +1,15 @@
+.THIS .hide-error-message   .slds-form-element__help {
+    display: none;
+}
+
+.THIS .wrap-class{
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+}
+
+.THIS .datarow:hover .dataCell{
+    background: rgb(208, 198, 198) !important;
+}

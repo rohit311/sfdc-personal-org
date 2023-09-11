@@ -1,0 +1,24 @@
+<aura:component >
+    <aura:attribute name="docId" type="String"/>
+    <aura:attribute name="allDocs" type="SObject[]" />
+    <aura:handler name="change" action="{!c.doInit}" value="{!v.docId}"/>
+    <div class="{!if(v.docId != '','slds-show','slds-hide')}" >
+        testing
+        <section aura:id="pop" class="slds-popover slds-nubbin_top" role="dialog" aria-labelledby="dialog-heading-id-1" aria-describedby="dialog-body-id-6">
+            <button class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{!c.closePop}">
+                X
+                <span class="slds-assistive-text">Close dialog</span>
+            </button>
+            <header class="slds-popover__header slds-p-vertical_medium">
+                <h2 id="dialog-heading-id-1" class="slds-text-heading_medium">Your Card Header</h2>
+            </header>
+            <div class="slds-popover__body" id="dialog-body-id-6">
+                <div aura:id="iframeHolder">
+                    
+                </div>
+            </div>
+            <footer class="slds-popover__footer">
+            </footer>
+        </section>
+    </div>
+</aura:component>

@@ -1,0 +1,14 @@
+<aura:component >
+    <aura:attribute name="sliderParams" type="Object" access="global"/>
+    
+    <lightning:slider min="{!v.sliderParams.min}"
+					  max="{!v.sliderParams.max}"
+					  step="{!v.sliderParams.step}"
+					  size="{!v.sliderParams.size}"
+					  value="{!v.sliderParams.value}"
+					  label="{!v.sliderParams.label}"
+					  variant="{!v.sliderParams.variant}"
+					  class="{!v.sliderParams.class}"
+					  disabled="{!v.sliderParams.disabled}"
+					  onchange="{!c.handleSliderChange}"/>    
+</aura:component>

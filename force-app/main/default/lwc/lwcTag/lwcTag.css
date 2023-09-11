@@ -1,0 +1,17 @@
+.container {
+  background-color: white;
+}
+
+.menu-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+p {
+  color: red;
+}
+
+.container {
+  background-color: antiquewhite;
+  min-height: 300px;
+}

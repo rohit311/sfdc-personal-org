@@ -1,0 +1,249 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL" controller="SALMobilityCntrl_V2">
+   
+    <aura:attribute name="tableData" type="List" />
+    <aura:attribute name="showButton" type="Boolean" default="true" />
+    <aura:attribute name="flag" type="Boolean" default="false" />
+    <aura:attribute name="opTableValues" type="List" />
+    <aura:attribute name="opDisplayValues" type="List" />
+    <aura:attribute name="sourceList" type="Sourcing_Channel__c[]" default="[]"/>
+    <aura:attribute name="selectedSource" type="Sourcing_Channel__c" default="{}"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="sourceSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="ValidSourceChannel" type="Boolean" default="false"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="acsToUpdate" type="List" />
+    <aura:registerEvent name="navigateToComponent" type="c:navigateToParent"/>
+    <aura:registerEvent name="DestroyChild1" type="c:DestroyChild"/>
+      
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+        <lightning:button class="slds-theme--alt-inverse  " iconName='utility:back' aura:id="BackButtonId" variant="brand" label="Back" onclick="{!c.sendback}" />
+        <br/><br/>
+    
+    <!-- first table where officer name and count of opps is displayed -->
+        <lightning:card title="Loan Details" class="applyColor" >
+            <aura:if isTrue="{!and(not(empty(v.tableData)),v.tableData.length >0)}"> 
+                
+                <div id="loan-table-div slds-grid slds-wrap slds-size_12-of-12" >
+                    
+                    <table class="slds-table  slds-hyphenate slds-wrap slds-size--12-of-12 slds-m-top_small slds-m-right_small floatLeft " style="overflow-y:scroll; overflow-x:hidden;">    
+                        
+                        <thead  class="slds-grid slds-wrap slds-table_bordered slds-size--12-of-12">
+                            <tr class ="headCls slds-grid slds-size--12-of-12 floatLeft">
+                                
+                                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left " style="margin-left:0px;color:#FFFFFF;background:#16325C"> 
+                                    ASF/PSF Names 
+                                </th>
+                                
+                                <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right" style="margin-left:0px;color:#FFFFFF;background:#16325C"> 
+                                    <b>Loans </b>
+                                </th>
+                                
+                                
+                            </tr>
+                        </thead>
+                        
+                        <tbody class="slds-grid slds-wrap slds-table_bordered floatLeft slds-size--12-of-12">
+                            <aura:iteration items="{!v.tableData}" var = "loan" aura:id="opps" indexVar="i">
+                                <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                    
+                                    <td class="floatLeft WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate">
+                                        <ui:outputText value="{!loan.psfName}" />
+                                    </td>
+                                    
+                                    
+                                    <td class="floatLeft WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_right slds-hyphenate">
+                                        <div class="slds-card"  >
+                                            
+                                            <aura:if isTrue="{!loan.countOfOpps==0}">
+                                                <lightning:button variant="base" value = "{!i}" onclick="{!c.goToZeroPsfOpps}" label="0" />	
+                                                <aura:set attribute="else">
+                                                    <lightning:button variant="base" value = "{!i}" onclick="{!c.goToPsfOpps}" label="{!loan.countOfOpps}" />	
+                                                </aura:set>
+                                            </aura:if>
+                                            
+                                            
+                                        </div> 
+                                        
+                                    </td>
+                                    
+                                </tr>
+                            </aura:iteration>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                
+                <aura:set attribute="else">
+                    <ui:message severity="warning" closable="false">
+                        <lightning:icon iconName="utility:info" variant="warning" class="iconSize"/>&nbsp;
+                        <span> No records found currently </span>
+                    </ui:message>
+                </aura:set>
+            </aura:if> 
+            
+            
+        </lightning:card>
+        
+        
+
+ <!-- second table displayed on opp count click-->
+ 
+    <aura:renderIf isTrue="{!v.flag}">
+        
+        <lightning:card title="Opportunities" class="applyColor" >
+            
+            <div id="loan-table-div slds-grid slds-wrap slds-size_12-of-12" >
+                <table class="slds-table  slds-hyphenate slds-wrap slds-size--12-of-12 slds-m-top_small slds-m-right_small floatLeft " >    
+                    <thead  class="slds-grid slds-hyphenate slds-wrap slds-table_bordered slds-size--12-of-12 slds-theme--shade">
+                        <tr class ="headCls slds-grid slds-size--12-of-12 floatLeft">
+                            
+                            <th class="WrapText slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left " style="margin-left:0px;color:#FFFFFF;background:#16325C"> 
+                                LAN 
+                            </th>
+                            
+                            <th class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right" style="margin-left:0px;color:#FFFFFF;background:#16325C"> 
+                                <b>Customer Name </b>
+                            </th>
+                            
+                      
+                        </tr>
+                        
+                    </thead>
+                    
+                    <tbody class="slds-grid slds-wrap slds-table_bordered slds-size--12-of-12">
+                        
+                        <aura:iteration items="{!v.opDisplayValues}" var="obj" indexVar="indVar">
+                            <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                                
+                                <td class="WrapText slds-col slds-size_6-of-12 slds-border_bottom slds-border_top slds-border_right slds-hyphenate slds-border--left">
+                                    <a onclick="{!c.toggleAssVersion}" id="{! obj.Id }">
+                                        <aura:if isTrue="{!v.class =='hideCls'}">
+                                            
+                                            <strong> <span class="important-message" id="{! obj.Id }" style="font-size:19.5px" >+ </span> </strong> 
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.myid == obj.Id}">
+                                                    <span class=" important-message slds-p-right_small" id="{! obj.Id }" style="font-size:19.5px" >-</span> 
+                                                    
+                                                    <aura:set attribute="else"  >
+                                                        <b>     <span class="important-message" style="font-size:19.5px" >+
+                                                            </span> </b> 
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </a>
+                                    
+                                    {!obj.Loan_Application_Number__c}
+                                </td>
+
+                                
+                                <td class="WrapText slds-col slds-size_6-of-12 slds-border_top slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                                    {!obj.CUSTOMER__r.Customer_Name__c}
+                                    
+                                </td>
+                            
+                                
+                            </tr>
+                            
+                            
+                            
+                            <aura:if isTrue="{!v.myid == obj.Id}">
+                                <aura:if isTrue="{!v.class == 'showCls' }">
+                                    
+                                    <tr class="{!v.class +' slds-m-top_none slds-p-top_none slds-grid slds-size--12-of-12'}"  aura:Id="AssVersionId">
+								<div class = "slds-m-top_none slds-p-top_none" style="width:100%;">
+                                    <fieldset class="slds-form--compound slds-m-bottom_none slds-m-top_none slds-p-top_none">
+                                        <div class="slds-form-element__row slds-m-top_none slds-p-top_none slds-m-bottom_none slds-p-botttom_none ">
+                                            
+                                                    
+                                                    <lightning:card class="slds-size--12-of-12 slds-p-top__none" >
+                                                        
+                                                        <div class="slds-border_top slds-p-bottom_none slds-m-top_none slds-wrap slds-grid--pull-padded slds-size--12-of-12 slds-align_absolute-center " style="background:#FFFFFF">                   
+                                                          
+                                                            <br/>
+                                                            <div class="slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2">
+                                                                <div class="slds-form-element__control  ">
+                                                                    Loan Amount:
+                                                                    <b><ui:outputText value="{!obj.Loan_Amount__c}"/></b>
+                                                                </div>
+                                                            </div>
+                                                            <br/>
+                                                            
+                                                            <div class="slds-form-element  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2">
+                                                                <div class="slds-form-element__control  ">
+                                                                    Area:
+                                                                    <b><ui:outputText value="{!obj.Area__c}"/></b>
+                                                                </div>
+                                                            </div>
+                                                            <br/>
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2">
+                                                                <div class="slds-form-element__control">
+                                                                    Date of Creation:
+                                                                  
+                                                                    <b><ui:outputText value="{!obj.Created_Time__c}"/></b> 
+                                                                    
+                                                                </div>
+                                                            </div> 
+                                 							<br/>
+                                                            
+                                                            <c:SmartSearchResult obj="{!obj}" acsToUpdate="{!v.acsToUpdate}"/>
+                                                           <br/>
+                                                            <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2 slds-m-top_medium" >
+                                                                <div class="slds-form-element__control" data-record="{!indVar}" onchange="{!c.storeAccountOwner}">
+                                                                     <lightning:select aura:id="oppOwner" label="Owner:" value="{!obj.OwnerId}" >
+                                                                        <aura:iteration items="{!v.tableData}" var="Owner" >   
+                                                                            
+                                                                            <option value="{!Owner.psfId}" text="{!Owner.psfName}" selected="{!obj.OwnerId==Owner.psfId}" >
+                                                                                
+                                                                            </option>
+                                                                        </aura:iteration>
+                                                                    </lightning:select>
+                                                                 </div>
+                                                            </div>
+                                                            
+                                                            <div class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--1-of-2"></div>
+                                                         
+                                                        </div>
+                                                    </lightning:card>
+                                                    
+                                                    
+                                        </div>     
+                                                
+                                            </fieldset>
+                                        
+                                        </div>
+                                    </tr>
+                                    
+                                    
+                                </aura:if>
+                            </aura:if>  
+                            
+                        </aura:iteration>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+            <br/>
+            <div class="slds-align_absolute-center">
+                <lightning:button label="Save" iconName="utility:save" class="slds-theme_alt-inverse slds-p horizontal" variant="brand" onclick="{!c.saveRecords}"></lightning:button>
+            </div>
+            
+        </lightning:card>
+        
+    </aura:renderIf>   
+    
+    <div aura:id="childCmp">{!v.body}</div>
+    
+</aura:component>

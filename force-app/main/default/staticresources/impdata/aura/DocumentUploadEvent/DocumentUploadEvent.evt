@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event to NOTIFY DOCUMENT IS UPLOADED" >
+	<aura:attribute name="fileName" type="String" default="" />
+    <aura:attribute name="uploadStatus" type="String" default=""/>
+    <aura:attribute name="flow" type="string" default=""/> 
+    <aura:attribute name="containsPhoto" type="Boolean" default=""/><!--23578-->
+</aura:event>

@@ -1,0 +1,471 @@
+<aura:component controller="SALMobilityCntrl_V2"  implements="forceCommunity:availableForAllPageTypes" access="GLOBAL">
+    <aura:attribute name="isPricingcmp" type="boolean" default="false"/> <!--Bug 22624 -->
+    <aura:attribute name="standardChecklist" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="deviationChecklist" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="manualChecklist" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="oppId" type="string" default="0065D000002tzzH"/>
+    <aura:attribute name="DocumentNameList" type="string[]" default=""/>
+    <aura:attribute name="DocumentNameMap" type="Map" default="{}"/>
+    <aura:attribute name="class" type="String" default="hideCls"/>
+    <aura:attribute name="class1" type="String" default="hideCls"/>
+    <aura:attribute name="statusList" type="List"/>
+    <aura:registerEvent name="passVerificationList" type="c:passVerificationList"/>
+    <aura:attribute name="uploadedAttachments" type="SObject[]"/>
+    <aura:attribute name="devList" type="List"/>
+		<!-- DMS 24317 s -->
+     <aura:attribute name="DMSDocmap" type="Map" default="{}"/>
+    <!--  DMS 24317 e-->
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="devSelected" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="Oppobj" type="Opportunity" default="{}" />
+    <aura:attribute name="appObj" type="Applicant__c" default="{}" />
+    <aura:attribute name="creditStatus" type="List"/>
+    <aura:attribute name="saleStatus" type="List"/>
+    <aura:attribute name="isUnderwitercmp" type="boolean" default="false"/>
+    <aura:method name="updateChkRec" action="{!c.updateChkRecords}" access="PUBLIC">
+        <aura:attribute name="checklistIDs" type="String[]" default=""/>
+        <aura:attribute name="status" type="String" default=""/>
+    </aura:method>
+    <aura:attribute name="myid" type="String"/>
+    <aura:attribute name="myid1" type="String"/>
+	<aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+	<aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:registerEvent name="populateNmList" type="c.DocNameList"/>
+   
+     <div  class="slds-p-top--x-small slds-align_absolute-center">
+       <lightning:button aura:id="veriBtn" variant="brand" label="Verification" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" onclick="{!c.callVerificationAPI}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+    </div>
+    <aura:if isTrue="{!v.Oppobj.StageName == 'DSA/PSF Login'}">
+    <div class="slds-p-top--x-small slds-align_absolute-center">
+            <lightning:button variant="brand" label="Generate Checklist" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" iconPosition="left" onclick="{!c.getChecklistDoc}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+    </div>
+    </aura:if>
+    <aura:if isTrue="{!v.Oppobj.StageName != 'DSA/PSF Login'}">
+        <div class="slds-p-top--x-small slds-align_absolute-center">
+            <lightning:button variant="brand" label="Initiate Deviation" class="slds-align_absolute-center slds-theme--alt-inverse" iconName="action:update_status" iconPosition="left" onclick="{!c.geDeviationDoc}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+        </div>
+    </aura:if>
+    <h1> <strong> Standard Documents </strong> </h1>
+    
+    <!-- <div aura:id="uploadedDocs" class="slds-border_top slds-border_left slds-border_right slds-border_bottom" id="uploadedDocs">
+        <div class="slds-grid slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+            <div class="slds-col slds-size-2-of-12 slds-hyphenate"> Sr No </div>
+            <div class="slds-col slds-size-5-of-12 slds-hyphenate slds-border_left slds-border_right">Deviation Name</div>
+           <!- <div class="slds-col slds-size-4-of-12 slds-hyphenate slds-border_left">Documents</div> ->
+            <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border_left">Mandatory</div>
+            <div class="slds-col slds-size-3-of-12 slds-hyphenate slds-border_left">Sales Status</div>
+        </div>
+        <aura:iteration items="{!v.standardChecklist}" var="obj">
+            <div class="slds-grid slds-has-divider-top slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+                <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border_right">
+                    {!obj.rowNum}
+                </div> 
+                <div class="slds-col slds-size-5-of-12 slds-hyphenate" style="height:100%;">{!obj.docName}</div>
+              <!-  <div class="slds-col slds-size-4-of-12 slds-hyphenate slds-border-left">
+                    <aura:if isTrue="{!obj.showPicklist}">
+                        <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.selectedDoc}" class="slds-align_absolute-center applycolwidth">
+                            <aura:iteration items="{!obj.documentList}" var="selectedDocument">
+                                <option value="{!selectedDocument}" text="{!selectedDocument}" selected="{!obj.selectedDoc == selectedDocument}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <aura:set attribute="else">
+                            {!obj.singleDoc}
+                        </aura:set>
+                    </aura:if> 
+                </div> ->
+                <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border-left">
+                    <lightning:input name="docMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" class="ApplyColor"/>
+                </div>
+                <div class="slds-col slds-size-3-of-12 slds-hyphenate slds-border-left">
+                   <!- <lightning:select aura:id="salesstatus" name="salesstatus" value="{!obj.docFamObj.Sales_Status__c}" class="slds-align_absolute-center applycolwidth">
+                        <option value=""> None </option>
+                        <aura:iteration items="{!v.statusList}" var="status">
+                            <option value="{!status}" text="{!status}" selected="{!obj.docFamObj.Sales_Status__c == status}"></option>
+                        </aura:iteration>
+                    </lightning:select> ->
+                    {!obj.docFamObj.Sales_Status__c}
+                </div>
+            </div> 
+        </aura:iteration>
+    </div> -->
+    
+    <table class="slds-table slds-hyphenate slds-table_bordered slds-size--12-of-12 slds-wrap" aura:id="uploadedDocs">    
+        <thead  class="slds-grid slds-hyphenate slds-wrap">
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <!--<th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                       
+                    </th>-->
+                <th class="WrapText slds-col slds-size_5-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Standard Name
+                    
+                </th>
+                <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Mandatory
+                </th>
+                <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right">
+                    Sales Status
+                </th>
+            </tr>
+            
+            
+        </thead>
+        <tbody class="slds-grid slds-wrap">
+            
+            <aura:iteration items="{!v.standardChecklist}" var="obj">
+                <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                    
+                    <!-- <td class="floatLeft WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            {!obj.rowNum}
+                            
+                        </td> -->
+                    
+                    <td class="WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        {!obj.docName}
+                    </td>
+                    <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        <!--<lightning:input name="docMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" class="ApplyColor"/>-->
+                        <ui:inputCheckbox value="{!obj.docFamObj.Mandatory__c}" disabled="true"/>
+                    </td>
+                    <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        {!obj.docFamObj.Sales_Status__c}
+                    </td>
+                    
+                </tr>
+                
+                
+                
+            </aura:iteration>
+        </tbody>
+    </table>
+    <br/>
+     <!-- Bug 22624 added aura:if -->
+    <aura:if isTrue="{!!v.isPricingcmp}">
+    <h1><strong>Deviations</strong> </h1> 
+    
+    <!-- <div aura:id="uploadedDocs1" class="slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+        <div class="slds-grid slds-border_top slds-border_left slds-border_right slds-border_bottom">
+            <div class="slds-col slds-size-2-of-12 slds-hyphenate" style="margin-left:0px"> Sr No </div>
+            <div class="slds-col slds-size-5-of-12 slds-hyphenate slds-border_left">Deviation Name</div>
+          <!- <div class="slds-col slds-size-4-of-12 slds-hyphenate slds-border_left">Documents</div> 
+            <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border_left">Mandatory</div>
+            <div class="slds-col slds-size-3-of-12 slds-hyphenate slds-border_left">Sales Status</div>
+        </div>
+        <aura:iteration items="{!v.deviationChecklist}" var="obj">
+            <div class="slds-grid slds-has-divider-top slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+                <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border_right">
+                    {!obj.rowNum}
+                </div> 
+                <div class="slds-col slds-size-5-of-12 slds-hyphenate">{!obj.deviationName}</div>
+              <!-  <div class="slds-col slds-size-4-of-12 slds-hyphenate slds-border-left">
+                    <aura:if isTrue="{!obj.showPicklist}">
+                        <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.selectedDoc}" class="slds-align_absolute-center applycolwidth">
+                            <aura:iteration items="{!obj.documentList}" var="selectedDocument">
+                                <option value="{!selectedDocument}" text="{!selectedDocument}" selected="{!obj.selectedDoc == selectedDocument}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <aura:set attribute="else">
+                            {!obj.singleDoc}
+                        </aura:set>
+                    </aura:if>
+                </div> 
+                <div class="slds-col slds-size-2-of-12 slds-hyphenate slds-border-left">
+                    <lightning:input name="devMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" />
+                </div>
+                <div class="slds-col slds-size-3-of-12 slds-hyphenate slds-border-left">
+                   <!- <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.docFamObj.Sales_Status__c}" class="slds-align_absolute-center applycolwidth">
+                        <option value=""> None </option>
+                        <aura:iteration items="{!v.statusList}" var="status">
+                            <option value="{!status}" text="{!status}" selected="{!obj.docFamObj.Sales_Status__c == status}"></option>
+                        </aura:iteration>
+                    </lightning:select>  
+                    {!obj.docFamObj.Sales_Status__c}
+                </div>
+            </div> 
+        </aura:iteration>
+    </div> -->
+    
+    <table class="slds-table slds-hyphenate slds-table_bordered  floatLeft slds-size--12-of-12" aura:id="uploadedDocs">    
+        <thead  class="slds-grid slds-hyphenate">
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <!--<th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                        
+                    </th>-->
+                <th class="WrapText slds-col slds-size_5-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Deviation Name
+                    
+                </th>
+                <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Type
+                </th>
+                <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right">
+                    Authority
+                </th>
+            </tr>
+            
+            
+        </thead>
+        
+        <tbody class="slds-grid slds-wrap">
+            
+            <aura:iteration items="{!v.deviationChecklist}" var="obj">
+                <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                    
+                    <!--<td class="floatLeft WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            {!obj.rowNum}
+                            
+                        </td> -->
+                    
+                    <td class="WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        <a onclick="{!c.toggleAssVersion1}" id="{! obj.docFamObj.Id }" style="text-decoration: none;">
+                            <aura:if isTrue="{!v.class1 =='hideCls'}">
+                                
+                                <span class="font-weight-bold important-message" id="{! obj.docFamObj.Id }">+ </span>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.myid1 == obj.docFamObj.Id}">
+                                        <span class="font-weight-bold slds-p-right_x-small important-message" id="{! obj.docFamObj.Id }">-</span> 
+                                        
+                                        <aura:set attribute="else"  >
+                                            <span class=" important-message">+
+                                            </span>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </a>{!obj.deviationName}
+                    </td>
+                    <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        <!--<lightning:input name="docMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" class="ApplyColor"/>-->
+                        {!obj.docFamObj.Deviation_Master__r.Deviation_Type__c}
+                    </td>
+                    <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                        {!obj.docFamObj.Deviation_Master__r.Minimum_Approving_Authority__c}
+                    </td>
+                </tr>
+                
+                <aura:if isTrue="{!v.myid1 == obj.docFamObj.Id}">
+                    <aura:if isTrue="{!v.class1 == 'showCls' }">
+                        
+                        <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                            <div style="width:100%;">
+                                <fieldset class="slds-form--compound">
+                                    <div class="slds-form-element__row slds-m-top--x-small ">
+                                        <div class="slds-box slds-box_x-small slds-theme_default slds-size--12-of-12" >
+                                        <lightning:card class=" slds-size--12-of-12" >
+                                            <header class="slds-hide"></header>
+                                            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--12-of-12  ">                   
+                                                <aura:if isTrue="{!!v.isUnderwitercmp}">
+                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control ">
+                                                                    <lightning:select aura:id="saleStatus" name="" label="Status:" value="{!obj.docFamObj.Sales_Status__c}" disabled="{!if(v.profileName ==obj.docFamObj.Deviation_Master__r.Minimum_Approving_Authority__c,false,true)}">
+                                                                        <option value="" text="--None--"> </option>
+                                                                        <aura:iteration var="option" items="{!v.saleStatus}">
+                                                                            <option value="{!option}" text="{!option}" selected="{!obj.docFamObj.Sales_Status__c == option}"></option>
+                                                                        </aura:iteration>     
+                                                                    </lightning:select>
+                                                    </div>
+                                                </div>
+                                                    </aura:if>
+                                                <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="docNameLong slds-form-element__control ">
+                                                        
+                                                            <lightning:input label="Mitigants:" disabled="{!if(v.profileName == 'Area Credit Manager' || v.profileName ==obj.docFamObj.Deviation_Master__r.Minimum_Approving_Authority__c,false,true)}" type ="text" value="{!obj.docFamObj.Mitigants_Remark__c}" />
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="docNameLong slds-form-element__control slds-grid">
+                                                        <label class="slds-size--2-of-6 slds-col slds-form-element__label">Documents:</label>
+                                                        
+                                                        <strong style="width:10rem">{!obj.docFamObj.DocumentFmlyName__r.Documents__c}</strong>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        
+                                                        <lightning:input type="toggle" value="{!obj.docFamObj.Mandatory__c}" label="Mandatory" disabled="true"/>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="{!if(v.myid1 == obj.docFamObj.Id,'slds-show','slds-hide')}">
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control slds-grid">
+                                                        <c:DocumentUploader aura:id="file-uploader-1" instance="1" forPricingDashboard="yes" parentId="{!v.oppId}" fileName="{!obj.deviationName+'_dev'}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="true" displayReadOnly="{!v.displayReadOnly}"/><!-- Need to add showUploadButton="false" -->
+                                                    </div>
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                            
+                                        </lightning:card>
+                                        
+                                        </div>
+                                        
+                                    </div>
+                                </fieldset>
+                            </div>
+                            
+                        </tr>
+                        
+                        
+                    </aura:if>
+                </aura:if>
+                
+                
+            </aura:iteration>
+        </tbody>
+    </table>
+    <div class="slds-p-top--x-small slds-align_absolute-center">
+        <lightning:button variant="brand" label="Save" class=" slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{!c.saveAutoDeviation}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+        </div>
+    <div class="slds-grid  slds-wrap slds-grid--pull-padded" >
+        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <div class="slds-form-element__control">
+                <lightning:select aura:id="devList" name="devList" label="" value="{!v.devSelected}">
+                    <option value=""> --None-- </option>
+                    <aura:iteration var="option" items="{!v.devList}">
+                        <option value="{!option.Id}">{!option.Name+'--'+option.BRE_Deviation_Code__c}</option>
+                    </aura:iteration>     
+                </lightning:select>
+            </div>
+        </div>
+        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+            <div class="slds-form-element__control">            
+                <lightning:button variant="brand" label="Add Deviation" class=" slds-theme--alt-inverse" iconName="utility:add" iconPosition="left" onclick="{!c.addDeviation}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </div>
+    </div>
+    
+    <aura:if isTrue="{!v.manualChecklist .length > 0}">
+         <table class="slds-table slds-hyphenate slds-table_bordered slds-size--12-of-12 slds-wrap" aura:id="uploadedDocs">    
+        <thead  class="slds-grid slds-hyphenate">
+            <tr class ="slds-grid slds-hyphenate slds-size--12-of-12">
+                <!--<th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-border_left slds-hyphenate " style="margin-left:0px"> 
+                        
+                    </th>-->
+                <th class="WrapText slds-col slds-size_5-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Deviation Name
+                    
+                </th>
+                <th class="WrapText slds-col slds-size_3-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-hyphenate">
+                    Type
+                </th>
+                <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right">
+                    Authority
+                </th>
+            </tr>
+            
+            
+        </thead>
+             <tbody class="slds-grid slds-wrap">                
+                 <aura:iteration items="{!v.manualChecklist}" var="obj">
+                     <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                         
+                         <!--<td class="floatLeft WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-border_right slds-hyphenate">
+                            {!obj.rowNum}
+                            
+                        </td> -->
+                         
+                         <td class="WrapText slds-col slds-size_5-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                             <a onclick="{!c.toggleAssVersion}" id="{! obj.docFamObj.Id }" style="text-decoration: none;">
+                                 <aura:if isTrue="{!v.class =='hideCls'}">
+                                     
+                                     <span class="font-weight-bold important-message" id="{! obj.docFamObj.Id }">+ </span>
+                                     <aura:set attribute="else">
+                                         <aura:if isTrue="{!v.myid == obj.docFamObj.Id}">
+                                             <span class="font-weight-bold slds-p-right_x-small important-message" id="{! obj.docFamObj.Id }">-</span> 
+                                             
+                                             <aura:set attribute="else"  >
+                                                 <span class=" important-message">+
+                                                 </span>
+                                             </aura:set>
+                                         </aura:if>
+                                     </aura:set>
+                                 </aura:if>
+                             </a>{!obj.deviationName}
+                         </td>
+                         <td class="WrapText slds-col slds-size_3-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                             <!--<lightning:input name="docMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" class="ApplyColor"/>-->
+                             {!obj.docFamObj.Deviation_Master__r.Deviation_Type__c}
+                         </td>
+                         <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left">
+                             {!obj.docFamObj.Deviation_Master__r.Minimum_Approving_Authority__c}
+                         </td>
+                     </tr>
+                     
+                     <aura:if isTrue="{!v.myid == obj.docFamObj.Id}">
+                         <aura:if isTrue="{!v.class == 'showCls' }">
+                             
+                             <tr class="{!v.class +' slds-grid slds-size--12-of-12'}" aura:Id="AssVersionId">
+                                 <div style="width:100%;">
+                                     <fieldset class="slds-form--compound">
+                                         <div class="slds-form-element__row slds-m-top--x-small ">
+                                             <div class="slds-box slds-box_x-small slds-theme_default slds-size--12-of-12" >
+                                                 <lightning:card class=" slds-size--12-of-12" >
+                                                     <header class="slds-hide"></header>
+                                                     <div class="slds-grid slds-wrap slds-grid--pull-padded slds-size--12-of-12  ">                   
+                                                        <aura:if isTrue="{!!v.isUnderwitercmp}">
+                                                         <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                             <div class="slds-form-element__control ">
+                                                                 
+                                                                         <lightning:select aura:id="saleStatus" name="" label="Status:" value="{!obj.docFamObj.Sales_Status__c}" disabled="{!if(v.profileName ==obj.docFamObj.Deviation_Master__r.Minimum_Approving_Authority__c,false,true)}">
+                                                                             <option value="" text="--None--"> </option>
+                                                                             <aura:iteration var="option" items="{!v.saleStatus}">
+                                                                                 <option value="{!option}" text="{!option}" selected="{!obj.docFamObj.Sales_Status__c == option}"></option>
+                                                                             </aura:iteration>     
+                                                                         </lightning:select>
+                                                             </div>
+                                                         </div>
+                                                        </aura:if>
+                                                        
+                                                         <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                             <div class="docNameLong slds-form-element__control ">
+                                                                 
+                                                                <lightning:input label="Mitigants:" type ="text" value="{!obj.docFamObj.Mitigants_Remark__c}" />
+                                                                 
+                                                             </div>
+                                                         </div>
+                                                         <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                             <div class="docNameLong slds-form-element__control slds-grid">
+                                                                 <label class="slds-size--2-of-6 slds-col slds-form-element__label">Documents:</label>
+                                                                 
+                                                                 <strong style="width:10rem">{!obj.docFamObj.DocumentFmlyName__r.Documents__c}</strong>
+                                                                 
+                                                             </div>
+                                                         </div>
+                                                         
+                                                        
+                                                         <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                             <div class="slds-form-element__control slds-grid">
+                                                                <c:DocumentUploader aura:id="file-uploader-1" instance="1" forPricingDashboard="yes" parentId="{!v.appObj.Id}"  fileName="{!obj.deviationName+'_dev'}" uploadType="Attachment" displayUpload="false" uploadImageFilesOnly="false" flow="Mobility2" showUploadButton="true" displayReadOnly="{!v.displayReadOnly}"/><!-- Need to add showUploadButton="false" --><!--DMS parent Added by swapnil bug 24317 -->
+                                                             </div>
+                                                            
+                                                         </div>
+                                                     </div>
+                                                     
+                                                 </lightning:card>
+                                                 
+                                             </div>
+                                             
+                                         </div>
+                                     </fieldset>
+                                 </div>
+                                 
+                             </tr>
+                             
+                             
+                         </aura:if>
+                     </aura:if>
+                     
+                     
+                 </aura:iteration>
+             </tbody>
+        </table>
+        
+        <div class="slds-p-top--x-small slds-align_absolute-center">
+            <lightning:button variant="brand" label="Save" class=" slds-theme--alt-inverse slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{!c.saveManDeviation}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+        </div>
+    </aura:if>
+    </aura:if>
+</aura:component>

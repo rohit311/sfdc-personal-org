@@ -1,0 +1,26 @@
+.THIS #gstDetailsHeading{
+    color:white;
+    font-size:14px;
+}
+.THIS .required{
+    border-left-width: 4px;
+    border-left-color: red;
+}
+
+.THIS .requiredCity{
+    border-left-width: 4px;
+    border-left-color: #ab0000;
+}
+
+.THIS .submitButtonClass{
+   	height: 30px;
+    width: 60px;
+    font-size: 13px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.THIS .GSTScroller{
+    height: 56vh;
+    width: 100%;
+}

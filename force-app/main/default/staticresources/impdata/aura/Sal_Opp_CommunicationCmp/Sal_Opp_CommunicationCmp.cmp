@@ -1,0 +1,302 @@
+<!-- Sal_Opp_CommunicationCmp -->
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <ltng:require scripts="{!$Resource.JS_CKYC_Field_Validation}"
+                  afterScriptsLoaded="{!c.afterScriptsLoaded_CKYCValidation}" /> <!-- Bug 23146 - CKYC POI/ POA validation -->
+    <aura:attribute name="oppObj" type="Opportunity"/> <!-- Bug 23146 - CKYC POI/ POA validation -->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="contact" type="Contact" default="{'sobjectType': 'Contact'}"/>
+    <aura:attribute name="account" type="Account" default="{'sobjectType': 'Account'}"/>
+    <aura:attribute name="isOwnedTrue" type="boolean" default="true"/>
+    <aura:attribute name="isMonthAtResiRequired" type="boolean"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="isMsgShownTrue" type="boolean" default="false"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="maritalStatusList" type="List"/>
+    <aura:attribute name="resTypeList" type="List"/>
+    <aura:attribute name="totalexpYr" type="List"/>
+    <aura:attribute name="totalexpMon" type="List"/>
+    <aura:attribute name="currentexpYr" type="List"/>
+    <aura:attribute name="currentexpMon" type="List"/>
+    <aura:attribute name="disablepage" type="Boolean" default="false"/> 
+    <aura:attribute name="permanentAddress" type="String"/>
+    <aura:attribute name="officeAddress" type="String"/>
+    <aura:attribute name="theme" type="String" default=""/>
+    
+    <!--YK CKYC CHANGES STARTS-->
+    <aura:attribute name="applicantObject" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="docProofList" type="List" />
+    
+    <ui:scrollerWrapper class="OppWrapScroller">
+        <div aria-labelledby="McpTab" class="slds-path__content" aura:id="communicationPanel" role="tabpanel">   
+            <br/>
+            <ul class="slds-accordion">
+                <li class="slds-accordion__list-item">
+                    <section class="slds-accordion__section slds-is-open">
+                        <div class="slds-accordion__summary">
+                            <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                                <div aria-controls="subsection1Content" aria-expanded="true" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider" onclick="{!c.togglePanel}" style="height:35px;width:100%" id="demogHeaderDiv">
+                                    <b><span id="demogIcon" class="slds-m-horizontal--x-small slds-text-heading--small">[-]</span></b>
+                                    <span id="demogLabelSpan" class="slds-truncate" title="Accordion summary">Demographic Details</span>
+                                </div>
+                            </h3>
+                        </div>
+                        <div aria-hidden="false" aura:id="demogSection">
+                            <div class="slds-p-horizontal--small">
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                    <div class="slds-p-horizontal--small">
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select aura:id="conMaritalStatus" class="optionClass" name="conMaritalStatusName" label="Marital Status" required="true" messageWhenValueMissing="Please Select Value" value="{!v.contact.Marital_Status__c}">
+                                                        <option value="">-- None --</option>
+                                                        <aura:iteration items="{!v.maritalStatusList}" var="maritalStatus">
+                                                            <option value="{!maritalStatus}" text="{!maritalStatus}" selected="{!v.contact.Marital_Status__c == maritalStatus}"></option>
+                                                        </aura:iteration>
+                                                    </lightning:select>                   
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select label="Residence Type" name="resTypeName" aura:id="conResidenceType" value="{!v.contact.Residence_Type__c}" onchange="{!c.onPicklistChange}" required="true" messageWhenValueMissing="Please Enter Value">
+                                                        <option value="">-- None --</option>
+                                                        <aura:iteration items="{!v.resTypeList}" var="resType">
+                                                            <option value="{!resType}" text="{!resType}" selected="{!v.contact.Residence_Type__c == resType}"></option>
+                                                        </aura:iteration>
+                                                    </lightning:select>                   
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <aura:if isTrue="{!v.isMonthAtResiRequired}">
+                                                    	<lightning:input aura:id="conMonthAtResidence" label="Month at Residence" value="{!v.contact.Years_At_Residence__c}" name="MonthAtResidenceName" placeholder="Month at Residence" type="text" maxlength="16" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Month at Residence can only accept digits." pattern="[0-9]*"/>
+                                                    <aura:set attribute="else">
+         												<lightning:input label="Month at Residence" value="{!v.contact.Years_At_Residence__c}" name="MonthAtResidenceName" placeholder="Month at Residence" type="text" maxlength="16" messageWhenPatternMismatch="Month at Residence can only accept digits." pattern="[0-9]*"/>	
+      												</aura:set>    
+                                                    </aura:if>
+                                                </div>
+                                            </div>
+                                            
+                                            
+                                            <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="conOfficeAddress" label="Office Address" value="{!v.officeAddress}" name="OfficeAddressName" placeholder="Office Address" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9-/][A-Za-z0-9-/ _]*$"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="conOfficePinCode" label="Office Pin code" value="{!v.contact.Office_Pin_Code__c}" name="OfficePincodeName" placeholder="Office Pin code" type="text" maxlength="6" messageWhenPatternMismatch="Pin Code must be 6 digits long" pattern="[0-9]*" messageWhenBadInput="Pin Code should contain only digits."/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="conOfficeLandlineNumber" label="Office landline Number" value="{!v.contact.Office_Landline_Number1__c}" name="OfficelandlineNumberName" placeholder="Office landline Number" type="text" maxlength="10" messageWhenPatternMismatch="Landline Number must be 10 digits long" pattern="[0-9]*" messageWhenBadInput="Landline Number should contain only digits."/>
+                                                </div>
+                                            </div>
+                                            <!--<aura:if isTrue="{!v.contact.Residence_Type__c != null}">-->
+                                            <aura:if isTrue="{!and(v.isOwnedTrue,and(v.contact.Residence_Type__c!='Owned by Self/Spouse',v.contact.Residence_Type__c!='Owned by Parent/Sibling'))}">
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="conPermanentAddress" label="Permanent Address" value="{!v.permanentAddress}" name="PermanentAddressName" placeholder="Permanent Address" pattern="^[A-Za-z0-9 _]*[A-Za-z0-9-/][A-Za-z0-9-/ _]*$"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="conPermanentPinCode" label="Permanent Pin code" value="{!v.contact.Permanent_Pin_Code__c}" name="PermanentPincodeName" placeholder="Permanent Pin code" type="text" maxlength="6" messageWhenPatternMismatch="Pin Code must be 6 digits long" pattern="[0-9]*" messageWhenBadInput="Pin Code should contain only digits."/>
+                                                    </div>
+                                                </div>
+                                                <!--</aura:if>-->
+                                            </aura:if>
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <div style="float:left;display:inline">
+                                                        <lightning:select aura:id="mcpFormYearId" name="totWorkExp" label="Total Work Experience Years" required="true" messageWhenValueMissing="Please Select Value" value="{!v.account.Total_Work_Experience_Yrs__c}">
+                                                            <option value="">-- None --</option>
+                                                            <aura:iteration items="{!v.totalexpYr}" var="year">
+                                                                <option value="{!year}" text="{!year}" selected="{!v.account.Total_Work_Experience_Yrs__c == year}"></option>
+                                                            </aura:iteration>
+                                                        </lightning:select> 
+                                                    </div>
+                                                    <div style="float:left;display:inline">
+                                                        <lightning:select aura:id="mcpFormMonthId" name="totWorkExpMon" label="Months" required="true" messageWhenValueMissing="Please Select Value" value="{!v.account.Total_Work_Experience_Months__c}">
+                                                            <option value="">-- None --</option>
+                                                            <aura:iteration items="{!v.totalexpMon}" var="month">
+                                                                <option value="{!month}" text="{!month}" selected="{!v.account.Total_Work_Experience_Months__c  == month}"></option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                                <div class="slds-form-element__control">
+                                                    <div style="float:left;display:inline">
+                                                        <lightning:select aura:id="mcpForm1" name="currWorkExp" label="Current Work Experience Years" required="true" messageWhenValueMissing="Please Select Value" value="{!v.account.Current_experiance_in_Years__c}">
+                                                            <option value="">-- None --</option>
+                                                            <aura:iteration items="{!v.currentexpYr}" var="cYear">
+                                                                <option value="{!cYear}" text="{!cYear}" selected="{!v.account.Current_experiance_in_Years__c == cYear}"></option>
+                                                            </aura:iteration>
+                                                        </lightning:select> 
+                                                    </div>
+                                                    <div style="float:left;display:inline">
+                                                        <lightning:select aura:id="mcpForm2" name="currWorkExpMon" label="Months" required="true" messageWhenValueMissing="Please Select Value" value="{!v.account.Current_experiance_in_Month__c}">
+                                                            <option value="">-- None --</option>
+                                                            <aura:iteration items="{!v.currentexpMon}" var="cMonth">
+                                                                <option value="{!cMonth}" text="{!cMonth}" selected="{!v.account.Current_experiance_in_Month__c == cMonth}"></option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </li>
+                
+                <li class="slds-accordion__list-item">
+                    <section class="slds-accordion__section">
+                        <div class="slds-accordion__summary">
+                            <h3 class="slds-text-heading_small slds-accordion__summary-heading">
+                                <div aria-controls="subsection2Content" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action slds-section-title--divider" onclick="{!c.togglePanel}" style="height:35px;width:100%" id="ckycHeaderDiv">
+                                    <b><span id="ckycIcon" class="slds-m-horizontal--x-small slds-text-heading--small">[+]</span></b>
+                                    <span id="ckycLabelSpan" class="slds-truncate" title="Accordion summary">CKYC Details</span>
+                                </div>
+                            </h3>
+                            
+                        </div>
+                        <div aria-hidden="true" class="slds-hide" aura:id="ckycSection">
+                            <div class="slds-p-horizontal--small">
+                                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input aura:id="ckycNo" label="CKYC No" value="{!v.applicantObject.CKYC_No__c }" name="ckycNo" placeholder="CKYC No" type="text"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="conFatherSpouse" class="optionClass" name="conFatherSpouse" label="Father / Spouse" value="{!v.contact.Father_Spouse__c}" messageWhenValueMissing="Please Enter Value" required="true">
+                                                <option value="">-- None --</option>
+                                                	<option value="Father" text="Father" selected="{!v.contact.Father_Spouse__c == 'Father'}"></option>
+                                                	<option value="Spouse" text="Spouse" selected="{!v.contact.Father_Spouse__c == 'Spouse'}"></option>
+                                            </lightning:select>                   
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="conFatherSpouseSalutation" class="optionClass" name="conFatherSpouseSalutation" label="Father / Spouse Salutation" value="{!v.contact.Father_Spouse_Salutation__c}" messageWhenValueMissing="Please Enter Value" required="true">
+                                                <option value="">-- None --</option>
+                                                	<option value="Mrs" text="Mrs" selected="{!v.contact.Father_Spouse__c == 'Mrs'}"></option>
+                                                	<option value="Mr" text="Mr" selected="{!v.contact.Father_Spouse__c == 'Mr'}"></option>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="conFatherSpouseFirstNameVal" label="Father / Spouse First Name" value="{!v.contact.Father_Spouse_First_Name__c}" placeholder="First Name" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please enter valid name" /> <!-- Bug 23146 - CKYC POI/ POA validation : Added pattern mismatch MSG -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="conFatherSpouseMiddleNameVal" label="Father / Spouse Middle Name" value="{!v.contact.Father_Spouse_Middle_Name__c}" placeholder="Middle Name"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="conFatherSpouseLastNameVal" label="Father / Spouse Last Name" value="{!v.contact.Father_Spouse_Last_Name__c}" placeholder="Last Name" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please enter valid name" /> <!-- Bug 23146 - CKYC POI/ POA validation : Added pattern mismatch MSG -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="motherFirstNameVal" label="Mother's First Name" value="{!v.contact.Mother_First_Name__c}" placeholder="Mother's First Name" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please enter valid name" /> <!-- Bug 23146 - CKYC POI/ POA validation : Added pattern mismatch MSG -->
+                                        </div>
+                                    </div>
+									
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="motherMiddleNameVal" label="Mother's Middle Name" value="{!v.contact.Mother_Middle_Name__c}" placeholder="Mother's Middle Name"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="motherLastNameVal" label="Mother's Last Name" value="{!v.contact.Mother_Last_Name__c}" placeholder="Mother's Last Name" messageWhenValueMissing="Please Enter Value" required="true" messageWhenPatternMismatch="Please enter valid name" /> <!-- Bug 23146 - CKYC POI/ POA validation : Added pattern mismatch MSG -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:select aura:id="documentProof" class="optionClass" name="documentProof" label="Identity Document Submitted" onchange="{!c.checkRequiredField}" value="{!v.applicantObject.Proof_of_Identity__c}" messageWhenValueMissing="Please Enter Value" required="true">
+                                                <option value="">-- None --</option>
+                                                <aura:iteration items="{!v.docProofList}" var="docName">
+                                                    <option value="{!docName.value}" text="{!docName.label}" selected="{!v.applicantObject.Proof_of_Identity__c == docName.value}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                    		<lightning:input aura:id="documentNumber" label="Identity Document No" value="{!v.applicantObject.Identity_Document_No__c}" placeholder="Identity Document No" messageWhenValueMissing="Please Enter Value" required="true"  onblur="{!c.validateCkycDetails_POI}" /> <!-- Bug 23146 - CKYC POI/ POA validation : Added on blur -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input type="date" label="Identity Document Expiry Date" name="docExpirydate" aura:id="docExpirydate" value="{!v.applicantObject.Identity_Document_Expiry_Date__c}" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </li>
+            </ul>
+        </div>
+    </ui:scrollerWrapper>
+    <br/>
+    <div class="slds-p-top--x-small">
+        <lightning:button variant="brand" label="Save Record" class="slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{! c.saveContactForCommunication }"/>
+    </div>
+    <div id="SuccessToast3" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div id="SuccessToastcomm" class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastnew}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="successmsg3"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="ErrorToast3" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+        <div id="ErrorToastcomm" class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme_error" role="alert" >
+                <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeToastError}" alternativeText="Close alert." />
+                <h2 id ="errormsg3"></h2>
+            </div>
+        </div>
+    </div>
+    <div aura:id="waiting" class="slds-hide slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+</aura:component>

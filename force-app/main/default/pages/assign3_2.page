@@ -1,0 +1,33 @@
+<apex:page controller="assign3_2_controller">
+<apex:form >
+
+<apex:pageBlock >
+    <apex:selectList value="{!l}" size="1">
+  <!--  <apex:actionFunction  action="{!disp}" name="display" reRender="dp"/>-->
+     <apex:actionSupport event="onchange" action="{!disp}" rerender="dp"/>
+
+    <apex:selectoptions value="{!options}"/>
+    </apex:selectList>
+</apex:pageBlock>
+ <br/>
+ <br/>
+ <br/>
+ <apex:pageBlock id="dp">
+     <apex:selectList value="{!a}" size="1">
+    <!--  <apex:actionFunction action="{!disp}" name="display"/> -->
+           <apex:selectoptions value="{!animals}"/>
+    </apex:selectList>
+ </apex:pageBlock>
+<br/>
+<br/>
+{!a}
+
+</apex:form>
+
+<script>
+function jsd(){
+assign3_2_controller x=new assign3_2_controller();
+x.disp();
+}
+</script>
+</apex:page>

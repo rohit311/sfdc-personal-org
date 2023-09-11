@@ -1,0 +1,7 @@
+<template>
+  <template lwc:if={contacts.data}>
+    <template for:each={contacts.data} for:item="contact">
+        <c-contact-row key={contact.Id} contact={contact}></c-contact-row>
+    </template>
+  </template>
+</template>

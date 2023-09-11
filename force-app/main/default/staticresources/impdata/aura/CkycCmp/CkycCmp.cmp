@@ -1,0 +1,120 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global" controller="CommonUtility">
+	<aura:attribute name="CKYCDocumentType" type="String" default=""/> <!--US11371-->
+    <aura:attribute name="dataSource" type="String" default=""/><!--US11371-->
+	<aura:attribute name="Product" type="String" default="SPL"/><!--11371 passed product to first API-->
+    <aura:attribute name="poiTypeList" type="List" default="['PAN','C-KYC','Driving License','Passport','Voter ID']"/>
+    <aura:attribute name="poiNumber" type="String" default=""/> 
+    <aura:attribute name="searchResp" type="Object" default=""/>
+    <aura:attribute name="downResp" type="Object" default=""/>
+    <aura:attribute name="ckycFlow" type="Object" default=""/> 
+    <aura:attribute name="ckycsmsLst" type="List" default=""/> 
+    <aura:attribute name="ckycPhoto" type="String" default=""/>
+    <aura:attribute name="currentDate" type="String" default=""/>
+    <aura:attribute name="poi" type="String" default="C"/> 
+    <aura:attribute name="recordId" type="String" default=""/> 
+    <aura:attribute name="poiType" type="String" default="PAN"/> 
+    <aura:attribute name="dateOfBirth" type="Date"/> 
+    <aura:attribute name="mobNo" type="String" default=""/> 
+    <aura:attribute name="isfirstRespfetched" type="Boolean" default=""/> 
+     <aura:attribute name="isSearchDone" type="Boolean" default=""/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+     <aura:attribute name="isReadOnly" type="boolean" default="false"/>
+    <aura:attribute name="isReadOnlyMobile" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	 <aura:attribute name="isCkycAttempted" type="boolean" default="false"/><!--added for US 21328-->
+    <aura:registerEvent name="shareCkycInfo" type="c:shareCkycInfo"/>
+    <!-- <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>-->
+    <aura:registerEvent name="CkycSearchInfo" type="c:CkycSearchInfo"/><!-- US : 13265-->
+
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-box slds-box_x-small slds-theme_shade" >
+        <lightning:card title="C-KYC Search" class="applyColor" >
+            <p class="slds-p-horizontal_small slds-theme_shade">
+                <div class="slds-p-horizontal--small">  
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:select aura:id="poiTypeId" name="poiTypeName" label="POI Type" value="{!v.poiType}" onchange="{!c.onPOIChange}" disabled="{!v.isReadOnly}">                                    
+                                    <aura:iteration items="{!v.poiTypeList}" var="poi">
+                                        <option value="{!poi}" text="{!poi}" selected="{!v.poiType == poi}"></option>
+                                    </aura:iteration>   
+                                </lightning:select>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="poiNumId" aura:id="poiNumName" label="POI Number" value="{!v.poiNumber}" required="true" disabled="{!v.isReadOnly}" onchange="{!c.validatePANVal}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input name="mobNoName" aura:id="mobval" label="Mobile Number" value="{!v.mobNo}" messageWhenPatternMismatch="Please Enter Valid Mobile Number" maxlength="10"  pattern="^([6789]\d{9})$" required="true" disabled="{!v.isReadOnlyMobile}"/>
+                            </div> 
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-align_absolute-center">
+                        <lightning:button variant="brand" label="Search" class="slds-theme--alt-inverse" iconName="utility:search" iconPosition="left" onclick="{!c.searchdata}" disabled="{!v.isReadOnly}"/>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.isfirstRespfetched}">
+                        <br/>
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label for="photo"><b>Photo</b></label>
+                                    <div id="photo">                                        
+                                        <aura:unescapedHtml value="{!v.searchResp.CKYCPhoto}" />
+                                    </div>                                    
+                                </div> 
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label for="applName"><b>Applicant Name</b></label>
+                                    <div id="applName">
+                                        <ui:outputText value="{!v.searchResp.CKYCName}"/>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label for="CreatDate"><b>Creation Date</b></label>
+                                    <div id="CreatDate">
+                                        <ui:outputText value="{!v.searchResp.CKYCGenDate}"/>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>                        
+                    </aura:if>
+                </div>
+            </p>
+        </lightning:card>
+        
+    </div>
+    <br/>
+    <!--<div class="slds-box slds-box_x-small slds-theme_shade" >-->
+        <aura:if isTrue="{!v.isfirstRespfetched}">
+            <!--<lightning:card title="C-KYC Download" class="applyColor" >-->
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">                              
+                        <div class="slds-form-element__control">
+                            <lightning:input label="Date of Birth:" type="date" value="{!v.dateOfBirth}" required="true" class="slds-size_4-of-4"  messageWhenValueMissing="Please Enter Dob" max="{!v.currentDate}" disabled="{!v.isReadOnly}"/>   
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-align_absolute-center">
+                        <br/>
+                        <lightning:button variant="brand" label="C-KYC Download" class="slds-theme--alt-inverse"  iconPosition="left" iconName="utility:approval" onclick="{!c.submit}" disabled="{!v.isReadOnly}"/>
+                    </div>
+                </p>
+            <!--</lightning:card> -->
+        </aura:if>
+   <!-- </div>-->
+</aura:component>

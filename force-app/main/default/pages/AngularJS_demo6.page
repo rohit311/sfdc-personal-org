@@ -1,0 +1,36 @@
+<apex:page >
+
+   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script> 
+  <div ng-app="notesApp">
+       <div ng-controller="MainCtrl  as Ctrl">
+          <div ng-repeat="(author,note) in Ctrl.notes">
+              <span class="label"> {{note.label}}</span>
+              <span class="author" ng-bind="author"></span>
+          </div>
+       </div>
+  </div>
+  <script>
+    angular.module('notesApp',[]).controller('MainCtrl',[function(){
+       var self=this;
+       self.notes = {
+            shyam: {
+            id: 1,
+            label: 'First Note',
+            done: false
+            },
+            Misko: {
+            id: 3,
+            label: 'Finished Third Note',
+            done: true
+            },
+            brad: {
+            id: 2,
+            label: 'Second Note',
+            done: false
+            }
+            };
+      
+    }]);
+     
+  </script>
+</apex:page>

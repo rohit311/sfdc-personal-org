@@ -1,0 +1,5 @@
+<!--c:SalMobFlowEvent-->
+<aura:event type="COMPONENT">
+    <!-- pass obligation record id where the event was fired to the handler. -->
+    <aura:attribute name="obligationRecordId" type="String" description="Pass value of obligation record id from child to parent" />
+</aura:event>

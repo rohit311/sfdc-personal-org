@@ -1,0 +1,41 @@
+<apex:page standardController="Employee__c">
+ 
+     <apex:tabPanel switchType="Client" selectedTab="">
+     
+      <apex:tab label="Employee__c" id="tabEmployee">
+             <apex:detail relatedList="false" title="true"/>
+         </apex:tab>
+
+         <apex:tab label="Leaves" id="tabLeaves">
+           <!--  <apex:relatedList subject="{!Employee__c}" list="Leaves__r"/> -->
+           <apex:pageBlock >
+              <apex:pageBlockSection title="Leaves">
+                    <apex:pageBlockTable value="{!Employee__c.Leaves__r}" var="e">
+               
+
+                          <apex:column >
+                          <apex:facet name="header">From</apex:facet>
+                               <apex:outputField value="{!e.From__c}"/><br/><br/>
+                                                      
+                          </apex:column>
+                       
+
+                          <apex:column >
+                           <apex:facet name="header">To</apex:facet>
+
+                           <apex:outputField value="{!e.FromDate__c}"/><br/><br/>
+                         
+                          </apex:column>
+                          <apex:column >
+                          <apex:facet name="header">Reason</apex:facet>
+
+                           <apex:outputField value="{!e.Reason__c}"/><br/><br/>
+                        
+                          </apex:column>
+                          
+                    </apex:pageBlockTable>
+              </apex:pageBlockSection> 
+              </apex:pageBlock>
+         </apex:tab>
+     </apex:tabPanel>
+</apex:page>

@@ -1,0 +1,44 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="SFDCMobilePOController" >
+    <aura:attribute name="SolPolicy1" type="Object[]" default="{}"/>
+    
+    
+    <div class="slds-modal__content slds-p-around--small">
+        <ui:scrollerWrapper class="wrapStyle"> 
+            <table  style="overflow:auto;" class=" slds-scrollable_y slds-size--12-of-12"> 
+                        <thead class="slds-grid">
+                            <tr class ="slds-grid slds-size--12-of-12">
+                                
+                                <th class="slds-col slds-size--6-of-12 slds-hyphenate slds-border_left bglightBlue">Description</th>
+                                <th class="slds-col slds-size--6-of-12 slds-hyphenate slds-border_left bglightBlue"> Value</th>      
+                            </tr>
+                        </thead>
+                    </table>
+              <table  style="overflow:auto;" class=" slds-scrollable_y slds-size--12-of-12"> 
+            <aura:iteration items="{!v.SolPolicy1}" var="obj">
+                <div class="slds-modal__content slds-p-around--medium slds-scrollable_y" >
+                    
+                    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" >
+                      
+                       
+                        <tbody class="slds-grid slds-wrap">
+                            
+                           
+                                <tr class="slds-grid slds-size--12-of-12 slds-has-divider--top slds-border_top slds-border_left slds-border_right slds-border_bottom">
+                                    
+                                    <td class="slds-col slds-size--6-of-12 slds-hyphenate">{!obj.Policy_Name__c }</td>
+                                    <td class="slds-col slds-size--6-of-12 slds-hyphenate slds-border--left"> {!obj.Reason__c }</td>
+                                </tr>
+                    
+                        </tbody>
+                     
+                    </div>
+                </div>
+            </aura:iteration>
+                     </table>
+        </ui:scrollerWrapper>       
+    </div>
+    
+    
+    
+    
+</aura:component>

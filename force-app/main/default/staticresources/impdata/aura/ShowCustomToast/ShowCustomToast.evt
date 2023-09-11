@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event to display custom toast.">
+    <aura:attribute name="title" type="string"/>
+    <aura:attribute name="message" type="string"/>
+    <aura:attribute name="type" type="string"/>
+</aura:event>

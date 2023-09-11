@@ -1,0 +1,206 @@
+<!-- Bug 20391 : Bug 22065 : Documents Section -->
+<aura:component controller="SAL20_DocumentsController" >
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <aura:attribute name="attributeWrapperObj" type="object"/>
+    <aura:attribute name="loanId" type="String" default="006O000000AETsM"/>
+    <aura:attribute name="documentType" type="String" default="Standard_Document"/>
+    
+    <aura:attribute name="isProcessing" type="Boolean" default="false"/> 
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Attributes : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    <div class="slds-p-around_xxx-small">
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <div class="slds-grid slds-page-header"  style="background: rgb(0,114,188);color:white">
+            <h1 class="slds-page-header__title slds-text-heading_large font-size-heading-x-large slds-align-middle">
+                <aura:if isTrue="{!v.documentType == 'Standard_Document'}">
+                    Standard Documents
+                </aura:if> 
+                <aura:if isTrue="{!v.documentType == 'Deviation_Document'}">
+                    Deviation Documents
+                </aura:if> 
+            </h1>
+        </div>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Discrepancy Section Title : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+ Standard Documents : Table : Start +-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!v.documentType == 'Standard_Document'}">
+            <br/>
+            <div class="slds-text-heading_medium">Standard Documents</div>
+            <table class="slds-table slds-hyphenate slds-table_bordered slds-size--12-of-12 slds-wrap document-table slds-max-medium-table_stacked-horizontal" aura:id="uploadedDocs">    
+                <thead  class="slds-grid slds-hyphenate slds-wrap " >
+                    <tr class ="slds-grid slds-hyphenate slds-size--12-of-12 slds-text-title_caps document-table-header" >
+                        <th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Sr No
+                        </th>
+                        <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Document Type
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Documents
+                        </th>
+                        <th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Mandatory
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Sales Status
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Ops Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="slds-grid slds-wrap">
+                    
+                    <aura:iteration items="{!v.attributeWrapperObj.docWrapperList}" var="docFamily" indexVar="index"  >
+                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Sr No" data-label="Sr No" >
+                                {!docFamily.rowNum}
+                            </td>
+                            <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Document Type" data-label="Document Type" >
+                                {!docFamily.docName}
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Documents" data-label="Documents" >
+                                <lightning:select name="selectDoc" label="" value="{!docFamily.selectedDoc}" >  
+                                    <aura:iteration items="{!docFamily.documentList}" var="oA">
+                                        <option value = "{!oA.value}" 
+                                                label = "{!oA.label}" 
+                                                selected = "{!oA.value == docFamily.selectedDoc}"
+                                                >{!oA.label}</option>  
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            <td class="WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Mandatory" data-label="Mandatory" >
+                                <ui:inputCheckbox  aura:id="checkMandatory" value="{!docFamily.docFamObj.Mandatory__c}" disabled="true" class="mandatory-checkbox" />
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Sales Status" data-label="Sales Status" >
+                                {!docFamily.docFamObj.Sales_Status__c}
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Ops Status"  data-label="Ops Status" >
+                                <lightning:select name="selectCPA_Status" label="" value="{!docFamily.docFamObj.CPA_Status__c}" >  
+                                    <aura:iteration items="{!v.attributeWrapperObj.optionsCPA_Status}" var="oC">
+                                        <option value = "{!oC.value}" 
+                                                label = "{!oC.label}" 
+                                                selected = "{!oC.value == docFamily.docFamObj.CPA_Status__c}"
+                                                >{!oC.label}</option>  
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </aura:if> 
+        <!-- +-+-+-+-+-+-+-+ Standard Documents : Table : End +-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+ Deviation Documents : Table : Start +-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{!v.documentType == 'Deviation_Document'}">
+            <br/>
+            <div class="slds-text-heading_medium">Deviation Documents</div>
+            <table class="slds-table slds-hyphenate slds-table_bordered slds-size--12-of-12 slds-wrap document-table slds-max-medium-table_stacked-horizontal" aura:id="uploadedDocs">    
+                <thead  class="slds-grid slds-hyphenate slds-wrap">
+                    <tr class ="slds-grid slds-hyphenate slds-size--12-of-12 slds-text-title_caps document-table-header">
+                        <th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Sr No
+                        </th>
+                        <th class="WrapText slds-col slds-size_4-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Deviation Name
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Documents
+                        </th>
+                        <th class="WrapText slds-col slds-size_1-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Mandatory
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Sales Status
+                        </th>
+                        <th class="WrapText slds-col slds-size_2-of-12 slds-border_top slds-border_bottom slds-hyphenate slds-border_left slds-border_right slds-hyphenate">
+                            Ops Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="slds-grid slds-wrap">
+                    
+                    <aura:iteration items="{!v.attributeWrapperObj.deviationDocWrapperList}" var="docFamily1" indexVar="index"  >
+                        <tr class="slds-grid slds-hyphenate slds-size--12-of-12 slds-border_left slds-border_right">
+                            <td class="WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Sr No" data-label="Sr No" >
+                                {!docFamily1.rowNum}
+                            </td>
+                            <td class="WrapText slds-col slds-size_4-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Deviation Name" data-label="Deviation Name" >
+                                {!docFamily1.deviationName}
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Documents" data-label="Documents"  >
+                                <lightning:select name="selectDoc" label="" value="{!docFamily1.selectedDoc}" disabled="{!(!docFamily1.showPicklist)}" >  
+                                    <aura:iteration items="{!docFamily1.documentList}" var="oA">
+                                        <option value = "{!oA.value}" 
+                                                label = "{!oA.label}" 
+                                                selected = "{!oA.value == docFamily1.selectedDoc}"
+                                                >{!oA.label}</option>  
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            <td class="WrapText slds-col slds-size_1-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Mandatory" data-label="Mandatory" >
+                                <ui:inputCheckbox  aura:id="checkMandatory" value="{!docFamily1.docFamObj.Mandatory__c}" disabled="true" class="mandatory-checkbox" />
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Sales Status" data-label="Sales Status" >
+                                {!docFamily1.docFamObj.Sales_Status__c}
+                            </td>
+                            <td class="WrapText slds-col slds-size_2-of-12 slds-border_bottom slds-border_right slds-hyphenate slds-border--left" title="Ops Status"  data-label="Ops Status" >
+                                <lightning:select name="selectCPA_Status" label="" value="{!docFamily1.docFamObj.CPA_Status__c}"  >  
+                                    <aura:iteration items="{!v.attributeWrapperObj.optionsCPA_Status}" var="oC">
+                                        <option value = "{!oC.value}" 
+                                                label = "{!oC.label}" 
+                                                selected = "{!oC.value == docFamily1.docFamObj.CPA_Status__c}"
+                                                >{!oC.label}</option>  
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+ Deviation Documents : Table : End +-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+ Save Button : Start +-+-+-+-+-+-+-+ -->  
+        <aura:if isTrue="{!and (v.documentType == 'Standard_Document', !empty(v.attributeWrapperObj.docWrapperList) )}"> <!-- Bug 22647 : issue with deviationDocWrapperList -->
+            <br/>
+            <div class="slds-text-align_center">
+                <lightning:button variant="brand" label="Save Document Status" title="Save Document Status" disabled="{!v.isProcessing }" onclick="{!c.onSaveDocumentStatus}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!and (v.documentType == 'Deviation_Document', !empty(v.attributeWrapperObj.deviationDocWrapperList) )}">
+            <br/>
+            <div class="slds-text-align_center">
+                <lightning:button variant="brand" label="Save Document Status" title="Save Document Status" disabled="{!v.isProcessing }" onclick="{!c.onSaveDocumentStatus}" class="slds-m-around_xx-small" iconName="utility:save" iconPosition="left" />
+            </div>
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+ Save Button : End +-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <aura:if isTrue="{! v.isProcessing }">
+            <div class="spinner-overlay">
+                <div class=".slds-is-relative" style="height: 6rem;">
+                    <div role="status" class="slds-spinner slds-spinner_large">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- <lightning:spinner alternativeText="Loading" /> -->
+        </aura:if>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Processing Spinner : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : Start +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+        <c:Toast aura:id="toastCmp"/>
+        <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom Toast Message : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    </div>
+    <!-- +-+-+-+-+-+-+-+-+-+-+-+-+-+ Body Container : End +-+-+-+-+-+-+-+-+-+-+-+-+-+ -->
+    
+</aura:component>

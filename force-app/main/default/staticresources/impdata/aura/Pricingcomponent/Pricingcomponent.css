@@ -1,0 +1,81 @@
+.THIS .offer-pg-cont{
+    width: 100%;
+    margin: 0px;
+    overflow: hidden;
+}/*
+.THIS .applywidth{
+        width: 10px;
+    }*/
+.THIS .applyzerowidth{
+       /* width: 10px;*/
+    }
+.THIS .offer-pg > .slds-path__item{
+    overflow-x: auto;
+    background-color:blue;
+    margin-left:10px;
+    float:left;
+}
+.THIS .offer-pg{
+    
+    width: 1500px;
+}
+.THIS .divWidth
+{
+      width: 600px;  
+    padding-right: 40px;
+}
+.THIS .applyposition
+{
+    position:"relative";
+}
+@media only screen and (max-width: 500px){
+   .THIS .offer-pg{
+        width: 450px;
+      padding-right : 50px;
+}
+
+.THIS .offer-pg-cont{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+    .THIS .applywidth{
+       /* width: 50px;
+        padding-left :50px;*/
+    }
+}
+
+@media only screen and (max-width: 680px) and (min-width: 500px){
+   .THIS .offer-pg{
+        
+        width: 700px;
+        padding-right : 100px;
+}
+
+.THIS .offer-pg-cont{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+    .THIS .applywidth{
+        width: 100px;
+    }
+}
+
+
+@media only screen and (max-width: 800px) and (min-width: 680px){
+   .THIS .offer-pg{
+        
+        width: 800px;
+        padding-right : 100px;
+}
+
+.THIS .offer-pg-cont{
+    width: 110%;
+    margin: 0px;
+    overflow: hidden;
+}
+    .THIS .applywidth{
+        width: 100px;
+    }
+}

@@ -1,0 +1,82 @@
+<aura:component controller="DynamicFieldsController" >
+   	<!--- Use Salesforce Lightning Design System CSS from Static resources -->   
+   	<ltng:require styles="{!$Resource.SLDSv2 + '/assets/styles/salesforce-lightning-design-system.css'}"/>
+    
+    <!-- START :  Added for Miles and LAIP purpose -->
+    <aura:method name="setCustfields"  action="{!c.setCustfields}">
+     <aura:attribute name="selectedRecord1" type="sObject" default="{}" description="Used to store SELECTED sObject Record"/>
+     <aura:attribute name="ObjectName1" type="String" description="Used to store lookup object name"/>
+     <aura:attribute name="FieldName1" type="String" description="Used to store lookup field name"/>
+     <aura:attribute name="ObjectLabel1" type="String" description="Used to store lookup object label"/>
+    </aura:method>
+    
+    <aura:method name="clearLookup"	action="{! c.clear }" />
+    <!-- START :  Added for Miles and LAIP purpose -->
+    
+    <!-- Declare attributes --> 
+    <aura:attribute name="selectedRecord" type="sObject" default="{}" description="Used to store SELECTED sObject Record"/>
+    <aura:attribute name="listOfSearchRecords" type="sObject[]" description="Used to store the list of search records which is returned from apex class"/>
+    <aura:attribute name="SearchKeyWord" type="String" description="Used to store search keyword used in WHERE condition"/>
+    <aura:attribute name="Message" type="String" default="Search Result.." description="Used to store default message displayed above text box"/>
+    <aura:attribute name="ObjectName" type="String" description="Used to store lookup object name"/>
+    <aura:attribute name="ObjectLabel" type="String" description="Used to store lookup object label"/>
+    <aura:attribute name="FieldName" type="String" description="Used to store lookup field name"/>
+    <aura:attribute name="schemeId" type="String"/> <!--Bug 20391 changes-->
+    <aura:attribute name="isCleared" type="Boolean" default="false"/><!--Bug 20391 changes-->
+    <!-- SAL Mobilty Flow -->
+    <aura:attribute name="isSALMobilityFlow" type="boolean" default="false"/>
+    <!-- SAL Mobilty Flow -->
+    
+    <!-- Declare events hendlers -->  
+    <aura:handler name="SelectedRecordEvent" event="c:SelectedRecordEvent" action="{!c.handleComponentEvent}" description="This event is fired when a record is selected from lookup records list"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}" description="This event is fired when an apex action is invoked"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}" description="This event is fired when an apex action is completed"/>
+    
+    <!-- Start of container for lookup box -->
+    <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+        <!-- Start of search bar for lookup box -->  
+        <div class="slds-form-element__control">
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+                <c:SVG class="slds-input__icon slds-show" xlinkHref="{!$Resource.SLDSv2 + '/assets/icons/utility-sprite/svg/symbols.svg#search'}" />
+                <!-- Start of object name and remove icon -->
+                <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                    <span class="slds-pill slds-pill-custom">
+                        <span class="slds-pill__label">
+                           <aura:if isTrue="{!v.ObjectName == 'Scrips__c'}">
+                                        {!v.selectedRecord.Name}
+                                    	<aura:set attribute="else">
+                                            {!v.selectedRecord.Name}
+                                        </aura:set>
+                                    </aura:if> 
+                        </span>
+                        <button class="slds-button slds-button--icon slds-pill__remove" onclick="{!c.clear}">
+                            <c:SVG class="slds-button__icon" xlinkHref="{!$Resource.SLDSv2 + '/assets/icons/utility-sprite/svg/symbols.svg#close'}" />
+                            <span class="slds-assistive-text">Remove</span>
+                        </button>
+                    </span>
+                </div>
+                <!-- End of object name and remove icon -->
+                <!-- Start of input box to enter search text -->
+                <div aura:id="lookupField" class="slds-show">
+                    <ui:inputText updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input " value="{!v.SearchKeyWord}" placeholder="{!'Search ' + if(v.FieldName1 == '', v.FieldName, v.ObjectLabel) + '...'}"/> 
+                </div>
+                <!-- End of input box to enter search text -->
+            </div>
+        </div>
+        <!-- End of search bar for lookup box -->
+        <!-- Start of lookup search result div -->  
+        <div class="slds-lookup__menu slds" id="lookup-348">
+            <div class="slds-lookup__item--label slds-text-body--small">{!v.Message}</div>
+            <center> <ui:spinner aura:id="spinner"/> </center>
+            <!-- Start of lookup search result list -->
+            <ul class="slds-lookup__list" role="listbox">
+                <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                    <c:customLookupResult record="{!singleRec}" isSALMobilityFlow="{!v.isSALMobilityFlow}" ObjectName="{!v.ObjectName}"/>
+                </aura:iteration>
+            </ul>
+            <!-- Start of lookup search result list -->
+        </div>
+        <!-- End of lookup search result div -->
+    </div>
+    <!-- End of container for lookup box -->
+</aura:component>

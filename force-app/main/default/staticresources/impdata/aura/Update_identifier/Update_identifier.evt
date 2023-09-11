@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="eventName" type="String"/>
+    <aura:attribute name="oppId" type="String"/>
+    <aura:attribute name="appId" type="String"/>
+</aura:event>

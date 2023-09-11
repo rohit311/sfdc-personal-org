@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute access="private" name="error" type="String" default=""/>
+    <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">      
+        <aura:if isTrue="{! !empty(v.error)}">
+            <ui:message title="Error" severity="error" closable="true">{!v.error}</ui:message>
+        </aura:if>
+        <iframe width="600" height="600" style="border: 1px solid" src="{!($Resource.Insurance_Product_Features+'/Insurance_Product_Features/BALIC-eTouch/index.html')}"/>
+    </div>  
+</aura:component>

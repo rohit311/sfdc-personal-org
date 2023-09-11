@@ -1,0 +1,167 @@
+<aura:component access="global" controller="SALMobilityCntrl_V2"  implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"  >
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="accObj" type="Account" default=""/>
+    <aura:attribute name="curAppId" type="String" default=""/><!--Bug 24668 -->
+    <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 -->
+     <aura:attribute name="appType" type="String" default="Primary"/><!--Bug 24668 -->
+    <aura:attribute name="priAppObj" type="Applicant__c" default="{}"/><!--Bug 24668 -->
+    <aura:attribute name="veriObj" type="Verification__c[]" default=""/>
+    <aura:attribute name="checklist" type="List"/>
+    <aura:attribute name="dispositionList" type="List"/>
+    <aura:attribute name="mapOfIcons" type="List"/>
+    <aura:attribute name="mapOfChecklist" type="Map" />       
+    <aura:attribute name="SOLDependentList" type="Object" />
+    <aura:attribute name="listchange" type="List" default=""/>       
+    <aura:registerEvent name="eventDashboard" type="c:EventDashboard"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute name="appTypeLst" type="List" default="['Primary']"/><!--24668 --> 
+    <!-- <aura:handler event="aura:doneRendering" action="{!c.onclickbutton}"/> -->
+    
+    
+    <div aura:id="dashboardModel" class="slds-size--12-of-12 slds-align_absolute-center" id="dashboardModelId"> 
+        <div aura:id="deviceBasedDiv" id="deviceBasedDiv" role="dialog" tabindex="-1" aria-describedby="MainPopUp" aria-labelledby="header99" class="{!$Browser.isIOS == true ? 'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large align-dashboard':'slds-align_absolute-center slds-modal slds-fade-in-open slds-modal_large'}">
+            <div class="slds-modal__container slds-size--12-of-12"  style="overflow:auto;">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse slds-text-heading_large" title="Close" onclick="{!c.onCrossButton}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> Sales Dashboard </h2>
+                </div>
+                
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div style="position:relative">
+                        <div class="innerDivWrapper">
+                            <div aura:id='MainPopUp' class="{!(v.oppId == null || v.oppId == '') ? 'slds-modal__content slds-p-around--medium  slds-scrollable_x slds-scrollable_y' : 'slds-modal__content slds-p-around--medium  slds-scrollable_x slds-scrollable_y'}" style="top:1rem;">
+                                
+                                
+                                
+                                <!-- <lightning:button title="Check" onclick="{!c.onclickbutton}">Check</lightning:button> -->
+                                <div class="slds-scrollable_y " style="font-size: 14px;overflow:scroll;">
+                                   	<!--24668 start -->
+                                    <div class="slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <lightning:select aura:id="appType"  label="Applicant" name="appType" value="{!v.appType}" onchange="{!c.onAppChange}">
+                                            <aura:iteration items="{!v.appTypeLst}" var="pl">
+                                                <option value="{!pl}" text="{!pl}" selected="{!pl == 'Primary'}"></option>
+                                            </aura:iteration>
+                                        </lightning:select> 
+                                    </div>
+                                    <!--24668 stop -->
+                                    <div id="mytable" style="overflow:auto;" class="slds-scrollable_x slds-scrollable_y slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-size--12-of-12">
+                                        
+                                        <ul class="slds-m-left_xx-small slds-grid slds-wrap slds-grid_pull-padded">                      
+                                            <aura:iteration items="{!v.SOLDependentList}" var="ch"> 
+                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                    <aura:if isTrue="{!and(icons.name == ch.key,icons.value == 'action:approval')}">
+                                                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                            <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                <div id="margin">
+                                                                </div>
+                                                                <div class="slds-media__figure">
+                                                                    <span id="{!ch.key}" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                        
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">{!ch.key}</span>
+                                                                        
+                                                                        
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                        <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                            {!ch.key}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div class="slds-tile__detail">
+                                                                        <dl class="slds-list_horizontal slds-wrap">
+                                                                            <dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                            <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}">{!icons.remarks}</dd>
+                                                                            
+                                                                            <div id="{!ch.key+'dropdownDiv'}" class="slds-hide slds-grid slds-size_12-of-12">
+                                                                                <dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Disposition: </dt>
+                                                                                <dd id="{!ch.key+'dropdown'}" class="slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;">
+                                                                                    <lightning:select class="" aura:id="disVal" name="{!ch.key}" label="" value="" onchange="{!c.onselectchange}">
+                                                                                        <option value="" text="--None--" style=""/>
+                                                                                        
+                                                                                        <aura:iteration items="{!ch.value}" var="dis">
+                                                                                            <option value="{!ch.key+';'+dis}" text="{!dis}" ></option>
+                                                                                        </aura:iteration>
+                                                                                    </lightning:select>  
+                                                                                </dd>
+                                                                            </div>
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                        </li>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:iteration>
+                                            <aura:iteration items="{!v.SOLDependentList}" var="ch"> 
+                                                <aura:iteration items="{!v.mapOfIcons}" var="icons" >
+                                                    <aura:if isTrue="{!and(icons.name == ch.key,icons.value == 'action:close')}">
+                                                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                            <article class="slds-box slds-tile slds-media slds-card__tile slds-hint-parent  card " >
+                                                                <div id="margin">
+                                                                </div>
+                                                                <div class="slds-media__figure">
+                                                                    <span id="{!ch.key}" class="slds-icon_container slds-icon-standard-contact" title="Description of icon when needed">
+                                                                        
+                                                                        <lightning:icon  iconName="{!icons.value}" />
+                                                                        <span class="slds-assistive-text">{!ch.key}</span>
+                                                                        
+                                                                        
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                                                                        <h3 class="slds-tile__title fontColor" title="Related Record Title 1" style="font-weight:bold;">
+                                                                            {!ch.key}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div class="slds-tile__detail">
+                                                                        <dl class="slds-list_horizontal slds-wrap">
+                                                                            <dt class="slds-size_1-of-2 slds-item_label slds-text-color_strong fontColor" title="First Label">Remarks: </dt>
+                                                                            <dd class="slds-size_1-of-2 slds-item_detail fontColor" title="Description for first label" id="{!ch.key+'remark'}">{!icons.remarks}</dd>
+                                                                            
+                                                                            <div id="{!ch.key+'dropdownDiv'}" class="slds-grid slds-size_12-of-12">
+                                                                                <dt class="slds-size_1-of-2 slds-item_label  slds-text-color_strong fontColor" title="Second Label" style="margin-top:5%;margin-right:10%">Disposition: </dt>
+                                                                                <dd id="{!ch.key+'dropdown'}" class="slds-size_1-of-2 slds-item_detail slds-truncate" title="Description for second label"  style="width:50%;">
+                                                                                    <lightning:select class="" aura:id="disVal" name="{!ch.key}" label="" value="" onchange="{!c.onselectchange}">
+                                                                                        <option value="" text="--None--" style=""/>
+                                                                                        
+                                                                                        <aura:iteration items="{!ch.value}" var="dis">
+                                                                                            <option value="{!ch.key+';'+dis}" text="{!dis}" ></option>
+                                                                                        </aura:iteration>
+                                                                                    </lightning:select>  
+                                                                                </dd>
+                                                                            </div>
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                        </li>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                    <div class="slds-p-around--x-small" align="center">
+                                        <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="Save" onclick="{!c.updateRecords}" disabled="{!v.stageName== 'DSA/PSF Login'?false:true}"/> <!-- CR 22307 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        
+    </div>
+    
+    
+</aura:component>

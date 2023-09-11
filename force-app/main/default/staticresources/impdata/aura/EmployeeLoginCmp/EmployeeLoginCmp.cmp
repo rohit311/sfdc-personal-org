@@ -1,0 +1,58 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:availableForFlowScreens" access="GLOBAL" controller="EmployeeLoanAutomationCtrl">
+    <!--  <ltng:require styles="{! $Resource.bootstrap + '/bootstrap-3.3.7-dist/css/bootstrap.min.css'}" 
+      scripts="{!join(',', 
+        $Resource.jquery224 , 
+        $Resource.bootstrap + '/bootstrap-3.3.7-dist/js/bootstrap.min.js')
+      }" afterScriptsLoaded="{!c.scriptsLoaded}"/>   -->
+    <!--To ensure proper rendering and touch zooming using below meta tag--> 
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="homeFlag" type="boolean" default="true"/>
+    <aura:attribute name="EmployeeId" type="String"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="hideOTPButton" type="Boolean" default="false"/>
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+    <aura:attribute name="employeeLoanBackground" type="String" default=""/>
+    
+    <aura:attribute name="mobileToShow" type="String" default=""/>
+    <aura:attribute name="showSubmitButton" type="Boolean" default="false"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute name="isError" type="Boolean"/>
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}"/>
+    <aura:attribute name="EmployeeDetails" type="Performance_reports__c" default="{EmployeeId__c:'',Mobile__c:'',One_Time_Password__c:''}"/>
+    <div aura:id="boxBorder" style="{!'position: relative; background:' + v.backgroundColor + ' url(' + v.employeeLoanBackground +') no-repeat; width: 100%; height: 100%;background-size: cover;'}" class="">
+        <div class=""><div style="{!'background:' + v.backgroundColor + ' url(' + v.backgroundImageURL +') no-repeat;'}" class="sizeOfDiv">
+            </div></div> 
+        <c:LoaderForMobility />
+        <c:Custom_Toast_Mobility />
+        
+        <aura:if isTrue="{!v.homeFlag}"> 
+            <div  class="slds-m-top_xx-large slds-grid slds-wrap slds-grid--pull-padded slds-size--12-of-12 " style="padding-bottom:20% !important">
+                <lightning:card  title="" class="{!$Browser.formFactor=='DESKTOP'?'bigCard extraTopMargin applyMarginToCard slds-section-title--divider applyColor slds-align_absolute-center':'bigCard applyMarginToCard slds-section-title--divider applyColor slds-align_absolute-center'}" >
+                    <ui:outputText value="Enter Your Details"/>
+                    <lightning:input text="number" aura:id='empidno' placeholder="Employee ID"  value="{!v.EmployeeDetails.EmployeeId__c}"  onblur="{!c.DisplayMobileNo}"/>
+                    <lightning:input class='slds-hide' placeholder="Mobile Number" value="{!v.EmployeeDetails.Mobile__c}" disabled= "true"/>
+                    <lightning:input placeholder="Mobile Number" aura:id="mId" value="{!v.mobileToShow}" disabled= "true"/>
+                    <aura:if isTrue="{!!v.hideOTPButton}">   
+                        <lightning:button aura:id="getOTPbutton" class="slds-m-top_x-small slds-align_absolute-center slds-theme--alt-inverse" label="Get OTP" variant="brand" onclick="{!c.getOTP}"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showSubmitButton}">
+                        <lightning:input aura:id='otpbox' placeholder="Please enter the OTP" value="{!v.EmployeeDetails.One_Time_Password__c}"/>
+                        <div><lightning:button aura:id="reOTP" class="slds-m-top_x-small  slds-theme--alt-inverse" label="Regenerate OTP" variant="brand" onclick="{!c.getOTP}"/>
+                            
+                            <lightning:button class=" slds-m-top_x-small  slds-theme--alt-inverse" label="Submit OTP" onclick="{!c.submitOTP}" variant="brand"/> 
+                        </div> </aura:if>
+                </lightning:card>  
+                
+                
+            </div>
+            
+            
+            
+            
+            
+            
+            
+        </aura:if>
+    </div>  
+</aura:component>

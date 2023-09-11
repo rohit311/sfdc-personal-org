@@ -1,0 +1,154 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="AccountController">
+    <aura:attribute name="accId" type="String" default="0012800000FJRtb"/>
+    <aura:attribute name="account" type="Account" default=""/>
+    <aura:attribute name="pageTitle" type="String" default=""/>
+    <!-- Cases record & header lists -->
+    <aura:attribute name="casesList" type="List" default=""/>
+    <aura:attribute name="casesHeaders" type="List" default="['Case Number','Subject','Priority','Status']"/>
+    <!-- Contact record & header lists -->
+    <aura:attribute name="contactList" type="List" default=""/>
+    <aura:attribute name="contactHeaders" type="List" default="['Contact Name','Title','Email']"/>
+    <!-- Opportunity record & header lists -->
+    <aura:attribute name="oppList" type="List" default=""/>
+    <aura:attribute name="oppHeaders" type="List" default="['Opportunity Name','Stage','Amount','Close Date']"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    
+    <!-- Spinner for loading start-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Spinner for loading end-->  
+    
+    <lightning:card  class="slds-theme_default">
+        <aura:set attribute="title">
+            <lightning:icon iconName="standard:account" size="small" class="slds-m-right_small"/>
+            {! v.pageTitle }
+        </aura:set>
+        <lightning:accordion aura:id="accordion" activeSectionName="details" allowMultipleSectionsOpen="true" class="slds-theme_shade">
+            <lightning:accordionSection name="details" label="Account Details">
+                <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded slds-theme_default">
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="Name" value="{!v.account.Name}" disabled="true" />
+                    </p>
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="Potential Value" value="{!v.account.Potential_Value__c}" disabled="true"/>
+                    </p>
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="Customer ID" value="{!v.account.Customer_ID__c}" disabled="true"/>
+                    </p>
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="Number of Locations" value="{!v.account.NumberofLocations__c}" disabled="true"/>
+                    </p>
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="SLA Expiration Date" value="{!v.account.SLAExpirationDate__c}" disabled="true"/>
+                    </p>
+                    <p class="slds-size--3-of-12 slds-m-right_large slds-m-left_large">
+                        <lightning:input label="Industry" value="{!v.account.Industry}" disabled="true"/>
+                    </p>
+                </div>
+            </lightning:accordionSection>
+            
+            <lightning:accordionSection name="Contacts" label="Contacts">                
+                <aura:if isTrue="{!not(empty(v.contactList))}">
+                    
+                    <table class="slds-table slds-table--bordered">
+                        <thead>
+                            <tr class="slds-text-heading--label">
+                                <aura:iteration items="{!v.contactHeaders}" var="conHeader">
+                                    <th>{!conHeader}</th>
+                                </aura:iteration>
+                            </tr>
+                        </thead>   
+                        <tbody>
+                        	<aura:iteration items="{!v.contactList}" var="conRec">
+                            	<tr>
+                                    <td>
+                                        <!--<a href="{!'/one/one.app?#/sObject/'+ conRec.Id + '/view'}" target="_blank">{!conRec.Name}</a>-->
+                                        <a href="{!'https://rohit311-dev-ed.my.salesforce.com/'+ conRec.Id}" target="_blank">{!conRec.Name}</a>
+                                    </td>
+                                    <td>{!conRec.Title}</td>
+                                    <td>{!conRec.Email}</td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>    
+                    
+                    <aura:set attribute="else">
+      					No Contacts found !
+    				</aura:set>
+                </aura:if>
+            </lightning:accordionSection>
+            
+            <lightning:accordionSection name="Opportunities" label="Opportunities">
+                <aura:if isTrue="{!not(empty(v.oppList))}">
+                    
+                    <table class="slds-table slds-table--bordered">
+                        <thead>
+                            <tr class="slds-text-heading--label">
+                                <aura:iteration items="{!v.oppHeaders}" var="oppHeader">
+                                    <th>{!oppHeader}</th>
+                                </aura:iteration>
+                            </tr>
+                        </thead>   
+                        <tbody>
+                        	<aura:iteration items="{!v.oppList}" var="oppRec">
+                            	<tr>
+                                    <td>
+                                        <!--<a href="{!'/one/one.app?#/sObject/'+ oppRec.Id + '/view'}" target="_blank">{!oppRec.Name}</a>-->
+                                        <a href="{!'https://rohit311-dev-ed.my.salesforce.com/'+ oppRec.Id}" target="_blank">{!oppRec.Name}</a>
+                                    </td>
+                                    <td>{!oppRec.StageName}</td>
+                                    <td>{!oppRec.Amount}</td>
+                                    <td>{!oppRec.CloseDate}</td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>    
+                    
+                    <aura:set attribute="else">
+      					No Opportunities found !
+    				</aura:set>
+                </aura:if>
+            </lightning:accordionSection>
+            <lightning:accordionSection name="Cases" label="Cases">
+                <aura:if isTrue="{!not(empty(v.casesList))}">
+                    
+                    <table class="slds-table slds-table--bordered">
+                        <thead>
+                            <tr class="slds-text-heading--label">
+                                <aura:iteration items="{!v.casesHeaders}" var="caseHeader">
+                                    <th>{!caseHeader}</th>
+                                </aura:iteration>
+                            </tr>
+                        </thead>   
+                        <tbody>
+                        	<aura:iteration items="{!v.casesList}" var="caseRec">
+                            	<tr>
+                                    <td>
+                                        <!--<a href="{!'/one/one.app?#/sObject/'+ oppRec.Id + '/view'}" target="_blank">{!oppRec.Name}</a>-->
+                                        <a href="{!'https://rohit311-dev-ed.my.salesforce.com/'+ caseRec.Id}" target="_blank">{!caseRec.CaseNumber}</a>
+                                    </td>
+                                    <td>{!caseRec.Subject}</td>
+                                    <td>{!caseRec.Priority}</td>
+                                    <td>{!caseRec.Status}</td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>    
+                    
+                    <aura:set attribute="else">
+      					No Cases found !
+    				</aura:set>
+                </aura:if>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </lightning:card>
+    
+</aura:component>

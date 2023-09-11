@@ -1,0 +1,349 @@
+<!--Final_Offer_Details-->
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    <aura:attribute name="cityList" type="List"/> <!--City CR -->
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" /> 
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="dsaUser" type="Boolean" default="false"/>
+    <aura:attribute name="nameTheme" type="String"/>
+    <aura:attribute name="oppId" type="Id" default=""/>
+    <aura:attribute name="loan" type="Opportunity" />
+    <aura:attribute name="stageCompletion" type="String"/>
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="applicant" type="Applicant__c" />
+    <aura:attribute name="ckycFlow" type="Object" default=""/> <!--23578 -->
+    <aura:attribute name="currentDate" type="String" default=""/><!--23578 -->
+    <aura:attribute name="contact" type="Contact" />
+    <aura:attribute name="isPreapproved" type="boolean" default="false"/>
+    <aura:attribute name="POobj" type="Product_Offerings__c" default="{}"/>
+    <aura:attribute name="camObj" type="CAM__c" />
+    <aura:attribute name="amountaspereligibility" type="String"/>
+    <aura:attribute name="theme" type="String" default="Theme3"/>
+    <aura:attribute name="tenorList" type="List" default="12,18,24,36,48,60,72"/><!--Added 18 value to tenor for Bug 23064-->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <!--Rohit Send to credit start -->
+    <aura:attribute name="primaryApp" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="showCredit" type="boolean" default="false"/>    
+    <aura:attribute name="wrapperList" type="SALMobilityCntrl_V2.SelectOption"/>
+    <aura:attribute name="selectedValue" type="string"/>
+    <aura:attribute name="isSalesVisible" type="boolean" default="true"/>
+    <aura:attribute name="isBoxEnabled" type="boolean" default="false"/>   
+    <!--underwriter screen changes start-->
+    <aura:attribute name="isCredit" type="Boolean" default="false"/>
+    <!--underwriter screen changes end-->
+    <!--User Story 9465-->
+    <aura:attribute name="downSizeList" type="List"/>
+    <aura:attribute name="final_foir" type="Decimal" />
+    <aura:attribute name="isHybirdFlexi" type="boolean" default="false"/>
+    <aura:attribute name="srcamObj" type="SurrogateCAM__c"/>
+    <!--<aura:attribute name="cibilExt1" type="Cibil_Extension1__c" default="{}"/>
+   <aura:attribute name="cibilobj" type="CIBIL__c" default="{}"/>-->
+    <!--User Story 9465-->
+    <aura:handler event="c:fireDynOffer" action="{!c.callBREFinalOffer}"/>
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:attribute type="String" name="page" default=""/> <!-- CR 22307 -->
+    <aura:handler event="c:SetParentAttributes" action="{!c.setParentAttributVar}"/><!--prod issue-->
+    <aura:registerEvent name="Update_identifier" type="c:Update_identifier"/><!-- user story 978 -->
+    <aura:attribute name="bankAccount" type="Bank_Account__c"/><!-- bankaccount partial CR--> 
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c" default="{}"/>
+    <aura:attribute name="cibilobj" type="CIBIL__c" default="{}"/>
+    <aura:attribute name="finAppl" type="Applicant__c"/><!--Bug 24668 983-->
+    <aura:attribute name="finApplCon" type="Contact"/><!--Bug 24668 983-->
+    <!-- US 983 rohit start -->
+    <aura:attribute name="obligLst" type="List"/>
+    <aura:attribute name="totalObligations" type="integer"/>
+    <aura:attribute name="oblType" type="List"/>
+    <aura:attribute name="statusLst" type="List"/>
+    <aura:attribute name="finLst" type="List"/>
+    <aura:attribute name="allApps" type="List"/>    
+    <aura:attribute name="loanTypeLst" type="List"/>
+    <aura:attribute name="loanVariantList" type="String[]"/><!-- US 1652 -->
+    <!-- US 983 rohit stop -->
+    
+    <!-- 16270 -->
+    <aura:attribute name="profileName" type="String"/>
+    <!-- 16270 -->
+    <!--rohit added for toast message Start -->
+    <div id="parentSuccessToastCredit" style="display:none; ">
+        <div class="slds-notify_container">
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon aura:id="SuccessButtonFinal" class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="parentsuccessMsgCredit">Detail saved successfully !</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="parentErrorToastCredit" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="action:close" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon aura:id="errorButtonFinal" class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="parentErrorMsgCredit">Internal Server Error </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="parentInfoToastCredit" style="display:none;">
+        <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--info" role="alert" >
+                <lightning:icon iconName="utility:info" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon aura:id="infoButtonFinal" class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="parentInfoMsgCredit"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--rohit added for toast message End -->
+    <!--Rohit Send to credit stop -->
+    
+    <!-- US 983 rohit S-->
+    <!--16270 first two attributes added for 16270 -->
+    <c:ObligationListView profileName="{!v.profileName}" enhancedFlag="{!v.account.Offer_Inhanced__c}" applicantObj="{!v.applicant}" theme="{!v.nameTheme}" cibil="{!v.cibilobj}" cibilExt1="{!v.cibilExt1}"  isCredit="{!v.isCredit}" displayReadOnly="{!v.displayReadOnly}" camObj="{#v.camObj}" loanTypeLst="{!v.loanTypeLst}" allApps="{!v.allApps}" oppId="{!v.loan.Id}" obligLst="{!v.obligLst}" totalObligations ="{!v.totalObligations}" stageName="{!v.stageName}" oblType="{!v.oblType}" statusLst="{!v.statusLst}" finLst="{!v.finLst}" />  <!--cibil,cibilExt1,isCredit added 9465 -->
+    <!-- US 983 rohit E-->
+    
+    
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium" >
+        <lightning:card title="" class="applyColor" ><!--US 1652-->
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-horizontal--small">                
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                        <aura:if isTrue="{!!v.isPreapproved}"><!--26795 1652 added condition-->
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:select aura:id="loanVariant" name="loanVariant" label="Loan Variant" value="{!v.loan.Loan_Variant__c}">
+                                        <option value="" text="--None--" />
+                                        <aura:iteration items="{!v.loanVariantList}" var="variant">
+                                            <option value="{!variant}" text="{!variant}" selected="{!v.loan.Loan_Variant__c == variant}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>  
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control"><!--add disabled for 1652 -->
+                                    <lightning:button aura:id="fetchOff" disabled="{!or(or(v.account.Offer_Inhanced__c,v.displayReadOnly),v.isPreapproved)}" variant="brand" label="Fetch Offer" class="slds-m-top_large slds-theme--alt-inverse" iconPosition="left" onclick="{!c.fetchOfferOnButtonClick}"/>             
+                                </div>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </p>
+            <aura:if isTrue="{!!v.dsaUser}">
+                <p class="slds-p-horizontal_small">
+                    
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                            
+                            <aura:if isTrue="{!v.isPreapproved}">
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="number" name="PreApprovedOfferAmount" label="Pre Approved Offer Amount" value="{!v.loan.Offer_Amount__c}" disabled="true" />
+                                    </div>
+                                </div> 
+                                <aura:set attribute="else">
+                                    <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                        <div class="slds-form-element__control">
+                                            <lightning:input type="number" name="DynamicOfferAmount" label="Dynamic Offer Amount" value="{!v.loan.Offer_Amount__c}"  messageWhenValueMissing="Please Enter Value" required="true" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="number" aura:id="offerROI" name="offerROI" label="Offer ROI" value="{!v.loan.Approved_Rate__c }" disabled="true" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div> 
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="number" aura:id="offerTenor" name="offerTenor" label="Offer Tenor" value="{!v.loan.Tenor__c}" disabled="true" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="number" aura:id="offerEMI" name="OfferEMI" label="Offer EMI" value="{!v.loan.EMI_CAM__c}" disabled="true" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="number" aura:id="pf" name="pf" label="Processing Fee" value="{!v.loan.Processing_Fees__c }" disabled="true" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div> 
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="pf" name="pf" label="Risk Segmentation" value="{!v.applicant.Risk_Segmentation__c }" disabled="true" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div> 
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="bankAccNo" label="Bank Account Number" value="{!v.bankAccount.Bank_Acct_Number__c}" pattern="^([0-9]+$)" messageWhenPatternMismatch="Please enter valid account number" name="bankAccountName" placeholder="Bank Account Number"/>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                    
+                </p>
+            </aura:if>
+            <div class=" slds-align_absolute-center">
+                <div class="slds-p-top--x-small slds-p-bottom--x-small">
+                    <lightning:button aura:id="enhanceOfferButton" disabled="{!or(v.account.Offer_Inhanced__c,v.displayReadOnly)}" variant="brand" label="Enhance Offer" class="slds-align_absolute-center slds-theme--alt-inverse" iconPosition="left" onclick="{!c.confirmEnhanceOffer}"/> <!-- CR 22307 -->
+                </div>
+                <div class="slds-p-top--x-small slds-m-left_x-small slds-p-bottom--x-small">
+                    <lightning:button class="slds-theme_alt-inverse" aura:id="savebank" variant="brand" label="Save" onclick="{!c.saveBankRecordcntrl}" disabled="{!or(v.account.Offer_Inhanced__c,v.displayReadOnly)}"/> <!-- CR 22307 -->
+                </div>
+            </div>
+            
+        </lightning:card>
+    </div>
+    
+    <aura:if isTrue="{!v.account.Offer_Inhanced__c}">
+        <div aura:id="enhance" class=" slds-box slds-box_x-small slds-theme_shade slds-theme_default slds-m-top_medium" >
+            <lightning:card title="Enhance Offer Details Section" class="applyColor" >
+                <lightning:accordion activeSectionName="">
+                    <lightning:accordionSection name="PerfiosDetails" label="Perfios Details"><!-- 24668 finAppl -->
+                        <c:SAL_Opp_PerfiosMainView finAppl="{!v.finAppl}" finApplCon="{!v.finApplCon}" displayReadOnly="{!v.displayReadOnly}" iscommunityUser="{!v.iscommunityUser}" nameTheme="{!v.nameTheme}" isCredit="{!v.isCredit}" stageCompletion="{!v.stageCompletion}" camObj="{!v.camObj}" loan="{!v.loan}" contact="{!v.contact}" account="{!v.account}" applicantObj="{!v.applicant}"/></lightning:accordionSection>
+                    <lightning:accordionSection name="AdditionalIncome" label="Additional Income">
+                        <c:IncomeDetails displayReadOnly="{!v.displayReadOnly}" cam="{!v.camObj}" loanid="{!v.oppId}" />
+                    </lightning:accordionSection>
+                    <aura:if isTrue="{!v.nameTheme == 'Theme3' || v.nameTheme == 'Theme4d'}">
+                        <lightning:accordionSection name="AddCoapplicant" label="Add Co-applicant">
+                            <!--23578 added currentDate , ckycFlow -->
+                            <c:CoApplicantSection currentDate="{!v.currentDate}" ckycFlow="{!v.ckycFlow}" cityList="{!v.cityList}" displayReadOnly="{!v.displayReadOnly}" recordId="{!v.oppId}" primApp="{!v.applicant}" accObj="{!v.account}" oppObj="{!v.loan}" isCredit="{!v.isCredit}"/> 
+                            
+                        </lightning:accordionSection>
+                    </aura:if>
+                    <lightning:accordionSection name="AddObligation" label="Add Obligation" >
+                        <div class="slds-accordion__content">
+                            <aura:if isTrue="{!and(v.oppId != null,v.loan.StageName != 'MCP Reject')}">
+                                <aura:if isTrue="{!v.camObj.Id != null}">
+                                    <c:ObligationRecordDetailsCmp cibil="{!v.cibilobj}" cibilExt1="{!v.cibilExt1}" applicantObj="{!v.applicant}" isCredit = "{!v.isCredit}" displayReadOnly="{!v.displayReadOnly}" loanAppID="{!v.oppId}" flow="mobility2"/>
+                                </aura:if>
+                            </aura:if>
+                            
+                        </div>
+                    </lightning:accordionSection>
+                </lightning:accordion>
+            </lightning:card>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!!v.isCredit}"><!--added if for 9465-->
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium" >
+            <lightning:card title="" aura:id="eligibility" class="applyColor" >
+                
+                <p class="slds-p-horizontal_small slds-theme_shade">
+                    <div class="slds-p-horizontal--small">                
+                        <div class="slds-grid slds-wrap slds-grid--pull-padded">  
+                            <aura:if isTrue="{!v.account.Offer_Inhanced__c}">
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="number" name="AmountasperEligibility" label="Max Loan Amount" value="{!v.camObj.sal_max_loan__c}" disabled="true" />
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <!--SAL 2.0 CR's changed tenor to input from picklist -->
+                                    <lightning:input required="true" aura:id="tenor" type="number" name="tenor" label="Tenor" value="{!v.camObj.Tenor__c}" messageWhenValueMissing="Please Enter Tenor" />
+                                    
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="decimal" aura:id="FinalROI" name="FinalROI" label="Final ROI" value="{!v.camObj.ROI__c}"  messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div> 
+                            
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" pattern="^[1-9][0-9]*$" messageWhenPatternMismatch="Please Enter Valid Amount" aura:id="Finalloanamount" value="{!v.camObj.Proposed_Loan_Amt__c}" name="Finalloanamountname" label="Final loan amount" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="text" aura:id="FinalPF" pattern="((\d+)((\.\d{1,2})?))$" name="FinalPF" label="Final PF" value="{!v.loan.Processing_Fees__c }" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.isPreapproved}"><!-- 1652-->
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:select aura:id="loanVariantpreapproved" name="loanVariant" label="Loan Variant" value="{!v.loan.Loan_Variant__c}">
+                                            <option value="" text="--None--" />
+                                            <aura:iteration items="{!v.loanVariantList}" var="variant">
+                                                <option value="{!variant}" text="{!variant}" selected="{!v.loan.Loan_Variant__c == variant}"></option>
+                                            </aura:iteration>
+                                        </lightning:select> 
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.account.Offer_Inhanced__c}">
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="number" aura:id="FinalEMI" disabled="true" name="FinalEMI" label="Final EMI" value="{!v.camObj.EMI_on_Proposed_Loan_TO__c}" messageWhenValueMissing="Please Enter Value" required="true"/>
+                                    </div>
+                                </div> 
+                                <div class="slds-form-element slds-p-top--x-small slds-is-required slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input type="text" aura:id="hybridFlexi" disabled="true" name="hybridFlexi" label="Eligible for Hybrid Flexi" value="{!v.camObj.Business_Continuty__c}" messageWhenValueMissing="Please Enter Value"/>
+                                    </div>
+                                </div> 
+                                
+                            </aura:if>
+                            
+                        </div>
+                    </div>
+                </p>
+                <div class="slds-p-top--x-small slds-m-bottom--x-small slds-align_absolute-center">
+                    <aura:if isTrue="{!v.account.Offer_Inhanced__c}">
+                        <lightning:button variant="brand" aura:id="saveEligibility" label="Calculate Eligibility" class=" slds-theme--alt-inverse" iconPosition="left" onclick="{!c.updateCamObj}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->   
+                        <aura:set attribute="else">
+                            <lightning:button variant="brand" aura:id="saveEligibility" label="Save" class="slds-theme--alt-inverse" iconPosition="left" onclick="{!c.updateCamObjOnly}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->            
+                        </aura:set>   </aura:if>
+                    
+                </div>
+            </lightning:card>
+        </div>
+    </aura:if>
+    <!--9465 || 30243 start-->
+    
+    <aura:if isTrue="{!v.isCredit}" >
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium" >
+            <lightning:card title=""   class="applyColor">
+                <c:EligibilityScreen1 oppId ="{!v.loan.Id}" secName="eligibility" camObj="{!v.camObj}" accObj="{!v.account}" appObj="{!v.applicant}"  downSizeList= "{!v.downSizeList}" srcamObj="{!v.srcamObj}" isHybirdFlexi="{!v.isHybirdFlexi}"  stageName = "{!v.stageName}" salesprofilecheck = "{!v.salesprofilecheck}" final_foir= "{!v.final_foir}" isFromTile="false" loan="{!v.loan}" />
+            </lightning:card>
+        </div>
+    </aura:if>
+    <!--9465 || 30243 stop-->
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium" >
+        <lightning:card title="POS Details"   class="applyColor">
+            <!--underwriter screen changes start-->
+            <c:Fetch_POS displayReadOnly="{!v.displayReadOnly}" oppId="{!v.oppId}" isCredit="{!v.isCredit}" account="{!v.account}" camObj="{!v.camObj}" oppObj="{!v.loan}"/> 
+            <!--underwriter screen changes end-->
+        </lightning:card>
+    </div>
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="overrideModalbox" class="slds-modal slds-align_absolute-center">
+        <div class="slds-modal__container">
+            <div class="slds-modal__content  slds-p-around--medium " style=" padding-left: 16px; ">         
+                On Enhancing offer, Preapproved Offer will be void and Banking will be mandatory. Do you want to proceed?
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">No</button>
+                <button class="slds-button slds-button--neutral" onclick="{!c.enhanceOffer}">Yes</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    
+</aura:component>

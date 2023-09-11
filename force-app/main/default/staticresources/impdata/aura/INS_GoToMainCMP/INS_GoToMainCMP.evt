@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Go to Main Comp from Profile/interaction/Products" >
+    <aura:attribute name="MainCmpParam" type="Object"/>
+</aura:event>

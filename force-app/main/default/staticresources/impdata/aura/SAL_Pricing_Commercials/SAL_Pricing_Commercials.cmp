@@ -1,0 +1,123 @@
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="Loan" type="Opportunity" default="{'sobjectType': 'Opportunity'}"/>
+    <aura:attribute name="applicantPrimary"  type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="oppId" type="String" default=""/>
+    <aura:attribute name="isHybirdFlexi" type="boolean" default='false'/> 
+    <aura:attribute name="showspinnerflag" type="Boolean" default="false"/> 
+    <aura:attribute name="DropLineFlexi" type="Integer" default="" />
+    <aura:handler name="change" value="{!v.applicantPrimary.Pure_Flexi_Period__c}" action="{!c.calculateDroplinePeriod}"/>
+
+    <ui:scrollerWrapper class="scrollerSize">
+        <div class="slds-p-horizontal--small">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+				<div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+					<div class="slds-form-element">
+						<div class="slds-form-element__control">
+							<lightning:input label="Approved Loan amount" value="{!v.Loan.Approved_Loan_Amount__c}" name="LoanAmount" disabled="true"/>
+						</div>
+					</div>
+				</div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="approvedRateId" step="0.01" label="Proposed Rate" value="{!v.Loan.Approved_Rate__c}" name="approvedRate" placeholder="Proposed Rate" type="text" maxlength="5" messageWhenValueMissing="Please Enter Proposed Rate" required="true" messageWhenPatternMismatch="Proposed Rate can only accept digits." pattern="((\d{1,2})((\.\d{1,2})?))$"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning:input label="Scheme" value="{!v.Loan.Scheme_Master__r.Name}" name="Scheme" disabled="true"/>
+                        </div>
+                    </div>
+                </div>
+                <aura:if isTrue="{!v.isHybirdFlexi}">
+                    <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control" id="pureFlexiDiv">    
+                                <lightning:input aura:id="PureFlexPeriod1" label="Pure Flexi Period" value="{!v.applicantPrimary.Pure_Flexi_Period__c}" name="PureFlexiPeriod"  type="text" maxlength="4" messageWhenPatternMismatch="Please enter valid Pure Flexi Period" pattern="[0-9]*" messageWhenBadInput="Pure Flexi Period should contain only digits." placeholder="Pure Flexi Period"/>
+                                <div aura:id="pureFlexiPeriod1div" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">
+                                    Pure Flexi period is required for hybrid flexi
+                                </div>
+                                <div aura:id="pureFlexiPeriod2div" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">
+                                    For Hybrid Flexi Tenor must be greater than 12 .Please change the tenor value or scheme
+                                </div>
+                                <div aura:id="pureFlexiPeriod3div" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">
+                                    Pure Flexi period cannot be 0
+                                </div>
+                                <div aura:id="pureFlexiPeriod4div" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">
+                                    Pure Flexi period cannot be greater than tenor-12
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>    
+                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control" id="tenordiv">
+                            <lightning:input aura:id="tenorLoan" label="Approved Tenor" value="{!v.Loan.Approved_Tenor__c}" name="ApprovedTenor" disabled="true"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <aura:if isTrue="{!v.isHybirdFlexi}">
+                    <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control" >
+                                <lightning:input label="Pure Flexi Period EMI" value="{!v.applicantPrimary.Pure_Flexi_EMI__c}" name="PureFlexi" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="DropLinPeriod1" label="Drop Line Flexi Period" value="{!v.DropLineFlexi}" name="DropLineFlexi" disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>  
+                <div class="slds-form-element slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="salesapprovepf" label="Sales Approved PF%" value="{!v.Loan.Processing_Fees__c}" type="text" maxlength="9" messageWhenPatternMismatch="Please enter valid Sales Approved PF%" pattern="((\d{1,6})((\.\d{1,2})?))$" messageWhenBadInput="Sales Approved PF% should contain only digits." name="ProcessingFees" placeholder="Sales Approved PF%" required="true" messageWhenValueMissing="Please Enter Sales Approved PF%"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                    <div class="slds-form-element__control">
+                        <lightning:textarea label="Approver Remarks" value="{!v.Loan.ACM_Comments__c}" name="ApproverRemarks" disabled="true" />
+                    </div>
+                </div>
+            </div>    
+            <br/>
+            
+            <lightning:button variant="brand" label="Save Loan Record" class="slds-align_absolute-center" iconName="utility:save" iconPosition="left" onclick="{!c.savePricingDetails}" />
+            
+            <div id="SuccessLoanMsg" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-notify_container " style="padding : 10px 10px 10px 10px " >
+                    <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                        <lightning:icon iconName="utility:success" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.successLoanMsg}" alternativeText="Close alert." />
+                        <div class="slds-notify__content">
+                            <h2 id ="successmsg"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div id="ErrorLoanMsg" style="display:none;" class="slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                <div class="slds-notify_container" style="padding : 10px 10px 10px 10px " >
+                    <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme_error" role="alert" >
+                        <lightning:icon iconName="utility:error" variant="success" size="medium" Class="iconContainer"/>&nbsp;
+                        <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.errorLoanMsg}" alternativeText="Close alert." />
+                        <h2 id ="errormsg"></h2>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+    </ui:scrollerWrapper>
+    
+</aura:component>

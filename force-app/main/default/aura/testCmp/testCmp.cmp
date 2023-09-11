@@ -1,0 +1,52 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId"> <!--inherit recordId attribute-->
+ 
+     <!-- 
+    /**
+    * Webkul Software.
+    *
+    * @category  Webkul
+    * @author    Webkul
+    * @copyright Copyright (c) 2010-2016 Webkul Software Private Limited (https://webkul.com)
+    * @license   https://store.webkul.com/license.html
+    */
+    -->
+     
+<aura:attribute name="record" type="Object" />
+<aura:attribute name="simpleRecord" type="Object" />
+<aura:attribute name="recordError" type="String" />
+ 
+<force:recordData aura:id="recordEditor"
+    layoutType="COMPACT"
+    recordId="{!v.recordId}"
+    targetError="{!v.recordError}"
+    targetRecord="{!v.record}"
+    targetFields="{!v.simpleRecord}"
+    mode="VIEW" />
+ 
+    <!-- Display a header with details about the record -->
+    <div class="slds-form--stacked">
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="recordName">Name: </label>
+            <div class="slds-form-element__control">
+              <ui:outputText class="slds-input" aura:id="recordName"
+                value="{!v.simpleRecord.Name}" />
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Display Lightning Data Service errors, if any -->
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        <div class="recordError">
+            <ui:message title="Error" severity="error" closable="true">
+                {!v.recordError}
+            </ui:message>
+        </div>
+    </aura:if>
+ 
+    <!-- Display an editing form -->
+    <lightning:input aura:id="recordName" name="recordName" label="Name"
+                  value="{!v.simpleRecord.Name}" required="true"/>
+ 
+     <lightning:button label="Save Record" onclick="{!c.handleSaveRecord}"
+               variant="brand" class="slds-m-top--medium"/>
+</aura:component>

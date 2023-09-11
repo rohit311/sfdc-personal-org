@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event to update contact and account after save of demographic details" >
+    <aura:attribute name="conObj" type="Contact"/>
+    <aura:attribute name="accObj" type="Account"/>
+</aura:event>

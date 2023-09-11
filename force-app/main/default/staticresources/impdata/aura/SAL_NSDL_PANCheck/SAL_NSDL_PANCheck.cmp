@@ -1,0 +1,700 @@
+<!--component Name : SAL_NSDL_PANCheck -->
+<aura:component controller="SALMobilityCntrl_V2"
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="GLOBAL">
+    <aura:attribute name="secondaryCibilRecs" type="CIBIL_secondary_match__c[]"/><!--10647 -->
+    <aura:attribute name="showcibilpopup" type="boolean" default="false"/><!--10647 -->
+    <!--<aura:handler name="change" value="{!v.account.PinCode__c}" action="{!c.pinChange}"/>-->
+    <aura:attribute name="cibDetails" type="Object" /><!--Bug 22624 Rohit -->
+	 <aura:attribute name="isCkycDone" type="Boolean" default="false"/><!-- Bug 23578 -->
+    <aura:attribute name="isCkycReadOnly" type="Boolean" default="false"/><!--23578 -->
+    <aura:attribute name="isPANCheckClick" type="Boolean" default="false"/><!--US_10726-->
+    <aura:attribute name="isCopyCKYC" type="Boolean" default="false"/><!--US_10726-->
+    <aura:attribute name="Ckycaccount" type="Account"/><!-- Bug 23578 -->
+    <aura:attribute name="dataSource" type="String" default=""/><!-- Bug 23578 -->
+    <aura:attribute name="Ckycapplicant" type="Applicant__c"/><!-- Bug 23578 -->
+    <!--City CR s-->
+    <aura:attribute name="citySearchKeyword" type="string" default=""/>
+    <aura:attribute name="cityList" type="List"/>
+    <aura:attribute name="finalCity" type="List"/>
+    <aura:attribute name="validCity" type="Boolean" default="false"/>
+    <!--City CR e-->
+    <aura:attribute name="selectedCity" type="string" default=""/>
+    <aura:attribute name="loan" type="Opportunity" />
+    <aura:attribute type="String" name="panFname"/>
+    <aura:attribute type="String" name="panLname"/>
+    <aura:attribute type="String" name="panMname"/>
+    <aura:handler event="c:SetPOId" action="{!c.removerecord}"/>
+    <aura:attribute name="theme" type="String" default=""/> 
+    <aura:attribute name="items" type="Product_Offerings__c[]" default="null"/>
+    <aura:attribute name="currentUser" type="String" default=""/> 
+    <aura:attribute type="boolean" name="defaultShow" default="false"/>
+    <aura:attribute type="boolean" name="epfoShow" default="false"/>
+    <aura:attribute type="boolean" name="conCreate" default="false"/>
+    <aura:attribute type="boolean" name="officeflag" default="false"/>
+    <aura:attribute type="Boolean" name="displayExotel" default="false"/><!-- Bug 23064 -->
+    <aura:attribute type="Boolean" name="salesprofilecheck" default="false"/><!-- Bug 23064 -->
+    <aura:attribute name="validExotelProd" type="String[]" default=""/><!-- Bug 23064 -->
+    <aura:attribute name="fromcloneflag" type="Boolean" default="false"/> <!--Added for Bug 23577-->
+    <aura:attribute name="PAN" type="String" default=""/>
+    <aura:attribute name="OppID" type="ID" />
+    <aura:attribute name="Product" type="String" default="SPL"/>
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="solObj" type="SOL_Policy__c" />
+    <aura:attribute name="PrimaryPNCheckLst" type="SOL_Policy__c[]" />
+    <aura:attribute type="Applicant__c" name="applicantObj"/>
+    <aura:attribute type="Contact" name="contObj" />
+    <aura:attribute type="String" name="otpValue"/>
+    <aura:attribute name="userInfo" type="user"/> 
+    <aura:attribute name="disableAadhaar" type="Boolean" default="false"/>
+    <aura:attribute name="disablePO" type="Boolean" default="false"/>
+    <aura:attribute name="disablePAN" type="Boolean" default="true"/>
+    <aura:attribute type="boolean" name="isPreapproved" default="false"/>
+    <aura:attribute name="EmployerList" type="Segment_Master__c[]" default="[]"/>
+    <aura:attribute name="selectedEmployer" type="Segment_Master__c" default="{}"/>
+    <aura:attribute name="EmployerSearchKeyword" type="string" default=""/>
+    <aura:attribute name="empsearching" type="Boolean" default="false"/>
+    <aura:attribute name="oldSearchKeyword" type="String" default=""/>
+    <aura:attribute name="areasearching" type="Boolean" default="false"/>
+    <aura:attribute name="isViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOneViewReportModalOpenold" type="boolean" default="false"/>
+    <aura:attribute name="cibilExt1" type="Cibil_Extension1__c"/>
+    <aura:attribute name="cibil" type="CIBIL__c"/>
+    <aura:attribute name="cibilTemp" type="Cibil_Temp__c"/>
+    <aura:attribute name="isCommunityUsr" type="boolean" default="false"/>
+    <aura:attribute name="isMobileNumberReadOnly" type="boolean" default="false"/>
+    <aura:attribute name="isSpecialProfile" type="Boolean"/>
+    <aura:attribute name="isOther" type="Boolean"/>
+    <aura:attribute name="tatMasterRecord" type="TAT_Master__c"/>
+    <aura:attribute name="isFieldAgent" type="Boolean" default="false"/>
+    <!-- Aman - Underwritter Screen - Start -->
+    <aura:attribute name="isUnderwriter" type="Boolean" default="false"/>
+    <aura:attribute name="mobileNumber" type="String"/>
+    <aura:attribute name="isTeleCaller" type="Boolean" default="false"/>
+    <!-- Aman - Underwritter Screen - End -->
+    <!-- CR 18896 start-->
+    <aura:attribute name="specialPro" type="Boolean" />
+    <!-- CR 18896 end-->
+    <aura:attribute name="areaList" type="Area_Locality__c[]" default="[]"/>
+    <aura:attribute name="selectedArea" type="Area_Locality__c" default="{}"/>
+    <aura:attribute name="oldAreaKeyword" type="String" default=""/>
+    <aura:attribute name="areaSearchKeyword" type="string" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="hideAadhaarSection" type="boolean" default=""/><!--added for bug id 21851-->
+    <!--Rohit details copy start -->
+    <aura:attribute name="kyc" type="eKYC__c" default=""/>
+    <aura:attribute name="po" type="Product_Offerings__c" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    <!--Rohit details copy stop -->
+    <aura:attribute name="ValidAreaLocality" type="Boolean" default="false"/>
+    <aura:attribute name="ValidCompanyName" type="Boolean" default="false"/>
+	<aura:method name="setCKYCfields" action="{!c.setCKYCfields}" >
+    	<aura:attribute name="appObj" type="String" default=""/> 
+    </aura:method><!--23578 -->
+    <aura:attribute name="isEditCkyc" type="Boolean" default="false"/><!--23578 -->
+    <aura:registerEvent name="callSaveAfterPANChk" type="c:callSaveAfterPANChk"/><!--23578 -->
+    <aura:attribute type="String" name="panSrc" default=""/><!--23578 -->
+    <aura:method name="callPanCheck" action="{!c.PanCheckFrmLandPg}" >
+    	 <aura:attribute name="from" type="String" default="parameter 1"/>
+    </aura:method><!--23578 -->
+    <aura:handler event="c:setPincode" action="{!c.setpincode}"/>
+    <aura:attribute name="createFlag" type="Boolean" default="false" />
+    <aura:attribute name="disableText" type="Boolean" default="false" />
+    <!--register events-->
+    <aura:registerEvent name="showhidespinner" type="c:Show_Hide_Spinner"/>
+    <aura:registerEvent name="displayToastMessage" type="c:ShowCustomToast"/>
+   
+    <aura:method name="checkOfficeEmailId" action="{!c.checkOfficeEmailId}" />
+    <aura:method name="validateData" action="{!c.validateData}" />
+    <aura:method name="validateCompany" action="{!c.validateCompany}" />
+    <!--Rohit disable fields start-->
+    <aura:method name="disableFields" action="{!c.disableFields}" />
+    <!--Rohit disable fields stop-->
+    <aura:registerEvent name="callsaveloanapplication" type="c:newloansave"/>
+    <aura:attribute type="boolean" name="callfrom" default="true"/>
+    <aura:attribute type="String" name="stageName" default=""/> <!-- CR 22307 -->
+    <aura:attribute type="Boolean" name="displayReadOnly" default="false"/> <!-- CR 22307 -->
+    <aura:handler event="c:UpdateConAcc" action="{!c.setConAcc}"/><!-- SAL 2.0 Adhoc-->
+	<aura:attribute name="preLangList" type="List"/><!--Bug 24675 -->
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top--x-small" >
+        <lightning:card title="Customer Details" class="applyColor" >
+            <!-- Rohit/Aman added radio buttons Start-->
+            
+            <aura:if isTrue="{!or(and(!v.isUnderwriter,and(v.OppID != '',v.OppID != null)),v.isCkycDone)}"><!-- 23578 added isCkycDone -->
+                <div class="slds-p-horizontal--small">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <!--<lightning:input aura:id="ekycBtn" type="radio" label="Copy EKYC Details" name="radioAddress" value="address" onchange="{!c.copyDetails}" disabled="{!v.disableAadhaar}"/>--><!--commented for bug id 22018/23785 -->
+                            <!-- <lightning:input aura:id="panBtn" type="radio" label="Copy PAN Details" name="radioAddress" value="address" onchange="{!c.copyDetails}" disabled="{!v.disablePAN}"/>--><!-- Commented for US-10726-->
+                            <lightning:input aura:id="poBtn" type="radio" label="Copy PO Details" name="radioAddress" value="address" onchange="{!c.copyDetails}" disabled="{!or(v.disablePO,and(or(v.OppID == '',v.OppID == null),v.isCkycDone))}"/>
+                             <lightning:input aura:id="CkycBtn" type="radio" label="Copy CKYC Details" name="radioAddress" value="address" onchange="{!c.copyDetails}" disabled="{!or(and(and(v.dataSource != 'Copy CKYC Data',v.dataSource != 'Edit CKYC Data'),!v.isCkycDone),and(or(v.OppID == '',v.OppID == null),!v.isCkycDone))}" checked="{!or(v.isCkycDone,or(v.dataSource == 'Copy CKYC Data',v.dataSource == 'Edit CKYC Data'))}"/><!-- 23578 -->
+                            <!--<lightning:input aura:id="CkycEditBtn" type="radio" label="Edit CKYC Details" name="radioAddress" value="address" onchange="{!c.copyDetails}" disabled="{!!v.isCkycDone}"/>--><!-- 23578 -->
+                             
+                            <br/>                            
+                            <br/>
+                             <lightning:input type="checkbox" label="Edit CKYC Details" checked="{!or(v.isEditCkyc,v.dataSource == 'Edit CKYC Data')}" aura:id="CkycEditBtn" disabled="{!or(and(v.dataSource != 'Copy CKYC Data',v.dataSource != 'Edit CKYC Data'),and(or(v.OppID == '',v.OppID == null),!v.isCkycDone))}" onchange="{!c.copyDetails}"/>
+                        </div>
+                    </div>     
+                </div> 
+            </aura:if>
+            <!-- Rohit/Aman added radio buttons Stop-->
+            
+            <p class="slds-p-horizontal_small  slds-theme_shade">
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <div style="float:left;display:inline">
+                                <aura:if isTrue="{!v.isPreapproved}">
+                                    <lightning:input required="true" messageWhenValueMissing="Please Enter Value"  aura:id="PANString" label="Enter PAN" value="{!v.account.PANNumber__c}" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please Enter Valid PAN" name="PANString" placeholder="Enter PAN" disabled="true"/>
+                                    <aura:set attribute="else">
+                                        <lightning:input  required="true" messageWhenValueMissing="Please Enter Value"  aura:id="PANString" label="Enter PAN" value="{!v.account.PANNumber__c}" maxlength="10" pattern="^([a-zA-Z]{3})([pP]{1})([a-zA-Z]{1})(\d{4})([a-zA-Z]{1})$" messageWhenPatternMismatch="Please Enter Valid PAN" name="PANString" placeholder="Enter PAN" disabled="{!v.isUnderwriter==true?true:false}"/>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div style="float:left;display:inline;margin-top:20px;margin-left:30px">
+                                <lightning:button aura:id="Pancheckbtn"  class="slds-theme_alt-inverse" variant="brand" label="PAN Check" onclick="{!c.PanCheck}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter correct value" required="true"  aura:id="FirstName" label="First Name" value="{!v.account.First_Name__c}" name="FName" placeholder="Enter First Name"/>        
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter correct value"  aura:id="MiddleName" label="Middle Name" value="{!v.account.Middle_Name__c}" name="MName" placeholder="Enter Middle Name"/>        
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" pattern="[a-zA-Z]*" messageWhenPatternMismatch="Please enter correct value" required="true" aura:id="LastName" label="Last Name" value="{!v.account.Last_Name__c}" name="LName" placeholder="Enter Last Name"/>        
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <aura:if isTrue="{!!v.isUnderwriter}">
+                                <aura:if isTrue="{!v.isMobileNumberReadOnly}">
+                                    <label class="slds-form-element__label" for="mobileNumber">Mobile Number</label>
+                                    <div class="slds-grid slds-size--3-of-5">
+                                        <div class="slds-size--1-of-2">
+                                            <a id="{!v.applicantObj.Id}" >{!v.account.Mobile__c}</a><!-- Sprint 23064 -->                                    
+                                            <!--Bug 23064 start-->
+                                        </div>
+                                        
+                                        <aura:if isTrue="{!and(v.displayExotel,!v.displayReadOnly)}">
+                                               <!-- 23064 changed by swapnil -->
+                                               <c:Exotel_APICmp frommobile="none" tomobile="{!v.account.Mobile__c}"  recordId="{!v.applicantObj.Id}" objName="Applicant__c"  Product="{!v.applicantObj.Product__c}"/>
+                                        </aura:if>
+                                        <!--Bug 23064 stop-->
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <lightning:input aura:id="Mobile" name="mobile" value="{!v.account.Mobile__c}" label="Mobile" placeholder="Mobile Number"  maxlength="10" required="true" pattern="^[6-9]\d{9}" messageWhenValueMissing="Please Enter Value" messageWhenPatternMismatch="Please Enter valid Mobile Number"/>
+                                    </aura:set>
+                                </aura:if>
+                                <aura:set attribute="else">
+                                    <div class="slds-form-element__control">
+                                        <label class="slds-form-element__label" for="mobileNumber">Mobile Number</label>
+                                        
+                                        <div class="slds-grid slds-size--3-of-5">
+                                            
+                                            
+                                            <a href="{! 'tel:' + '' + !v.account.Mobile__c}" class="slds-m-right_large">{!v.account.Mobile__c}</a><!-- Sprint 23064 --> 
+                                            <aura:if isTrue="{!and(v.displayExotel,!v.displayReadOnly)}">
+                                                <div onclick="{!c.makeacall}" class="slds-size--1-of-2" data-value="{!v.applicantObj.Id}">
+                                                    <!--<lightning:button class="slds-theme_alt-inverse " iconName="action:call" variant="brand" label="Call" value="{!v.account.Mobile__c}"/>-->
+                                                      <!-- 23064 changed by swapnil -->
+                                               <c:Exotel_APICmp frommobile="none" tomobile="{!v.account.Mobile__c}"  recordId="{!v.applicantObj.Id}" objName="Applicant__c"  Product="{!v.applicantObj.Product__c}"/>
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                    
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input required="true" name="DOB" type="date" label="DOB" aura:id="DOB" messageWhenValueMissing="Please Enter Value" messageWhenBadInput="Invalid DOB" value="{!v.account.Date_of_Birth__c}" disabled="{!v.isUnderwriter==true?true:false}"/>
+                            <div aura:id="dobdiv" style="color:#c23934;font-size: 0.75rem;" class="slds-hide">Please Enter Valid Date</div><!--added fro bug id 18459-->
+                        </div>
+                    </div>
+                    <!-- SAL 2.0 adhoc start-->
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd" maxlength="35" label="Residence Address Line 1" value="{!v.contObj.Address_1__c}" disabled="{!v.disableText}" name="resAdd" placeholder="Enter Residence Address"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd2" maxlength="35" label="Residence Address Line 2" value="{!v.contObj.Address_2__c}" disabled="{!v.disableText}" name="resAdd2" placeholder="Enter Residence Address"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input messageWhenValueMissing="Please Enter Value" required="true" aura:id="resAdd3" maxlength="35" label="Residence Address Line 3" value="{!v.contObj.Address_3__c}" disabled="{!v.disableText}" name="resAdd3" placeholder="Enter Residence Address"/>
+                        </div>
+                    </div>
+                    <!--SAL 2.0 Adhoc end -->
+                    <aura:if isTrue="{!!v.isUnderwriter}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" required="true"  aura:id="areaLoc" label="Area/Locality" value="{!v.contObj.Resi_Area__c}" name="areaLoc" placeholder="Area/Locality" messageWhenPatternMismatch=""/>        
+                            </div>
+                        </div>
+                        
+                    </aura:if>
+                    <aura:if isTrue="{!!v.isUnderwriter}">
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input onchange="{!c.pinChange}" messageWhenValueMissing="Please Enter Value" required="true"  aura:id="pincode" label="Pincode" value="{!v.account.PinCode__c}" name="pincode" placeholder="Pincode" maxlength="6" messageWhenPatternMismatch="Please Enter Valid Pin code" pattern="^([0-9]{6})" disabled="{!and(v.account.PinCode__c != null,v.dataSource == 'Copy CKYC Data')}"/><!--changed messageWhenPatternMismatch message for bug id 18600 -->        
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    
+                    <!--City CR s -->
+                    <div aura:id="citySearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="cityField"><span class="requiredClass">*</span>City</label>
+                            <ui:inputText aura:id="cityField" class="slds-input"  updateOn="keyup" keyup="{!c.cityKeyPressController}" value="{!v.citySearchKeyword}" placeholder="Enter City" disabled="{!v.isUnderwriter}" />                
+                            <!--This part is for Display typehead lookup result List-->  
+                            <div class="slds-lookup__menu slds" id="referralList">
+                                <div aura:id="referralMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                <ul class="slds-lookup__list" role="listbox">
+                                    <aura:iteration items="{!v.finalCity}" var="singleRec" indexVar="idx">
+                                        <li role="presentation">
+                                            <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                <div class="slds-media__body">
+                                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                        <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectCity}">{!singleRec.city} </a></div>
+                                                    </div>
+                                                </div>    
+                                            </span>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                        <div class="slds-form-element__control">
+                            <lightning:input aura:id="state" label="State" value="{!v.account.Current_State__c}" name="state" disabled="true"/>        
+                        </div>
+                    </div>
+                    <!--City CR e -->
+                    <aura:if isTrue="{!v.loan.Id != null}">
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="cIBILScoreId" label="CIBIL Score" value="{!v.applicantObj.CIBIL_Score__c}" name="cIBILScoreName" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="codifiedCIBILId" label="Codified CIBIL" value="{!v.applicantObj.Codified_CIBIL__c}" name="codifiedCIBILName" disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="dpdCLuster" label="DPD CLuster Segment" value="{!v.cibilTemp.DPD_cluster_Segment__c}" name="codifiedCIBILName" disabled="true"/>
+                            </div>
+                        </div>
+						
+						   <!-- 24675 Start -->
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                               <lightning:select aura:id="pref_lang"  label="Preferred Language" value="{!v.account.Preferred_language__c }" name="pref_lang" ><!--</lightning:select>onchange="{!c.setPrefferedLang}">-->
+                                        <option value="">-- None --</option>
+                                        <aura:iteration items="{!v.preLangList}" var="pl">
+                                            <option value="{!pl}" text="{!pl}" selected="{!v.account.Preferred_language__c == pl}"></option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                            </div>
+                        </div>
+						<!-- 24675 stop -->
+                         <!-- 10647 -->
+                        <div class="slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.secondaryCibilRecs.length > 0}">
+                                    <lightning:input type="text" name="authFlag" value="YES" label="Secondary CIBIL" placeholder="" disabled="true"/>
+                                    <aura:set attribute="else">
+                                        <lightning:input type="text" name="authFlag" value="No" label="Secondary CIBIL" placeholder="" disabled="true"/>
+                                    </aura:set>
+                                </aura:if>                    
+                            </div>
+                        </div>
+                       <div style="padding-top: 30px;" class="slds-p-top_large slds-form-element slds-p-top--x-small  slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:button class="slds-theme_alt-inverse" aura:id="saveButtonId"  variant="brand" label="View Secondary Cibil" onclick="{!c.opencibilpopup}" disabled="{!v.secondaryCibilRecs.length == 0}"/>
+                            </div>
+                        </div>
+                        <!-- 10647 stop-->
+                        <aura:if isTrue="{!!v.isUnderwriter}">
+                            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="select-01"> View CIBIL- link </label> <br/>
+                                    <aura:if isTrue="{!v.cibil}">
+                                        <!--<a onclick="{!c.redirectToViewCibilReport}">
+                                            View CIBIL Report
+                                        </a>-->
+                                        <a onclick="{!c.openOneViewCIBIL}">
+                                            View CIBIL Report
+                                        </a>
+                                        <aura:set attribute="else">
+                                            Link Not Available
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="select-01"> View Old CIBIL- link </label> <br/>
+                                    <aura:if isTrue="{!v.cibil}">
+                                        <a onclick="{!c.redirectToViewCibilReport}">
+                                            View Old CIBIL Report
+                                        </a>
+                                        <aura:set attribute="else">
+                                            Link Not Available
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="select-01"> View CIBIL Report- link </label> <br/>
+                                    <aura:if isTrue="{!v.cibilExt1}">
+                                        <a onclick="{!c.redirectToOneViewCibilReport}">
+                                            One View CIBIL Report
+                                        </a>
+                                        <aura:set attribute="else">
+                                            Link Not Available
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-p-top--small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label" for="select-01"> View Old CIBIL Report- link </label> <br/>
+                                    <aura:if isTrue="{!v.cibilExt1}">
+                                        <a onclick="{!c.redirectToOneViewCibilReportold}">
+                                            One View Old CIBIL Report
+                                        </a>
+                                        <aura:set attribute="else">
+                                            Link Not Available
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            
+                        </aura:if>
+                    </aura:if>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+    <aura:if isTrue="{!and(v.conCreate,or(v.OppID == '',v.OppID == null))}" >
+        <aura:if isTrue="{!!v.isUnderwriter}">
+            <div class="slds-p-top--x-small slds-p-bottom--x-small slds-align_absolute-center">
+                <lightning:button variant="brand" label="Save" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.savenew}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </aura:if>
+    </aura:if>
+    <aura:if isTrue="{!!v.conCreate}" >
+        <aura:if isTrue="{!!v.isUnderwriter}">
+            <div class="slds-p-top--x-small slds-p-bottom--x-small slds-align_absolute-center">
+                <lightning:button variant="brand" label="Search" class="slds-theme--alt-inverse" iconName="utility:search" iconPosition="left" onclick="{!c.searchOffer}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.defaultShow}">
+            <div class="slds-box slds-box_x-small slds-theme_shade" >
+                
+                <div aura:id="polist">
+                    
+                    <aura:if isTrue="{!v.items != null}">
+                        <div class="slds-theme_default slds-m-top--x-small slds-box slds-box_x-small" >
+                            <lightning:card title="Product Offerings" class=""/>
+                            
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-theme_default slds-m-top--x-small slds-box slds-box_x-small" >
+                                <lightning:card title="No Records Found" class=""/>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                    
+                    <aura:iteration items="{!v.items}" var="PerItem">
+                        <div class="slds-theme_default slds-m-top--x-small slds-box slds-box_x-small" >
+                            <lightning:card class="slds-theme_default" >
+                                <c:ProductOfferingDisplayComponent item="{!PerItem}" isTeleCaller="{!v.isTeleCaller}" isFieldAgent="{!v.isFieldAgent}" currentUser="{!v.currentUser}" sbsBranch="{!PerItem.Lead__r.SBS_Branch__r.Name}" userBranchCity="{!v.userInfo.Branch_City__c}"/> 
+                            </lightning:card>
+                        </div>
+                    </aura:iteration>
+                </div>
+                
+            </div>
+            <div class="slds-p-top--x-small slds-align_absolute-center">
+                <lightning:button variant="brand" label="Continue" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.continue}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+            </div>
+        </aura:if>
+    </aura:if>
+    <br/>
+    <aura:if isTrue="{!or(v.officeflag,v.isUnderwriter)}">
+        <div class="slds-box slds-box_x-small slds-theme_shade" >
+            <lightning:card title="Office Details" class="applyColor"  >
+                <p class="slds-p-horizontal_small  slds-theme_shade">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <!--22017 s -->
+                        <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="netSal" name="netSal" value="{!v.account.Gross_Salary_Turn_Over__c}" label="Net Salary - Per Month" required="true" pattern="^[1-9]\d*(\.\d+)?$" messageWhenPatternMismatch="Please enter valid number" messageWhenValueMissing="Please Enter Value"/>
+                            </div>
+                        </div> 
+                        <!--22017 e -->
+                        <div aura:id="EmployerSearchResult" class="slds-form-element slds-p-top--x-small slds-lookup slds-is-close slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label" for="employer"><span class="requiredClass">*</span>Company Name</label>
+                                <ui:inputText aura:id="employer" required="true" class="slds-input" updateOn="keyup" keyup="{!c.empKeyPressController}" value="{!v.EmployerSearchKeyword}" placeholder="Enter Employer" disabled="{!v.createFlag}"/>                
+                                <!--This part is for Display typehead lookup result List-->  
+                                <div class="slds-lookup__menu slds" id="EmployerList">
+                                    <div aura:id="empMessage" class="slds-lookup__item--label slds-text-body--small">{!v.message}</div>
+                                    <ul class="slds-lookup__list" role="listbox">
+                                        <aura:iteration items="{!v.EmployerList}" var="singleRec" indexVar="idx">
+                                            <li role="presentation">
+                                                <span class="slds-lookup__item-action slds-media slds-media--center" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                            <div class="slds-lookup__result-text"><a  data-record="{!idx}" onclick="{!c.selectEmployer}">{!singleRec.Name} </a></div>
+                                                        </div>
+                                                    </div>    
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.isOther}">
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="othercompany" name="othercompany" value="{!v.account.Name_of_the_Company_Employer__c}" label="Employer Name(If Others)" required="true" messageWhenValueMissing="Please Enter Value"/>
+                                </div>
+                            </div> 
+                        </aura:if>
+                        <aura:if isTrue="{!!v.OppID}">
+                            <div class="slds-form-element slds-is-required slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="companyCategoryId" label="Company Category" value="{!v.account.Type_Of_Industry__c}" name="companyCategoryName" disabled="true"/>
+                                </div>
+                            </div> 
+                        </aura:if>
+                        <aura:if isTrue="{!v.OppID}">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <div style="float:left;display:inline">
+                                        <lightning:input messageWhenValueMissing="Please Enter Value" aura:id="companyCategoryId" label="Company Category" value="{!v.account.Type_Of_Industry__c}" name="companyCategoryName" disabled="true"/>
+                                    </div>
+                                    <div style="float:left;display:inline;margin-top:20px;margin-left:30px">
+                                        <lightning:button variant="brand" label="EPFO Check" class="slds-theme--alt-inverse" iconName="utility:save" iconPosition="left" onclick="{!c.doEPFOCheck}" disabled="{!v.epfoShow}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input disabled="true" aura:id="epfo" label="EPFO" value="{!v.account.EPFO_Result__c}" name="EPFO Result" />        
+                            </div>
+                        </div>
+                        
+                        <!-- personal emial id is rempoved CR 18895-->
+                        
+                        <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                            <div class="slds-form-element__control">
+                                <lightning:input aura:id="officialEmailId" type="text" messageWhenValueMissing="Please Enter Value" label="Official Email ID" placeholder="Office Email" name="officeemail" value="{!v.contObj.Office_Email_Id__c}" messageWhenPatternMismatch="Please Enter Valid Email Id" pattern="^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+[a-z]{1,4}$"/>
+                            </div>
+                        </div>
+                        <!--CR 18896 start-->
+                        
+                        <aura:if isTrue="{!v.isSpecialProfile}">
+                            <div class="slds-form-element slds-p-top--x-small slds-grid slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <label class="slds-size--1-of-4 "> Special Profile </label>
+                                <div class="slds-form-element__control">
+                                    <lightning:input type="toggle" clas="slds-size--1-of-3" aura:id="specialProfile" label="" name="specialProfile" checked="{!v.specialPro}"/>
+                                </div>
+                            </div>
+                        </aura:if> 
+                        
+                        <!--CR 18896 end-->
+                        <aura:if isTrue="{!!v.applicantObj.Office_Email_Id_Verified__c}">
+                            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--3-of-6 slds-large-size--4-of-12">
+                                <div class="slds-form-element__control">
+                                    <div>
+                                        <lightning:input type="text" aura:id="otpvalue" maxlength="5" name="otpvalue" value="{!v.otpValue}" label="Enter OTP" placeholder="Enter OTP received in Email" messageWhenValueMissing="Please Enter OTP" messageWhenPatternMismatch="OTP can only accept digits." pattern="[0-9]*"/>
+                                    </div>
+                                    <div class="slds-form-element__control">
+                                        <div style="float:left;display:inline;margin-top:20px;margin-left:30px">
+                                            <lightning:button aura:id="submitOTP" iconName="utility:save" variant="brand" class="slds-theme_alt-inverse" label="Verify OTP" onclick="{!c.submitOTP}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                            
+                                        </div>
+                                        <div style="float:left;display:inline;margin-top:20px;margin-left:30px">
+                                            
+                                            <lightning:button aura:id="submitOTP" iconName="utility:save" variant="brand" class="slds-theme_alt-inverse" label="Email Verification" onclick="{!c.doEmploymentCheck}" disabled="{!v.displayReadOnly}"/> <!-- CR 22307 -->
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </aura:if>
+                    </div>
+                </p>
+            </lightning:card>
+        </div>
+    </aura:if>
+    {!v.body} 
+    
+    
+    <aura:if isTrue="{!v.isViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'/Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'/Partner/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/OTPOneViewCIBILpage?id=' + v.cibil.Id+'&amp;appId='+v.applicantObj.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isOneViewReportModalOpen}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center slds-size--6-of-6 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModel}">
+                        [X]
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <!--Rohit 22624 commented and added lightning component --> 
+                    <!--<aura:if isTrue="{!v.isCommunityUsr == true}">	
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'/Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'/Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>-->
+                    <c:DetailedCibilReportCmp cibDetails="{!v.cibDetails}"/>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+        <aura:if isTrue="{!v.isOneViewReportModalOpenold}">
+        <!--Rohit added slds absolute center class for center alignment-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_large slds-align--absolute-center slds-size--6-of-6 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOneViewModelold}">
+                        [X]
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> One View CIBIL Report </h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <!--Rohit 22624 commented and added lightning component --> 
+                    <aura:if isTrue="{!v.isCommunityUsr == true}">	
+                        <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                            <iframe src="{!'/Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                            <aura:set attribute="else">
+                                <iframe src="{!'/Partner/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.theme == 'Theme4t'}">
+                                <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" frameBorder="0"/>
+                                <aura:set attribute="else">
+                                    <iframe src="{!'/apex/DetailedCibilReportPage?id=' + v.cibil.Id}" width="100%" height="800" frameBorder="0"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeOneViewModel}">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+   <aura:if isTrue="{!v.showcibilpopup}"><!--10647-->
+        <div role="dialog" tabindex="-1" aria-labelledby="header99"  class="slds-modal slds-fade-in-open slds-modal_large slds-align_absolute-center">
+            <div class="slds-modal__container slds-scrollable_y" style="overflow:auto;" >
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium"> CIBIL Secondary Match Details</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium slds-scrollable_y">
+                    <iframe src="{!'/apex/secondarycibil_mobility?priamryappid=' + v.applicantObj.Id+'&amp;oppid='+v.oppId}" frameBorder="0" height="300px" width="100%"/>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+</aura:component>

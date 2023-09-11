@@ -1,0 +1,4 @@
+.THIS.disabledMCP{
+    pointer-events:none;
+    cursor: not-allowed;
+}

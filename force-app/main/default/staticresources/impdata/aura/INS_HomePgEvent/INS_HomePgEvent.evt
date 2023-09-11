@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Go to Home Page from every Tile" >
+    <aura:attribute name="HomeEventParam" type="Object"/>
+</aura:event>

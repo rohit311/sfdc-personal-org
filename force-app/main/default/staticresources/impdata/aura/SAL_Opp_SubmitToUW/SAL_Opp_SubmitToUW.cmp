@@ -1,0 +1,196 @@
+<aura:component controller="SALMobilityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global">
+    <!--Rohit 16111 S-->
+    <aura:attribute name="isEkycMandatory" type="Boolean" default="false"/>
+    <aura:attribute name="isEkycdone" type="Boolean" default="false"/>
+    <!--Rohit 16111 E-->
+    <aura:attribute name="parentId" type="string" />    
+    <aura:attribute name="primaryApp" type="Applicant__c" default="{'sobjectType': 'Applicant__c'}"/>
+    <aura:attribute name="showCredit" type="boolean" default="false"/>    
+    <aura:attribute name="ekycRecord" type="boolean" default="false"/>  
+    <aura:attribute name="wrapperList" type="SALMobilityController.SelectOption"/>
+    <aura:attribute name="selectedValue" type="string"/>
+    <aura:attribute name="isBoxEnabled" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="nameTheme" type="string"/>
+    <aura:attribute name="disablepage" type="Boolean" default="false"/>   
+    <!--<aura:attribute name="uploadedAttachments" type="SalesEligibilityDetailsCtrl.DocumentWrapper[]"/>-->
+    <aura:attribute name="standardChecklist" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="deviationChecklist" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="picklistData" type="LightningDocumentWrapper[]"/>
+    <aura:attribute name="statusList" type="List"/>
+    <aura:attribute name="documentMessage" type="string"/>
+    <aura:attribute name="kyc" type="eKYC__c" default="{'sobjectType':'eKYC__c'}"/>
+    <aura:attribute name="iscommunityUser" type="boolean" default="false" />
+    <aura:handler event="c:InitiateKYCForm" action="{!c.initiateKYCForm}"/>
+    
+    <div class="slds-p-horizontal--small parentclass" id="checkboxDiv">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+            <div class="slds-form-element slds-p-top--x-small slds-p-horizontal--small slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                <div class="slds-form-element__control" style="margin-left:-14px">
+                    <lightning:input type="checkbox" name="sendToCreditName" checked="checked" label="I hereby confirm that these fields are checked and filled as per documents provided by the customer" aura:id="sendToCreditId" class="creditcheckbox"/>
+                </div>
+            </div>
+            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+                <div class="slds-p-around--x-small">
+                    <lightning:button aura:id="sendToCreditButton" variant="brand" label="Send to Credit" onclick="{!c.operationSelectCreditOfficer}"/>
+                </div>
+                <div class="slds-p-around--x-small">
+                    <lightning:button aura:id="generateChecklist" variant="brand" label="Generate Checklist" onclick="{!c.getChecklistDoc}"/>
+                </div>
+            </div>
+            
+            <div class="slds-form-element slds-size--1-of-1 slds-medium-size--6-of-6 slds-large-size--12-of-12">
+                <div class="slds-form-element__control">
+                    <aura:if isTrue="{!v.showCredit}">
+                        <lightning:select aura:id="wrapId" class="optionClass" name="wrapName" label="Credit User List" required="true" messageWhenValueMissing="Please Select Credit User List" value="{!v.selectedValue}">
+                            <option value="">-- None --</option>
+                            <aura:iteration items="{!v.wrapperList}" var="wrap">
+                                <option value="{!wrap.value}" text="{!wrap.label}" selected="{!v.wrapperList.label == wrap}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <aura:if isTrue="{!v.isBoxEnabled}">
+                            <lightning:textarea value="{!v.primaryApp.ASM_Comments__c}" name="commentName" label="ASM Comments" aura:id="commentId"/>
+                        </aura:if>
+                        <div class="slds-p-top--small">
+                            <lightning:button aura:id="saveId" variant="brand" label="Submit to Credit" onclick="{!c.sendToCreditOfficer}"/>
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <strong> Standard Documents </strong> 
+    <div aura:id="uploadedDocs" class="slds-border_top slds-border_left slds-border_right slds-border_bottom" id="uploadedDocs">
+        <div class="slds-grid slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+            <div class="slds-col slds-size--1-of-12 slds-hyphenate"> Sr No </div>
+            <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border_left slds-border_right">Document Type</div>
+            <div class="slds-col slds-size--4-of-12 slds-hyphenate slds-border_left">Documents</div>
+            <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border_left">Mandatory</div>
+            <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border_left">Sales Status</div>
+        </div>
+        <aura:iteration items="{!v.standardChecklist}" var="obj">
+            <div class="slds-grid slds-has-divider--top slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+                <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border_right">
+                    {!obj.rowNum}
+                </div> 
+                <div class="slds-col slds-size--3-of-12 slds-hyphenate" style="height:100%;">{!obj.docName}</div>
+                <div class="slds-col slds-size--4-of-12 slds-hyphenate slds-border--left">
+                    <aura:if isTrue="{!obj.showPicklist}">
+                        <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.selectedDoc}" class="slds-align_absolute-center applycolwidth">
+                            <aura:iteration items="{!obj.documentList}" var="selectedDocument">
+                                <option value="{!selectedDocument}" text="{!selectedDocument}" selected="{!obj.selectedDoc == selectedDocument}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <aura:set attribute="else">
+                            {!obj.singleDoc}
+                        </aura:set>
+                    </aura:if> 
+                </div>
+                <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border--left">
+                    <lightning:input name="docMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" class="ApplyColor"/>
+                </div>
+                <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border--left">
+                    <lightning:select aura:id="salesstatus" name="salesstatus" value="{!obj.docFamObj.Sales_Status__c}" class="slds-align_absolute-center applycolwidth">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.statusList}" var="status">
+                            <option value="{!status}" text="{!status}" selected="{!obj.docFamObj.Sales_Status__c == status}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </div> 
+        </aura:iteration>
+    </div>
+    <br/>
+    
+    <strong>Deviation Documents </strong>
+    <div aura:id="uploadedDocs1" class="slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+        <div class="slds-grid slds-border_top slds-border_left slds-border_right slds-border_bottom">
+            <div class="slds-col slds-size--1-of-12 slds-hyphenate" style="margin-left:0px"> Sr No </div>
+            <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border_left">Deviation Name</div>
+            <div class="slds-col slds-size--4-of-12 slds-hyphenate slds-border_left">Documents</div>
+            <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border_left">Mandatory</div>
+            <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border_left">Sales Status</div>
+        </div>
+        <aura:iteration items="{!v.deviationChecklist}" var="obj">
+            <div class="slds-grid slds-has-divider--top slds-border_top slds-border_left slds-border_right slds-border_bottom" style="text-align:center">
+                <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border_right">
+                    {!obj.rowNum}
+                </div> 
+                <div class="slds-col slds-size--3-of-12 slds-hyphenate">{!obj.deviationName}</div>
+                <div class="slds-col slds-size--4-of-12 slds-hyphenate slds-border--left">
+                    <aura:if isTrue="{!obj.showPicklist}">
+                        <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.selectedDoc}" class="slds-align_absolute-center applycolwidth">
+                            <aura:iteration items="{!obj.documentList}" var="selectedDocument">
+                                <option value="{!selectedDocument}" text="{!selectedDocument}" selected="{!obj.selectedDoc == selectedDocument}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <aura:set attribute="else">
+                            {!obj.singleDoc}
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-col slds-size--1-of-12 slds-hyphenate slds-border--left">
+                    <lightning:input name="devMandatory" type="checkbox" label="" checked="{!obj.docFamObj.Mandatory__c}" disabled="true" />
+                </div>
+                <div class="slds-col slds-size--3-of-12 slds-hyphenate slds-border--left">
+                    <lightning:select aura:id="salesstatus" name="salesstatus" label="" value="{!obj.docFamObj.Sales_Status__c}" class="slds-align_absolute-center applycolwidth">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.statusList}" var="status">
+                            <option value="{!status}" text="{!status}" selected="{!obj.docFamObj.Sales_Status__c == status}"></option>
+                        </aura:iteration>
+                    </lightning:select>  
+                </div>
+            </div> 
+        </aura:iteration>
+    </div>
+    
+    <div class="slds-grid slds-wrap slds-grid--pull-padded slds-p-bottom--large" align="center">
+        <div class="slds-p-around--x-small">
+            <lightning:button aura:id="savedocuments" variant="brand" label="Save Documents" onclick="{!c.savedocumentList}"/>
+        </div>
+    </div>
+    <div aura:id="waiting" class="slds-hide mySpinner slds-modal slds-fade-in-open spinClass slds-spinner_container" >
+        <!-- <lightning:spinner variant="brand" size="large" alternativeText="Wait while we fetch the details"/>  -->
+        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>       
+    </div>
+    
+    <div id="displaysuccessToast" style="display:none; ">
+        <div id="SuccessToastelg" class="slds-notify_container">
+            <div aura:id="alert" class="slds-notify slds-notify--alert slds-theme--success " role="alert" >
+                <lightning:icon iconName="utility:success" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close" iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentSuccessToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="displaysuccessMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div id="displayErrorToast" style="display:none;">
+        <div id="ErrorToastelg" class="slds-notify_container">
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--error " role="alert" >
+                <lightning:icon iconName="utility:error" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeParentErrorToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="displayErrorMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="displayInfoToast" style="display:none;">
+        <div id="InfoToastelg" class="slds-notify_container">
+            <div aura:id ="alert" class="slds-notify slds-notify--alert slds-theme--info " role="alert" >
+                <lightning:icon iconName="utility:info" variant="inverse" size="medium" Class="iconContainer"/>&nbsp;
+                <lightning:buttonIcon class="slds-notify__close " iconName="utility:close" variant="bare-inverse" size="medium" onclick="{!c.closeInfoToastToast}" alternativeText="Close alert." />
+                <div class="slds-notify__content">
+                    <h2 id ="displayInfoMsg"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

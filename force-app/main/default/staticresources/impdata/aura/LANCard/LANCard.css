@@ -1,0 +1,18 @@
+.THIS .slds-button_brand{
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+}
+
+.THIS .cFont{ 
+    font: 400 13.3333px Arial;
+    font-style: normal;
+    font-variant-ligatures: normal;
+    font-variant-caps: normal;
+    font-variant-numeric: normal;
+    font-variant-east-asian: normal;
+    font-weight: 400;
+    font-stretch: normal;
+    font-size: 13.3333px;
+    line-height: normal;
+    font-family: Arial;
+}

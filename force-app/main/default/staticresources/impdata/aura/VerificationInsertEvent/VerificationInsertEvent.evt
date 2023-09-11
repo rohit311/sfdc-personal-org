@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Verification insert event" >
+    <aura:attribute name="verificationId" type="String"/>
+    <aura:attribute name="selectFileErrorFlag" type="Boolean"/>
+</aura:event>

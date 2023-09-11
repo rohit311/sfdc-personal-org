@@ -1,0 +1,11 @@
+<apex:page controller="MapDemo">
+  <apex:repeat value="{!dir}" var="d">
+     <apex:outputText value="{!d}">
+     </apex:outputText>
+         - 
+     <apex:outputText value="{!dir[d]}">
+     </apex:outputText>
+     <br/>
+  </apex:repeat>
+  
+</apex:page>
