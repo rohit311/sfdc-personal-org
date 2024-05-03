@@ -1,7 +1,7 @@
 trigger AccountsTrigger on Account (after delete, after insert, after update, after undelete, before delete, before insert, before update) {
     //fflib_SObjectDomain.triggerHandler(Accounts.class);
 
-    if (Trigger.isAfter && Trigger.isUpdate) {
+    /*if (Trigger.isAfter && Trigger.isUpdate) {
       List<Opportunity> oppsList = [SELECT dom__c, CreatedDate, StageName FROM Opportunity WHERE AccountId IN :Trigger.new];
       List<Opportunity> oppsToUpdate = new List<Opportunity>();
       DateTime daysBefore30 = System.now() - 30;
@@ -33,5 +33,5 @@ trigger AccountsTrigger on Account (after delete, after insert, after update, af
           }
         }
       }
-    }
+    }*/
 }

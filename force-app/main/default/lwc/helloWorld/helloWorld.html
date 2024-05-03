@@ -21,7 +21,7 @@
       <template for:each={columns} for:item="col">
         <div key={col.subHeading} class="slds-size_1-of-2">{col.subHeading}</div>
       </template>
-    </div>-->
+    </div>
 
     <div class="container">
       <lightning-layout multiple-rows="true">
@@ -31,5 +31,23 @@
           </lightning-layout-item>
         </template>
       </lightning-layout>
+  </div>
+  Sample text
+
+  <div style="width: 20%">
+    <lightning-combobox
+            name="progress"
+            label="Status"
+            value=""
+            placeholder="Select Progress"
+            options={options}
+            onchange={handleChange}
+            dropdown-alignment="left"
+            variant="label-hidden"
+    ></lightning-combobox>
+    <p>Selected value is: {value}</p>
+  </div>-->
+  <div class="slds-p-around_small" id="scroll_container" lwc:ref="myDiv" >
+    Sample div
   </div>
 </template>

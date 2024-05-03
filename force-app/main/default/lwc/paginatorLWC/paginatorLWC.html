@@ -1,5 +1,5 @@
 <template>
-  <div class="slds-m-bottom_small">
+  <div class="slds-m-bottom_small" id="scroll_container">
     <lightning-combobox
       name="records-per-page"
       variant="label-hidden"
@@ -38,6 +38,13 @@
     ></lightning-button>
   </div>
 
-  <lightning-datatable key-field="id" data={recordsToDisplay} columns={columns}>
-  </lightning-datatable>
+  <div class="scrollContainer" onscroll={scrollCheck}>
+    <lightning-datatable
+      key-field="id"
+      data={recordsToDisplay}
+      columns={columns}>
+    </lightning-datatable>
+  </div>
+
+
 </template>

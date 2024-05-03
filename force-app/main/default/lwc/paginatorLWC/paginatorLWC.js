@@ -47,4 +47,15 @@ export default class PaginatorLWC extends LightningElement {
       { label: "50", value: "50" }
     ];
   }
+
+  scrollCheck(event){
+    console.log('Current value of the input: ' + event.target.scrollTop);
+    console.log('Current value of the input: ' + event.target.scrollBottom);
+  }
+
+  renderedCallback() {
+    /*let div= this.refs.myDiv;
+    console.log(':div:',div)
+    div.onscroll = this.scrollCheck;*/
+  }
 }

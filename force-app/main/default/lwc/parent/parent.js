@@ -5,6 +5,22 @@ import FIELD_OWNER_NAME from "@salesforce/schema/Account.Owner.Name";
 import FIELD_PHONE from "@salesforce/schema/Account.Phone";
 import FIELD_INDUSTRY from "@salesforce/schema/Account.Industry";
 export default class Parent extends LightningElement {
+
+  constructor(){
+    console.log("In parent - constructor");
+  }
+
+  connectedCallback() {
+    console.log("In parent - connectedCallback");
+  }
+  renderedCallback() {
+    console.log("In parent - renderedCallback");
+  }
+
+  render() {
+    console.log("In parent - render");
+  }
+
       @api recordId;
       @wire(getRecord, { recordId: "$recordId", fields: [FIELD_NAME, FIELD_INDUSTRY], optionalFields: [FIELD_PHONE, FIELD_OWNER_NAME] })
 account;
