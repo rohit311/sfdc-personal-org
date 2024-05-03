@@ -21,7 +21,7 @@ trigger AccountsTrigger on Account (after delete, after insert, after update, af
     else if (Trigger.isBefore && Trigger.isUpdate) {
       Map<Id, Double> amountMap = new Map<Id,Double>();
       List<AggregateResult> results = [SELECT AccountId, SUM(AMOUNT)totalAmount FROM Opportunity WHERE AccountId IN :Trigger.new GROUP BY AccountId];
-
+      System.debug('Sample debug');
       if (results.size() > 0) {
         for (AggregateResult res : results) {
           amountMap.put((Id)res.get('AccountId'), (Double)res.get('totalAmount'));
