@@ -64,7 +64,6 @@ export default class HelloWorld extends NavigationMixin(LightningElement) {
 
       let result = await promise; // wait until the promise resolves (*)
 
-      alert(result); // "done!"
   }
 
   connectedCallback() {

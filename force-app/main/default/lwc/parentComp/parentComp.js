@@ -15,4 +15,12 @@ export default class ParentCmp extends LightningElement {
   renderedCallback() {
     console.log("In parent - renderedCallback");
   }
+
+  handleCompare() {
+    const vtest = "test";
+    const buttons = this.template.querySelector(`lightning-button[data-id="${vtest}"]`);
+  //const buttons = this.template.querySelector('[data-id="'+j.pId+'"]');
+  //const buttons = this.template.querySelector('.'+j.planName);
+  buttons.classList.add('slds-hide');
+  }
 }
