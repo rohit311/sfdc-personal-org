@@ -45,7 +45,9 @@ jobs:
             --definition-file config/project-scratch-def.json \
             --alias CI_Scratch \
             --duration-days 3 \
-            --set-default
+            --set-default \
+            --wait 5
+          sfdx org list --all
 
       - name: Deploy Source to Scratch Org
         run: sfdx source push --target-org CI_Scratch
