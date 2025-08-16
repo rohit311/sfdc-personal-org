@@ -19,10 +19,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Salesforce CLI
-        uses: amtrack/sfdx-action@v1
+        uses: forcedotcom/salesforcedx-action@v2
 
-      - name: Authenticate to Dev Hub / Developer org
-        run: sfdx auth:jwt:grant --clientid ${{ secrets.SF_CLIENT_ID }} --jwtkeyfile assets/server.key --username ${{ secrets.SF_USERNAME }} --instanceurl https://login.salesforce.com
+      - name: Authenticate to Dev Hub
+        env:
+          SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
+        run: |
+          echo "${SF_JWT_KEY}" > assets/server.key
+          sfdx auth:jwt:grant --clientid $SF_CLIENT_ID \
+                             --jwtkeyfile assets/server.key \
+                             --username $SF_USERNAME \
+                             --instanceurl https://login.salesforce.com
 
       - name: Create Scratch Org
         run: |
