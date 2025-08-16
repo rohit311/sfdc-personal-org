@@ -42,9 +42,9 @@ jobs:
         run: |
           # Create scratch org with correct flags
           sfdx org create scratch \
-            --definitionfile config/project-scratch-def.json \
+            --definition-file config/project-scratch-def.json \
             --alias CI_Scratch \
-            --duration 7 \
+            --duration-days 3 \
             --set-default
 
       - name: Deploy Source to Scratch Org
