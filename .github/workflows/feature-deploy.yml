@@ -39,7 +39,7 @@ jobs:
 
       - name: Create Scratch Org
         run: |
-          sfdx force:org:create -f config/project-scratch-def.json -a CI_Scratch -d 7
+          sfdx org create scratch --definitionfile config/project-scratch-def.json --setdefaultusername --devhubusername $SF_USERNAME --durationdays 7 --alias MyScratchOrg
           sfdx force:org:display -u CI_Scratch
 
       - name: Deploy Source to Scratch Org
