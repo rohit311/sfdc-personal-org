@@ -36,6 +36,7 @@ jobs:
                              --jwtkeyfile /tmp/server.key \
                              --username $SF_USERNAME \
                              --instanceurl https://login.salesforce.com
+                             --set-default-dev-hub
 
       - name: Create Scratch Org
         run: |
@@ -43,7 +44,6 @@ jobs:
           sfdx org create scratch \
             --definitionfile config/project-scratch-def.json \
             --alias CI_Scratch \
-            --dev-hub-user $SF_USERNAME \
             --duration 7 \
             --set-default
 
