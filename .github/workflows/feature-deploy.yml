@@ -30,7 +30,8 @@ jobs:
           SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
         run: |
-          echo "${SF_JWT_KEY}" > assets/server.key
+          # Write private key to a temporary file
+          echo "${SF_JWT_KEY}" > /tmp/server.key
           sfdx auth:jwt:grant --clientid $SF_CLIENT_ID \
                              --jwtkeyfile assets/server.key \
                              --username $SF_USERNAME \
