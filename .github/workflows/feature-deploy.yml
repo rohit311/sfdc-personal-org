@@ -43,9 +43,10 @@ jobs:
           sfdx org create scratch \
             --definitionfile config/project-scratch-def.json \
             --alias CI_Scratch \
-            --duration-days 7 \
             --target-dev-hub $SF_USERNAME \
+            --duration-days 7 \
             --set-default
+
           sfdx force:org:display -u CI_Scratch
 
       - name: Deploy Source to Scratch Org
