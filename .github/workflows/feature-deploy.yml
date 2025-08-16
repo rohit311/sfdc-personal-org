@@ -46,7 +46,7 @@ jobs:
             --alias CI_Scratch \
             --duration-days 3 \
             --set-default \
-            --wait 5
+            --wait 3
           sfdx org list --all
 
       - name: Deploy Source to Scratch Org
