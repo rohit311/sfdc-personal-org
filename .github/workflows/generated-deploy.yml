@@ -49,6 +49,9 @@ jobs:
           --set-default \
           --wait 5
 
+    - name: Set Scratch Org as Default
+      run: sf config set default-org=CI_Scratch
+
     - name: Deploy Source to Scratch Org
       run: |
         sf project deploy start \
