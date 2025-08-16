@@ -51,7 +51,7 @@ jobs:
           sfdx org list --all
 
       - name: Deploy Source to Scratch Org
-        run: sfdx source push --target-org CI_Scratch
+        run: sf org source push --target-org CI_Scratch
 
       - name: Run Apex Tests
         run: sfdx apex test run --target-org CI_Scratch --result-format human --wait 10
