@@ -29,6 +29,7 @@ jobs:
           SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
           SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
+          SFDX_LOG_LEVEL: DEBUG
         run: |
           # Write private key to a temporary file
           echo "${SF_JWT_KEY}" > /tmp/server.key
