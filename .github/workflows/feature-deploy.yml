@@ -51,13 +51,13 @@ jobs:
           sfdx org list --all
 
       - name: Deploy Source to Scratch Org
-        run: sf org source push --target-org CI_Scratch
+        run: sf project deploy start --target-org CI_Scratch
 
       - name: Run Apex Tests
-        run: sfdx apex test run --target-org CI_Scratch --result-format human --wait 10
+        run: sf apex test run --target-org CI_Scratch --result-format human --wait 10
 
       - name: Delete Scratch Org
-        run: sfdx org delete --target-org CI_Scratch --noprompt
+        run: sf org delete scratch --target-org CI_Scratch --noprompt
 
 
   
