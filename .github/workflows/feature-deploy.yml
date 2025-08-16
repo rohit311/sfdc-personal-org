@@ -9,3 +9,37 @@ on:
   push:
     branches:
       - feature/*   # Trigger on any feature branch push
+
+jobs:
+  deploy-to-scratch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Salesforce CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+          tar xJf sfdx-linux-amd64.tar.xz
+          ./sfdx/install
+
+      - name: Authenticate to Dev Hub / Developer org
+        run: sfdx auth:jwt:grant --clientid ${{ secrets.SF_CLIENT_ID }} --jwtkeyfile assets/server.key --username ${{ secrets.SF_USERNAME }} --instanceurl https://login.salesforce.com
+
+      - name: Create Scratch Org
+        run: |
+          sfdx force:org:create -f config/project-scratch-def.json -a CI_Scratch -d 7
+          sfdx force:org:display -u CI_Scratch
+
+      - name: Deploy Source to Scratch Org
+        run: sfdx force:source:push -u CI_Scratch
+
+      - name: Run Apex Tests
+        run: sfdx force:apex:test:run -u CI_Scratch --resultformat human --wait 10
+
+      - name: Delete Scratch Org
+        run: sfdx force:org:delete -u CI_Scratch -p
+
+
+  
