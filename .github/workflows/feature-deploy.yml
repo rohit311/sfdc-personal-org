@@ -33,7 +33,7 @@ jobs:
           # Write private key to a temporary file
           echo "${SF_JWT_KEY}" > /tmp/server.key
           sfdx auth:jwt:grant --clientid $SF_CLIENT_ID \
-                             --jwtkeyfile assets/server.key \
+                             --jwtkeyfile /tmp/server.key \
                              --username $SF_USERNAME \
                              --instanceurl https://login.salesforce.com
 
