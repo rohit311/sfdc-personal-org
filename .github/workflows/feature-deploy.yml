@@ -42,12 +42,11 @@ jobs:
           # Create scratch org with correct flags
           sfdx org create scratch \
             --alias CI_Scratch \
+            --target-dev-hub $SF_USERNAME \
             --definitionfile config/project-scratch-def.json \
             --dev-hub-user $SF_USERNAME \
             --duration 7 \
             --set-default
-
-          sfdx force:org:display -u CI_Scratch
 
       - name: Deploy Source to Scratch Org
         run: sfdx source push --target-org CI_Scratch
