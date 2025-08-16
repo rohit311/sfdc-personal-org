@@ -51,6 +51,9 @@ jobs:
             --wait 3 || true
           sfdx org list --all
 
+      - name: Set Scratch Org as default
+        run:  sf config set default-org=CI_Scratch
+
       - name: Deploy Source to Scratch Org
         run: sf project deploy start --target-org CI_Scratch
 
