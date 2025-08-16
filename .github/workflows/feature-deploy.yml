@@ -40,11 +40,10 @@ jobs:
       - name: Create Scratch Org
         run: |
           # Create scratch org with correct flags
-          sfdx org create scratch \
+          sfdx org create scratch CI_Scratch \
             --definitionfile config/project-scratch-def.json \
-            --alias CI_Scratch \
-            --target-dev-hub $SF_USERNAME \
-            --duration-days 7 \
+            --dev-hub-user $SF_USERNAME \
+            --duration 7 \
             --set-default
 
           sfdx force:org:display -u CI_Scratch
