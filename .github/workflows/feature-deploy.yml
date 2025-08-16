@@ -39,21 +39,23 @@ jobs:
 
       - name: Create Scratch Org
         run: |
-          sfdx org create scratch --definitionfile config/project-scratch-def.json \
-                        --setdefaultusername \
-                        --alias MyScratchOrg \
-                        --target-dev-hub $SF_USERNAME \
-                        --durationdays 7
+          # Create scratch org with correct flags
+          sfdx org create scratch \
+            --definitionfile config/project-scratch-def.json \
+            --alias CI_Scratch \
+            --duration-days 7 \
+            --target-dev-hub $SF_USERNAME \
+            --set-default
           sfdx force:org:display -u CI_Scratch
 
       - name: Deploy Source to Scratch Org
-        run: sfdx force:source:push -u CI_Scratch
+        run: sfdx source push --target-org CI_Scratch
 
       - name: Run Apex Tests
-        run: sfdx force:apex:test:run -u CI_Scratch --resultformat human --wait 10
+        run: sfdx apex test run --target-org CI_Scratch --result-format human --wait 10
 
       - name: Delete Scratch Org
-        run: sfdx force:org:delete -u CI_Scratch -p
+        run: sfdx org delete --target-org CI_Scratch --noprompt
 
 
   
