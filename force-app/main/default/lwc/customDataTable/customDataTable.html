@@ -1,0 +1,133 @@
+<template>
+  <template lwc:if={apexCallIsInProgress}>
+    <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+  </template>
+
+  <lightning-card title="Accounts List View" icon-name="standard:account">
+    <div>
+      <lightning-input
+        class="slds-m-bottom_small slds-m-left_x-small search-inp"
+        name="enter-search"
+        label="Search Accounts by name"
+        placeholder="Enter Account name to search"
+        type="search"
+        oncommit={handleCommit}
+      ></lightning-input>
+    </div>
+    <template lwc:if={areRecordsAvailable}>
+      <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead>
+          <tr class="slds-line-height_reset">
+            <template for:each={columns} for:item="col">
+              <th key={col.name} aria-sort="none" class="slds-is-resizable slds-is-sortable slds-cell_action-mode" scope="col">
+                <a class="slds-th__action slds-text-link_reset" href="#" role="button" tabindex="0" data-id={col.id} onclick={handleColumnSort} onmouseover={handleMouseOverForSort} onmouseleave={handleMouseLeaveForSort}>
+                  <span class="slds-assistive-text">Sort by: </span>
+                  <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title={col.name}>{col.name}</span>
+                    <template lwc:if={col.showSortIcon}>
+                      <template lwc:if={col.sortable}>
+                        <span class="slds-icon_container">
+                          <template lwc:if={col.sortOrderIsAsc}>
+                            <lightning-icon icon-name="utility:arrowup" size="xx-small" alternative-text="asc" title="asc"></lightning-icon>
+                          </template>
+                          <template lwc:else>
+                            <lightning-icon icon-name="utility:arrowdown" size="xx-small" alternative-text="desc" title="desc"></lightning-icon>
+                          </template>
+                        </span>
+                      </template>
+                    </template>
+                    <template lwc:else>
+                      <template lwc:if={col.showSortIconOnHover}>
+                        <lightning-icon icon-name="utility:arrowdown" size="x-small" alternative-text="desc" title="desc"></lightning-icon>
+                      </template>
+                    </template>
+                  </div>
+                </a>
+              </th>
+          </template>
+          </tr>
+        </thead>
+        <tbody>
+
+          <template for:each={records} for:item="rec">
+            <tr key={rec.Id}>
+              <th class="slds-cell_action-mode" scope="row">
+                <div class="slds-truncate" title={rec.Name}>
+                  <a href={rec.url} target="_blank" rel="noopener noreferrer" tabindex="0">{rec.Name}</a>
+                </div>
+              </th>
+              <td class="slds-cell_action-mode" role="gridcell">
+                <div class="slds-truncate" title={rec.Industry}>{rec.Industry}</div>
+              </td>
+              <td class="slds-cell_action-mode" role="gridcell">
+                <div
+                  class="slds-truncate"
+                  style="display:flex;justify-content: space-between;min-height: 19.5px;"
+                  data-id={rec.Id}
+                  title={rec.Industry}
+                  onclick={handleInlineEdit}
+                  onmouseover={handleMouseOverForEdit}
+                  onmouseleave={handleMouseLeaveForEdit}>
+                    <template lwc:if={rec.showFieldEdit}>
+                      <lightning-input type="number" data-id={rec.Id} variant="label-hidden" onchange={handleRevenueChange}></lightning-input>
+                    </template>
+                    <template lwc:else>{rec.AnnualRevenue}</template>
+
+                    <template lwc:if={rec.showEditIcon}>
+                      <lightning-icon icon-name="utility:edit" size="x-small" alternative-text="edit" title="edit"></lightning-icon>
+                    </template>
+                  </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      <template lwc:if={showSaveButton}>
+        <div class="slds-m-top_medium slds-m-right_x-small save-btn-cls">
+          <lightning-button
+            variant="brand"
+            label="Save"
+            name="save"
+            onclick={handleInlineSave}
+          ></lightning-button>
+        </div>
+      </template>
+      <div class="slds-m-top_medium">
+        <lightning-button
+          variant="brand"
+          disabled={disableFirstPageBtn}
+          label="First"
+          name="first"
+          onclick={handleNavigation}
+        ></lightning-button>
+        <lightning-button
+          variant="brand"
+          class="slds-m-left_small"
+          disabled={prevoiusBtnIsDisabled}
+          label="Previous"
+          name="previous"
+          onclick={handleNavigation}
+        ></lightning-button>
+        <lightning-button
+          variant="brand"
+          class="slds-m-left_small"
+          disabled={nextBtnIsDisabled}
+          label="Next"
+          name="next"
+          onclick={handleNavigation}
+        ></lightning-button>
+        <lightning-button
+          variant="brand"
+          class="slds-m-left_small"
+          disabled={disableLastPageBtn}
+          label="Last"
+          name="last"
+          onclick={handleNavigation}
+        ></lightning-button>
+      </div>
+    </template>
+    <template lwc:else>
+      No records present !
+    </template>
+ </lightning-card>
+</template>

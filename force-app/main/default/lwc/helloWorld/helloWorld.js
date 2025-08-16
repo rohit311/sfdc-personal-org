@@ -1,7 +1,9 @@
 import { LightningElement, track } from 'lwc';
 import fetchProfiles from '@salesforce/apex/LightningProfileController.fetchProfiles';
+import {NavigationMixin} from 'lightning/navigation';
 
-export default class HelloWorld extends LightningElement {
+
+export default class HelloWorld extends NavigationMixin(LightningElement) {
     @track greeting = 'World';
     MySimpleValue = "The label wraps to a second line, in which case the background on the line that appears below the value to align with the wrapped label is now white";
     MySimpleValue2 = "";
@@ -54,4 +56,43 @@ export default class HelloWorld extends LightningElement {
 
     console.log('Spinner 2 ::' + this.showSpinner); //set to false
   }
+
+  async init() {
+    let promise = new Promise((resolve, reject) => {
+        setTimeout(() => resolve("done!"), 1000)
+      });
+
+      let result = await promise; // wait until the promise resolves (*)
+
+  }
+
+  connectedCallback() {
+    this.init();
+  }
+
+
+  value = 'inProgress';
+
+    get options() {
+        return [
+            { label: 'New', value: 'new' },
+            { label: 'In Progress', value: 'inProgress' },
+            { label: 'Finished', value: 'finished' },
+        ];
+    }
+
+    handleChange(event) {
+        this.value = event.detail.value;
+    }
+
+    scrollCheck(event){
+      console.log('Current value of the input: ' + event.target.scrollTop);
+      console.log('Current value of the input: ' + event.target.scrollBottom);
+    }
+
+    renderedCallback() {
+      var div= this.refs.myDiv;
+      console.log(':div:',div)
+      div.onscroll = this.scrollCheck;
+    }
 }

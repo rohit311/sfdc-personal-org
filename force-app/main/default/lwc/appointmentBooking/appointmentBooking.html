@@ -1,0 +1,8 @@
+<template>
+  <lightning-card  title="Book an Appointment">
+    <lightning-record-form
+    object-api-name={objectName}
+    fields={appointmentFields}
+    onsuccess={handleAppointmentCreated}></lightning-record-form>
+  </lightning-card>
+</template>

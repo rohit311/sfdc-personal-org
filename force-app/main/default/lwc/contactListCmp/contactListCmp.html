@@ -1,0 +1,23 @@
+<template>
+  <lightning-card title="wireListInfoByName">
+    <template lwc:if={displayColumns}>
+      <div class="slds-m-around_medium">
+        <template for:each={displayColumns} for:item="col">
+          <p key={col.fieldApiName}>{col.fieldApiName} : {col.label}</p>
+        </template>
+      </div>
+    </template>
+  </lightning-card>
+
+  <lightning-card title="Files upload">
+    <lightning-file-upload
+        label="Attach receipt"
+        name="fileUploader"
+        accept={acceptedFormats}
+        record-id={recordId}
+        onuploadfinished={handleUploadFinished}
+        multiple
+    >
+    </lightning-file-upload>
+  </lightning-card>
+</template>

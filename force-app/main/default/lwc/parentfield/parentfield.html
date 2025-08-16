@@ -1,0 +1,12 @@
+<template>
+  abc
+  <template for:each={fieldConfigs} for:item="config">
+     <div class="slds-col slds-size_3-of-12 slds-p-vertical_x-small" key={config.Id}>
+         <c-child-field
+             config={config}
+             edit-mode={editMode}
+         >
+         </c-child-field>
+       </div>
+   </template>
+</template>

@@ -1,0 +1,12 @@
+<template>
+  <template if:true={isCheckbox}>
+   <template if:true={editMode}>
+       <label class="slds-form-element__label checkbox-label" for={config.Id}>{config.MasterLabel}</label>
+       <lightning-input class={config.Field_API_Name__c} type="checkbox" checked={config.fieldValue} value={config.fieldValue} data-recid={config.Field_API_Name__c} onchange={handleFieldChange}></lightning-input>
+   </template>
+   <template if:false={editMode}>
+       <label class="slds-form-element__label checkbox-label" for={config.Id}>{config.MasterLabel}</label>
+       <lightning-input type="checkbox" checked={config.fieldValue} value={config.fieldValue} disabled></lightning-input>
+   </template>
+ </template>
+</template>

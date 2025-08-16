@@ -1,0 +1,8 @@
+.search-inp {
+  width: 25vw;
+}
+
+.save-btn-cls {
+  display: flex;
+  justify-content: flex-end;
+}
