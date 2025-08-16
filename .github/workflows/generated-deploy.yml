@@ -1,0 +1,71 @@
+name: Salesforce CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+
+jobs:
+  scratch-org-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SF_USERNAME: ${{ secrets.SF_USERNAME }}       # Dev Hub username
+      SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}     # Connected App Consumer Key
+      SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}         # Base64-encoded private key
+      SFDX_LOG_LEVEL: DEBUG
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Salesforce CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install wget unzip -y
+        wget https://developer.salesforce.com/media/salesforce-cli/sf-linux-x64.tar.xz
+        mkdir sfcli && tar xf sf-linux-x64.tar.xz -C sfcli
+        ./sfcli/sf/install
+
+    - name: Install SF Project Plugin
+      run: sf plugins install @salesforce/plugin-project
+
+    - name: Authenticate Dev Hub via JWT
+      run: |
+        echo "${SF_JWT_KEY}" | base64 --decode > /tmp/server.key
+        sf auth:jwt:grant \
+          --client-id $SF_CLIENT_ID \
+          --jwt-key-file /tmp/server.key \
+          --username $SF_USERNAME \
+          --instance-url https://login.salesforce.com \
+          --set-default-dev-hub
+
+    - name: Create Scratch Org
+      run: |
+        sf org create scratch \
+          --definition-file config/project-scratch-def.json \
+          --alias CI_Scratch \
+          --duration-days 7 \
+          --set-default \
+          --wait 5
+
+    - name: Deploy Source to Scratch Org
+      run: |
+        sf project deploy start \
+          --target-org CI_Scratch \
+          --wait 10 \
+          --verbose
+
+    - name: Run Apex Tests
+      run: |
+        sf apex test run \
+          --target-org CI_Scratch \
+          --result-format human \
+          --wait 10
+
+    - name: Delete Scratch Org
+      if: always()
+      run: |
+        sf org delete scratch \
+          --target-org CI_Scratch \
+          --noprompt
