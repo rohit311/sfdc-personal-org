@@ -35,7 +35,7 @@ jobs:
           sfdx auth:jwt:grant --clientid $SF_CLIENT_ID \
                              --jwtkeyfile /tmp/server.key \
                              --username $SF_USERNAME \
-                             --instanceurl https://login.salesforce.com
+                             --instanceurl https://login.salesforce.com \
                              --set-default-dev-hub
 
       - name: Create Scratch Org
