@@ -1,0 +1,11 @@
+# Workflow for autoamting feature branch CICD
+# Steps in feature branch CICD:
+# 
+
+
+name:  Salesforce feature branch workflow
+
+on:
+  push:
+    branches:
+      - feature/*   # Trigger on any feature branch push
