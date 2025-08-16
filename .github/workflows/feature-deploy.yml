@@ -23,6 +23,7 @@ jobs:
         uses: sfdx-actions/setup-sfdx@v1
         with:
           sfdx-auth-url: ${{ secrets.SF_AUTH_URL }}
+          version: latest
 
       - name: Authenticate to Dev Hub
         env:
