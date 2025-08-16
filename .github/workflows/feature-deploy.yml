@@ -18,13 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Install Salesforce CLI
       - name: Install Salesforce CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install wget unzip -y
-          wget https://developer.salesforce.com/media/salesforce-cli/sf-linux-x64.tar.xz
-          mkdir sfcli && tar xf sf-linux-x64.tar.xz -C sfcli
-          ./sfcli/sf/install
+        uses: sfdx-actions/setup-sfdx@v1
+        with:
+          sfdx-auth-url: ${{ secrets.SF_AUTH_URL }}
 
       - name: Authenticate to Dev Hub
         env:
