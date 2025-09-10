@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>49.0</apiVersion>
+    <interviewLabel>Calculate discounts {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Calculate discounts</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Find_Related_Account</name>
+        <label>Find Related Account</label>
+        <locationX>451</locationX>
+        <locationY>223</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>AccountID</elementReference>
+            </value>
+        </filters>
+        <object>Account</object>
+        <outputAssignments>
+            <assignToReference>AccountRevenue</assignToReference>
+            <field>AnnualRevenue</field>
+        </outputAssignments>
+    </recordLookups>
+    <status>InvalidDraft</status>
+    <variables>
+        <description>Stores the ID number of the account associated with the opportunity</description>
+        <name>AccountID</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Stores the revenue (in US dollars) of the account associated with the opportunity</description>
+        <name>AccountRevenue</name>
+        <dataType>Currency</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <description>Stores the ID number of the opportunity that triggered the flow</description>
+        <name>OpportunityID</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
