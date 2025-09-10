@@ -1,0 +1,16 @@
+<template>
+  <lightning-card title="Real Time Cases">
+    <div class="slds-m-around_medium">
+      <template lwc:if={cases.data}>
+        <lightning-datatable
+          key-field="Id"
+          data={cases.data}
+          columns={columns}
+          hide-checkbox-column="true"
+          show-row-number-column="true">
+        </lightning-datatable>
+      </template>
+    </div>
+
+  </lightning-card>
+</template>
